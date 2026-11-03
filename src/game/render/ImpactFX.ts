@@ -84,6 +84,10 @@ export class ImpactFX {
         blending: THREE.AdditiveBlending,
         depthWrite: false,
         side: THREE.DoubleSide,
+        // P2.2 性能：透明 + 双面材质默认会被 three.js 拆成“先背面、再正面”两遍绘制，
+        // 每遍都改 material.side 并标记 needsUpdate，导致每帧重新计算着色器参数（实测每帧 20 多次）。
+        // 单遍绘制：同一颜色的两层半透明叠加结果相同，外观不变。
+        forceSinglePass: true,
       }),
     );
     this.trails.frustumCulled = false;
@@ -369,8 +373,13 @@ export class ImpactFX {
       if (this.lightLife <= 0) this.light.intensity = 0;
     }
 
-    // 冲击波
-    for (const w of [...this.waves, ...this.softWaves]) {
+    // 冲击波（两组分别遍历，不再每帧拼接新数组）
+    this.updateWaves(this.waves, dt);
+    this.updateWaves(this.softWaves, dt);
+  }
+
+  private updateWaves(list: typeof this.waves, dt: number): void {
+    for (const w of list) {
       if (w.life <= 0) continue;
       if (w.delay > 0) {
         w.delay -= dt;
@@ -385,6 +394,20 @@ export class ImpactFX {
       (w.mesh.material as THREE.MeshBasicMaterial).opacity = (1 - t) * (1 - t) * 0.9 * w.alpha;
       if (w.life <= 0) w.mesh.visible = false;
     }
+  }
+
+  /**
+   * 预热：把所有闪光 / 冲击波临时设为可见并编译一次着色器，
+   * 避免第一次猛撞时才初始化这些材质（真机上会表现为第一下撞击卡一帧）。
+   */
+  prewarm(renderer: THREE.WebGLRenderer, scene: THREE.Scene, camera: THREE.Camera): void {
+    for (const f of this.flashes) f.sprite.visible = true;
+    for (const w of this.waves) w.mesh.visible = true;
+    for (const w of this.softWaves) w.mesh.visible = true;
+    renderer.compile(scene, camera);
+    for (const f of this.flashes) f.sprite.visible = false;
+    for (const w of this.waves) w.mesh.visible = false;
+    for (const w of this.softWaves) w.mesh.visible = false;
   }
 
   clear(): void {

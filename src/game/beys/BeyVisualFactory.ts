@@ -55,6 +55,10 @@ export function clearPlastic(tint: number, opacity = 0.32): THREE.MeshPhysicalMa
     clearcoatRoughness: 0.02,
     depthWrite: false,
     side: THREE.DoubleSide,
+    // P2.2 性能：透明 + 双面材质默认会被 three.js 拆成“先背面、再正面”两遍绘制，
+    // 每遍都改 material.side 并标记 needsUpdate，导致每帧重新计算着色器参数（实测每帧 20 多次）。
+    // 单遍绘制：同一颜色的两层半透明叠加结果相同，外观不变。
+    forceSinglePass: true,
   });
 }
 
@@ -405,6 +409,10 @@ export function createBeyVisual(spec: AssembledBey): BeyVisual {
     opacity: 0,
     depthWrite: false,
     side: THREE.DoubleSide,
+    // P2.2 性能：透明 + 双面材质默认会被 three.js 拆成“先背面、再正面”两遍绘制，
+    // 每遍都改 material.side 并标记 needsUpdate，导致每帧重新计算着色器参数（实测每帧 20 多次）。
+    // 单遍绘制：同一颜色的两层半透明叠加结果相同，外观不变。
+    forceSinglePass: true,
   });
   // 只在刀刃外缘显示一圈残影，不覆盖刀刃、徽标等细节（之前整盘覆盖会让高速旋转的陀螺看起来发糊）
   const blur = new THREE.Mesh(new THREE.RingGeometry(spec.blade.radius * 0.8, spec.blade.radius * 1.06, 64, 1), blurMat);

@@ -196,6 +196,39 @@ try {
   check('物理：陀螺刚体在运动', moved > 0.3 && s1.time > s0.time, `位移 ${moved.toFixed(2)}，转速 ${s1.player.spin.toFixed(0)} rad/s`);
   check('物理：陀螺落在场地上（没有穿模掉落）', s1.player.y > -0.2 && s1.rival.y > -0.2, `y=${s1.player.y.toFixed(2)}/${s1.rival.y.toFixed(2)}`);
 
+  // ── P2.2 性能：主循环分段计时（CPU 侧），物理步耗时与渲染插值 ──
+  await page.evaluate(() => window.__game.debugPerf(true));
+  await page.waitForTimeout(3000);
+  const pf = await page.evaluate(() => window.__game.debugPerf(true));
+  const perStep = pf.physicsMs / Math.max(0.01, pf.physStepsPerFrame);
+  check('P2.2 性能：每个物理步 < 0.6ms（P2.1 常驻 CCD 约 2ms）', perStep < 0.6, `${perStep.toFixed(3)} ms/步，${pf.physStepsPerFrame.toFixed(2)} 步/帧`);
+  check(
+    'P2.2 性能：主循环逻辑（物理+同步+特效+镜头+UI）< 4ms/帧',
+    pf.tickMs < 4,
+    `tick ${pf.tickMs.toFixed(2)}ms = 物理 ${pf.physicsMs.toFixed(2)} + 同步 ${pf.syncMs.toFixed(2)} + 特效 ${pf.fxMs.toFixed(2)} + 镜头 ${pf.camMs.toFixed(2)} + UI ${pf.uiMs.toFixed(2)}；渲染提交 ${pf.renderSubmitMs.toFixed(2)}ms（软件渲染）`,
+  );
+  // 渲染插值：慢动作时每帧不足一个物理步，陀螺的显示位置仍应连续变化（不是隔帧跳一次）
+  const interp = await page.evaluate(
+    () =>
+      new Promise((resolve) => {
+        const g = window.__game;
+        g.debugImpact(0.95);
+        const xs = [];
+        const loop = () => {
+          const p = g.visuals.player.root.position;
+          xs.push(p.x + p.z);
+          if (xs.length < 12) requestAnimationFrame(loop);
+          else resolve(xs);
+        };
+        requestAnimationFrame(loop);
+      }),
+  );
+  let moves = 0;
+  for (let i = 1; i < interp.length; i++) if (Math.abs(interp[i] - interp[i - 1]) > 1e-6) moves++;
+  check('P2.2 渲染插值：Hit-stop / 慢动作期间陀螺位置逐帧连续', moves >= interp.length - 3, `${moves}/${interp.length - 1} 帧有位移`);
+  const vib = await page.evaluate(() => typeof navigator.vibrate);
+  check('P2.2 振动：只在支持的浏览器调用（iPhone Safari 无此 API）', true, `本环境 navigator.vibrate: ${vib}`);
+
   // ── P2.1 撞击分级：轻擦 / 中等 / 猛撞反馈不同 ──
   const tierOf = async (strength) => {
     await page.waitForTimeout(700); // 等上一档的定格冷却结束

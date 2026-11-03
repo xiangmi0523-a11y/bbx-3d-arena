@@ -22,6 +22,14 @@ export class BattleCamera {
   private readonly focus = new THREE.Vector3();
   private readonly desiredPos = new THREE.Vector3();
   private readonly desiredFocus = new THREE.Vector3();
+  // 每帧复用的临时向量（避免每帧分配，减少 GC 抖动）
+  private readonly basePos = new THREE.Vector3();
+  private readonly _center = new THREE.Vector3();
+  private readonly _vel = new THREE.Vector3();
+  private readonly _look = new THREE.Vector3();
+  /** 方向性冲击：沿撞击法线把镜头“推”一下，随后弹回 */
+  private readonly punch = new THREE.Vector3();
+  private readonly punchVel = new THREE.Vector3();
   private orbit = Math.PI / 2;
   private orbitVel = 0;
   private shake = 0;
@@ -36,6 +44,7 @@ export class BattleCamera {
   constructor(aspect: number) {
     this.camera = new THREE.PerspectiveCamera(this.baseFov, aspect, 0.05, 200);
     this.camera.position.set(0, 7, 10);
+    this.basePos.set(0, 7, 10);
     this.camera.lookAt(0, 0, 0);
     this.setAspect(aspect);
   }
@@ -59,9 +68,16 @@ export class BattleCamera {
    * 撞击反馈。shake / fovKick 由撞击等级给出（见 impactTiers）：
    * 取最大值而不是累加，连续轻擦不会叠成剧烈晃动，强撞也不会被弱撞覆盖。
    */
-  impact(shake: number, fovKick = shake * 0.8): void {
+  impact(shake: number, fovKick = shake * 0.8, dir?: { x: number; z: number }): void {
     this.shake = Math.min(1, Math.max(this.shake, shake));
     this.fovKick = Math.min(1, Math.max(this.fovKick, fovKick));
+    if (dir && shake > 0.3) {
+      // 沿撞击方向的冲击：只给中等以上，强度随震动量非线性增长
+      const k = Math.pow(shake, 1.5) * 2.2;
+      this.punchVel.x += dir.x * k;
+      this.punchVel.y -= k * 0.35;
+      this.punchVel.z += dir.z * k;
+    }
   }
 
   update(dt: number, targets: CameraTarget[], snap = false): void {
@@ -81,8 +97,8 @@ export class BattleCamera {
       this.desiredPos.set(Math.cos(a) * d, 5.6 * portrait, Math.sin(a) * d);
     } else {
       // 战斗 / 结算：跟随
-      const center = new THREE.Vector3();
-      const vel = new THREE.Vector3();
+      const center = this._center.set(0, 0, 0);
+      const vel = this._vel.set(0, 0, 0);
       for (const t of targets) {
         center.add(t.position);
         vel.add(t.velocity);
@@ -130,7 +146,7 @@ export class BattleCamera {
 
     const kPos = snap ? 1 : 1 - Math.exp(-dt * (this.mode === 'battle' ? 3.2 : 2.2));
     const kFocus = snap ? 1 : 1 - Math.exp(-dt * 5);
-    this.camera.position.lerp(this.desiredPos, kPos);
+    this.basePos.lerp(this.desiredPos, kPos);
     this.focus.lerp(this.desiredFocus, kFocus);
 
     // 震动
@@ -138,12 +154,17 @@ export class BattleCamera {
     this.fovKick = Math.max(0, this.fovKick - dt * 3.5);
     // 幅度随力度非线性增长（轻擦几乎不动、猛撞明显），衰减快（≤0.25 秒），不影响观察和操作
     const s = Math.pow(this.shake, 1.6) * 0.16;
-    const shakeOffset = new THREE.Vector3(
-      Math.sin(this.time * 71) * s,
-      Math.sin(this.time * 53 + 1) * s,
-      Math.sin(this.time * 61 + 2) * s,
+    // 方向冲击：阻尼弹簧，约 0.2 秒回到原位
+    const pdt = Math.min(dt, 1 / 30);
+    this.punchVel.addScaledVector(this.punch, -220 * pdt).multiplyScalar(Math.exp(-pdt * 16));
+    this.punch.addScaledVector(this.punchVel, pdt);
+    this.camera.position.copy(this.basePos).add(this.punch);
+    this._look.set(
+      this.focus.x + Math.sin(this.time * 71) * s + this.punch.x * 0.5,
+      this.focus.y + Math.sin(this.time * 53 + 1) * s + this.punch.y * 0.5,
+      this.focus.z + Math.sin(this.time * 61 + 2) * s + this.punch.z * 0.5,
     );
-    this.camera.lookAt(this.focus.clone().add(shakeOffset));
+    this.camera.lookAt(this._look);
     // 冲击缩放：FOV 瞬间收紧再回弹
     const fov = this.baseFov - this.fovKick * 6;
     if (Math.abs(this.camera.fov - fov) > 0.01) {

@@ -1,6 +1,6 @@
 import type RAPIER from '@dimforge/rapier3d-compat';
 import { ARENA, floorHeight } from '../arena/arenaSpec';
-import type { PhysicsWorld } from '../physics/PhysicsWorld';
+import { GRAVITY, type PhysicsWorld } from '../physics/PhysicsWorld';
 import type { AssembledBey } from './parts/assemble';
 
 export interface Vec3 {
@@ -38,25 +38,30 @@ export const BEY_TUNING = {
   railSpinCost: 1.2,
   /** 冲刺最高水平速度 */
   railMaxSpeed: 9.5,
-  /** 进动基础角速度（rad/s） */
-  precessBase: 1.6,
+  /**
+   * 进动基础角速度（rad/s）。牵引方向随进动旋转，攻击型的绕圈半径 ≈ 速度 / 进动角速度：
+   * P2.2 诊断发现 1.0 rad/s 时半径约 3 米，正好是外圈轨道，攻击型绕 12 秒都碰不到中央的防御型；
+   * 提高到 3.0 后每圈半径约 1.5–2 米、圈心随碗面漂移，轨迹像花瓣一样反复穿过中央。
+   */
+  precessBase: 3.0,
   /** 进动随转速降低而加快：+precessSpin / ω */
-  precessSpin: 90,
+  precessSpin: 80,
   /** 冲刺方向向场地中心偏转的比例 */
   railInward: 0.8,
-  /** 连续贴轨冲刺多久后被轨道末端甩出（秒，随机区间） */
-  railHoldMin: 0.3,
-  railHoldMax: 0.9,
-  /** 甩出后的横穿速度（m/s，按齿轮咬合度缩放） */
-  railReleaseSpeed: 7.5,
-  /** 甩出方向瞄准中心附近的随机散布半径 */
-  railReleaseSpread: 0.7,
-  /** 甩出后多久内不再咬合轨道（秒），保证能横穿场地 */
-  railCooldown: 1.1,
-  /** 平底/橡胶轴心的“花瓣冲刺”：轴心倾斜咬地，沿进动方向加速（m/s 目标速度、m/s² 加速度） */
-  driveSpeed: 6,
-  driveAccel: 11,
-  driveSpinCost: 0.5,
+  /**
+   * 轴心牵引（花瓣轨迹）：平底 / 橡胶轴心倾斜着咬地，接触面偏离转轴，
+   * 转动的接触面与地面的摩擦把陀螺推向“垂直于倾斜方向”，倾斜方向随进动旋转 → 花瓣形轨迹。
+   * 目标速度与加速度都按齿轮咬合度和剩余转速缩放。
+   */
+  driveSpeed: 8.5,
+  driveAccel: 24,
+  driveSpinCost: 0.35,
+  /**
+   * 轴心滚动 / 滑动阻力：水平减速度 = (rollBase + rollFriction × 轴心摩擦) × g。
+   * 没有这一项时，陀螺在碗边的离心轨道几乎不损失能量，会长时间绕外圈（P2.1 诊断：最长 24 秒没有交锋）。
+   */
+  rollBase: 0.012,
+  rollFriction: 0.06,
 };
 
 /**
@@ -89,10 +94,6 @@ export class BeyPhysics {
   private readonly spinSign: number;
   /** 进动相位（倾斜方向） */
   private precession = Math.random() * Math.PI * 2;
-  /** 连续贴轨时间 / 本次贴轨的甩出阈值 / 甩出后的冷却 */
-  private railTime = 0;
-  private railHold = 1;
-  private railCooldown = 0;
 
   constructor(pw: PhysicsWorld, spec: AssembledBey, launch: LaunchParams) {
     this.pw = pw;
@@ -109,7 +110,11 @@ export class BeyPhysics {
       R.RigidBodyDesc.dynamic()
         .setTranslation(launch.position.x, launch.position.y, launch.position.z)
         .setRotation(rotation)
-        .setCcdEnabled(true)
+        // P2.2 性能：Rapier 的完整 CCD（形状扫掠 + 子步）对着 6900 个三角形的碗面，
+        // 每个物理步要 2.0ms（120Hz 下每帧 4ms，是主循环最大的 CPU 开销），关掉后每步 0.06ms。
+        // 平时最快 11 m/s，每步移动 9cm，小于刀刃半径，不会穿透；
+        // 只有高速下落（发射落地、被撞飞后落回）时临时打开 CCD，防止细针尖穿过碗面。见 preStep。
+        .setCcdEnabled(false)
         .setCanSleep(false)
         .setLinearDamping(0.15)
         .setAngularDamping(0),
@@ -136,14 +141,15 @@ export class BeyPhysics {
       .setTranslation(0, layers.disc.center, 0)
       .setMass(disc.mass)
       .setFriction(0.3)
-      .setRestitution(0.4)
+      // 金属对撞几乎不反弹：恢复系数低，弹开主要来自刀刃咬合冲量
+      .setRestitution(0.1)
       .setActiveEvents(events);
     // Blade
     const bladeDesc = R.ColliderDesc.cylinder(blade.height / 2, blade.radius)
       .setTranslation(0, layers.blade.center, 0)
       .setMass(blade.mass)
       .setFriction(blade.friction)
-      .setRestitution(blade.restitution)
+      .setRestitution(blade.restitution * 0.4)
       .setActiveEvents(events);
 
     for (const d of [ball, shaft, discDesc]) this.colliders.push(world.createCollider(d, this.body));
@@ -171,6 +177,24 @@ export class BeyPhysics {
     };
   }
 
+  /** 渲染用的插值位置与转轴（写入 out，避免每帧分配） */
+  renderState(alpha: number, pos: Vec3, upOut: Vec3): void {
+    const p = this.body.translation();
+    const u = this.up();
+    const a = this.hasPrev ? alpha : 1;
+    const b = 1 - a;
+    pos.x = this.prevPos.x * b + p.x * a;
+    pos.y = this.prevPos.y * b + p.y * a;
+    pos.z = this.prevPos.z * b + p.z * a;
+    upOut.x = this.prevUp.x * b + u.x * a;
+    upOut.y = this.prevUp.y * b + u.y * a;
+    upOut.z = this.prevUp.z * b + u.z * a;
+    const l = Math.hypot(upOut.x, upOut.y, upOut.z) || 1;
+    upOut.x /= l;
+    upOut.y /= l;
+    upOut.z /= l;
+  }
+
   /** 转速比例 0..1 */
   get spinRatio(): number {
     return Math.min(1, this.spin / this.launchSpin);
@@ -184,11 +208,31 @@ export class BeyPhysics {
     return this.colliders.some((c) => c.handle === handle);
   }
 
+  /** 上一个物理步结束时的位置与转轴（渲染插值用） */
+  readonly prevPos: Vec3 = { x: 0, y: 0, z: 0 };
+  readonly prevUp: Vec3 = { x: 0, y: 1, z: 0 };
+  private hasPrev = false;
+  private ccdOn = false;
+
   /** 每个物理步之前调用 */
   preStep(dt: number): void {
     const T = BEY_TUNING;
     const body = this.body;
     const up = this.up();
+    const p0 = body.translation();
+    this.prevPos.x = p0.x;
+    this.prevPos.y = p0.y;
+    this.prevPos.z = p0.z;
+    this.prevUp.x = up.x;
+    this.prevUp.y = up.y;
+    this.prevUp.z = up.z;
+    this.hasPrev = true;
+    const lv = body.linvel();
+    const needCcd = lv.y < -3.5 || lv.x * lv.x + lv.z * lv.z > 100;
+    if (needCcd !== this.ccdOn) {
+      this.ccdOn = needCcd;
+      body.enableCcd(needCcd);
+    }
     const w = body.angvel();
     const spinSigned = w.x * up.x + w.y * up.y + w.z * up.z;
     let px = w.x - up.x * spinSigned;
@@ -209,9 +253,7 @@ export class BeyPhysics {
     // 2) 极限轨道：齿轮轴心咬合轨道冲刺
     this.dashing = false;
     const grip = this.spec.tip.gearGrip;
-    this.railCooldown = Math.max(0, this.railCooldown - dt);
-    if (r < ARENA.railInner - 0.9) this.railTime = Math.max(0, this.railTime - dt);
-    if (grip > 0 && this.railCooldown <= 0 && this.grounded && r > ARENA.railInner && r < ARENA.railOuter + 0.05 && mag > T.minStableSpin) {
+    if (grip > 0 && this.grounded && r > ARENA.railInner && r < ARENA.railOuter + 0.05 && mag > T.minStableSpin) {
       const ex = pos.x / r;
       const ez = pos.z / r;
       // ω × e_r 的水平分量（ω 竖直），冲刺方向为其反方向（齿轮在外圈齿条上滚动）
@@ -232,29 +274,28 @@ export class BeyPhysics {
         this.dashing = true;
       }
     }
-    // Xtreme 冲刺：攻击型（齿轮咬合强）在外圈高速绕行一段后被轨道甩出，横穿场地撞向中央。
-    // 没有这一步时，攻击型会在碗边形成稳定的离心轨道，十几秒都碰不到对手。
-    const outer = r > ARENA.railInner - 1.0 && r < ARENA.railOuter + 0.05;
-    if (grip >= 0.5 && this.grounded && outer && this.railCooldown <= 0 && mag > T.minStableSpin * 2) {
-      this.railTime += dt;
-      if (this.railTime > this.railHold) this.releaseFromRail(pos, grip, mag);
-    }
-
-    // 花瓣冲刺：攻击型轴心（咬合强）倾斜着咬地，沿进动方向不断加速，
-    // 形成在场地里来回穿梭的轨迹，会反复冲上外圈轨道再被甩回中央。
+    // 轴心牵引（花瓣轨迹）：方向垂直于当前倾斜方向，随进动旋转
     if (grip >= 0.5 && this.grounded && !this.dashing && mag > T.minStableSpin * 2) {
       const ratio = Math.min(1, mag / this.launchSpin);
       const v = body.linvel();
-      const target = T.driveSpeed * grip * (0.35 + 0.65 * ratio);
-      const sp = Math.hypot(v.x, v.z);
-      if (sp < target) {
-        const m = body.mass();
-        const a = T.driveAccel * grip * ratio * m * dt;
-        // 已在移动时沿当前方向加速（平底轴心保持冲刺），静止时沿倾斜方向起步
-        const dx = sp > 0.3 ? v.x / sp : Math.cos(this.precession);
-        const dz = sp > 0.3 ? v.z / sp : Math.sin(this.precession);
+      const dx = -Math.sin(this.precession) * this.spinSign;
+      const dz = Math.cos(this.precession) * this.spinSign;
+      const along = v.x * dx + v.z * dz;
+      if (along < T.driveSpeed * grip * (0.35 + 0.65 * ratio)) {
+        const a = T.driveAccel * grip * ratio * body.mass() * dt;
         body.applyImpulse({ x: dx * a, y: 0, z: dz * a }, true);
         decay += T.driveSpinCost * grip;
+      }
+    }
+
+    // 轴心滚动 / 滑动阻力：在碗面上持续损失水平速度，绕圈的陀螺会慢慢滑回中央与对手相遇
+    if (this.grounded) {
+      const v = body.linvel();
+      const sp = Math.hypot(v.x, v.z);
+      if (sp > 1e-3) {
+        const dv = Math.min(sp, (T.rollBase + T.rollFriction * this.spec.tip.friction) * -GRAVITY * dt);
+        const m = body.mass();
+        body.applyImpulse({ x: (-v.x / sp) * dv * m, y: 0, z: (-v.z / sp) * dv * m }, true);
       }
     }
 
@@ -285,25 +326,6 @@ export class BeyPhysics {
       true,
     );
     this.spin = mag;
-  }
-
-  private releaseFromRail(pos: Vec3, grip: number, mag: number): void {
-    const T = BEY_TUNING;
-    this.railTime = 0;
-    this.railHold = T.railHoldMin + Math.random() * (T.railHoldMax - T.railHoldMin);
-    this.railCooldown = T.railCooldown;
-    const a = Math.random() * Math.PI * 2;
-    const rr = Math.random() * T.railReleaseSpread;
-    let dx = Math.cos(a) * rr - pos.x;
-    let dz = Math.sin(a) * rr - pos.z;
-    const len = Math.hypot(dx, dz) || 1;
-    dx /= len;
-    dz /= len;
-    const v = this.body.linvel();
-    const speed = Math.max(Math.hypot(v.x, v.z), T.railReleaseSpeed * grip * Math.min(1, 0.3 + (0.8 * mag) / this.launchSpin));
-    const m = this.body.mass();
-    // 用冲量改变速度（而不是直接设置），仍由刚体引擎积分
-    this.body.applyImpulse({ x: (dx * speed - v.x) * m, y: 0, z: (dz * speed - v.z) * m }, true);
   }
 
   /** 施加水平撞击冲量 */

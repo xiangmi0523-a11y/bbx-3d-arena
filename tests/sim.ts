@@ -31,14 +31,20 @@ export async function simulateBattle(opts: SimOptions) {
   const max = (opts.maxSeconds ?? 130) * 120;
   let steps = 0;
   let maxAbs = 0;
+  const impactLog: { t: number; tier: string; strength: number }[] = [];
+  let seen = 0;
   for (; steps < max && !battle.result; steps++) {
     pw.step();
+    for (; seen < battle.impacts.length; seen++) {
+      const e = battle.impacts[seen];
+      impactLog.push({ t: (steps + 1) / 120, tier: e.tier, strength: e.strength });
+    }
     for (const b of Object.values(battle.beys)) {
       const p = b!.body.translation();
       maxAbs = Math.max(maxAbs, Math.abs(p.x), Math.abs(p.z));
     }
     if (opts.trace && steps % 60 === 0) opts.trace(steps / 120, battle);
   }
-  const out = { battle, steps, maxAbs };
-  return { ...out, dispose: () => pw.dispose() };
+  const out = { battle, steps, maxAbs, impactLog };
+  return { ...out, step: () => pw.step(), dispose: () => pw.dispose() };
 }

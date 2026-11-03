@@ -160,7 +160,9 @@ body {
 .result-finish { font-size: 14px; color: var(--fg); margin: 4px 0 10px; }
 .result-actions { display: flex; gap: 10px; justify-content: center; }
 
-.fps { position: absolute; left: calc(8px + var(--safe-l)); bottom: calc(4px + var(--safe-b)); font-size: 10px; color: var(--muted); pointer-events: none; }
+.fps { position: absolute; left: calc(8px + var(--safe-l)); bottom: calc(4px + var(--safe-b)); font-size: 10px; color: var(--muted); pointer-events: auto; padding: 4px 6px 0 0; }
+.fps.open { color: #fff; }
+.perf-panel { margin-top: 4px; padding: 6px 8px; background: rgba(8, 10, 16, 0.82); border-radius: 6px; line-height: 1.5; max-width: min(560px, 90vw); }
 
 /* 竖屏提示：只在竖屏时显示 */
 .rotate-hint { display: none; }

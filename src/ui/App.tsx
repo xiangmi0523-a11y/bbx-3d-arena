@@ -165,7 +165,40 @@ function Overlay({ engine }: { engine: GameEngine }) {
           </div>
         </div>
       )}
-      {s.fps > 0 && s.phase !== "garage" && <div className="fps">{s.fps} fps · {s.quality}</div>}
+      {s.fps > 0 && s.phase !== "garage" && <PerfBadge engine={engine} fps={s.fps} quality={s.quality} />}
+    </div>
+  );
+}
+
+/**
+ * 帧率角标：点一下展开性能面板（真机实测用）。
+ * 面板每秒刷新：帧间隔中位数 / P95 / 最长帧、主循环各段 CPU 耗时、绘制调用。
+ * GPU 耗时浏览器拿不到，只能看“帧间隔明显大于 CPU 合计”来判断瓶颈在 GPU。
+ */
+function PerfBadge({ engine, fps, quality }: { engine: GameEngine; fps: number; quality: string }) {
+  const [open, setOpen] = useState(false);
+  const [p, setP] = useState<ReturnType<GameEngine['debugPerf']> | null>(null);
+  useEffect(() => {
+    if (!open) return;
+    engine.debugPerf(true);
+    const id = setInterval(() => setP(engine.debugPerf(true)), 1000);
+    return () => clearInterval(id);
+  }, [open, engine]);
+  const f = (v: number) => v.toFixed(2);
+  return (
+    <div className={`fps ${open ? 'open' : ''}`} data-testid="perf-badge" onClick={() => setOpen(!open)}>
+      {fps} fps · {quality}
+      {open && p && (
+        <div className="perf-panel">
+          <div>帧间隔 中位 {f(p.intervalP50)} · P95 {f(p.intervalP95)} · P99 {f(p.intervalP99)} · 最长逻辑+提交 {f(p.maxFrameMs)} ms</div>
+          <div>
+            CPU/帧：物理 {f(p.physicsMs)}（{f(p.physStepsPerFrame)} 步）· 同步 {f(p.syncMs)} · 特效 {f(p.fxMs)} · 镜头 {f(p.camMs)} · UI {f(p.uiMs)} · 渲染提交 {f(p.renderSubmitMs)} ms
+          </div>
+          <div>
+            绘制调用 {p.calls} · 三角形 {(p.triangles / 1000).toFixed(0)}k{p.heapMB > 0 ? ` · JS 堆 ${p.heapMB.toFixed(1)} MB` : ''}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
