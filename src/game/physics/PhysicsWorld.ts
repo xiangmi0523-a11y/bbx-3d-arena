@@ -70,6 +70,15 @@ export class PhysicsWorld {
     this.afterStep?.(PHYSICS_DT);
   }
 
+  /**
+   * 渲染插值系数 0..1：距离下一个物理步还剩多少。
+   * 物理固定 120Hz，屏幕帧间隔有抖动、慢动作时每帧只有 0/1 步，
+   * 直接显示最新物理状态会一顿一顿（看起来像掉帧），按这个系数在上一步与当前步之间插值。
+   */
+  get alpha(): number {
+    return Math.min(1, this.accumulator / PHYSICS_DT);
+  }
+
   resetAccumulator(): void {
     this.accumulator = 0;
   }

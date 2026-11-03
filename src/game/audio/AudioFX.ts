@@ -74,7 +74,9 @@ export class AudioFX {
 
     // 1) 金属振动分音（非谐波比例）：轻擦高而短（“叮”），猛撞低而长（“铛——”）
     const base =
-      (tier === 'heavy' ? 560 : tier === 'medium' ? 820 : 1350) * (1 + (Math.random() - 0.5) * 0.12);
+      // P2.2：力度直接来自真实冲量，同一档内越重音高越低（猛撞 560 → 400Hz，听起来更沉）
+      (tier === 'heavy' ? 560 - 160 * (s - 0.65) / 0.35 : tier === 'medium' ? 860 - 120 * (s - 0.3) / 0.35 : 1400 - 200 * s / 0.3) *
+      (1 + (Math.random() - 0.5) * 0.12);
     const ratios = [1, 1.63, 2.76, 3.91, 5.4];
     const decay = tier === 'heavy' ? 0.75 : tier === 'medium' ? 0.3 : 0.09;
     ratios.forEach((ratio, i) => {

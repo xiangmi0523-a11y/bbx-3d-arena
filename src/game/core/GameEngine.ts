@@ -73,6 +73,8 @@ const SIDES: Side[] = ['player', 'rival'];
  */
 const _Y = new THREE.Vector3(0, 1, 0);
 const _up = new THREE.Vector3();
+const _rp = { x: 0, y: 0, z: 0 };
+const _ru = { x: 0, y: 1, z: 0 };
 const _tilt = new THREE.Quaternion();
 const _yaw = new THREE.Quaternion();
 
@@ -157,6 +159,12 @@ export class GameEngine {
       this.resetRound();
       this.setPhase('title');
       this.cam.setMode('overview', true);
+      // 预先编译撞击特效的着色器，第一次猛撞不再卡一帧
+      try {
+        this.fx.prewarm(this.renderer, this.scene, this.cam.camera);
+      } catch (err) {
+        console.warn('特效预热失败', err);
+      }
       this.last = performance.now();
       this.raf = requestAnimationFrame(this.frame);
       document.addEventListener('visibilitychange', this.onVisibility);
@@ -404,7 +412,7 @@ export class GameEngine {
   /** 调试：手动触发一次撞击特效（不影响物理） */
   debugImpact(strength: number): void {
     this.playImpact(
-      { strength, tier: impactTier(strength), approach: 0, x: 0, y: 0.5, z: 0, nx: 1, nz: 0 },
+      { strength, tier: impactTier(strength), approach: 0, impulse: 0, dvRel: strength * 12, x: 0, y: 0.5, z: 0, nx: 1, nz: 0 },
       this.phase === 'battle',
     );
   }
@@ -418,9 +426,11 @@ export class GameEngine {
   private playImpact(imp: ImpactEvent, allowTimeFx: boolean): void {
     const fb = impactFeedback(imp.strength);
     this.fx.impact(imp.x, imp.y, imp.z, imp.strength, { x: imp.nx, z: imp.nz }, floorHeight(Math.hypot(imp.x, imp.z)));
-    this.cam.impact(fb.shake, fb.fovKick);
+    this.cam.impact(fb.shake, fb.fovKick, { x: imp.nx, z: imp.nz });
     this.audio.clash(imp.strength);
-    if (fb.vibrate > 0) navigator.vibrate?.(fb.vibrate);
+    // 振动：iPhone Safari 没有实现 Vibration API（navigator.vibrate 不存在），这里只在 Android 浏览器生效。
+    // iPhone 上的触感反馈要等 Capacitor 打包后用原生 Haptics 插件实现。
+    if (fb.vibrate > 0 && typeof navigator.vibrate === 'function') navigator.vibrate(fb.vibrate);
     let hitstop = 0;
     let slowmo = 0;
     if (allowTimeFx) {
@@ -690,9 +700,61 @@ export class GameEngine {
       this.renderer.render(this.garage.scene, this.garage.camera);
       return;
     }
+    const t0 = performance.now();
     this.tick(dt);
+    const t1 = performance.now();
     this.renderer.render(this.scene, this.cam.camera);
+    const t2 = performance.now();
+    const pf = this.perf;
+    pf.frames++;
+    pf.tick += t1 - t0;
+    pf.render += t2 - t1;
+    pf.maxFrame = Math.max(pf.maxFrame, t2 - t0);
+    pf.interval.push(elapsed);
+    if (pf.interval.length > 600) pf.interval.shift();
   };
+
+  /**
+   * 主循环分段计时（CPU 侧，毫秒累计）：物理 / 同步 / 特效 / 镜头 / UI / 渲染提交。
+   * 渲染一栏只是 CPU 提交 WebGL 指令的时间，GPU 实际耗时浏览器拿不到（iOS 也不支持计时查询）。
+   */
+  private readonly perf = {
+    frames: 0, tick: 0, render: 0, physics: 0, physSteps: 0, sync: 0, fx: 0, cam: 0, ui: 0, maxFrame: 0,
+    interval: [] as number[],
+  };
+
+  /** 调试：读取并清零分段计时 */
+  debugPerf(reset = true) {
+    const p = this.perf;
+    const n = Math.max(1, p.frames);
+    const iv = [...p.interval].sort((a, b) => a - b);
+    const q = (k: number) => (iv.length ? iv[Math.min(iv.length - 1, Math.floor(iv.length * k))] : 0);
+    const out = {
+      frames: p.frames,
+      tickMs: p.tick / n,
+      physicsMs: p.physics / n,
+      physStepsPerFrame: p.physSteps / n,
+      syncMs: p.sync / n,
+      fxMs: p.fx / n,
+      camMs: p.cam / n,
+      uiMs: p.ui / n,
+      renderSubmitMs: p.render / n,
+      maxFrameMs: p.maxFrame,
+      intervalP50: q(0.5),
+      intervalP95: q(0.95),
+      intervalP99: q(0.99),
+      calls: this.renderer.info.render.calls,
+      triangles: this.renderer.info.render.triangles,
+      geometries: this.renderer.info.memory.geometries,
+      textures: this.renderer.info.memory.textures,
+      heapMB: ((performance as unknown as { memory?: { usedJSHeapSize: number } }).memory?.usedJSHeapSize ?? 0) / 1048576,
+    };
+    if (reset) {
+      p.frames = p.tick = p.render = p.physics = p.physSteps = p.sync = p.fx = p.cam = p.ui = p.maxFrame = 0;
+      p.interval.length = 0;
+    }
+    return out;
+  }
 
   /** 强撞击触发短暂慢动作：0.12 秒内降到 0.22 倍速，保持约 0.2 秒，再平滑恢复 */
   private updateTimeScale(dt: number): void {
@@ -731,10 +793,14 @@ export class GameEngine {
     }
 
     if (phase === 'battle' || phase === 'result') {
-      this.pw!.advance(dt);
+      const a0 = performance.now();
+      this.perf.physSteps += this.pw!.advance(dt);
+      const a1 = performance.now();
       for (const imp of battle.impacts) this.playImpact(imp, phase === 'battle');
       battle.impacts.length = 0;
       this.syncBeys();
+      this.perf.physics += a1 - a0;
+      this.perf.sync += performance.now() - a1;
       if (battle.result && phase === 'battle') this.onResult(battle.result);
       const a = battle.beys.player;
       const b = battle.beys.rival;
@@ -743,18 +809,27 @@ export class GameEngine {
 
     if (phase !== 'paused') {
       // 特效跟随慢动作（火花也变慢），镜头用真实时间，保证操作手感
+      const f0 = performance.now();
       this.fx.update(dt, this.cam.camera);
-      const targets = SIDES.map((s) => battle.beys[s])
-        .filter((b): b is NonNullable<typeof b> => !!b)
-        .filter((b) => phase !== 'result' || b === battle.beys[battle.result!.winner])
-        .map((b) => {
-          const p = b.body.translation();
-          const v = b.body.linvel();
-          return { position: new THREE.Vector3(p.x, p.y, p.z), velocity: new THREE.Vector3(v.x, v.y, v.z) };
-        });
+      const f1 = performance.now();
+      this.perf.fx += f1 - f0;
+      // 复用镜头目标对象（P2.1 每帧新建数组和 4 个 Vector3）
+      const targets = this.camTargets;
+      targets.length = 0;
+      for (const s of SIDES) {
+        const b = battle.beys[s];
+        if (!b || (phase === 'result' && b !== battle.beys[battle.result!.winner])) continue;
+        const t = this.camTargetPool[targets.length];
+        t.position.copy(this.visuals[s]?.root.position ?? (b.body.translation() as THREE.Vector3Like));
+        const v = b.body.linvel();
+        t.velocity.set(v.x, v.y, v.z);
+        targets.push(t);
+      }
       this.cam.update(realDt, targets);
+      this.perf.cam += performance.now() - f1;
     }
 
+    const u0 = performance.now();
     this.uiTimer += realDt;
     if (this.uiTimer > 1 / 15) {
       this.uiTimer = 0;
@@ -770,9 +845,12 @@ export class GameEngine {
         this.store.set({ fps: this.fpsAcc.fps });
       }
     }
+    this.perf.ui += performance.now() - u0;
   }
 
   private frameDt = 1 / 60;
+  private readonly camTargets: { position: THREE.Vector3; velocity: THREE.Vector3 }[] = [];
+  private readonly camTargetPool = [0, 1].map(() => ({ position: new THREE.Vector3(), velocity: new THREE.Vector3() }));
 
   private syncBeys(): void {
     const battle = this.battle!;
@@ -780,13 +858,13 @@ export class GameEngine {
       const b = battle.beys[side];
       const v = this.visuals[side];
       if (!b || !v) continue;
-      const p = b.body.translation();
-      v.root.position.set(p.x, p.y, p.z);
+      // 在上一个与当前物理步之间插值，慢动作 / 帧间隔抖动时移动依然连续
+      b.renderState(this.pw!.alpha, _rp, _ru);
+      v.root.position.set(_rp.x, _rp.y, _rp.z);
       // 倾斜姿态完全来自刚体；绕自身轴的转角用“视觉转速”：
       // 物理转速 100+ rad/s 在 60fps 下每帧转 2 弧度以上，三叶刀刃会频闪、糊成一片。
       // 视觉转速封顶在每帧约 0.4 弧度，能看清刀刃细节，同时仍能看出转得快慢。
-      const up = b.up();
-      _up.set(up.x, up.y, up.z);
+      _up.set(_ru.x, _ru.y, _ru.z);
       _tilt.setFromUnitVectors(_Y, _up);
       const visualSpin = Math.min(b.spin, 10 + b.spin * 0.12);
       this.visualYaw[side] += b.spinDirection * visualSpin * this.frameDt * this.timeScale;

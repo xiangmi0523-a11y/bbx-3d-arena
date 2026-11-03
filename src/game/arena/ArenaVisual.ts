@@ -58,6 +58,9 @@ export function createArenaVisual(spec: ArenaSpec = ARENA): THREE.Group {
   }
   teeth.count = n;
   teeth.castShadow = true;
+  // P2.2 性能：实例化网格与普通网格共用 three.js 默认的阴影深度材质时，每帧要来回切换着色器参数两次；
+  // 单独给齿条一个深度材质（参数相同，阴影外观不变）
+  teeth.customDepthMaterial = new THREE.MeshDepthMaterial({ depthPacking: THREE.RGBADepthPacking });
   group.add(teeth);
 
   // 轨道内沿发光线
@@ -77,6 +80,10 @@ export function createArenaVisual(spec: ArenaSpec = ARENA): THREE.Group {
     roughness: 0.1,
     metalness: 0,
     side: THREE.DoubleSide,
+    // P2.2 性能：透明 + 双面材质默认会被 three.js 拆成“先背面、再正面”两遍绘制，
+    // 每遍都改 material.side 并标记 needsUpdate，导致每帧重新计算着色器参数（实测每帧 20 多次）。
+    // 单遍绘制：同一颜色的两层半透明叠加结果相同，外观不变。
+    forceSinglePass: true,
     depthWrite: false,
   });
   const rimMat = new THREE.MeshPhysicalMaterial({ color: 0x232a3a, metalness: 0.6, roughness: 0.3, clearcoat: 0.6 });
