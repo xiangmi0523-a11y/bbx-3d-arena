@@ -4,11 +4,14 @@ import { PLAYER_LOADOUT, RIVAL_LOADOUT } from '../src/game/beys/parts/catalog';
 import { assembleBey } from '../src/game/beys/parts/assemble';
 import { loadRapier, PhysicsWorld } from '../src/game/physics/PhysicsWorld';
 import type { LaunchCommand } from '../src/game/launcher/PullStringGesture';
+import type { BeyLoadout } from '../src/game/beys/parts/types';
 
 export interface SimOptions {
   player: LaunchCommand;
   rival: LaunchCommand;
   maxSeconds?: number;
+  playerLoadout?: BeyLoadout;
+  rivalLoadout?: BeyLoadout;
   trace?: (t: number, b: BattleSystem) => void;
 }
 
@@ -17,7 +20,10 @@ export async function simulateBattle(opts: SimOptions) {
   const R = await loadRapier();
   const pw = new PhysicsWorld(R);
   createArenaPhysics(pw);
-  const battle = new BattleSystem(pw, { player: assembleBey(PLAYER_LOADOUT), rival: assembleBey(RIVAL_LOADOUT) });
+  const battle = new BattleSystem(pw, {
+    player: assembleBey(opts.playerLoadout ?? PLAYER_LOADOUT),
+    rival: assembleBey(opts.rivalLoadout ?? RIVAL_LOADOUT),
+  });
   pw.beforeStep = (dt) => battle.preStep(dt);
   pw.afterStep = (dt) => battle.postStep(dt);
   battle.launch('player', opts.player);

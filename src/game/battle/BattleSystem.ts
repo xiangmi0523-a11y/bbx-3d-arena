@@ -29,6 +29,9 @@ export interface ImpactEvent {
   x: number;
   y: number;
   z: number;
+  /** 撞击法线（水平，从 player 指向 rival） */
+  nx: number;
+  nz: number;
 }
 
 export const SMASH_TUNING = {
@@ -37,11 +40,13 @@ export const SMASH_TUNING = {
   /** 接触面相对线速度（来自转速）的贡献 */
   surface: 0.03,
   /** 总体倍率 */
-  scale: 1.8,
+  scale: 1.5,
   /** 切向（转速带来的侧推）比例 */
   tangential: 0.45,
   /** 每次撞击的转速损失系数 */
-  spinLoss: 1.6,
+  spinLoss: 2.6,
+  /** 撞击后的晃动（倾斜角速度，rad/s 每单位冲量） */
+  wobble: 1.1,
   cooldown: 0.12,
 };
 
@@ -135,13 +140,20 @@ export class BattleSystem {
     a.applyImpulse((-nx - tx * T.tangential) * toA * ma, 0.15 * toA * ma, (-nz - tz * T.tangential) * toA * ma);
     b.loseSpin(toB * T.spinLoss);
     a.loseSpin(toA * T.spinLoss);
+    // 撞击让陀螺短暂晃动（绕水平轴的角速度），自稳系统随后把它扶正
+    b.wobble(nz * toB * T.wobble, -nx * toB * T.wobble);
+    a.wobble(-nz * toA * T.wobble, nx * toA * T.wobble);
 
     this.hits++;
+    // 接触点：沿法线从 A 的中心向外 A 的半径处，高度取刃的中心
+    const contactY = (pa.y + pb.y) / 2 + (a.spec.layers.blade.center + b.spec.layers.blade.center) / 2;
     this.impacts.push({
-      strength: Math.min(1, base / 6),
-      x: (pa.x + pb.x) / 2,
-      y: (pa.y + pb.y) / 2 + 0.3,
-      z: (pa.z + pb.z) / 2,
+      strength: Math.min(1, base / 7),
+      x: pa.x + nx * Math.min(ra, len / 2),
+      y: contactY,
+      z: pa.z + nz * Math.min(ra, len / 2),
+      nx,
+      nz,
     });
   }
 

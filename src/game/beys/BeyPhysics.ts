@@ -35,11 +35,15 @@ export const BEY_TUNING = {
   /** 极限轨道冲刺加速度 */
   railDash: 16,
   /** 极限轨道冲刺的转速消耗 */
-  railSpinCost: 2.5,
+  railSpinCost: 1.2,
   /** 冲刺最高水平速度 */
   railMaxSpeed: 9.5,
+  /** 进动基础角速度（rad/s） */
+  precessBase: 1.6,
+  /** 进动随转速降低而加快：+precessSpin / ω */
+  precessSpin: 90,
   /** 冲刺方向向场地中心偏转的比例 */
-  railInward: 0.6,
+  railInward: 0.8,
 };
 
 /**
@@ -70,6 +74,8 @@ export class BeyPhysics {
   grounded = false;
   private readonly pw: PhysicsWorld;
   private readonly spinSign: number;
+  /** 进动相位（倾斜方向） */
+  private precession = Math.random() * Math.PI * 2;
 
   constructor(pw: PhysicsWorld, spec: AssembledBey, launch: LaunchParams) {
     this.pw = pw;
@@ -88,7 +94,7 @@ export class BeyPhysics {
         .setRotation(rotation)
         .setCcdEnabled(true)
         .setCanSleep(false)
-        .setLinearDamping(0.08)
+        .setLinearDamping(0.15)
         .setAngularDamping(0),
     );
 
@@ -100,6 +106,8 @@ export class BeyPhysics {
       .setTranslation(0, tip.contactRadius, 0)
       .setMass(tip.mass * 0.6)
       .setFriction(tip.friction)
+      // 摩擦相乘：低摩擦轴心在斜面上打滑、被重力拉回中心；高摩擦轴心抓地、绕场移动
+      .setFrictionCombineRule(R.CoefficientCombineRule.Multiply)
       .setRestitution(0.1);
     const shaftH = Math.max(0.02, layers.tip.top - tip.contactRadius);
     const shaft = R.ColliderDesc.cylinder(shaftH / 2, 0.11)
@@ -211,9 +219,17 @@ export class BeyPhysics {
     // 3) 陀螺仪自稳：转得越快越能保持直立
     const s = Math.max(0, Math.min(1, (mag - T.minStableSpin) / (this.launchSpin * 0.3)));
     if (s > 0) {
-      // 倾斜轴 = up × worldUp
-      const ax = -up.z;
-      const az = up.x;
+      // 目标姿态：轴心类型决定的“自然倾角”，倾斜方向以进动角速度绕竖直轴旋转。
+      // 倾斜的轴心与地面的接触点偏离转轴，摩擦力方向随进动旋转，
+      // 由 Rapier 的摩擦自然产生花瓣形移动轨迹（攻击型轴心倾角大、移动激烈）。
+      this.precession += dt * this.spinSign * -(T.precessBase + T.precessSpin / Math.max(20, mag));
+      const lean = this.spec.tip.drift * Math.min(1, mag / (this.launchSpin * 0.5));
+      const tx = Math.sin(lean) * Math.cos(this.precession);
+      const tz = Math.sin(lean) * Math.sin(this.precession);
+      const ty = Math.cos(lean);
+      // 回正轴 = up × target
+      const ax = up.y * tz - up.z * ty;
+      const az = up.x * ty - up.y * tx;
       px += (T.uprightStiffness * s * ax - T.uprightDamping * s * px) * dt;
       pz += (T.uprightStiffness * s * az - T.uprightDamping * s * pz) * dt;
       py -= T.uprightDamping * s * py * dt;
@@ -230,6 +246,16 @@ export class BeyPhysics {
   /** 施加水平撞击冲量 */
   applyImpulse(x: number, y: number, z: number): void {
     this.body.applyImpulse({ x, y, z }, true);
+  }
+
+  /** 撞击后的晃动：给一个绕水平轴的角速度 */
+  wobble(wx: number, wz: number): void {
+    const w = this.body.angvel();
+    const max = 6;
+    this.body.setAngvel(
+      { x: w.x + Math.max(-max, Math.min(max, wx)), y: w.y, z: w.z + Math.max(-max, Math.min(max, wz)) },
+      true,
+    );
   }
 
   /** 撞击造成的转速损失 */

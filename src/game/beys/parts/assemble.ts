@@ -61,3 +61,29 @@ export function assembleBey(loadout: BeyLoadout): AssembledBey {
 export function swapPart(loadout: BeyLoadout, kind: keyof BeyLoadout, id: string): BeyLoadout {
   return { ...loadout, [kind]: id };
 }
+
+export interface BeyStats {
+  attack: number;
+  defense: number;
+  stamina: number;
+  mobility: number;
+  weight: number;
+  burst: number;
+}
+
+/** 由部件推算的展示用属性（0..1），只给 UI 用，不参与物理 */
+export function computeStats(b: AssembledBey): BeyStats {
+  const c = (v: number) => Math.max(0.04, Math.min(1, v));
+  return {
+    attack: c(b.blade.attack * 0.8 + b.tip.friction * 0.25 + (b.disc.visual.sharpness ?? 0) * 0.1),
+    defense: c(b.blade.defense * 0.85 + (b.totalMass - 4) * 0.12),
+    stamina: c(1 - (b.tip.spinDecay - 0.8) / 2.4 + (b.totalMass - 4.4) * 0.1),
+    mobility: c(b.tip.friction * 0.6 + b.tip.gearGrip * 0.35 + b.tip.drift),
+    weight: c((b.totalMass - 3.8) / 1.8),
+    burst: c(b.disc.burstResistance),
+  };
+}
+
+export function partMass(b: AssembledBey): string {
+  return `${(b.totalMass * 8.5).toFixed(1)} g`;
+}
