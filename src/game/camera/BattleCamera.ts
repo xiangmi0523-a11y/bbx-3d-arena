@@ -55,9 +55,13 @@ export class BattleCamera {
   }
 
   /** 撞击反馈，strength 0..1 */
-  impact(strength: number): void {
-    this.shake = Math.min(1, this.shake + strength * 0.9);
-    this.fovKick = Math.min(1, this.fovKick + strength * 0.7);
+  /**
+   * 撞击反馈。shake / fovKick 由撞击等级给出（见 impactTiers）：
+   * 取最大值而不是累加，连续轻擦不会叠成剧烈晃动，强撞也不会被弱撞覆盖。
+   */
+  impact(shake: number, fovKick = shake * 0.8): void {
+    this.shake = Math.min(1, Math.max(this.shake, shake));
+    this.fovKick = Math.min(1, Math.max(this.fovKick, fovKick));
   }
 
   update(dt: number, targets: CameraTarget[], snap = false): void {
@@ -130,10 +134,10 @@ export class BattleCamera {
     this.focus.lerp(this.desiredFocus, kFocus);
 
     // 震动
-    this.shake = Math.max(0, this.shake - dt * 4.5);
+    this.shake = Math.max(0, this.shake - dt * 4);
     this.fovKick = Math.max(0, this.fovKick - dt * 3.5);
-    // 震动幅度小、衰减快（约 0.2 秒），不影响观察和操作
-    const s = this.shake * this.shake * 0.1;
+    // 幅度随力度非线性增长（轻擦几乎不动、猛撞明显），衰减快（≤0.25 秒），不影响观察和操作
+    const s = Math.pow(this.shake, 1.6) * 0.16;
     const shakeOffset = new THREE.Vector3(
       Math.sin(this.time * 71) * s,
       Math.sin(this.time * 53 + 1) * s,
@@ -141,7 +145,7 @@ export class BattleCamera {
     );
     this.camera.lookAt(this.focus.clone().add(shakeOffset));
     // 冲击缩放：FOV 瞬间收紧再回弹
-    const fov = this.baseFov - this.fovKick * 5;
+    const fov = this.baseFov - this.fovKick * 6;
     if (Math.abs(this.camera.fov - fov) > 0.01) {
       this.camera.fov = fov;
       this.camera.updateProjectionMatrix();

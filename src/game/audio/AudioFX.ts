@@ -1,3 +1,4 @@
+import { impactTier } from '../battle/impactTiers';
 /**
  * 实时合成音效（Web Audio，无外部音频文件，离线可用）：
  *  - 金属碰撞：若干非谐波正弦分音（模拟金属板振动）+ 带通噪声瞬态；
@@ -11,6 +12,18 @@ export class AudioFX {
   private master: GainNode | null = null;
   private noiseBuf: AudioBuffer | null = null;
   private lastHit = 0;
+  private lastStrength = 0;
+  private voices = 0;
+  /** 软削波曲线：给低频重击加谐波 */
+  private readonly softClip: Float32Array<ArrayBuffer> = (() => {
+    const n = 1024;
+    const c = new Float32Array(n);
+    for (let i = 0; i < n; i++) {
+      const x = (i / (n - 1)) * 2 - 1;
+      c[i] = Math.tanh(x * 2.6) / Math.tanh(2.6);
+    }
+    return c;
+  })();
   private hum: { osc: OscillatorNode; osc2: OscillatorNode; gain: GainNode } | null = null;
   muted = false;
 
@@ -43,24 +56,34 @@ export class AudioFX {
     if (!this.ready) return;
     const ctx = this.ctx!;
     const now = ctx.currentTime;
-    // 同一帧多次碰撞合并
-    if (now - this.lastHit < 0.03) return;
+    const s = Math.max(0.02, Math.min(1, strength));
+    const tier = impactTier(s);
+    // 同一时刻（≤15ms）的多次接触合并成一次；但更强的撞击总能打断弱的
+    if (now - this.lastHit < 0.015 && s <= this.lastStrength) return;
     this.lastHit = now;
-    const s = Math.max(0.05, Math.min(1, strength));
+    this.lastStrength = s;
+    // 同时发声的撞击数有上限，避免连撞时爆音 / 卡顿
+    if (this.voices >= 6) return;
+    this.voices++;
+    const life = tier === 'heavy' ? 0.9 : tier === 'medium' ? 0.45 : 0.15;
+    setTimeout(() => this.voices--, life * 1000);
+
     const out = ctx.createGain();
-    out.gain.value = 0.25 + 0.75 * s;
+    out.gain.value = tier === 'heavy' ? 1 : tier === 'medium' ? 0.55 + 0.25 * s : 0.18 + 0.5 * s;
     out.connect(this.master!);
 
-    // 金属振动分音（非谐波比例），随机微调音高避免重复感
-    const base = 820 + Math.random() * 360 - s * 200;
+    // 1) 金属振动分音（非谐波比例）：轻擦高而短（“叮”），猛撞低而长（“铛——”）
+    const base =
+      (tier === 'heavy' ? 560 : tier === 'medium' ? 820 : 1350) * (1 + (Math.random() - 0.5) * 0.12);
     const ratios = [1, 1.63, 2.76, 3.91, 5.4];
-    const decay = 0.12 + 0.45 * s;
+    const decay = tier === 'heavy' ? 0.75 : tier === 'medium' ? 0.3 : 0.09;
     ratios.forEach((ratio, i) => {
+      if (tier === 'light' && i > 2) return;
       const osc = ctx.createOscillator();
       osc.type = i === 0 ? 'triangle' : 'sine';
       osc.frequency.value = base * ratio * (1 + (Math.random() - 0.5) * 0.02);
       const g = ctx.createGain();
-      const amp = (0.22 / (i + 1)) * (i > 2 ? 0.5 + s : 1);
+      const amp = (0.2 / (i + 1)) * (i > 2 ? 0.6 + s : 1);
       g.gain.setValueAtTime(0, now);
       g.gain.linearRampToValueAtTime(amp, now + 0.002);
       g.gain.exponentialRampToValueAtTime(0.0001, now + decay / (1 + i * 0.35));
@@ -69,32 +92,64 @@ export class AudioFX {
       osc.stop(now + decay + 0.05);
     });
 
-    // 瞬态噪声：撞击的“咔”
+    // 2) 瞬态噪声：撞击的“咔”，越强越亮越长
     const noise = ctx.createBufferSource();
     noise.buffer = this.noiseBuf;
     const bp = ctx.createBiquadFilter();
     bp.type = 'bandpass';
-    bp.frequency.value = 2500 + 4000 * s;
+    bp.frequency.value = tier === 'light' ? 6500 : 2600 + 2500 * s;
     bp.Q.value = 0.9;
     const ng = ctx.createGain();
-    ng.gain.setValueAtTime(0.9 * s + 0.2, now);
-    ng.gain.exponentialRampToValueAtTime(0.0001, now + 0.04 + 0.06 * s);
+    ng.gain.setValueAtTime(tier === 'light' ? 0.35 : 0.6 + 0.6 * s, now);
+    ng.gain.exponentialRampToValueAtTime(0.0001, now + (tier === 'light' ? 0.03 : 0.05 + 0.07 * s));
     noise.connect(bp).connect(ng).connect(out);
-    noise.start(now, Math.random() * 0.3, 0.15);
+    noise.start(now, Math.random() * 0.3, 0.2);
 
-    // 强撞击：低频冲击
-    if (s > 0.45) {
-      const thump = ctx.createOscillator();
-      thump.type = 'sine';
-      thump.frequency.setValueAtTime(140, now);
-      thump.frequency.exponentialRampToValueAtTime(45, now + 0.18);
-      const tg = ctx.createGain();
-      tg.gain.setValueAtTime(0.55 * s, now);
-      tg.gain.exponentialRampToValueAtTime(0.0001, now + 0.25);
-      thump.connect(tg).connect(out);
-      thump.start(now);
-      thump.stop(now + 0.3);
-    }
+    if (tier === 'light') return;
+
+    // 3) 低频重击：中等是短促的“咚”，猛撞是下潜的重低音。
+    //    经过软削波产生谐波——手机外放发不出 50Hz，但能放出它的 2、3 次谐波，听起来依然“厚”
+    const thump = ctx.createOscillator();
+    thump.type = 'sine';
+    const f0 = tier === 'heavy' ? 150 : 210;
+    const f1 = tier === 'heavy' ? 38 : 90;
+    const tl = tier === 'heavy' ? 0.38 : 0.16;
+    thump.frequency.setValueAtTime(f0, now);
+    thump.frequency.exponentialRampToValueAtTime(f1, now + tl * 0.8);
+    const shaper = ctx.createWaveShaper();
+    shaper.curve = this.softClip;
+    const tg = ctx.createGain();
+    tg.gain.setValueAtTime(tier === 'heavy' ? 0.95 : 0.5, now);
+    tg.gain.exponentialRampToValueAtTime(0.0001, now + tl);
+    thump.connect(shaper).connect(tg).connect(out);
+    thump.start(now);
+    thump.stop(now + tl + 0.05);
+
+    if (tier !== 'heavy') return;
+
+    // 4) 猛撞：低通噪声“轰”的冲击体感 + 40ms 后的场地回响
+    const body = ctx.createBufferSource();
+    body.buffer = this.noiseBuf;
+    const lp = ctx.createBiquadFilter();
+    lp.type = 'lowpass';
+    lp.frequency.setValueAtTime(1400, now);
+    lp.frequency.exponentialRampToValueAtTime(180, now + 0.3);
+    const bg = ctx.createGain();
+    bg.gain.setValueAtTime(0.9, now);
+    bg.gain.exponentialRampToValueAtTime(0.0001, now + 0.32);
+    body.connect(lp).connect(bg).connect(out);
+    body.start(now, Math.random() * 0.3, 0.4);
+
+    const echo = ctx.createOscillator();
+    echo.type = 'triangle';
+    echo.frequency.value = base * 0.98;
+    const eg = ctx.createGain();
+    eg.gain.setValueAtTime(0, now + 0.04);
+    eg.gain.linearRampToValueAtTime(0.07, now + 0.045);
+    eg.gain.exponentialRampToValueAtTime(0.0001, now + 0.6);
+    echo.connect(eg).connect(out);
+    echo.start(now + 0.04);
+    echo.stop(now + 0.65);
   }
 
   /** 发射音效，power 0..1 */

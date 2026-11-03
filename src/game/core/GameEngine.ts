@@ -4,7 +4,8 @@ import { createArenaPhysics } from '../arena/ArenaPhysics';
 import { createArenaVisual } from '../arena/ArenaVisual';
 import { floorHeight } from '../arena/arenaSpec';
 import { AudioFX } from '../audio/AudioFX';
-import { BattleSystem, type BattleResult } from '../battle/BattleSystem';
+import { BattleSystem, type BattleResult, type ImpactEvent } from '../battle/BattleSystem';
+import { impactFeedback, impactTier, type ImpactTier } from '../battle/impactTiers';
 import { createBeyVisual, type BeyVisual } from '../beys/BeyVisualFactory';
 import { assembleBey, swapPart, type AssembledBey } from '../beys/parts/assemble';
 import { listParts, PLAYER_LOADOUT, RIVAL_LOADOUT, sanitizeLoadout } from '../beys/parts/catalog';
@@ -70,6 +71,11 @@ const SIDES: Side[] = ['player', 'rival'];
  * 游戏主引擎：把渲染（Three.js）、物理（Rapier）、对战规则、输入、摄像机、音效、组装界面串起来。
  * React 只通过 store 读取快照、通过公开方法发出指令，不直接接触 3D 对象。
  */
+const _Y = new THREE.Vector3(0, 1, 0);
+const _up = new THREE.Vector3();
+const _tilt = new THREE.Quaternion();
+const _yaw = new THREE.Quaternion();
+
 export class GameEngine {
   readonly store: Store<GameSnapshot>;
   readonly gesture = new PullStringGesture();
@@ -100,6 +106,14 @@ export class GameEngine {
   private timeScale = 1;
   private slowmoHold = 0;
   private slowmoCooldown = 0;
+  /** Hit-stop：强撞瞬间短暂定格（真实秒） */
+  private hitstop = 0;
+  private hitstopCooldown = 0;
+  /** 最近一次撞击（调试 / 测试用） */
+  private lastImpact: { strength: number; tier: ImpactTier; hitstop: number; slowmo: number } | null = null;
+  /** 视觉转角：与物理转速解耦，避免 60fps 下高速旋转出现频闪 / 糊成一团 */
+  private visualYaw: Record<Side, number> = { player: 0, rival: 0 };
+  private dprQuery: MediaQueryList | null = null;
   private readonly save = new SaveStore();
   private quality: QualityController;
   private readonly initialQuality: QualityLevel;
@@ -203,7 +217,7 @@ export class GameEngine {
     this.pw!.resetAccumulator();
     this.setPhase('battle');
     this.cam.setMode('battle');
-    this.cam.impact(0.35);
+    this.cam.impact(0.35, 0.2);
     this.audio.launch(cmd.power);
     navigator.vibrate?.(20);
   }
@@ -359,6 +373,21 @@ export class GameEngine {
       rival: read('rival'),
       result: b?.result ?? null,
       pixelRatio: this.renderer.getPixelRatio(),
+      devicePixelRatio: window.devicePixelRatio || 1,
+      canvas: (() => {
+        const c = this.renderer.domElement;
+        const r = c.getBoundingClientRect();
+        const gl = this.renderer.getContext();
+        return {
+          cssWidth: r.width,
+          cssHeight: r.height,
+          width: c.width,
+          height: c.height,
+          drawingBufferWidth: gl.drawingBufferWidth,
+          drawingBufferHeight: gl.drawingBufferHeight,
+          samples: gl.getParameter(gl.SAMPLES) as number,
+        };
+      })(),
       expectedPixelRatio: this.quality.pixelRatio(window.devicePixelRatio || 1),
       quality: this.quality.level,
       initialQuality: this.initialQuality,
@@ -374,9 +403,40 @@ export class GameEngine {
 
   /** 调试：手动触发一次撞击特效（不影响物理） */
   debugImpact(strength: number): void {
-    this.fx.impact(0, 0.5, 0, strength, { x: 1, z: 0 }, 0);
-    this.cam.impact(strength);
-    this.audio.clash(strength);
+    this.playImpact(
+      { strength, tier: impactTier(strength), approach: 0, x: 0, y: 0.5, z: 0, nx: 1, nz: 0 },
+      this.phase === 'battle',
+    );
+  }
+
+  /** 调试：最近一次撞击的反馈参数 */
+  debugLastImpact() {
+    return this.lastImpact ? { ...this.lastImpact, timeScale: this.timeScale } : null;
+  }
+
+  /** 一次撞击的全部反馈：特效、镜头、音效、振动、Hit-stop、慢动作（按等级区分） */
+  private playImpact(imp: ImpactEvent, allowTimeFx: boolean): void {
+    const fb = impactFeedback(imp.strength);
+    this.fx.impact(imp.x, imp.y, imp.z, imp.strength, { x: imp.nx, z: imp.nz }, floorHeight(Math.hypot(imp.x, imp.z)));
+    this.cam.impact(fb.shake, fb.fovKick);
+    this.audio.clash(imp.strength);
+    if (fb.vibrate > 0) navigator.vibrate?.(fb.vibrate);
+    let hitstop = 0;
+    let slowmo = 0;
+    if (allowTimeFx) {
+      // Hit-stop 只给中等以上；同一段连击里不重复定格，避免节奏被打碎
+      if (fb.hitstop > 0 && this.hitstopCooldown <= 0) {
+        hitstop = fb.hitstop;
+        this.hitstop = Math.max(this.hitstop, hitstop);
+        this.hitstopCooldown = fb.tier === 'heavy' ? 0.5 : 0.35;
+      }
+      if (fb.slowmo > 0 && this.slowmoCooldown <= 0) {
+        slowmo = fb.slowmo;
+        this.slowmoHold = slowmo;
+        this.slowmoCooldown = 2.2;
+      }
+    }
+    this.lastImpact = { strength: imp.strength, tier: fb.tier, hitstop, slowmo };
   }
 
   // ───────────────────────── 内部 ─────────────────────────
@@ -463,14 +523,26 @@ export class GameEngine {
   }
 
   private resize = (): void => {
-    const w = Math.max(1, this.container.clientWidth);
-    const h = Math.max(1, this.container.clientHeight);
+    // 用带小数的 CSS 尺寸：clientWidth 会取整，画布缓冲区与实际显示尺寸会差 1~3 个物理像素而被拉伸
+    const rect = this.container.getBoundingClientRect();
+    const w = Math.max(1, rect.width);
+    const h = Math.max(1, rect.height);
     const pr = this.quality.pixelRatio(window.devicePixelRatio || 1);
     if (this.renderer.getPixelRatio() !== pr) this.renderer.setPixelRatio(pr);
     this.renderer.setSize(w, h, false);
+    this.watchDpr();
     this.cam.setAspect(w / h);
     this.layoutGarage();
   };
+
+  /** 设备像素比变化（缩放、外接屏）时重新按原生分辨率渲染 */
+  private watchDpr(): void {
+    const dpr = window.devicePixelRatio || 1;
+    if (this.dprQuery && this.dprQuery.media === `(resolution: ${dpr}dppx)`) return;
+    this.dprQuery?.removeEventListener('change', this.resize);
+    this.dprQuery = window.matchMedia?.(`(resolution: ${dpr}dppx)`) ?? null;
+    this.dprQuery?.addEventListener('change', this.resize);
+  }
 
   private layoutGarage(): void {
     if (!this.garage) return;
@@ -598,8 +670,9 @@ export class GameEngine {
     if (this.disposed) return;
     this.raf = requestAnimationFrame(this.frame);
     const elapsed = now - this.last;
-    // 帧率上限 60：120Hz 屏幕上隔帧渲染，降低发热
-    if (elapsed < 1000 / 62) return;
+    // 帧率上限 60：120Hz 屏幕上隔帧渲染，降低发热。
+    // 门槛留 3ms 余量：60Hz 屏幕的帧间隔有抖动，门槛太紧会随机跳帧、被误判为卡顿而自动降画质。
+    if (elapsed < 1000 / 60 - 3) return;
     const dt = Math.min(0.05, elapsed / 1000);
     this.last = now;
     this.fpsAcc.frames++;
@@ -609,7 +682,9 @@ export class GameEngine {
       this.fpsAcc.frames = 0;
       this.fpsAcc.time = 0;
     }
-    if (this.phase !== 'paused' && this.phase !== 'loading') this.quality.sample(elapsed / 1000);
+    // 只在对战相关画面测帧率（组装界面生成缩略图时的长帧不算）
+    const ph = this.phase;
+    if (ph === 'battle' || ph === 'aim' || ph === 'result') this.quality.sample(elapsed / 1000);
     if (this.phase === 'garage' && this.garage) {
       this.garage.update(dt);
       this.renderer.render(this.garage.scene, this.garage.camera);
@@ -622,9 +697,14 @@ export class GameEngine {
   /** 强撞击触发短暂慢动作：0.12 秒内降到 0.22 倍速，保持约 0.2 秒，再平滑恢复 */
   private updateTimeScale(dt: number): void {
     this.slowmoCooldown = Math.max(0, this.slowmoCooldown - dt);
-    if (this.slowmoHold > 0) {
+    this.hitstopCooldown = Math.max(0, this.hitstopCooldown - dt);
+    if (this.hitstop > 0) {
+      // Hit-stop：物理和火花几乎定格（镜头震动仍按真实时间进行，操作不受影响）
+      this.hitstop -= dt;
+      this.timeScale = 0.03;
+    } else if (this.slowmoHold > 0) {
       this.slowmoHold -= dt;
-      this.timeScale += (0.22 - this.timeScale) * (1 - Math.exp(-dt * 30));
+      this.timeScale += (0.25 - this.timeScale) * (1 - Math.exp(-dt * 30));
     } else {
       this.timeScale += (1 - this.timeScale) * (1 - Math.exp(-dt * 5));
       if (this.timeScale > 0.995) this.timeScale = 1;
@@ -636,6 +716,7 @@ export class GameEngine {
   private tick(realDt: number): void {
     const phase = this.phase;
     const battle = this.battle!;
+    this.frameDt = realDt;
     this.updateTimeScale(realDt);
     const dt = realDt * this.timeScale;
 
@@ -651,17 +732,7 @@ export class GameEngine {
 
     if (phase === 'battle' || phase === 'result') {
       this.pw!.advance(dt);
-      for (const imp of battle.impacts) {
-        const s = imp.strength;
-        this.fx.impact(imp.x, imp.y, imp.z, s, { x: imp.nx, z: imp.nz }, floorHeight(Math.hypot(imp.x, imp.z)));
-        this.cam.impact(s);
-        this.audio.clash(s);
-        navigator.vibrate?.(Math.round(8 + s * 30));
-        if (s > 0.55 && this.slowmoCooldown <= 0 && phase === 'battle') {
-          this.slowmoHold = 0.12 + 0.18 * s;
-          this.slowmoCooldown = 2.5;
-        }
-      }
+      for (const imp of battle.impacts) this.playImpact(imp, phase === 'battle');
       battle.impacts.length = 0;
       this.syncBeys();
       if (battle.result && phase === 'battle') this.onResult(battle.result);
@@ -672,7 +743,7 @@ export class GameEngine {
 
     if (phase !== 'paused') {
       // 特效跟随慢动作（火花也变慢），镜头用真实时间，保证操作手感
-      this.fx.update(dt);
+      this.fx.update(dt, this.cam.camera);
       const targets = SIDES.map((s) => battle.beys[s])
         .filter((b): b is NonNullable<typeof b> => !!b)
         .filter((b) => phase !== 'result' || b === battle.beys[battle.result!.winner])
@@ -701,6 +772,8 @@ export class GameEngine {
     }
   }
 
+  private frameDt = 1 / 60;
+
   private syncBeys(): void {
     const battle = this.battle!;
     for (const side of SIDES) {
@@ -708,11 +781,19 @@ export class GameEngine {
       const v = this.visuals[side];
       if (!b || !v) continue;
       const p = b.body.translation();
-      const q = b.body.rotation();
       v.root.position.set(p.x, p.y, p.z);
-      v.root.quaternion.set(q.x, q.y, q.z, q.w);
+      // 倾斜姿态完全来自刚体；绕自身轴的转角用“视觉转速”：
+      // 物理转速 100+ rad/s 在 60fps 下每帧转 2 弧度以上，三叶刀刃会频闪、糊成一片。
+      // 视觉转速封顶在每帧约 0.4 弧度，能看清刀刃细节，同时仍能看出转得快慢。
+      const up = b.up();
+      _up.set(up.x, up.y, up.z);
+      _tilt.setFromUnitVectors(_Y, _up);
+      const visualSpin = Math.min(b.spin, 10 + b.spin * 0.12);
+      this.visualYaw[side] += b.spinDirection * visualSpin * this.frameDt * this.timeScale;
+      _yaw.setFromAxisAngle(_Y, this.visualYaw[side]);
+      v.root.quaternion.copy(_tilt).multiply(_yaw);
       const mat = v.blur.material as THREE.MeshBasicMaterial;
-      mat.opacity = Math.min(0.6, b.spinRatio * 0.7) * (b.spin > 20 ? 1 : b.spin / 20);
+      mat.opacity = Math.min(0.28, b.spinRatio * 0.32) * (b.spin > 20 ? 1 : b.spin / 20);
     }
   }
 
