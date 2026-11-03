@@ -65,6 +65,19 @@ export interface DiagResult {
   gaps: number[];
   /** 平均水平速度 */
   meanSpeed: { player: number; rival: number };
+  /** 撞墙次数（刀刃 / 盘碰到外墙的接触事件）与撞墙时的径向速度 */
+  wallHits: { player: number; rival: number };
+  wallHitSpeeds: number[];
+  /** 贴边时间占比（外沿距墙 < 0.25） */
+  nearWall: { player: number; rival: number };
+  /** 平均离中心距离 */
+  meanR: { player: number; rival: number };
+  /** 转速降到发射时一半所用的时间（秒，未降到则为对局时长） */
+  spinHalf: { player: number; rival: number };
+  /** 每次中等以上撞击中各自受到的速度变化 */
+  dvTaken: { player: number[]; rival: number[] };
+  /** 获胜方 */
+  winner: 'player' | 'rival' | 'none';
 }
 
 const h = (v: { x: number; z: number }) => Math.hypot(v.x, v.z);
@@ -86,7 +99,8 @@ export async function diagnoseBattle(opts: {
   const R = await loadRapier();
   const { PLAYER_LOADOUT, RIVAL_LOADOUT } = await import('../../src/game/beys/parts/catalog');
   const pw = new PhysicsWorld(R);
-  createArenaPhysics(pw);
+  const arena = createArenaPhysics(pw);
+  const wallSet = new Set(arena.walls.map((c) => c.handle));
   const battle = new BattleSystem(pw, {
     player: assembleBey(opts.playerLoadout ?? PLAYER_LOADOUT),
     rival: assembleBey(opts.rivalLoadout ?? RIVAL_LOADOUT),
@@ -127,6 +141,14 @@ export async function diagnoseBattle(opts: {
   let lastEnd = 0;
   const gaps: number[] = [];
   const outer = { player: 0, rival: 0 };
+  const wallHits = { player: 0, rival: 0 };
+  const wallHitSpeeds: number[] = [];
+  const onWall = { player: false, rival: false };
+  const nearWall = { player: 0, rival: 0 };
+  const rSum = { player: 0, rival: 0 };
+  const spin0 = { player: A.spin, rival: B.spin };
+  const spinHalf = { player: -1, rival: -1 };
+  const dvTaken = { player: [] as number[], rival: [] as number[] };
   const speedSum = { player: 0, rival: 0 };
   let steps = 0;
 
@@ -217,6 +239,10 @@ export async function diagnoseBattle(opts: {
         void _n;
         void _gap;
         episodes.push(ep);
+        if (ep.tier === 'medium' || ep.tier === 'heavy') {
+          dvTaken.player.push(ep.dvA);
+          dvTaken.rival.push(ep.dvB);
+        }
         lastEnd = battle.time;
         cur = null;
       }
@@ -224,8 +250,24 @@ export async function diagnoseBattle(opts: {
     steps++;
     for (const [side, b] of [['player', A], ['rival', B]] as const) {
       const p = b.body.translation();
-      if (Math.hypot(p.x, p.z) > ARENA.railInner - 0.7) outer[side] += dt;
+      const r = Math.hypot(p.x, p.z);
+      if (r > ARENA.railInner - 0.7) outer[side] += dt;
+      if (r + b.spec.outerRadius > ARENA.radius - 0.25 && r < ARENA.radius) nearWall[side] += dt;
+      rSum[side] += r;
       speedSum[side] += h(b.body.linvel());
+      if (spinHalf[side] < 0 && b.spin < spin0[side] * 0.5) spinHalf[side] = battle.time;
+      let touching = false;
+      for (const c of b.colliders) {
+        pw.world.contactPairsWith(c, (o) => {
+          if (wallSet.has(o.handle)) touching = true;
+        });
+      }
+      if (touching && !onWall[side]) {
+        wallHits[side]++;
+        const v = b.body.linvel();
+        wallHitSpeeds.push(r > 0.01 ? (v.x * p.x + v.z * p.z) / r : 0);
+      }
+      onWall[side] = touching;
     }
   };
 
@@ -240,6 +282,13 @@ export async function diagnoseBattle(opts: {
     outerFraction: { player: outer.player / duration, rival: outer.rival / duration },
     gaps,
     meanSpeed: { player: speedSum.player / steps, rival: speedSum.rival / steps },
+    wallHits,
+    wallHitSpeeds,
+    nearWall: { player: nearWall.player / duration, rival: nearWall.rival / duration },
+    meanR: { player: rSum.player / steps, rival: rSum.rival / steps },
+    spinHalf: { player: spinHalf.player < 0 ? duration : spinHalf.player, rival: spinHalf.rival < 0 ? duration : spinHalf.rival },
+    dvTaken,
+    winner: battle.result ? battle.result.winner : 'none',
   };
   pw.dispose();
   return out;
@@ -264,6 +313,7 @@ export function summarize(label: string, runs: DiagResult[]): string {
     `- **发射撞击之后**的中等以上撞击：${eps.filter((e) => e.t > 1.5 && (e.tier === 'medium' || e.tier === 'heavy')).length} 次 = ${f((eps.filter((e) => e.t > 1.5 && (e.tier === 'medium' || e.tier === 'heavy')).length / dur) * 10, 2)} 次 / 10 秒`,
     `- 交锋间隔中位数 ${f(med(runs.flatMap((r) => r.gaps)), 1)} 秒，最长 ${f(Math.max(0, ...runs.flatMap((r) => r.gaps)), 1)} 秒；平均速度 player ${f(runs.reduce((s, r) => s + r.meanSpeed.player, 0) / runs.length)} / rival ${f(runs.reduce((s, r) => s + r.meanSpeed.rival, 0) / runs.length)} m/s；平均时长 ${f(dur / runs.length, 1)} 秒`,
     `- 外圈停留占比：player ${f((runs.reduce((s, r) => s + r.outerFraction.player, 0) / runs.length) * 100, 0)}%，rival ${f((runs.reduce((s, r) => s + r.outerFraction.rival, 0) / runs.length) * 100, 0)}%`,
+    `- 撞墙：${f((runs.reduce((s, r) => s + r.wallHits.player + r.wallHits.rival, 0) / dur) * 10, 2)} 次 / 10 秒（两台合计），撞墙径向速度中位数 ${f(med(runs.flatMap((r) => r.wallHitSpeeds)))} m/s；贴边时间 player ${f((runs.reduce((s, r) => s + r.nearWall.player, 0) / runs.length) * 100, 0)}% / rival ${f((runs.reduce((s, r) => s + r.nearWall.rival, 0) / runs.length) * 100, 0)}%`,
     `- 一次碰撞里撞击结算被触发多次（重复施加）：${eps.filter((e) => e.smashCalls > 1).length} 次`,
     `- 结果：${runs.map((r) => r.result).join('，')}`,
     '',

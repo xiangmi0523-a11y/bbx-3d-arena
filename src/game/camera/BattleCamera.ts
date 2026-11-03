@@ -1,3 +1,4 @@
+import { ARENA_SCALE } from '../arena/arenaSpec';
 import * as THREE from 'three';
 
 export interface CameraTarget {
@@ -72,8 +73,9 @@ export class BattleCamera {
     this.shake = Math.min(1, Math.max(this.shake, shake));
     this.fovKick = Math.min(1, Math.max(this.fovKick, fovKick));
     if (dir && shake > 0.3) {
-      // 沿撞击方向的冲击：只给中等以上，强度随震动量非线性增长
-      const k = Math.pow(shake, 1.5) * 2.2;
+      // 沿撞击方向的冲击：只给中等以上，强度随震动量非线性增长。
+      // P2.2.1：镜头随场地放大拉远了，冲击位移按 ARENA_SCALE 放大，画面上的冲击幅度保持不变
+      const k = Math.pow(shake, 1.5) * 2.2 * ARENA_SCALE;
       this.punchVel.x += dir.x * k;
       this.punchVel.y -= k * 0.35;
       this.punchVel.z += dir.z * k;
@@ -87,14 +89,14 @@ export class BattleCamera {
 
     if (this.mode === 'overview') {
       this.orbit += dt * 0.12;
-      const d = 10.5 * portrait;
+      const d = 10.5 * ARENA_SCALE * portrait;
       this.desiredFocus.set(0, 0.4, 0);
-      this.desiredPos.set(Math.cos(this.orbit) * d, 6.2 * portrait, Math.sin(this.orbit) * d);
+      this.desiredPos.set(Math.cos(this.orbit) * d, 6.2 * ARENA_SCALE * portrait, Math.sin(this.orbit) * d);
     } else if (this.mode === 'aim') {
       const a = Math.PI / 2 + this.aimBias * 0.18;
-      const d = 8.6 * portrait;
+      const d = 8.6 * ARENA_SCALE * portrait;
       this.desiredFocus.set(0, 0.3, -0.4);
-      this.desiredPos.set(Math.cos(a) * d, 5.6 * portrait, Math.sin(a) * d);
+      this.desiredPos.set(Math.cos(a) * d, 5.6 * ARENA_SCALE * portrait, Math.sin(a) * d);
     } else {
       // 战斗 / 结算：跟随
       const center = this._center.set(0, 0, 0);
@@ -123,7 +125,7 @@ export class BattleCamera {
         }
         this.orbitVel += (0.1 + pull - this.orbitVel) * (1 - Math.exp(-dt * 1.5));
         this.orbit += this.orbitVel * dt;
-        const dist = THREE.MathUtils.clamp(4.2 + spread * 0.85, 5, 10.5) * portrait;
+        const dist = THREE.MathUtils.clamp(4.2 + spread * 0.85, 5, 10.5 * ARENA_SCALE) * portrait;
         const height = dist * 0.48;
         this.desiredPos.set(
           this.desiredFocus.x + Math.cos(this.orbit) * dist,
@@ -153,7 +155,7 @@ export class BattleCamera {
     this.shake = Math.max(0, this.shake - dt * 4);
     this.fovKick = Math.max(0, this.fovKick - dt * 3.5);
     // 幅度随力度非线性增长（轻擦几乎不动、猛撞明显），衰减快（≤0.25 秒），不影响观察和操作
-    const s = Math.pow(this.shake, 1.6) * 0.16;
+    const s = Math.pow(this.shake, 1.6) * 0.16 * ARENA_SCALE;
     // 方向冲击：阻尼弹簧，约 0.2 秒回到原位
     const pdt = Math.min(dt, 1 / 30);
     this.punchVel.addScaledVector(this.punch, -220 * pdt).multiplyScalar(Math.exp(-pdt * 16));

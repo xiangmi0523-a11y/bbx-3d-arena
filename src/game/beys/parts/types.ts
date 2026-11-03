@@ -50,6 +50,11 @@ export interface BladeSpec extends PartBase {
   attack: number;
   /** 防御 0..1：被撞时冲量减免 */
   defense: number;
+  /**
+   * 重量分布：转动惯量 = 质量 × 半径² × rimWeight。
+   * 0.5 = 均匀圆盘；越大重量越集中在外缘（耐力型的配重外圈），同样质量下更能维持旋转。
+   */
+  rimWeight: number;
   visual: BladeVisual;
 }
 
@@ -68,6 +73,8 @@ export interface DiscSpec extends PartBase {
   height: number;
   /** 抗爆裂值（P1 预留，P2 爆裂判定使用） */
   burstResistance: number;
+  /** 重量分布（同 Blade.rimWeight） */
+  rimWeight: number;
   visual: DiscVisual;
 }
 

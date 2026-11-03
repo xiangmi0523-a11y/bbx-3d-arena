@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 import { createArenaPhysics } from '../arena/ArenaPhysics';
 import { createArenaVisual } from '../arena/ArenaVisual';
-import { floorHeight } from '../arena/arenaSpec';
+import { ARENA_SCALE, floorHeight } from '../arena/arenaSpec';
 import { AudioFX } from '../audio/AudioFX';
 import { BattleSystem, type BattleResult, type ImpactEvent } from '../battle/BattleSystem';
 import { impactFeedback, impactTier, type ImpactTier } from '../battle/impactTiers';
@@ -15,7 +15,7 @@ import { GarageView, renderThumbnails, type FocusRect } from '../garage/GarageVi
 import { launchDirection, launchPoint, rivalCommand, type Side } from '../launcher/launch';
 import { LauncherModel } from '../launcher/LauncherModel';
 import { IDLE_PULL, PullStringGesture, type LaunchCommand, type PullState } from '../launcher/PullStringGesture';
-import { loadRapier, PhysicsWorld, type Rapier } from '../physics/PhysicsWorld';
+import { loadRapier, PhysicsWorld, PHYSICS_DT, type Rapier } from '../physics/PhysicsWorld';
 import { ImpactFX } from '../render/ImpactFX';
 import { initialQuality, QualityController, type QualityLevel, type QualityPreset } from '../render/Quality';
 import { SaveStore, type SaveData } from '../storage/SaveStore';
@@ -53,7 +53,6 @@ export interface GameSnapshot {
   fps: number;
   quality: QualityLevel;
   /** 慢动作中（UI 可做提示） */
-  slowmo: boolean;
   garage: GarageState;
 }
 
@@ -104,15 +103,12 @@ export class GameEngine {
   private fpsAcc = { frames: 0, time: 0, fps: 0 };
   private previewSpin = 0;
   private resultRecorded = false;
-  /** 时间缩放（慢动作） */
-  private timeScale = 1;
-  private slowmoHold = 0;
-  private slowmoCooldown = 0;
-  /** Hit-stop：强撞瞬间短暂定格（真实秒） */
-  private hitstop = 0;
-  private hitstopCooldown = 0;
+  /**
+   * P2.2.1：取消慢动作和 Hit-stop，所有碰撞都以正常时间流速进行。
+   * 撞击力度只通过真实的物理结果（速度 / 方向变化）和火花、音效、镜头表现。
+   */
   /** 最近一次撞击（调试 / 测试用） */
-  private lastImpact: { strength: number; tier: ImpactTier; hitstop: number; slowmo: number } | null = null;
+  private lastImpact: { strength: number; tier: ImpactTier } | null = null;
   /** 视觉转角：与物理转速解耦，避免 60fps 下高速旋转出现频闪 / 糊成一团 */
   private visualYaw: Record<Side, number> = { player: 0, rival: 0 };
   private dprQuery: MediaQueryList | null = null;
@@ -141,7 +137,6 @@ export class GameEngine {
       save: this.save.data,
       fps: 0,
       quality: this.quality.level,
-      slowmo: false,
       garage: { draft: { ...loadouts.player }, exploded: false, thumbs: {} },
     });
   }
@@ -413,17 +408,16 @@ export class GameEngine {
   debugImpact(strength: number): void {
     this.playImpact(
       { strength, tier: impactTier(strength), approach: 0, impulse: 0, dvRel: strength * 12, x: 0, y: 0.5, z: 0, nx: 1, nz: 0 },
-      this.phase === 'battle',
     );
   }
 
   /** 调试：最近一次撞击的反馈参数 */
   debugLastImpact() {
-    return this.lastImpact ? { ...this.lastImpact, timeScale: this.timeScale } : null;
+    return this.lastImpact ? { ...this.lastImpact } : null;
   }
 
   /** 一次撞击的全部反馈：特效、镜头、音效、振动、Hit-stop、慢动作（按等级区分） */
-  private playImpact(imp: ImpactEvent, allowTimeFx: boolean): void {
+  private playImpact(imp: ImpactEvent): void {
     const fb = impactFeedback(imp.strength);
     this.fx.impact(imp.x, imp.y, imp.z, imp.strength, { x: imp.nx, z: imp.nz }, floorHeight(Math.hypot(imp.x, imp.z)));
     this.cam.impact(fb.shake, fb.fovKick, { x: imp.nx, z: imp.nz });
@@ -431,22 +425,7 @@ export class GameEngine {
     // 振动：iPhone Safari 没有实现 Vibration API（navigator.vibrate 不存在），这里只在 Android 浏览器生效。
     // iPhone 上的触感反馈要等 Capacitor 打包后用原生 Haptics 插件实现。
     if (fb.vibrate > 0 && typeof navigator.vibrate === 'function') navigator.vibrate(fb.vibrate);
-    let hitstop = 0;
-    let slowmo = 0;
-    if (allowTimeFx) {
-      // Hit-stop 只给中等以上；同一段连击里不重复定格，避免节奏被打碎
-      if (fb.hitstop > 0 && this.hitstopCooldown <= 0) {
-        hitstop = fb.hitstop;
-        this.hitstop = Math.max(this.hitstop, hitstop);
-        this.hitstopCooldown = fb.tier === 'heavy' ? 0.5 : 0.35;
-      }
-      if (fb.slowmo > 0 && this.slowmoCooldown <= 0) {
-        slowmo = fb.slowmo;
-        this.slowmoHold = slowmo;
-        this.slowmoCooldown = 2.2;
-      }
-    }
-    this.lastImpact = { strength: imp.strength, tier: fb.tier, hitstop, slowmo };
+    this.lastImpact = { strength: imp.strength, tier: fb.tier };
   }
 
   // ───────────────────────── 内部 ─────────────────────────
@@ -573,8 +552,8 @@ export class GameEngine {
     key.castShadow = true;
     key.shadow.mapSize.set(this.quality.preset.shadowMapSize, this.quality.preset.shadowMapSize);
     const sc = key.shadow.camera;
-    sc.left = sc.bottom = -6.5;
-    sc.right = sc.top = 6.5;
+    sc.left = sc.bottom = -6.5 * ARENA_SCALE;
+    sc.right = sc.top = 6.5 * ARENA_SCALE;
     sc.near = 2;
     sc.far = 26;
     key.shadow.bias = -0.0008;
@@ -624,8 +603,6 @@ export class GameEngine {
     this.audio.stopHum();
     this.resultRecorded = false;
     this.previewSpin = 0;
-    this.timeScale = 1;
-    this.slowmoHold = 0;
     this.gesture.cancel();
 
     this.pw = new PhysicsWorld(this.R);
@@ -655,7 +632,6 @@ export class GameEngine {
       result: null,
       time: 0,
       hits: 0,
-      slowmo: false,
       player: hudOf(this.specs.player),
       rival: hudOf(this.specs.rival),
     });
@@ -719,7 +695,7 @@ export class GameEngine {
    * 渲染一栏只是 CPU 提交 WebGL 指令的时间，GPU 实际耗时浏览器拿不到（iOS 也不支持计时查询）。
    */
   private readonly perf = {
-    frames: 0, tick: 0, render: 0, physics: 0, physSteps: 0, sync: 0, fx: 0, cam: 0, ui: 0, maxFrame: 0,
+    frames: 0, tick: 0, render: 0, physics: 0, physSteps: 0, sync: 0, fx: 0, cam: 0, ui: 0, maxFrame: 0, dtSum: 0,
     interval: [] as number[],
   };
 
@@ -734,6 +710,8 @@ export class GameEngine {
       tickMs: p.tick / n,
       physicsMs: p.physics / n,
       physStepsPerFrame: p.physSteps / n,
+      /** 物理时间 / 帧时间：1 = 正常时间流速（P2.2.1 取消慢动作后应始终约为 1） */
+      timeRatio: p.dtSum > 0 ? (p.physSteps * PHYSICS_DT) / p.dtSum : 1,
       syncMs: p.sync / n,
       fxMs: p.fx / n,
       camMs: p.cam / n,
@@ -750,37 +728,17 @@ export class GameEngine {
       heapMB: ((performance as unknown as { memory?: { usedJSHeapSize: number } }).memory?.usedJSHeapSize ?? 0) / 1048576,
     };
     if (reset) {
-      p.frames = p.tick = p.render = p.physics = p.physSteps = p.sync = p.fx = p.cam = p.ui = p.maxFrame = 0;
+      p.frames = p.tick = p.render = p.physics = p.physSteps = p.sync = p.fx = p.cam = p.ui = p.maxFrame = p.dtSum = 0;
       p.interval.length = 0;
     }
     return out;
-  }
-
-  /** 强撞击触发短暂慢动作：0.12 秒内降到 0.22 倍速，保持约 0.2 秒，再平滑恢复 */
-  private updateTimeScale(dt: number): void {
-    this.slowmoCooldown = Math.max(0, this.slowmoCooldown - dt);
-    this.hitstopCooldown = Math.max(0, this.hitstopCooldown - dt);
-    if (this.hitstop > 0) {
-      // Hit-stop：物理和火花几乎定格（镜头震动仍按真实时间进行，操作不受影响）
-      this.hitstop -= dt;
-      this.timeScale = 0.03;
-    } else if (this.slowmoHold > 0) {
-      this.slowmoHold -= dt;
-      this.timeScale += (0.25 - this.timeScale) * (1 - Math.exp(-dt * 30));
-    } else {
-      this.timeScale += (1 - this.timeScale) * (1 - Math.exp(-dt * 5));
-      if (this.timeScale > 0.995) this.timeScale = 1;
-    }
-    const slow = this.timeScale < 0.9;
-    if (slow !== this.store.get().slowmo) this.store.set({ slowmo: slow });
   }
 
   private tick(realDt: number): void {
     const phase = this.phase;
     const battle = this.battle!;
     this.frameDt = realDt;
-    this.updateTimeScale(realDt);
-    const dt = realDt * this.timeScale;
+    const dt = realDt;
 
     if (phase === 'aim') {
       const pull = this.store.get().pull;
@@ -794,9 +752,10 @@ export class GameEngine {
 
     if (phase === 'battle' || phase === 'result') {
       const a0 = performance.now();
+      this.perf.dtSum += dt;
       this.perf.physSteps += this.pw!.advance(dt);
       const a1 = performance.now();
-      for (const imp of battle.impacts) this.playImpact(imp, phase === 'battle');
+      for (const imp of battle.impacts) this.playImpact(imp);
       battle.impacts.length = 0;
       this.syncBeys();
       this.perf.physics += a1 - a0;
@@ -804,7 +763,7 @@ export class GameEngine {
       if (battle.result && phase === 'battle') this.onResult(battle.result);
       const a = battle.beys.player;
       const b = battle.beys.rival;
-      if (a && b) this.audio.setHum(((a.spinRatio + b.spinRatio) / 2) * this.timeScale);
+      if (a && b) this.audio.setHum((a.spinRatio + b.spinRatio) / 2);
     }
 
     if (phase !== 'paused') {
@@ -867,7 +826,7 @@ export class GameEngine {
       _up.set(_ru.x, _ru.y, _ru.z);
       _tilt.setFromUnitVectors(_Y, _up);
       const visualSpin = Math.min(b.spin, 10 + b.spin * 0.12);
-      this.visualYaw[side] += b.spinDirection * visualSpin * this.frameDt * this.timeScale;
+      this.visualYaw[side] += b.spinDirection * visualSpin * this.frameDt;
       _yaw.setFromAxisAngle(_Y, this.visualYaw[side]);
       v.root.quaternion.copy(_tilt).multiply(_yaw);
       const mat = v.blur.material as THREE.MeshBasicMaterial;
