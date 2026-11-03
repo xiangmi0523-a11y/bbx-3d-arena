@@ -2,14 +2,21 @@ import * as THREE from 'three';
 import { ARENA } from '../arena/arenaSpec';
 
 /** 用 Canvas 程序化生成贴图（不依赖外部图片资源） */
-function canvasTexture(size: number, draw: (ctx: CanvasRenderingContext2D, size: number) => void): THREE.CanvasTexture {
+function canvasTexture(
+  size: number,
+  draw: (ctx: CanvasRenderingContext2D, size: number) => void,
+  /** 实际像素倍数：按 size 的逻辑坐标绘制，画布按 res 倍分辨率生成 */
+  res = 1,
+): THREE.CanvasTexture {
   const canvas = document.createElement('canvas');
-  canvas.width = canvas.height = size;
+  canvas.width = canvas.height = size * res;
   const ctx = canvas.getContext('2d')!;
+  ctx.scale(res, res);
   draw(ctx, size);
   const tex = new THREE.CanvasTexture(canvas);
   tex.colorSpace = THREE.SRGBColorSpace;
-  tex.anisotropy = 4;
+  // 场地是斜着看的，各向异性过滤决定远处纹理是否发糊（Three 会按 GPU 上限自动截断）
+  tex.anisotropy = 16;
   return tex;
 }
 
@@ -101,7 +108,7 @@ export function createFloorTexture(): THREE.CanvasTexture {
     ctx.arc(c, c, ARENA.radius * scale + 6, 0, Math.PI * 2);
     ctx.arc(c, c, ARENA.railInner * scale, 0, Math.PI * 2, true);
     ctx.fill();
-  });
+  }, 2);
 }
 
 /** 旋转残影贴图：径向条纹 + 透明渐变 */

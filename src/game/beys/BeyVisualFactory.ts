@@ -406,7 +406,8 @@ export function createBeyVisual(spec: AssembledBey): BeyVisual {
     depthWrite: false,
     side: THREE.DoubleSide,
   });
-  const blur = new THREE.Mesh(new THREE.CircleGeometry(spec.blade.radius * 1.06, 64), blurMat);
+  // 只在刀刃外缘显示一圈残影，不覆盖刀刃、徽标等细节（之前整盘覆盖会让高速旋转的陀螺看起来发糊）
+  const blur = new THREE.Mesh(new THREE.RingGeometry(spec.blade.radius * 0.8, spec.blade.radius * 1.06, 64, 1), blurMat);
   blur.rotation.x = -Math.PI / 2;
   blur.position.y = spec.layers.blade.top + 0.012;
   blur.renderOrder = 3;

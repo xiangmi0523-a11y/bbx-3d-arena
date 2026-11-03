@@ -1,11 +1,13 @@
 import * as THREE from 'three';
+import { impactFeedback } from '../battle/impactTiers';
 
 /**
- * 金属碰撞特效（全部按撞击力度 0..1 缩放）：
- *  - 闪光：极短的白热高光精灵 + 点光源脉冲，照亮周围金属；
- *  - 火花：多方向喷射的拖尾火花（线段尾迹 + 亮点头部），受重力下坠、颜色由白→橙→暗红逐渐消散；
- *  - 冲击波：贴地扩散的光环，外扩时变薄变淡。
- * 闪光很小且只持续约 0.1 秒、火花从接触点向外喷，不会长时间遮挡陀螺本体。
+ * 金属碰撞特效，按撞击等级（轻擦 / 中等 / 猛撞，见 impactTiers）给出明显不同的反馈：
+ *  - 闪光：极短的白热十字星 + 点光源脉冲，猛撞时多一层白色内核；
+ *  - 火花：多方向喷射的拖尾火花。拖尾是朝向镜头的细长条带（有真实宽度），
+ *    不再是 1 像素的 GL 线段——在 3x Retina 屏上 1 像素线只有 1/3 个点宽，几乎看不见；
+ *  - 冲击波：贴地扩散，中等 1 层，猛撞 2~3 层（亮环 + 延迟的宽环 + 柔和气浪）。
+ * 每次撞击各自占用独立的粒子 / 闪光 / 冲击波槽位，连续撞击不会互相覆盖。
  * 粒子池固定容量，不在运行时分配内存，避免 iPhone 上 GC 卡顿。
  */
 
@@ -22,9 +24,9 @@ function radialTexture(stops: [number, string][], size = 128): THREE.CanvasTextu
   return t;
 }
 
-const SPARKS = 420;
-const FLASHES = 4;
-const WAVES = 5;
+const SPARKS = 900;
+const FLASHES = 8;
+const WAVES = 12;
 
 export interface ImpactQuality {
   /** 火花数量倍率 */
@@ -41,11 +43,16 @@ export class ImpactFX {
   private readonly sLife = new Float32Array(SPARKS);
   private readonly sMax = new Float32Array(SPARKS);
   private readonly sHeat = new Float32Array(SPARKS);
-  private readonly trailPos = new Float32Array(SPARKS * 6);
-  private readonly trailCol = new Float32Array(SPARKS * 6);
+  private readonly sWidth = new Float32Array(SPARKS);
+  private readonly sFloor = new Float32Array(SPARKS);
+  private readonly sTrail = new Float32Array(SPARKS);
+  /** 每个火花 4 个顶点（头左、头右、尾左、尾右） */
+  private readonly trailPos = new Float32Array(SPARKS * 12);
+  private readonly trailCol = new Float32Array(SPARKS * 12);
   private readonly headPos = new Float32Array(SPARKS * 3);
   private readonly headCol = new Float32Array(SPARKS * 3);
-  private readonly trails: THREE.LineSegments;
+  private readonly trails: THREE.Mesh;
+  private readonly camPos = new THREE.Vector3();
   private readonly heads: THREE.Points;
   private nextSpark = 0;
 
@@ -55,16 +62,29 @@ export class ImpactFX {
   private lightLife = 0;
 
   // 冲击波
-  private readonly waves: { mesh: THREE.Mesh; life: number; max: number; size: number }[] = [];
+  private readonly waves: { mesh: THREE.Mesh; life: number; max: number; size: number; delay: number; alpha: number }[] = [];
+  private readonly softWaves: { mesh: THREE.Mesh; life: number; max: number; size: number; delay: number; alpha: number }[] = [];
 
   constructor() {
     this.sPos.fill(-999);
     const tGeo = new THREE.BufferGeometry();
     tGeo.setAttribute('position', new THREE.BufferAttribute(this.trailPos, 3).setUsage(THREE.DynamicDrawUsage));
     tGeo.setAttribute('color', new THREE.BufferAttribute(this.trailCol, 3).setUsage(THREE.DynamicDrawUsage));
-    this.trails = new THREE.LineSegments(
+    const idx = new Uint32Array(SPARKS * 6);
+    for (let k = 0; k < SPARKS; k++) {
+      const v = k * 4;
+      idx.set([v, v + 2, v + 1, v + 1, v + 2, v + 3], k * 6);
+    }
+    tGeo.setIndex(new THREE.BufferAttribute(idx, 1));
+    this.trails = new THREE.Mesh(
       tGeo,
-      new THREE.LineBasicMaterial({ vertexColors: true, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false }),
+      new THREE.MeshBasicMaterial({
+        vertexColors: true,
+        transparent: true,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false,
+        side: THREE.DoubleSide,
+      }),
     );
     this.trails.frustumCulled = false;
     this.trails.renderOrder = 5;
@@ -75,7 +95,7 @@ export class ImpactFX {
     this.heads = new THREE.Points(
       hGeo,
       new THREE.PointsMaterial({
-        size: 0.06,
+        size: 0.07,
         map: radialTexture([
           [0, 'rgba(255,255,255,1)'],
           [0.35, 'rgba(255,230,180,0.9)'],
@@ -137,17 +157,25 @@ export class ImpactFX {
       [0.9, 'rgba(255,255,255,1)'],
       [1, 'rgba(255,255,255,0)'],
     ], 256);
-    for (let i = 0; i < WAVES; i++) {
+    const softTex = radialTexture([
+      [0, 'rgba(255,255,255,0)'],
+      [0.45, 'rgba(200,225,255,0.10)'],
+      [0.82, 'rgba(220,240,255,0.45)'],
+      [1, 'rgba(255,255,255,0)'],
+    ], 256);
+    const makeWave = (tex: THREE.Texture) => {
       const mesh = new THREE.Mesh(
         new THREE.PlaneGeometry(2, 2),
-        new THREE.MeshBasicMaterial({ map: ringTex, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, opacity: 0 }),
+        new THREE.MeshBasicMaterial({ map: tex, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, opacity: 0 }),
       );
       mesh.rotation.x = -Math.PI / 2;
       mesh.visible = false;
       mesh.renderOrder = 4;
       this.root.add(mesh);
-      this.waves.push({ mesh, life: 0, max: 1, size: 1 });
-    }
+      return { mesh, life: 0, max: 1, size: 1, delay: 0, alpha: 1 };
+    };
+    for (let i = 0; i < WAVES; i++) this.waves.push(makeWave(ringTex));
+    for (let i = 0; i < 4; i++) this.softWaves.push(makeWave(softTex));
   }
 
   /**
@@ -156,30 +184,43 @@ export class ImpactFX {
    * @param floorY 接触点下方的地面高度（冲击波贴地）
    */
   impact(x: number, y: number, z: number, strength: number, normal: { x: number; z: number }, floorY: number): void {
-    const s = Math.max(0.05, Math.min(1, strength));
+    const fb = impactFeedback(strength);
+    const heavy = fb.tier === 'heavy';
 
-    // 闪光
-    const f = this.flashes.find((fl) => fl.life <= 0) ?? this.flashes[0];
+    // 闪光：取一个空闲槽位（都在用时取剩余寿命最短的），不打断正在播放的闪光
+    const pickFlash = () => this.flashes.reduce((a, b) => (b.life < a.life ? b : a));
+    const f = pickFlash();
     f.sprite.position.set(x, y, z);
-    f.max = f.life = 0.06 + 0.07 * s;
-    f.size = 0.35 + 0.75 * s;
+    f.max = f.life = fb.tier === 'light' ? 0.05 : 0.07 + 0.05 * fb.local + (heavy ? 0.03 : 0);
+    f.size = fb.flash;
     f.sprite.visible = true;
-    this.light.position.set(x, y + 0.15, z);
-    this.light.intensity = 12 + 50 * s;
-    this.lightLife = 0.12;
+    if (heavy) {
+      // 猛撞：额外一层更小、更白的内核，强调“金属咬合”的瞬间
+      const core = pickFlash();
+      core.sprite.position.set(x, y, z);
+      core.max = core.life = 0.05;
+      core.size = fb.flash * 0.45;
+      core.sprite.visible = true;
+    }
+    // 点光源：多次撞击取更亮的一次，不会被弱撞击压暗
+    if (fb.light >= this.light.intensity * 0.6) {
+      this.light.position.set(x, y + 0.15, z);
+      this.light.intensity = Math.max(this.light.intensity, fb.light);
+      this.lightLife = heavy ? 0.16 : 0.1;
+    }
 
-    // 火花：两束沿切向（刀刃擦过的方向）+ 少量向四周
-    const n = Math.round((14 + 70 * s) * this.quality.sparkScale);
+    // 火花：两束沿切向（刀刃擦过的方向）+ 一部分向四周
+    const n = Math.max(3, Math.round(fb.sparks * this.quality.sparkScale));
     const tx = -normal.z;
     const tz = normal.x;
+    const width = fb.tier === 'light' ? 0.012 : heavy ? 0.024 : 0.018;
     for (let i = 0; i < n; i++) {
       const k = this.nextSpark;
       this.nextSpark = (this.nextSpark + 1) % SPARKS;
       const r = Math.random();
       let dx: number;
       let dz: number;
-      if (r < 0.7) {
-        // 切向两束，带一点法向散开
+      if (r < 0.65) {
         const side = Math.random() < 0.5 ? 1 : -1;
         const spread = (Math.random() - 0.5) * 1.1;
         dx = tx * side + normal.x * spread;
@@ -190,35 +231,49 @@ export class ImpactFX {
         dz = Math.sin(a);
       }
       const len = Math.hypot(dx, dz) || 1;
-      const sp = (3 + Math.random() * 7) * (0.55 + s * 0.9);
+      const sp = (3 + Math.random() * 7) * fb.sparkSpeed;
       this.sVel[k * 3] = (dx / len) * sp;
-      this.sVel[k * 3 + 1] = 0.6 + Math.random() * (1.5 + 4 * s);
+      this.sVel[k * 3 + 1] = 0.5 + Math.random() * (1.2 + 3.5 * fb.sparkSpeed);
       this.sVel[k * 3 + 2] = (dz / len) * sp;
       this.sPos[k * 3] = x + (Math.random() - 0.5) * 0.05;
       this.sPos[k * 3 + 1] = y + (Math.random() - 0.5) * 0.05;
       this.sPos[k * 3 + 2] = z + (Math.random() - 0.5) * 0.05;
-      this.sMax[k] = this.sLife[k] = 0.18 + Math.random() * (0.25 + 0.35 * s);
+      this.sMax[k] = this.sLife[k] = (0.16 + Math.random() * 0.4) * fb.sparkLife;
       this.sHeat[k] = 0.7 + Math.random() * 0.3;
+      this.sWidth[k] = width * (0.6 + Math.random() * 0.6);
+      this.sFloor[k] = floorY;
+      this.sTrail[k] = (heavy ? 0.045 : 0.03) * (0.7 + Math.random() * 0.6);
     }
 
-    // 冲击波（中等以上力度才有，力度越大越大越亮）
-    if (s > 0.15) {
-      const w = this.waves.find((wv) => wv.life <= 0) ?? this.waves[0];
-      w.mesh.position.set(x, floorY + 0.02, z);
-      w.max = w.life = 0.32 + 0.25 * s;
-      w.size = 0.7 + 1.9 * s;
-      w.mesh.visible = true;
-    }
+    // 冲击波：中等 1 层；猛撞 2~3 层（亮环 + 延迟的宽环 + 柔和气浪）
+    const pickWave = (pool: typeof this.waves) => pool.reduce((a, b) => (b.life + b.delay < a.life + a.delay ? b : a));
+    const spawn = (pool: typeof this.waves, size: number, life: number, delay: number, alpha: number) => {
+      const w = pickWave(pool);
+      w.mesh.position.set(x, floorY + 0.02 + delay * 0.02, z);
+      w.max = w.life = life;
+      w.size = size;
+      w.delay = delay;
+      w.alpha = alpha;
+      w.mesh.visible = false;
+    };
+    if (fb.waves >= 1) spawn(this.waves, heavy ? 1.6 + 0.8 * fb.local : 0.9 + 0.5 * fb.local, heavy ? 0.42 : 0.32, 0, heavy ? 1 : 0.7);
+    if (fb.waves >= 2) spawn(this.waves, 2.6 + 1.0 * fb.local, 0.6, 0.06, 0.6);
+    if (fb.waves >= 3) spawn(this.softWaves, 3.2 + 0.8 * fb.local, 0.7, 0.02, 0.8);
   }
 
-  update(dt: number): void {
+  /** 每帧更新；camera 用于让火花拖尾条带始终朝向镜头 */
+  update(dt: number, camera?: THREE.Camera): void {
+    if (camera) this.camPos.setFromMatrixPosition(camera.matrixWorld);
     // 火花
+    const cp = this.camPos;
     for (let k = 0; k < SPARKS; k++) {
       const i3 = k * 3;
-      const i6 = k * 6;
+      const i12 = k * 12;
       if (this.sLife[k] <= 0) {
-        this.trailPos[i6 + 1] = this.trailPos[i6 + 4] = -999;
-        this.headPos[i3 + 1] = -999;
+        if (this.trailPos[i12 + 1] !== -999) {
+          for (let v = 0; v < 4; v++) this.trailPos[i12 + v * 3 + 1] = -999;
+          this.headPos[i3 + 1] = -999;
+        }
         continue;
       }
       this.sLife[k] -= dt;
@@ -230,9 +285,9 @@ export class ImpactFX {
       this.sPos[i3] += this.sVel[i3] * dt;
       this.sPos[i3 + 1] += this.sVel[i3 + 1] * dt;
       this.sPos[i3 + 2] += this.sVel[i3 + 2] * dt;
-      // 落地弹一下
-      if (this.sPos[i3 + 1] < -1.15) {
-        this.sPos[i3 + 1] = -1.15;
+      // 落在撞击点下方的地面上弹一下
+      if (this.sPos[i3 + 1] < this.sFloor[k]) {
+        this.sPos[i3 + 1] = this.sFloor[k];
         this.sVel[i3 + 1] *= -0.3;
       }
       const t = Math.max(0, this.sLife[k] / this.sMax[k]); // 1 → 0
@@ -241,22 +296,52 @@ export class ImpactFX {
       const r = Math.min(1, 0.35 + heat * 1.2);
       const g = Math.min(1, heat * heat * 1.3 + 0.05);
       const b = Math.min(1, heat * heat * heat * 1.1);
-      const trail = 0.018 + 0.02 * t;
-      this.trailPos[i6] = this.sPos[i3];
-      this.trailPos[i6 + 1] = this.sPos[i3 + 1];
-      this.trailPos[i6 + 2] = this.sPos[i3 + 2];
-      this.trailPos[i6 + 3] = this.sPos[i3] - this.sVel[i3] * trail;
-      this.trailPos[i6 + 4] = this.sPos[i3 + 1] - this.sVel[i3 + 1] * trail;
-      this.trailPos[i6 + 5] = this.sPos[i3 + 2] - this.sVel[i3 + 2] * trail;
-      this.trailCol[i6] = r;
-      this.trailCol[i6 + 1] = g;
-      this.trailCol[i6 + 2] = b;
-      this.trailCol[i6 + 3] = r * 0.15;
-      this.trailCol[i6 + 4] = g * 0.1;
-      this.trailCol[i6 + 5] = 0;
-      this.headPos[i3] = this.sPos[i3];
-      this.headPos[i3 + 1] = this.sPos[i3 + 1];
-      this.headPos[i3 + 2] = this.sPos[i3 + 2];
+      const px = this.sPos[i3];
+      const py = this.sPos[i3 + 1];
+      const pz = this.sPos[i3 + 2];
+      const trail = this.sTrail[k] * (0.4 + 0.6 * t);
+      const qx = px - this.sVel[i3] * trail;
+      const qy = py - this.sVel[i3 + 1] * trail;
+      const qz = pz - this.sVel[i3 + 2] * trail;
+      // 条带宽度方向 = 速度方向 × 视线方向
+      const ax = px - qx;
+      const ay = py - qy;
+      const az = pz - qz;
+      const vx = cp.x - px;
+      const vy = cp.y - py;
+      const vz = cp.z - pz;
+      let wx = ay * vz - az * vy;
+      let wy = az * vx - ax * vz;
+      let wz = ax * vy - ay * vx;
+      const wl = Math.hypot(wx, wy, wz) || 1;
+      const hw = this.sWidth[k] * (0.5 + 0.5 * t);
+      wx = (wx / wl) * hw;
+      wy = (wy / wl) * hw;
+      wz = (wz / wl) * hw;
+      const P = this.trailPos;
+      P[i12] = px + wx;
+      P[i12 + 1] = py + wy;
+      P[i12 + 2] = pz + wz;
+      P[i12 + 3] = px - wx;
+      P[i12 + 4] = py - wy;
+      P[i12 + 5] = pz - wz;
+      // 尾部收窄成尖
+      P[i12 + 6] = qx + wx * 0.15;
+      P[i12 + 7] = qy + wy * 0.15;
+      P[i12 + 8] = qz + wz * 0.15;
+      P[i12 + 9] = qx - wx * 0.15;
+      P[i12 + 10] = qy - wy * 0.15;
+      P[i12 + 11] = qz - wz * 0.15;
+      const C = this.trailCol;
+      C[i12] = C[i12 + 3] = r;
+      C[i12 + 1] = C[i12 + 4] = g;
+      C[i12 + 2] = C[i12 + 5] = b;
+      C[i12 + 6] = C[i12 + 9] = r * 0.12;
+      C[i12 + 7] = C[i12 + 10] = g * 0.06;
+      C[i12 + 8] = C[i12 + 11] = 0;
+      this.headPos[i3] = px;
+      this.headPos[i3 + 1] = py;
+      this.headPos[i3 + 2] = pz;
       this.headCol[i3] = r;
       this.headCol[i3 + 1] = g;
       this.headCol[i3 + 2] = b;
@@ -285,14 +370,19 @@ export class ImpactFX {
     }
 
     // 冲击波
-    for (const w of this.waves) {
+    for (const w of [...this.waves, ...this.softWaves]) {
       if (w.life <= 0) continue;
+      if (w.delay > 0) {
+        w.delay -= dt;
+        continue;
+      }
+      w.mesh.visible = true;
       w.life -= dt;
       const t = 1 - Math.max(0, w.life / w.max); // 0 → 1
       const ease = 1 - (1 - t) * (1 - t) * (1 - t);
       const sc = 0.15 + w.size * ease;
       w.mesh.scale.set(sc, sc, sc);
-      (w.mesh.material as THREE.MeshBasicMaterial).opacity = (1 - t) * (1 - t) * 0.9;
+      (w.mesh.material as THREE.MeshBasicMaterial).opacity = (1 - t) * (1 - t) * 0.9 * w.alpha;
       if (w.life <= 0) w.mesh.visible = false;
     }
   }
@@ -303,8 +393,9 @@ export class ImpactFX {
       f.life = 0;
       f.sprite.visible = false;
     }
-    for (const w of this.waves) {
+    for (const w of [...this.waves, ...this.softWaves]) {
       w.life = 0;
+      w.delay = 0;
       w.mesh.visible = false;
     }
     this.light.intensity = 0;

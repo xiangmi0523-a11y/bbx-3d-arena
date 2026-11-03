@@ -40,6 +40,8 @@ try {
       'Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Mobile/15E148 Safari/604.1',
   });
   const page = await context.newPage();
+  // 软件渲染（无 GPU）下 3x 分辨率每帧很慢，截图需要更长的超时
+  page.setDefaultTimeout(120000);
   const errors = [];
   page.on('pageerror', (e) => errors.push(e.message));
   page.on('console', (m) => m.type() === 'error' && errors.push(m.text()));
@@ -148,14 +150,42 @@ try {
   );
   check('画质：iPhone 3x 屏起始为“高清”档', bl.initialQuality === 'high', `起始=${bl.initialQuality}，当前=${bl.quality}（软件渲染帧率低，会自动降档）`);
   check('画质：渲染像素比与当前档位一致', Math.abs(bl.pixelRatio - bl.expectedPixelRatio) < 0.01, `pixelRatio=${bl.pixelRatio}`);
-  // 锁定高清档，验证 Retina 像素比，并用于后续截图
+  // ── P2.1 清晰度：画布缓冲区必须与屏幕物理像素 1:1 ──
   await page.evaluate(() => window.__game.setQuality('high'));
   await page.waitForTimeout(300);
   const hq = await page.evaluate(() => window.__game.debugState());
-  check('画质：高清档 Retina 像素比 2.6', hq.pixelRatio >= 2.5, `pixelRatio=${hq.pixelRatio}`);
-  // 软件渲染下 2.6x 太慢（截图会超时），后续截图用中档（2x）
+  const cv = hq.canvas;
+  check('清晰度：高清档按原生 3x 渲染', hq.devicePixelRatio === 3 && hq.pixelRatio === 3, `dpr=${hq.devicePixelRatio} pixelRatio=${hq.pixelRatio}`);
+  check(
+    '清晰度：画布缓冲区 = CSS 尺寸 × DPR（不被拉伸）',
+    Math.abs(cv.width - cv.cssWidth * 3) <= 1 && Math.abs(cv.height - cv.cssHeight * 3) <= 1,
+    `CSS ${cv.cssWidth}×${cv.cssHeight} → 缓冲区 ${cv.width}×${cv.height}`,
+  );
+  check('清晰度：WebGL 绘制缓冲区与画布一致', cv.drawingBufferWidth === cv.width && cv.drawingBufferHeight === cv.height, `${cv.drawingBufferWidth}×${cv.drawingBufferHeight}`);
+  check('清晰度：开启 MSAA 抗锯齿', cv.samples >= 2, `samples=${cv.samples}`);
   await page.evaluate(() => window.__game.setQuality('medium'));
+  await page.waitForTimeout(200);
+  const md = await page.evaluate(() => window.__game.debugState());
+  check('清晰度：中档仍为原生 3x（只降阴影和粒子）', md.pixelRatio === 3, `pixelRatio=${md.pixelRatio}`);
+  await page.evaluate(() => window.__game.setQuality('low'));
+  await page.waitForTimeout(200);
+  const low = await page.evaluate(() => window.__game.debugState());
+  check('清晰度：最低档不低于 2x', low.pixelRatio >= 2, `pixelRatio=${low.pixelRatio}`);
+  // 软件渲染（无 GPU）下 3x 截图非常慢，后续截图用最低档 2x；真机按自动档位运行
   page.setDefaultTimeout(90000);
+
+  // ── P2.1 性能：满粒子时特效更新的 CPU 开销、绘制调用数 ──
+  const perf = await page.evaluate(() => {
+    const g = window.__game;
+    for (let i = 0; i < 8; i++) g.fx.impact(0, 0.5, 0, 1, { x: 1, z: 0 }, 0);
+    const t0 = performance.now();
+    for (let i = 0; i < 120; i++) g.fx.update(1 / 600, g.cam.camera);
+    const ms = (performance.now() - t0) / 120;
+    g.fx.clear();
+    return { ms, calls: g.renderer.info.render.calls, tris: g.renderer.info.render.triangles };
+  });
+  check('性能：满粒子特效更新 < 1.5ms/帧（CPU）', perf.ms < 1.5, `${perf.ms.toFixed(3)} ms/帧`);
+  check('性能：每帧绘制调用 < 250', perf.calls < 250, `draw calls=${perf.calls}，三角形=${perf.tris}`);
 
   // 战斗中物理推进、刚体运动
   const s0 = await page.evaluate(() => window.__game.debugState());
@@ -166,12 +196,45 @@ try {
   check('物理：陀螺刚体在运动', moved > 0.3 && s1.time > s0.time, `位移 ${moved.toFixed(2)}，转速 ${s1.player.spin.toFixed(0)} rad/s`);
   check('物理：陀螺落在场地上（没有穿模掉落）', s1.player.y > -0.2 && s1.rival.y > -0.2, `y=${s1.player.y.toFixed(2)}/${s1.rival.y.toFixed(2)}`);
 
-  // 撞击特效：手动触发一次满力度撞击，截图检查闪光 / 火花 / 冲击波
-  await page.evaluate(() => window.__game.debugImpact(1));
-  await page.waitForTimeout(40);
-  await page.screenshot({ path: `${OUT}/14-impact.png` });
-  await page.waitForTimeout(150);
+  // ── P2.1 撞击分级：轻擦 / 中等 / 猛撞反馈不同 ──
+  const tierOf = async (strength) => {
+    await page.waitForTimeout(700); // 等上一档的定格冷却结束
+    return page.evaluate((x) => {
+      window.__game.debugImpact(x);
+      return window.__game.debugLastImpact();
+    }, strength);
+  };
+  const lt = await tierOf(0.15);
+  await page.waitForTimeout(30);
+  await page.screenshot({ path: `${OUT}/14a-impact-light.png` });
+  const mt = await tierOf(0.45);
+  await page.waitForTimeout(30);
+  await page.screenshot({ path: `${OUT}/14b-impact-medium.png` });
+  await page.waitForTimeout(2300); // 慢动作冷却
+  const ht = await tierOf(0.95);
+  // 逐帧记录之后 1 秒内的最小时间缩放（Hit-stop 定格 + 慢动作）
+  const minScale = await page.evaluate(
+    () =>
+      new Promise((resolve) => {
+        let min = 1;
+        const t0 = performance.now();
+        const loop = () => {
+          min = Math.min(min, window.__game.debugLastImpact().timeScale);
+          if (performance.now() - t0 < 1000) requestAnimationFrame(loop);
+          else resolve(min);
+        };
+        loop();
+      }),
+  );
+  await page.evaluate(() => window.__game.debugImpact(0.95));
+  await page.waitForTimeout(30);
+  await page.screenshot({ path: `${OUT}/14c-impact-heavy.png` });
+  await page.waitForTimeout(120);
   await page.screenshot({ path: `${OUT}/15-impact-trails.png` });
+  check('撞击分级：轻擦无定格、无慢动作', lt.tier === 'light' && lt.hitstop === 0 && lt.slowmo === 0, JSON.stringify(lt));
+  check('撞击分级：中等有短定格、无慢动作', mt.tier === 'medium' && mt.hitstop > 0 && mt.slowmo === 0, JSON.stringify(mt));
+  check('撞击分级：猛撞有 Hit-stop + 慢动作', ht.tier === 'heavy' && ht.hitstop > mt.hitstop && ht.slowmo > 0, JSON.stringify(ht));
+  check('撞击分级：猛撞瞬间时间几乎定格 / 慢放', minScale < 0.3, `最小 timeScale=${minScale.toFixed(2)}`);
 
   // 暂停：物理时间不再前进
   await page.tap('[data-testid=pause]');

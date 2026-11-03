@@ -15,6 +15,8 @@ export interface QualityPreset {
   level: QualityLevel;
   /** 像素比上限（实际取 min(devicePixelRatio, 该值)） */
   maxPixelRatio: number;
+  /** 像素比下限：任何档位都不低于它（3x 屏上最低 2x，避免画面重新变糊） */
+  minPixelRatio: number;
   shadowMapSize: number;
   shadows: boolean;
   sparkScale: number;
@@ -22,11 +24,17 @@ export interface QualityPreset {
   envIntensity: number;
 }
 
+/**
+ * P2.1：清晰度优先。
+ * 之前高档把 3x 屏渲染在 2.6x、中档 2x、低档 1.5x，浏览器再把画布非整数倍拉伸到屏幕，
+ * 是“整体发糊”的主要原因。现在中/高/超三档都按设备原生像素比渲染（1:1 对应物理像素），
+ * 性能不够时优先降阴影和粒子，只有最低档才降到 2x。
+ */
 export const PRESETS: Record<QualityLevel, QualityPreset> = {
-  low: { level: 'low', maxPixelRatio: 1.5, shadowMapSize: 1024, shadows: true, sparkScale: 0.55, envIntensity: 0.8 },
-  medium: { level: 'medium', maxPixelRatio: 2, shadowMapSize: 1024, shadows: true, sparkScale: 0.8, envIntensity: 1 },
-  high: { level: 'high', maxPixelRatio: 2.6, shadowMapSize: 2048, shadows: true, sparkScale: 1, envIntensity: 1 },
-  ultra: { level: 'ultra', maxPixelRatio: 3, shadowMapSize: 2048, shadows: true, sparkScale: 1, envIntensity: 1 },
+  low: { level: 'low', maxPixelRatio: 2, minPixelRatio: 2, shadowMapSize: 1024, shadows: true, sparkScale: 0.45, envIntensity: 0.85 },
+  medium: { level: 'medium', maxPixelRatio: 3, minPixelRatio: 2, shadowMapSize: 1024, shadows: true, sparkScale: 0.65, envIntensity: 1 },
+  high: { level: 'high', maxPixelRatio: 3, minPixelRatio: 2, shadowMapSize: 1536, shadows: true, sparkScale: 0.9, envIntensity: 1 },
+  ultra: { level: 'ultra', maxPixelRatio: 3, minPixelRatio: 2, shadowMapSize: 2048, shadows: true, sparkScale: 1, envIntensity: 1 },
 };
 
 const ORDER: QualityLevel[] = ['low', 'medium', 'high', 'ultra'];
@@ -68,7 +76,8 @@ export class QualityController {
 
   /** 每帧调用，frameDt 为真实帧间隔（秒） */
   sample(frameDt: number): void {
-    if (this.locked || frameDt <= 0 || frameDt > 0.5) return;
+    // 超过 0.25 秒的单帧（切后台、生成缩略图等）不算掉帧
+    if (this.locked || frameDt <= 0 || frameDt > 0.25) return;
     this.samples.push(frameDt);
     if (this.samples.length > 30) this.samples.shift();
     if (this.samples.length < 30) return;
@@ -93,6 +102,7 @@ export class QualityController {
   }
 
   pixelRatio(dpr: number): number {
-    return Math.min(dpr, this.preset.maxPixelRatio);
+    const p = this.preset;
+    return Math.max(Math.min(dpr, p.minPixelRatio), Math.min(dpr, p.maxPixelRatio));
   }
 }

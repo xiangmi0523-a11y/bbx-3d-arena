@@ -130,11 +130,32 @@ describe('P2：部件系统', () => {
 });
 
 describe('P2：画质分级', () => {
-  it('iPhone 3x 屏从高清档起步，像素比 ≥ 2.5', async () => {
+  it('iPhone 3x 屏从高清档起步，按原生 3x 渲染（不做非整数缩放）', async () => {
     const { initialQuality, QualityController } = await import('../src/game/render/Quality');
     const lvl = initialQuality('Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X)', 3, 6);
     expect(lvl).toBe('high');
-    expect(new QualityController(lvl).pixelRatio(3)).toBeGreaterThanOrEqual(2.5);
+    expect(new QualityController(lvl).pixelRatio(3)).toBe(3);
+  });
+  it('P2.1：中/高/超档都是原生分辨率，最低档也不低于 2x', async () => {
+    const { QualityController, PRESETS } = await import('../src/game/render/Quality');
+    for (const lvl of ['medium', 'high', 'ultra'] as const) {
+      expect(new QualityController(lvl).pixelRatio(3)).toBe(3);
+      expect(new QualityController(lvl).pixelRatio(2)).toBe(2);
+    }
+    expect(new QualityController('low').pixelRatio(3)).toBe(2);
+    // 1x 屏不会被放大渲染
+    expect(new QualityController('low').pixelRatio(1)).toBe(1);
+    // 降档时先降粒子和阴影
+    expect(PRESETS.low.sparkScale).toBeLessThan(PRESETS.high.sparkScale);
+    expect(PRESETS.low.shadowMapSize).toBeLessThanOrEqual(PRESETS.high.shadowMapSize);
+  });
+  it('P2.1：组装界面生成缩略图之类的超长单帧不会触发降档', async () => {
+    const { QualityController } = await import('../src/game/render/Quality');
+    const q = new QualityController('high');
+    for (let i = 0; i < 40; i++) q.sample(1 / 60);
+    for (let i = 0; i < 10; i++) q.sample(0.4);
+    for (let i = 0; i < 200; i++) q.sample(1 / 60);
+    expect(q.level).toBe('high');
   });
   it('持续掉帧自动降档，最多升回一档', async () => {
     const { QualityController } = await import('../src/game/render/Quality');
@@ -143,5 +164,53 @@ describe('P2：画质分级', () => {
     expect(q.level).toBe('medium');
     for (let i = 0; i < 600; i++) q.sample(1 / 60);
     expect(['medium', 'high']).toContain(q.level);
+  });
+});
+
+describe('P2.1：撞击力度分级', () => {
+  it('轻擦 / 中等 / 猛撞三档阈值', async () => {
+    const { impactTier } = await import('../src/game/battle/impactTiers');
+    expect(impactTier(0.05)).toBe('light');
+    expect(impactTier(0.29)).toBe('light');
+    expect(impactTier(0.3)).toBe('medium');
+    expect(impactTier(0.6)).toBe('medium');
+    expect(impactTier(0.65)).toBe('heavy');
+    expect(impactTier(1)).toBe('heavy');
+  });
+  it('三档反馈明显不同，且不是所有碰撞都打满', async () => {
+    const { impactFeedback } = await import('../src/game/battle/impactTiers');
+    const light = impactFeedback(0.15);
+    const medium = impactFeedback(0.45);
+    const heavy = impactFeedback(0.85);
+    // 轻擦：无冲击波、无定格、无慢动作、几乎不震屏
+    expect(light.waves).toBe(0);
+    expect(light.hitstop).toBe(0);
+    expect(light.slowmo).toBe(0);
+    expect(light.shake).toBeLessThan(0.2);
+    expect(light.sparks).toBeLessThan(20);
+    // 中等：单层冲击波、短定格、不慢动作
+    expect(medium.waves).toBe(1);
+    expect(medium.hitstop).toBeGreaterThan(0);
+    expect(medium.slowmo).toBe(0);
+    // 猛撞：多层冲击波、更长定格、慢动作
+    expect(heavy.waves).toBeGreaterThanOrEqual(2);
+    expect(heavy.slowmo).toBeGreaterThan(0);
+    expect(heavy.hitstop).toBeGreaterThan(medium.hitstop);
+    // 各项随等级递增，且相邻两档差距明显（至少 1.5 倍）
+    for (const k of ['shake', 'sparks', 'sparkSpeed', 'flash', 'light'] as const) {
+      expect(medium[k], k).toBeGreaterThan(light[k] * 1.5);
+      expect(heavy[k], k).toBeGreaterThan(medium[k] * 1.2);
+    }
+  });
+  it('力度单调：越强反馈越大（同档内也连续变化）', async () => {
+    const { impactFeedback } = await import('../src/game/battle/impactTiers');
+    let prev = impactFeedback(0);
+    for (let s = 0.02; s <= 1.0001; s += 0.02) {
+      const f = impactFeedback(s);
+      expect(f.shake).toBeGreaterThanOrEqual(prev.shake);
+      expect(f.sparks).toBeGreaterThanOrEqual(prev.sparks);
+      expect(f.flash).toBeGreaterThanOrEqual(prev.flash);
+      prev = f;
+    }
   });
 });
