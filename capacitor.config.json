@@ -1,0 +1,9 @@
+{
+  "appId": "com.bbx3d.arena",
+  "appName": "BBX 3D Arena",
+  "webDir": "dist",
+  "ios": {
+    "contentInset": "never",
+    "preferredContentMode": "mobile"
+  }
+}

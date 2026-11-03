@@ -1,0 +1,32 @@
+{
+  "name": "bbx-3d-arena",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "原创 3D 陀螺对战游戏（离线单人），Three.js + Rapier 3D + React + Vite",
+  "scripts": {
+    "dev": "vite --host",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview --host",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "build:preview": "SINGLE_FILE=1 vite build",
+    "test:e2e": "node scripts/e2e.mjs"
+  },
+  "dependencies": {
+    "@dimforge/rapier3d-compat": "^0.19.3",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "three": "^0.181.2"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.2",
+    "@types/react-dom": "^19.2.2",
+    "@types/three": "^0.181.0",
+    "@vitejs/plugin-react": "^5.2.0",
+    "typescript": "^5.9.3",
+    "vite": "^7.3.7",
+    "vite-plugin-singlefile": "^2.3.4",
+    "vitest": "^4.1.12"
+  }
+}
