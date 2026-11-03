@@ -27,14 +27,21 @@ export function createArenaVisual(spec: ArenaSpec = ARENA): THREE.Group {
   geo.computeVertexNormals();
   const floor = new THREE.Mesh(
     geo,
-    new THREE.MeshStandardMaterial({ map: createFloorTexture(), roughness: 0.45, metalness: 0.25 }),
+    // 碗面：高光漆面 + 清漆层，能映出环境和灯光，陀螺下方有清晰阴影
+    new THREE.MeshPhysicalMaterial({
+      map: createFloorTexture(),
+      roughness: 0.38,
+      metalness: 0.15,
+      clearcoat: 0.8,
+      clearcoatRoughness: 0.12,
+    }),
   );
   floor.receiveShadow = true;
   group.add(floor);
 
   // 2) 极限轨道：沿外缘一圈齿条（实例化网格），口袋处断开
-  const toothGeo = new THREE.BoxGeometry(0.16, 0.12, 0.07);
-  const toothMat = new THREE.MeshStandardMaterial({ color: 0xff7a1a, metalness: 0.6, roughness: 0.35, emissive: 0x451a00 });
+  const toothGeo = new THREE.BoxGeometry(0.16, 0.12, 0.07, 1, 1, 1);
+  const toothMat = new THREE.MeshStandardMaterial({ color: 0xff8a2a, metalness: 0.85, roughness: 0.28, emissive: 0x2a0e00 });
   const teethCount = 180;
   const teeth = new THREE.InstancedMesh(toothGeo, toothMat, teethCount);
   const m = new THREE.Matrix4();
@@ -72,7 +79,7 @@ export function createArenaVisual(spec: ArenaSpec = ARENA): THREE.Group {
     side: THREE.DoubleSide,
     depthWrite: false,
   });
-  const rimMat = new THREE.MeshStandardMaterial({ color: 0x2b3448, metalness: 0.7, roughness: 0.3 });
+  const rimMat = new THREE.MeshPhysicalMaterial({ color: 0x232a3a, metalness: 0.6, roughness: 0.3, clearcoat: 0.6 });
   const glowMat = new THREE.MeshBasicMaterial({ color: 0x46c8ff });
   const wallH = spec.wallHeight + 0.4;
   for (const [a0, a1] of wallArcs(spec)) {

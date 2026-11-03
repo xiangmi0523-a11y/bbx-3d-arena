@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { FINISH_LABEL } from '../game/battle/BattleSystem';
 import { GameEngine, type BeyHud, type GameSnapshot } from '../game/core/GameEngine';
+import { GarageScreen } from './GarageScreen';
 import { LauncherPad } from './LauncherPad';
+import type { QualityLevel } from '../game/render/Quality';
 
 declare global {
   interface Window {
@@ -62,7 +64,7 @@ function Overlay({ engine }: { engine: GameEngine }) {
 
   return (
     <div className="overlay">
-      <RotateHint />
+      {s.phase !== "garage" && <RotateHint />}
       {s.phase === 'loading' && <div className="center-card">正在加载物理引擎…</div>}
       {s.phase === 'error' && (
         <div className="center-card error">
@@ -83,14 +85,23 @@ function Overlay({ engine }: { engine: GameEngine }) {
             <div className="vs">VS</div>
             <BeyCard hud={s.rival} side="rival" />
           </div>
-          <button className="btn primary big" onClick={() => engine.start()} data-testid="start">
-            开始对战
-          </button>
+          <div className="title-actions">
+            <button className="btn big" onClick={() => engine.openGarage()} data-testid="open-garage">
+              组装陀螺
+            </button>
+            <button className="btn primary big" onClick={() => engine.start()} data-testid="start">
+              开始对战
+            </button>
+          </div>
           <div className="record">
             战绩 {s.save.wins} 胜 {s.save.losses} 负 · 累计 {s.save.points} 分
           </div>
         </div>
       )}
+
+      {s.phase === 'garage' && <GarageScreen engine={engine} s={s} />}
+
+      {s.slowmo && <div className="slowmo-vignette" />}
 
       {(s.phase === 'aim' || s.phase === 'battle' || s.phase === 'result') && (
         <>
@@ -128,6 +139,7 @@ function Overlay({ engine }: { engine: GameEngine }) {
             <button className="btn ghost" onClick={() => engine.toTitle()}>
               返回标题
             </button>
+            <QualityPicker engine={engine} level={s.quality} />
           </div>
         </div>
       )}
@@ -144,13 +156,36 @@ function Overlay({ engine }: { engine: GameEngine }) {
             <button className="btn primary" onClick={() => engine.restart()} data-testid="again">
               再来一局
             </button>
+            <button className="btn" onClick={() => engine.openGarage()}>
+              更换部件
+            </button>
             <button className="btn ghost" onClick={() => engine.toTitle()}>
               返回标题
             </button>
           </div>
         </div>
       )}
-      {import.meta.env.DEV && s.fps > 0 && <div className="fps">{s.fps} fps</div>}
+      {s.fps > 0 && s.phase !== "garage" && <div className="fps">{s.fps} fps · {s.quality}</div>}
+    </div>
+  );
+}
+
+const QUALITY_LABEL: Record<QualityLevel, string> = { low: '流畅', medium: '均衡', high: '高清', ultra: '极致' };
+
+function QualityPicker({ engine, level }: { engine: GameEngine; level: QualityLevel }) {
+  return (
+    <div className="quality">
+      <div className="quality-label">画质（自动调整中：{QUALITY_LABEL[level]}）</div>
+      <div className="quality-row">
+        {(['low', 'medium', 'high', 'ultra'] as QualityLevel[]).map((q) => (
+          <button key={q} className={`btn tiny ${q === level ? 'on' : ''}`} onClick={() => engine.setQuality(q)}>
+            {QUALITY_LABEL[q]}
+          </button>
+        ))}
+        <button className="btn tiny ghost" onClick={() => engine.setQuality('auto')}>
+          自动
+        </button>
+      </div>
     </div>
   );
 }

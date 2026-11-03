@@ -130,16 +130,18 @@ export class BattleCamera {
     this.focus.lerp(this.desiredFocus, kFocus);
 
     // 震动
-    this.shake = Math.max(0, this.shake - dt * 2.8);
-    this.fovKick = Math.max(0, this.fovKick - dt * 2.2);
-    const s = this.shake * this.shake * 0.18;
+    this.shake = Math.max(0, this.shake - dt * 4.5);
+    this.fovKick = Math.max(0, this.fovKick - dt * 3.5);
+    // 震动幅度小、衰减快（约 0.2 秒），不影响观察和操作
+    const s = this.shake * this.shake * 0.1;
     const shakeOffset = new THREE.Vector3(
       Math.sin(this.time * 71) * s,
       Math.sin(this.time * 53 + 1) * s,
       Math.sin(this.time * 61 + 2) * s,
     );
     this.camera.lookAt(this.focus.clone().add(shakeOffset));
-    const fov = this.baseFov - this.fovKick * 7;
+    // 冲击缩放：FOV 瞬间收紧再回弹
+    const fov = this.baseFov - this.fovKick * 5;
     if (Math.abs(this.camera.fov - fov) > 0.01) {
       this.camera.fov = fov;
       this.camera.updateProjectionMatrix();
