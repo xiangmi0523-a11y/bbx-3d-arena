@@ -27,7 +27,12 @@ export interface AssembledBey {
   outerRadius: number;
   /** 发射时的最大转速（rad/s），由重量和部件决定 */
   maxSpin: number;
+  /** 绕转轴的转动惯量（kg·m² 的游戏单位），由各零件质量、半径和重量分布算出 */
+  spinInertia: number;
 }
+
+/** 转动惯量的参考值（约等于默认组合），转速衰减和撞击掉速都按 参考值 / 实际值 缩放 */
+export const REF_INERTIA = 0.55;
 
 function layer(bottom: number, height: number): StackLayer {
   return { bottom, top: bottom + height, center: bottom + height / 2 };
@@ -54,6 +59,10 @@ export function assembleBey(loadout: BeyLoadout): AssembledBey {
     outerRadius: Math.max(blade.radius, disc.radius),
     // 越重转速上限略低，但惯量更大
     maxSpin: 170 - (totalMass - 4) * 6,
+    spinInertia:
+      blade.mass * blade.radius * blade.radius * blade.rimWeight +
+      disc.mass * disc.radius * disc.radius * disc.rimWeight +
+      tip.mass * tip.contactRadius * tip.contactRadius * 0.5,
   };
 }
 

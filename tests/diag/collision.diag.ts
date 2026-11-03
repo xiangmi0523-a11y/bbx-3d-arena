@@ -2,6 +2,8 @@ import { appendFileSync, mkdirSync, writeFileSync } from 'node:fs';
 import { test } from 'vitest';
 import { BEY_TUNING } from '../../src/game/beys/BeyPhysics';
 import { SMASH_TUNING } from '../../src/game/battle/BattleSystem';
+import { ARENA } from '../../src/game/arena/arenaSpec';
+if (process.env.DIAG_ARENA) Object.assign(ARENA, JSON.parse(process.env.DIAG_ARENA));
 if (process.env.DIAG_TUNE) Object.assign(BEY_TUNING, JSON.parse(process.env.DIAG_TUNE));
 if (process.env.DIAG_SMASH) Object.assign(SMASH_TUNING, JSON.parse(process.env.DIAG_SMASH));
 

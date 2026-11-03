@@ -4,8 +4,9 @@
  * 力度 strength 0..1 来自物理：碰撞前一刻两台陀螺沿法线的接近速度 + 转速带来的接触面速度。
  * 三个等级的反馈必须明显不同，而不是所有碰撞都打满：
  *  - light  轻擦：几粒细火花、清脆的“叮”，几乎不震屏，不打断节奏；
- *  - medium 中等：成束火花 + 单层冲击波 + 金属“铛”声 + 轻微震屏和 Hit-stop；
- *  - heavy  猛撞：大量长拖尾火花 + 双层冲击波 + 低频重击声 + 明显震屏 + Hit-stop + 慢动作。
+ *  - medium 中等：成束火花 + 单层冲击波 + 金属“铛”声 + 轻微震屏；
+ *  - heavy  猛撞：大量长拖尾火花 + 多层冲击波 + 低频重击声 + 明显震屏和方向性镜头冲击。
+ * P2.2.1：取消 Hit-stop 和慢动作，时间始终正常流动；力度只靠真实物理结果和上面的视听反馈表现。
  */
 
 export type ImpactTier = 'light' | 'medium' | 'heavy';
@@ -26,10 +27,6 @@ export interface ImpactFeedback {
   shake: number;
   /** 冲击推近 0..1 */
   fovKick: number;
-  /** Hit-stop 定格时长（真实秒） */
-  hitstop: number;
-  /** 慢动作持续时长（真实秒），0 = 不触发 */
-  slowmo: number;
   /** 火花数量（高画质下） */
   sparks: number;
   /** 火花速度倍率（喷射距离） */
@@ -59,8 +56,6 @@ export function impactFeedback(strength: number): ImpactFeedback {
       local: k,
       shake: lerp(0.04, 0.14, k),
       fovKick: 0,
-      hitstop: 0,
-      slowmo: 0,
       sparks: Math.round(lerp(5, 16, k)),
       sparkSpeed: lerp(0.45, 0.7, k),
       sparkLife: lerp(0.55, 0.75, k),
@@ -77,8 +72,6 @@ export function impactFeedback(strength: number): ImpactFeedback {
       local: k,
       shake: lerp(0.32, 0.5, k),
       fovKick: lerp(0.15, 0.35, k),
-      hitstop: lerp(0.02, 0.035, k),
-      slowmo: 0,
       sparks: Math.round(lerp(34, 60, k)),
       sparkSpeed: lerp(0.85, 1.1, k),
       sparkLife: lerp(0.9, 1.1, k),
@@ -94,8 +87,6 @@ export function impactFeedback(strength: number): ImpactFeedback {
     local: k,
     shake: lerp(0.75, 1, k),
     fovKick: lerp(0.65, 1, k),
-    hitstop: lerp(0.055, 0.085, k),
-    slowmo: lerp(0.18, 0.3, k),
     sparks: Math.round(lerp(100, 150, k)),
     sparkSpeed: lerp(1.35, 1.75, k),
     sparkLife: lerp(1.3, 1.6, k),

@@ -30,7 +30,8 @@ function partBars(p: PartSpec): [string, number][] {
   }
   return [
     ['耐久', 1 - (p.spinDecay - 0.6) / 2.4],
-    ['机动', p.friction],
+    // P2.2.1：橡胶轴心摩擦系数调低后，机动性改按“漂移量”（轴心牵引跑动的强度）显示，更接近实战表现
+    ['机动', p.drift / 0.2],
     ['冲刺', p.gearGrip],
   ];
 }

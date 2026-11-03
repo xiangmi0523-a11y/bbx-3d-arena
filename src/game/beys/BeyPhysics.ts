@@ -1,7 +1,7 @@
 import type RAPIER from '@dimforge/rapier3d-compat';
 import { ARENA, floorHeight } from '../arena/arenaSpec';
 import { GRAVITY, type PhysicsWorld } from '../physics/PhysicsWorld';
-import type { AssembledBey } from './parts/assemble';
+import { REF_INERTIA, type AssembledBey } from './parts/assemble';
 
 export interface Vec3 {
   x: number;
@@ -48,6 +48,8 @@ export const BEY_TUNING = {
   precessSpin: 80,
   /** 冲刺方向向场地中心偏转的比例 */
   railInward: 0.8,
+  /** 陀尖接地宽度对抗倾倒能力的影响（0 = 不影响，1 = 完全按宽度）。宽轴心（球头/平底）更难被撞倒 */
+  tipStability: 0.5,
   /**
    * 轴心牵引（花瓣轨迹）：平底 / 橡胶轴心倾斜着咬地，接触面偏离转轴，
    * 转动的接触面与地面的摩擦把陀螺推向“垂直于倾斜方向”，倾斜方向随进动旋转 → 花瓣形轨迹。
@@ -60,8 +62,8 @@ export const BEY_TUNING = {
    * 轴心滚动 / 滑动阻力：水平减速度 = (rollBase + rollFriction × 轴心摩擦) × g。
    * 没有这一项时，陀螺在碗边的离心轨道几乎不损失能量，会长时间绕外圈（P2.1 诊断：最长 24 秒没有交锋）。
    */
-  rollBase: 0.012,
-  rollFriction: 0.06,
+  rollBase: 0.02,
+  rollFriction: 0.02,
 };
 
 /**
@@ -100,6 +102,12 @@ export class BeyPhysics {
     this.spec = spec;
     const { R, world } = pw;
     this.spinSign = spec.blade.spin === 'right' ? -1 : 1; // 右旋 = 俯视顺时针 = 绕 +Y 负方向
+    this.inertiaRatio = REF_INERTIA / spec.spinInertia;
+    // 抗倾倒 = 角动量（惯量）× 陀尖接地宽度：宽的平底 / 球头被撞歪时接触点外移、自己扶正；
+    // 针尖几乎没有扶正力矩，被猛撞容易大幅倾斜、边缘刮地掉速
+    const tipK = BEY_TUNING.tipStability;
+    this.gyroFactor =
+      Math.sqrt(spec.spinInertia / REF_INERTIA) * (1 - tipK + tipK * Math.min(1.3, spec.tip.contactRadius / 0.12));
 
     const tilt = launch.tilt ?? 0;
     const axis = launch.tiltAxis ?? { x: 1, y: 0, z: 0 };
@@ -212,6 +220,10 @@ export class BeyPhysics {
   readonly prevPos: Vec3 = { x: 0, y: 0, z: 0 };
   readonly prevUp: Vec3 = { x: 0, y: 1, z: 0 };
   private hasPrev = false;
+  /** 参考惯量 / 实际惯量：摩擦力矩造成的掉速倍率 */
+  private readonly inertiaRatio: number;
+  /** 陀螺自稳强度倍率（√(I / 参考惯量)） */
+  private readonly gyroFactor: number;
   private ccdOn = false;
 
   /** 每个物理步之前调用 */
@@ -247,7 +259,9 @@ export class BeyPhysics {
 
     // 1) 转速衰减：轴心恒定摩擦 + 空气阻力 + 倾倒刮地
     let mag = Math.abs(spinSigned);
-    let decay = this.spec.tip.spinDecay + T.airDrag * mag;
+    // 轴心摩擦、牵引、刮地都是“力矩”，转速下降 = 力矩 / 转动惯量：
+    // 同样的轴心，惯量大（重量集中在外缘）的陀螺掉速更慢 → 耐力型的优势来自零件本身
+    let decay = this.spec.tip.spinDecay;
     if (this.tilt > 0.5) decay += T.scrapeDecay * Math.min(1, (this.tilt - 0.5) * 2);
 
     // 2) 极限轨道：齿轮轴心咬合轨道冲刺
@@ -299,10 +313,12 @@ export class BeyPhysics {
       }
     }
 
+    decay = decay * this.inertiaRatio + T.airDrag * mag;
     mag = Math.max(0, mag - decay * dt);
 
-    // 3) 陀螺仪自稳：转得越快越能保持直立
-    const s = Math.max(0, Math.min(1, (mag - T.minStableSpin) / (this.launchSpin * 0.3)));
+    // 3) 陀螺仪自稳：转得越快越能保持直立；角动量 L = Iω 越大越难被撞歪（防御 / 耐力型更稳）
+    const s =
+      Math.max(0, Math.min(1, (mag - T.minStableSpin) / (this.launchSpin * 0.3))) * this.gyroFactor;
     if (s > 0) {
       // 目标姿态：轴心类型决定的“自然倾角”，倾斜方向以进动角速度绕竖直轴旋转。
       // 倾斜的轴心与地面的接触点偏离转轴，摩擦力方向随进动旋转，

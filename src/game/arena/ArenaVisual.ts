@@ -42,7 +42,8 @@ export function createArenaVisual(spec: ArenaSpec = ARENA): THREE.Group {
   // 2) 极限轨道：沿外缘一圈齿条（实例化网格），口袋处断开
   const toothGeo = new THREE.BoxGeometry(0.16, 0.12, 0.07, 1, 1, 1);
   const toothMat = new THREE.MeshStandardMaterial({ color: 0xff8a2a, metalness: 0.85, roughness: 0.28, emissive: 0x2a0e00 });
-  const teethCount = 180;
+  // 齿距保持不变：齿数随周长增加
+  const teethCount = Math.round(180 * (spec.radius / 4.6));
   const teeth = new THREE.InstancedMesh(toothGeo, toothMat, teethCount);
   const m = new THREE.Matrix4();
   const q = new THREE.Quaternion();

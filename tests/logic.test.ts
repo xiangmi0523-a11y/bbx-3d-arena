@@ -182,20 +182,20 @@ describe('P2.1：撞击力度分级', () => {
     const light = impactFeedback(0.15);
     const medium = impactFeedback(0.45);
     const heavy = impactFeedback(0.85);
-    // 轻擦：无冲击波、无定格、无慢动作、几乎不震屏
+    // P2.2.1：任何等级都不再改变时间流速（没有定格 / 慢动作字段）
+    for (const f of [light, medium, heavy]) {
+      expect('hitstop' in f).toBe(false);
+      expect('slowmo' in f).toBe(false);
+    }
+    // 轻擦：无冲击波、几乎不震屏
     expect(light.waves).toBe(0);
-    expect(light.hitstop).toBe(0);
-    expect(light.slowmo).toBe(0);
     expect(light.shake).toBeLessThan(0.2);
     expect(light.sparks).toBeLessThan(20);
-    // 中等：单层冲击波、短定格、不慢动作
+    // 中等：单层冲击波
     expect(medium.waves).toBe(1);
-    expect(medium.hitstop).toBeGreaterThan(0);
-    expect(medium.slowmo).toBe(0);
-    // 猛撞：多层冲击波、更长定格、慢动作
+    // 猛撞：多层冲击波、明显的镜头冲击
     expect(heavy.waves).toBeGreaterThanOrEqual(2);
-    expect(heavy.slowmo).toBeGreaterThan(0);
-    expect(heavy.hitstop).toBeGreaterThan(medium.hitstop);
+    expect(heavy.fovKick).toBeGreaterThan(medium.fovKick * 1.5);
     // 各项随等级递增，且相邻两档差距明显（至少 1.5 倍）
     for (const k of ['shake', 'sparks', 'sparkSpeed', 'flash', 'light'] as const) {
       expect(medium[k], k).toBeGreaterThan(light[k] * 1.5);

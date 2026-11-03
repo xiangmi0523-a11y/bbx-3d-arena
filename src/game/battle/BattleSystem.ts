@@ -68,8 +68,8 @@ export const SMASH_TUNING = {
   engageBase: 0.4,
   engageRef: 5,
   engageMin: 0.35,
-  /** 刀刃碰撞的额外摩擦损失：每单位冲量 / 质量损失的转速 */
-  spinLoss: 0.8,
+  /** 刀刃碰撞的摩擦损失：掉速 = spinLoss × 冲量 × 刀刃半径 / 转动惯量 */
+  spinLoss: 0.19,
   /** 两次撞击结算的最短间隔（秒）；连续撞击各自独立结算 */
   cooldown: 0.07,
   /** 力度：总冲量折算的相对速度变化达到该值（m/s）即满力度 */
@@ -214,10 +214,11 @@ export class BattleSystem {
     // 牛顿第三定律：A 受 -I，B 受 +I；速度变化按各自质量分配（重的陀螺被推得少）
     b.body.applyImpulseAtPoint({ x: ix, y: 0, z: iz }, { x: cx, y: cy, z: cz }, true);
     a.body.applyImpulseAtPoint({ x: -ix, y: 0, z: -iz }, { x: cx, y: cy, z: cz }, true);
-    // 金属刀刃互相刮擦的摩擦损失（冲量越大损失越多，重的陀螺损失得少）
+    // 金属刀刃互相刮擦的摩擦损失：冲量作用在刀刃外缘，角冲量 = 冲量 × 半径，
+    // 掉速 = 角冲量 / 转动惯量（惯量大、重量在外缘的陀螺被撞后掉速少）
     const jSmash = Math.hypot(jn, jt);
-    a.loseSpin((T.spinLoss * jSmash) / ma);
-    b.loseSpin((T.spinLoss * jSmash) / mb);
+    a.loseSpin((T.spinLoss * jSmash * ra) / a.spec.spinInertia);
+    b.loseSpin((T.spinLoss * jSmash * rb) / b.spec.spinInertia);
 
     const impulse = this.contactImpulse(a, b) + jSmash;
     const dvRel = impulse / mu;

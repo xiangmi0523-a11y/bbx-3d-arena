@@ -187,12 +187,6 @@ body {
 
 /* ───────── P2：标题按钮 / 慢动作 / 画质 ───────── */
 .title-actions { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
-.slowmo-vignette {
-  position: absolute; inset: 0; pointer-events: none !important;
-  background: radial-gradient(ellipse at center, rgba(0,0,0,0) 55%, rgba(120,170,255,0.18) 100%);
-  animation: slowmo-in 0.12s ease-out;
-}
-@keyframes slowmo-in { from { opacity: 0; } to { opacity: 1; } }
 .btn.small { min-width: 0; padding: 8px 14px; font-size: 14px; min-height: 40px; border-radius: 10px; }
 .btn.tiny { min-width: 0; padding: 6px 10px; font-size: 12px; min-height: 32px; border-radius: 8px; }
 .btn.on { background: rgba(57, 240, 216, 0.2); border-color: var(--cyan); }

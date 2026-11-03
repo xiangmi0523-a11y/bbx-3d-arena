@@ -188,12 +188,19 @@ try {
   check('性能：每帧绘制调用 < 250', perf.calls < 250, `draw calls=${perf.calls}，三角形=${perf.tris}`);
 
   // 战斗中物理推进、刚体运动
+  // P2.2.1：耐力型（针尖）稳在中央附近绕小圈，起止点直线距离可能很小，所以按 1.5 秒内的轨迹长度判断
   const s0 = await page.evaluate(() => window.__game.debugState());
-  await page.waitForTimeout(1500);
+  let moved = 0;
+  let prev = s0;
+  for (let i = 0; i < 6; i++) {
+    await page.waitForTimeout(250);
+    const s = await page.evaluate(() => window.__game.debugState());
+    moved += Math.hypot(s.player.x - prev.player.x, s.player.z - prev.player.z);
+    prev = s;
+  }
   await page.screenshot({ path: `${OUT}/04-battle.png` });
   const s1 = await page.evaluate(() => window.__game.debugState());
-  const moved = Math.hypot(s1.player.x - s0.player.x, s1.player.z - s0.player.z);
-  check('物理：陀螺刚体在运动', moved > 0.3 && s1.time > s0.time, `位移 ${moved.toFixed(2)}，转速 ${s1.player.spin.toFixed(0)} rad/s`);
+  check('物理：陀螺刚体在运动', moved > 0.3 && s1.time > s0.time, `轨迹长度 ${moved.toFixed(2)}，转速 ${s1.player.spin.toFixed(0)} rad/s`);
   check('物理：陀螺落在场地上（没有穿模掉落）', s1.player.y > -0.2 && s1.rival.y > -0.2, `y=${s1.player.y.toFixed(2)}/${s1.rival.y.toFixed(2)}`);
 
   // ── P2.2 性能：主循环分段计时（CPU 侧），物理步耗时与渲染插值 ──
@@ -207,12 +214,11 @@ try {
     pf.tickMs < 4,
     `tick ${pf.tickMs.toFixed(2)}ms = 物理 ${pf.physicsMs.toFixed(2)} + 同步 ${pf.syncMs.toFixed(2)} + 特效 ${pf.fxMs.toFixed(2)} + 镜头 ${pf.camMs.toFixed(2)} + UI ${pf.uiMs.toFixed(2)}；渲染提交 ${pf.renderSubmitMs.toFixed(2)}ms（软件渲染）`,
   );
-  // 渲染插值：慢动作时每帧不足一个物理步，陀螺的显示位置仍应连续变化（不是隔帧跳一次）
+  // 渲染插值：物理 120Hz 与屏幕帧不同步，陀螺的显示位置仍应逐帧连续变化
   const interp = await page.evaluate(
     () =>
       new Promise((resolve) => {
         const g = window.__game;
-        g.debugImpact(0.95);
         const xs = [];
         const loop = () => {
           const p = g.visuals.player.root.position;
@@ -225,13 +231,13 @@ try {
   );
   let moves = 0;
   for (let i = 1; i < interp.length; i++) if (Math.abs(interp[i] - interp[i - 1]) > 1e-6) moves++;
-  check('P2.2 渲染插值：Hit-stop / 慢动作期间陀螺位置逐帧连续', moves >= interp.length - 3, `${moves}/${interp.length - 1} 帧有位移`);
+  check('P2.2 渲染插值：陀螺位置逐帧连续', moves >= interp.length - 3, `${moves}/${interp.length - 1} 帧有位移`);
   const vib = await page.evaluate(() => typeof navigator.vibrate);
   check('P2.2 振动：只在支持的浏览器调用（iPhone Safari 无此 API）', true, `本环境 navigator.vibrate: ${vib}`);
 
   // ── P2.1 撞击分级：轻擦 / 中等 / 猛撞反馈不同 ──
   const tierOf = async (strength) => {
-    await page.waitForTimeout(700); // 等上一档的定格冷却结束
+    await page.waitForTimeout(700); // 两次撞击之间留一点间隔，便于截图
     return page.evaluate((x) => {
       window.__game.debugImpact(x);
       return window.__game.debugLastImpact();
@@ -243,31 +249,21 @@ try {
   const mt = await tierOf(0.45);
   await page.waitForTimeout(30);
   await page.screenshot({ path: `${OUT}/14b-impact-medium.png` });
-  await page.waitForTimeout(2300); // 慢动作冷却
+  // P2.2.1：猛撞前后时间流速保持正常（物理时间 / 帧时间 ≈ 1，没有定格和慢动作）
+  await page.evaluate(() => window.__game.debugPerf(true));
   const ht = await tierOf(0.95);
-  // 逐帧记录之后 1 秒内的最小时间缩放（Hit-stop 定格 + 慢动作）
-  const minScale = await page.evaluate(
-    () =>
-      new Promise((resolve) => {
-        let min = 1;
-        const t0 = performance.now();
-        const loop = () => {
-          min = Math.min(min, window.__game.debugLastImpact().timeScale);
-          if (performance.now() - t0 < 1000) requestAnimationFrame(loop);
-          else resolve(min);
-        };
-        loop();
-      }),
-  );
-  await page.evaluate(() => window.__game.debugImpact(0.95));
   await page.waitForTimeout(30);
   await page.screenshot({ path: `${OUT}/14c-impact-heavy.png` });
   await page.waitForTimeout(120);
   await page.screenshot({ path: `${OUT}/15-impact-trails.png` });
-  check('撞击分级：轻擦无定格、无慢动作', lt.tier === 'light' && lt.hitstop === 0 && lt.slowmo === 0, JSON.stringify(lt));
-  check('撞击分级：中等有短定格、无慢动作', mt.tier === 'medium' && mt.hitstop > 0 && mt.slowmo === 0, JSON.stringify(mt));
-  check('撞击分级：猛撞有 Hit-stop + 慢动作', ht.tier === 'heavy' && ht.hitstop > mt.hitstop && ht.slowmo > 0, JSON.stringify(ht));
-  check('撞击分级：猛撞瞬间时间几乎定格 / 慢放', minScale < 0.3, `最小 timeScale=${minScale.toFixed(2)}`);
+  await page.evaluate(() => {
+    for (let i = 0; i < 4; i++) setTimeout(() => window.__game.debugImpact(0.95), i * 150);
+  });
+  await page.waitForTimeout(1500);
+  const tr = await page.evaluate(() => window.__game.debugPerf(true));
+  check('撞击分级：三档分别为轻擦 / 中等 / 猛撞', lt.tier === 'light' && mt.tier === 'medium' && ht.tier === 'heavy', `${lt.tier} / ${mt.tier} / ${ht.tier}`);
+  check('P2.2.1 无慢动作：连续猛撞期间物理时间与真实时间同速', Math.abs(tr.timeRatio - 1) < 0.15, `物理时间 / 帧时间 = ${tr.timeRatio.toFixed(3)}（${tr.frames} 帧）`);
+  check('P2.2.1 无慢动作：没有慢动作暗角', (await page.locator('.slowmo-vignette').count()) === 0);
 
   // 暂停：物理时间不再前进
   await page.tap('[data-testid=pause]');

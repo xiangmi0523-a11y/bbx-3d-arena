@@ -106,9 +106,10 @@ try {
     // 测量窗口：前半段自由对战，后半段每 0.5 秒触发一次猛撞特效（满粒子负载）
     const t0 = Date.now();
     await page.waitForTimeout((SECONDS * 1000) / 2);
-    const fxTimer = await page.evaluate(() => {
-      return setInterval(() => window.__game.debugImpact(0.95), 500);
-    });
+    // PERF_FX=0：不触发猛撞特效（P2.2 的猛撞带慢动作，会让每帧物理步数大幅减少，和无慢动作版本不可直接比）
+    const fxTimer = await page.evaluate((on) => {
+      return on ? setInterval(() => window.__game.debugImpact(0.95), 500) : 0;
+    }, process.env.PERF_FX !== '0');
     await page.waitForTimeout((SECONDS * 1000) / 2);
     await page.evaluate((id) => clearInterval(id), fxTimer);
     const wall = (Date.now() - t0) / 1000;

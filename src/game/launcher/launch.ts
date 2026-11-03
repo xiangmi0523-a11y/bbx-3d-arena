@@ -1,4 +1,4 @@
-import { floorHeight } from '../arena/arenaSpec';
+import { ARENA_SCALE, floorHeight } from '../arena/arenaSpec';
 import type { LaunchParams } from '../beys/BeyPhysics';
 import type { AssembledBey } from '../beys/parts/assemble';
 import type { LaunchCommand } from './PullStringGesture';
@@ -6,7 +6,7 @@ import type { LaunchCommand } from './PullStringGesture';
 export type Side = 'player' | 'rival';
 
 /** 发射点所在半径与离地高度 */
-export const LAUNCH_RADIUS = 2.7;
+export const LAUNCH_RADIUS = 2.7 * ARENA_SCALE;
 export const LAUNCH_HEIGHT = 0.75;
 
 /** 玩家在 +Z 一侧（靠近镜头），对手在 -Z 一侧 */

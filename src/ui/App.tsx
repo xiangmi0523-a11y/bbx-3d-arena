@@ -101,7 +101,6 @@ function Overlay({ engine }: { engine: GameEngine }) {
 
       {s.phase === 'garage' && <GarageScreen engine={engine} s={s} />}
 
-      {s.slowmo && <div className="slowmo-vignette" />}
 
       {(s.phase === 'aim' || s.phase === 'battle' || s.phase === 'result') && (
         <>
