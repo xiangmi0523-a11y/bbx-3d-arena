@@ -137,3 +137,69 @@ export function createSpinBlurTexture(color: number): THREE.CanvasTexture {
     }
   });
 }
+
+/**
+ * 「疾风新月」中心徽标（原创图形）：黑底 + 蓝色外环，中间是三道旋转前掠的风刃新月和一颗四角星。
+ * 参考图的徽标位置是黑底圆形图案，这里只沿用“黑底圆徽 + 蓝白配色”的形式，图案不使用参考图里的龙头。
+ */
+export function createGaleEmblemTexture(): THREE.CanvasTexture {
+  return canvasTexture(256, (ctx, S) => {
+    const c = S / 2;
+    // 黑底（中心略亮，有立体感）
+    const bg = ctx.createRadialGradient(c, c * 0.85, 0, c, c, c);
+    bg.addColorStop(0, '#16203a');
+    bg.addColorStop(0.75, '#070a12');
+    bg.addColorStop(1, '#020306');
+    ctx.fillStyle = bg;
+    ctx.beginPath();
+    ctx.arc(c, c, c, 0, Math.PI * 2);
+    ctx.fill();
+    // 蓝色外环 + 内细白环
+    ctx.lineWidth = S * 0.045;
+    ctx.strokeStyle = '#1f6bff';
+    ctx.beginPath();
+    ctx.arc(c, c, c * 0.93, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.lineWidth = S * 0.008;
+    ctx.strokeStyle = 'rgba(220,235,255,0.7)';
+    ctx.beginPath();
+    ctx.arc(c, c, c * 0.84, 0, Math.PI * 2);
+    ctx.stroke();
+
+    ctx.save();
+    ctx.translate(c, c);
+    const k = c * 0.72;
+    // 三道风刃新月：每道是两条圆弧围成的弯月，绕中心 120° 旋转排布
+    for (let i = 0; i < 3; i++) {
+      ctx.save();
+      ctx.rotate((i / 3) * Math.PI * 2 - 0.35);
+      const grad = ctx.createLinearGradient(0, -k, 0, -k * 0.2);
+      grad.addColorStop(0, '#ffffff');
+      grad.addColorStop(0.35, '#7fb4ff');
+      grad.addColorStop(1, '#1240c8');
+      ctx.fillStyle = grad;
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = S * 0.012;
+      ctx.lineJoin = 'round';
+      ctx.beginPath();
+      ctx.moveTo(-k * 0.12, -k * 0.22);
+      ctx.quadraticCurveTo(-k * 0.05, -k * 0.95, k * 0.62, -k * 0.86);
+      ctx.quadraticCurveTo(k * 0.18, -k * 0.62, k * 0.16, -k * 0.2);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+      ctx.restore();
+    }
+    // 中心四角星
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath();
+    for (let i = 0; i < 8; i++) {
+      const a = (i / 8) * Math.PI * 2 - Math.PI / 2;
+      const r = (i % 2 === 0 ? 0.26 : 0.08) * k;
+      ctx.lineTo(Math.cos(a) * r, Math.sin(a) * r);
+    }
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+  }, 2);
+}

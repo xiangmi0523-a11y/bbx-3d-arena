@@ -4,6 +4,7 @@
  *   npx vite  →  打开 /tools/bey-sheet.html
  *   参数：?set=balance|attack|defense|stamina（默认 balance）
  *         或 ?blade=<id>&disc=<id>&tip=<id> 指定任意组合
+ *         ?only=blade|disc|tip 只显示单个零件（爆炸图格换成该零件的独立 3D 展示）
  *
  * 一屏 6 个视图：顶视 / 侧视 / 底视（正交）、爆炸图、侧视 + 碰撞体、透视 + 碰撞体。
  * 碰撞体直接读自真实的 Rapier 刚体（tools/inspect/colliders.ts），不是按参数另画一份，
@@ -29,6 +30,7 @@ const q = new URLSearchParams(location.search);
 const base = SETS[q.get('set') ?? 'balance'] ?? SETS.balance;
 const loadout: BeyLoadout = { blade: q.get('blade') ?? base.blade, disc: q.get('disc') ?? base.disc, tip: q.get('tip') ?? base.tip };
 const spec = assembleBey(loadout);
+const only = (['blade', 'disc', 'tip'] as const).find((k) => k === q.get('only')) ?? null;
 
 const COLORS: Record<ColliderInfo['label'], number> = {
   blade: 0xff8a1f,
@@ -73,6 +75,7 @@ function makeScene(): THREE.Scene {
 const sceneA = makeScene();
 const visual = createBeyVisual(spec);
 visual.blur.visible = false;
+if (only) for (const k of ['blade', 'disc', 'tip'] as const) visual.slots[k].visible = k === only;
 sceneA.add(visual.root);
 // 地面基准线（y = 0）与转轴
 const axis = new THREE.Line(
@@ -127,13 +130,18 @@ function colliderMesh(c: ColliderInfo): THREE.Object3D {
 const sceneB = makeScene();
 const exploded = createBeyVisual(spec);
 exploded.blur.visible = false;
-exploded.slots.tip.position.y = spec.layers.tip.bottom - 0.12;
-exploded.slots.disc.position.y = spec.layers.disc.bottom + 0.2;
-exploded.slots.blade.position.y = spec.layers.blade.bottom + 0.55;
+if (only) {
+  for (const k of ['blade', 'disc', 'tip'] as const) exploded.slots[k].visible = k === only;
+  exploded.root.rotation.y = 0.5;
+} else {
+  exploded.slots.tip.position.y = spec.layers.tip.bottom - 0.12;
+  exploded.slots.disc.position.y = spec.layers.disc.bottom + 0.2;
+  exploded.slots.blade.position.y = spec.layers.blade.bottom + 0.55;
+}
 sceneB.add(exploded.root);
 
 // ── 相机 ──
-const S = 0.68; // 正交视图半宽
+const S = only === 'blade' ? 0.6 : 0.68; // 正交视图半宽
 const ortho = (pos: THREE.Vector3, up: THREE.Vector3, target: THREE.Vector3) => {
   const c = new THREE.OrthographicCamera(-S, S, S, -S, 0.01, 20);
   c.position.copy(pos);
@@ -141,7 +149,7 @@ const ortho = (pos: THREE.Vector3, up: THREE.Vector3, target: THREE.Vector3) => 
   c.lookAt(target);
   return c;
 };
-const midY = spec.totalHeight / 2;
+const midY = only ? spec.layers[only].center : spec.totalHeight / 2;
 const camTop = ortho(new THREE.Vector3(0, 5, 0), new THREE.Vector3(0, 0, -1), new THREE.Vector3(0, 0, 0));
 const camSide = ortho(new THREE.Vector3(0, midY, 5), new THREE.Vector3(0, 1, 0), new THREE.Vector3(0, midY, 0));
 const camBottom = ortho(new THREE.Vector3(0, -5, 0), new THREE.Vector3(0, 0, 1), new THREE.Vector3(0, 0, 0));
@@ -151,7 +159,9 @@ const persp = (pos: THREE.Vector3, target: THREE.Vector3) => {
   c.lookAt(target);
   return c;
 };
-const camExploded = persp(new THREE.Vector3(1.9, 1.7, 2.6), new THREE.Vector3(0, 0.5, 0));
+const camExploded = only
+  ? persp(new THREE.Vector3(0, midY + 1.05, 1.75), new THREE.Vector3(0, midY - 0.05, 0))
+  : persp(new THREE.Vector3(1.9, 1.7, 2.6), new THREE.Vector3(0, 0.5, 0));
 const camOblique = persp(new THREE.Vector3(1.5, 1.4, 2.2), new THREE.Vector3(0, midY, 0));
 
 interface View {
@@ -165,7 +175,9 @@ const views: View[] = [
   { title: '顶视', note: '正交，俯视（+Y）', scene: sceneA, camera: camTop, colliders: false },
   { title: '侧视', note: '正交，虚线为转轴，横线为 y=0 接地面', scene: sceneA, camera: camSide, colliders: false },
   { title: '底视', note: '正交，仰视（−Y）', scene: sceneA, camera: camBottom, colliders: false },
-  { title: '爆炸图', note: 'Tip / Disc / Blade 沿转轴分开', scene: sceneB, camera: camExploded, colliders: false },
+  only
+    ? { title: '独立 3D 展示', note: `只显示 ${only}，斜上方透视`, scene: sceneB, camera: camExploded, colliders: false }
+    : { title: '爆炸图', note: 'Tip / Disc / Blade 沿转轴分开', scene: sceneB, camera: camExploded, colliders: false },
   { title: '侧视 + 碰撞体', note: '彩色线框为 Rapier 实际碰撞体', scene: sceneA, camera: camSide, colliders: true },
   { title: '透视 + 碰撞体', note: '与侧视同一份碰撞体数据', scene: sceneA, camera: camOblique, colliders: true },
 ];
@@ -223,7 +235,8 @@ function ratioCell(ratio: number, limit: number): string {
 async function main(): Promise<void> {
   const R = await loadRapier();
   const cols = readColliders(R, spec);
-  for (const c of cols) colliderGroup.add(colliderMesh(c));
+  const showCol = (c: ColliderInfo) => !only || (only === 'tip' ? c.label.startsWith('tip') : c.label === only);
+  for (const c of cols) if (showCol(c)) colliderGroup.add(colliderMesh(c));
 
   const info = document.createElement('div');
   info.id = 'info';

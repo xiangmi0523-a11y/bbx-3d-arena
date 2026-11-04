@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { createSpinBlurTexture } from '../render/textures';
+import { buildGaleBlade } from './models/galeBlade';
 import type { AssembledBey } from './parts/assemble';
 import type { BladeSpec, DiscSpec, PartKind, PartSpec, TipSpec } from './parts/types';
 
@@ -137,9 +138,11 @@ function rivet(material: THREE.Material, r = 0.022, h = 0.02): THREE.Mesh {
 // ───────────────────────── Blade ─────────────────────────
 
 export function buildBladeModel(spec: BladeSpec): THREE.Group {
+  const v = spec.visual;
+  // P2.3：按设计参考图重制的刀刃走独立的建模文件
+  if (v.style === 'gale') return buildGaleBlade(spec);
   const g = new THREE.Group();
   g.name = `blade:${spec.id}`;
-  const v = spec.visual;
   const R = spec.radius;
   const H = spec.height;
   const mMetal = metal(v.metal);

@@ -30,7 +30,6 @@ const TARGET = { radial: 1.03, bladeTop: 1.25, discLockRise: 0.02, centroid: 0.0
 const LEGACY: Record<string, { radial?: number; bladeTop?: number }> = {
   'blade:blaze-fang': { bladeTop: 1.395 },
   'blade:tidal-bastion': { radial: 1.045, bladeTop: 1.38 },
-  'blade:gale-crescent': { bladeTop: 1.42 },
   'blade:titan-crown': { radial: 1.045, bladeTop: 1.355 },
   'disc:tri-lock': { radial: 1.045 },
   'disc:hex-lock': { radial: 1.04 },

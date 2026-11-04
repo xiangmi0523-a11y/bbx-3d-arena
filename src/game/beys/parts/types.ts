@@ -24,7 +24,8 @@ export interface PartBase {
   mass: number;
 }
 
-export type BladeStyle = 'fang' | 'bastion' | 'crescent' | 'crown';
+/** gale = P2.3 按设计参考图重制的银蓝平衡型（疾风新月） */
+export type BladeStyle = 'fang' | 'bastion' | 'crescent' | 'crown' | 'gale';
 
 export interface BladeVisual {
   style: BladeStyle;
