@@ -1,3 +1,4 @@
+import * as THREE from 'three';
 import { beforeAll, describe, expect, it } from 'vitest';
 import { ARENA } from '../src/game/arena/arenaSpec';
 import { BEY_TUNING } from '../src/game/beys/BeyPhysics';
@@ -7,6 +8,7 @@ import { listParts } from '../src/game/beys/parts/catalog';
 import type { PartSpec } from '../src/game/beys/parts/types';
 import { loadRapier, type Rapier } from '../src/game/physics/PhysicsWorld';
 import { readColliders } from '../tools/inspect/colliders';
+import { findCoplanar, measureSeat } from '../tools/inspect/fit';
 import { measureVisual, type VisualBounds } from '../tools/inspect/visualBounds';
 import snapshot from './fixtures/physics-snapshot.json';
 
@@ -32,7 +34,6 @@ const LEGACY: Record<string, { radial?: number; bladeTop?: number }> = {
   'blade:tidal-bastion': { radial: 1.045, bladeTop: 1.38 },
   'blade:titan-crown': { radial: 1.045, bladeTop: 1.355 },
   'disc:tri-lock': { radial: 1.045 },
-  'disc:hex-lock': { radial: 1.04 },
   'disc:quad-edge': { radial: 1.04 },
   'disc:ring-guard': { radial: 1.04 },
 };
@@ -84,6 +85,27 @@ describe('视觉模型包围盒（相对碰撞体）', () => {
   it('LEGACY 里只有真实存在的部件', () => {
     const ids = new Set(parts.map(key));
     for (const k of Object.keys(LEGACY)) expect(ids.has(k)).toBe(true);
+  });
+});
+
+describe('Blade + Disc 装配（P2.3 阶段 2，射线实测）', () => {
+  it('疾风新月 + 六角锁盘：不穿插，Disc 顶面有支承面贴住 Blade 底面', () => {
+    const spec = assembleBey({ blade: 'gale-crescent', disc: 'hex-lock', tip: 'dome-ball' });
+    const seat = measureSeat(spec, 0.008, 6);
+    expect(seat.penetrating).toBe(0);
+    expect(seat.minGap).toBeGreaterThan(-0.0005);
+    expect(seat.contactRatio).toBeGreaterThan(0.05);
+  }, 60000);
+
+  it('六角锁盘自身、以及与疾风新月装配后没有共面重叠的面（不会 z-fighting 闪烁）', () => {
+    const spec = assembleBey({ blade: 'gale-crescent', disc: 'hex-lock', tip: 'dome-ball' });
+    const root = new THREE.Group();
+    for (const k of ['disc', 'blade'] as const) {
+      const m = buildPartModel(spec[k]);
+      m.position.y = spec.layers[k].bottom;
+      root.add(m);
+    }
+    expect(findCoplanar(root).pairs).toBe(0);
   });
 });
 

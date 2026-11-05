@@ -141,7 +141,15 @@ if (only) {
 sceneB.add(exploded.root);
 
 // ── 相机 ──
-const S = only === 'blade' ? 0.6 : 0.68; // 正交视图半宽
+// 正交视图半宽：单看某个零件时按它的外径取景（Disc / Tip 比 Blade 小很多）
+// ?focus=joint：放大 Blade 与 Disc 的接合处（装配关系特写）
+const joint = q.get('focus') === 'joint';
+const S = joint ? 0.17 : only === 'blade' ? 0.6 : only === 'disc' ? spec.disc.radius * 1.2 : only === 'tip' ? 0.3 : 0.68;
+/** 透视机位按零件大小缩放（以 Blade 为 1） */
+const Z = joint ? 0.42 : only === 'disc' ? (spec.disc.radius * 1.2) / 0.6 : only === 'tip' ? 0.5 : 1;
+// ?section=1：两个侧视格沿过转轴的竖直面剖开（只保留 z ≤ 0 的一半），直接看到零件截面的配合
+const section = q.get('section') === '1';
+const sectionPlane = [new THREE.Plane(new THREE.Vector3(0, 0, -1), 0)];
 const ortho = (pos: THREE.Vector3, up: THREE.Vector3, target: THREE.Vector3) => {
   const c = new THREE.OrthographicCamera(-S, S, S, -S, 0.01, 20);
   c.position.copy(pos);
@@ -149,9 +157,10 @@ const ortho = (pos: THREE.Vector3, up: THREE.Vector3, target: THREE.Vector3) => 
   c.lookAt(target);
   return c;
 };
-const midY = only ? spec.layers[only].center : spec.totalHeight / 2;
+const midY = joint ? spec.layers.disc.top : only ? spec.layers[only].center : spec.totalHeight / 2;
 const camTop = ortho(new THREE.Vector3(0, 5, 0), new THREE.Vector3(0, 0, -1), new THREE.Vector3(0, 0, 0));
-const camSide = ortho(new THREE.Vector3(0, midY, 5), new THREE.Vector3(0, 1, 0), new THREE.Vector3(0, midY, 0));
+const sideX = joint ? spec.disc.radius * 0.62 : 0;
+const camSide = ortho(new THREE.Vector3(sideX, midY, 5), new THREE.Vector3(0, 1, 0), new THREE.Vector3(sideX, midY, 0));
 const camBottom = ortho(new THREE.Vector3(0, -5, 0), new THREE.Vector3(0, 0, 1), new THREE.Vector3(0, 0, 0));
 const persp = (pos: THREE.Vector3, target: THREE.Vector3) => {
   const c = new THREE.PerspectiveCamera(30, 1, 0.01, 50);
@@ -160,9 +169,11 @@ const persp = (pos: THREE.Vector3, target: THREE.Vector3) => {
   return c;
 };
 const camExploded = only
-  ? persp(new THREE.Vector3(0, midY + 1.05, 1.75), new THREE.Vector3(0, midY - 0.05, 0))
+  ? persp(new THREE.Vector3(0, midY + 1.05 * Z, 1.75 * Z), new THREE.Vector3(0, midY - 0.05 * Z, 0))
   : persp(new THREE.Vector3(1.9, 1.7, 2.6), new THREE.Vector3(0, 0.5, 0));
-const camOblique = persp(new THREE.Vector3(1.5, 1.4, 2.2), new THREE.Vector3(0, midY, 0));
+const camOblique = joint
+  ? persp(new THREE.Vector3(0.95, midY + 0.05, 1.3), new THREE.Vector3(0.06, midY + 0.01, 0))
+  : persp(new THREE.Vector3(1.5 * Z, midY + (1.4 - midY) * Z, 2.2 * Z), new THREE.Vector3(0, midY, 0));
 
 interface View {
   title: string;
@@ -179,7 +190,7 @@ const views: View[] = [
     ? { title: '独立 3D 展示', note: `只显示 ${only}，斜上方透视`, scene: sceneB, camera: camExploded, colliders: false }
     : { title: '爆炸图', note: 'Tip / Disc / Blade 沿转轴分开', scene: sceneB, camera: camExploded, colliders: false },
   { title: '侧视 + 碰撞体', note: '彩色线框为 Rapier 实际碰撞体', scene: sceneA, camera: camSide, colliders: true },
-  { title: '透视 + 碰撞体', note: '与侧视同一份碰撞体数据', scene: sceneA, camera: camOblique, colliders: true },
+  { title: '透视 + 碰撞体', note: '与侧视同一份碰撞体数据', scene: sceneA, camera: camOblique, colliders: !joint },
 ];
 
 const cells: HTMLDivElement[] = views.map((v) => {
@@ -220,6 +231,7 @@ function render(): void {
     const y = innerHeight - r.y - r.h;
     renderer.setViewport(r.x, y, r.w, r.h);
     renderer.setScissor(r.x, y, r.w, r.h);
+    renderer.clippingPlanes = section && v.camera === camSide ? sectionPlane : [];
     renderer.render(v.scene, v.camera);
   });
 }

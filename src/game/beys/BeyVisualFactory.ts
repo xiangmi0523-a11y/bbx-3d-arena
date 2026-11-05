@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { createSpinBlurTexture } from '../render/textures';
 import { buildGaleBlade } from './models/galeBlade';
+import { buildRatchetDisc } from './models/ratchetDisc';
 import type { AssembledBey } from './parts/assemble';
 import type { BladeSpec, DiscSpec, PartKind, PartSpec, TipSpec } from './parts/types';
 
@@ -28,8 +29,26 @@ export interface BeyVisual {
 
 // ───────────────────────── 材质库 ─────────────────────────
 
+/**
+ * P2.3 阶段 2：同参数的材质只建一个实例（以前每个螺丝、每个卡扣各建一个）。
+ * 外观完全不变，只减少材质实例和着色器状态切换；共用实例带 userData.shared，disposeObject 不释放。
+ */
+const memo = new Map<string, THREE.Material>();
+function cached<A extends unknown[], M extends THREE.Material>(name: string, make: (...args: A) => M): (...args: A) => M {
+  return (...args: A) => {
+    const key = `${name}:${args.join(',')}`;
+    let m = memo.get(key) as M | undefined;
+    if (!m) {
+      m = make(...args);
+      m.userData.shared = true;
+      memo.set(key, m);
+    }
+    return m;
+  };
+}
+
 /** 彩色涂层：清漆层带来锐利高光 */
-export function paint(color: number, rough = 0.32): THREE.MeshPhysicalMaterial {
+function make_paint(color: number, rough = 0.32): THREE.MeshPhysicalMaterial {
   return new THREE.MeshPhysicalMaterial({
     color,
     roughness: rough,
@@ -40,12 +59,12 @@ export function paint(color: number, rough = 0.32): THREE.MeshPhysicalMaterial {
 }
 
 /** 抛光金属：完全金属 + 低粗糙度，依赖环境贴图反射 */
-export function metal(color: number, rough = 0.18): THREE.MeshStandardMaterial {
+function make_metal(color: number, rough = 0.18): THREE.MeshStandardMaterial {
   return new THREE.MeshStandardMaterial({ color, metalness: 1, roughness: rough, envMapIntensity: 1.25 });
 }
 
 /** 透明塑料：半透明 + 清漆，不用 transmission（iPhone 上开销太大） */
-export function clearPlastic(tint: number, opacity = 0.32): THREE.MeshPhysicalMaterial {
+function make_clearPlastic(tint: number, opacity = 0.32): THREE.MeshPhysicalMaterial {
   return new THREE.MeshPhysicalMaterial({
     color: tint,
     transparent: true,
@@ -63,13 +82,19 @@ export function clearPlastic(tint: number, opacity = 0.32): THREE.MeshPhysicalMa
   });
 }
 
-function satin(color: number): THREE.MeshStandardMaterial {
+function make_satin(color: number): THREE.MeshStandardMaterial {
   return new THREE.MeshStandardMaterial({ color, roughness: 0.55, metalness: 0.2 });
 }
 
-function glow(color: number, intensity = 0.6): THREE.MeshStandardMaterial {
+function make_glow(color: number, intensity = 0.6): THREE.MeshStandardMaterial {
   return new THREE.MeshStandardMaterial({ color, emissive: color, emissiveIntensity: intensity, roughness: 0.3 });
 }
+
+export const paint = cached('paint', make_paint);
+export const metal = cached('metal', make_metal);
+export const clearPlastic = cached('clear', make_clearPlastic);
+const satin = cached('satin', make_satin);
+const glow = cached('glow', make_glow);
 
 // ───────────────────────── 几何工具 ─────────────────────────
 
@@ -277,6 +302,7 @@ export function buildBladeModel(spec: BladeSpec): THREE.Group {
 // ───────────────────────── Disc ─────────────────────────
 
 export function buildDiscModel(spec: DiscSpec): THREE.Group {
+  if (spec.visual.style === 'ratchet') return buildRatchetDisc(spec);
   const g = new THREE.Group();
   g.name = `disc:${spec.id}`;
   const v = spec.visual;
@@ -380,6 +406,8 @@ export function disposeObject(root: THREE.Object3D): void {
       m.geometry.dispose();
       const mats = Array.isArray(m.material) ? m.material : [m.material];
       for (const mat of mats) {
+        // 材质库里的共用实例（models/materials.ts）被其他零件、其他陀螺同时使用，不释放
+        if (mat.userData.shared) continue;
         (mat as THREE.MeshStandardMaterial).map?.dispose();
         mat.dispose();
       }

@@ -105,7 +105,7 @@ export const DISCS: Record<string, DiscSpec> = {
     radius: 0.32,
     height: 0.12,
     burstResistance: 0.75,
-    visual: { points: 6, sharpness: 0.35, color: 0x2a2e36, accent: 0x1f7cf0 },
+    visual: { style: 'ratchet', points: 6, sharpness: 0.35, color: 0x0b1c4a, accent: 0x1f5cff },
   },
   'quad-edge': {
     kind: 'disc',

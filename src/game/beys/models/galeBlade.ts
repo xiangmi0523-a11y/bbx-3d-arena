@@ -1,7 +1,6 @@
 import * as THREE from 'three';
-import { mergeGeometries, toCreasedNormals } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
-import { createGaleEmblemTexture } from '../../render/textures';
-import { getMetalRoughnessMap, getStudioEnv } from '../../render/studioEnv';
+import { P, chamfer, creased, lathe, merge, mesh, slab } from './geom';
+import { bluePlastic, clearDome, darkPlastic, galeEmblem, polishedMetal, satinMetal } from './materials';
 import type { BladeSpec } from '../parts/types';
 
 /**
@@ -29,191 +28,6 @@ import type { BladeSpec } from '../parts/types';
  */
 
 const TAU = Math.PI * 2;
-/** 折角大于这个角度的棱保持锐利，小于的平滑过渡 */
-const CREASE = THREE.MathUtils.degToRad(20);
-
-// ───────────────────────── 材质（银色金属 / 蓝色透明塑料 / 深色塑料 三类明确区分） ─────────────────────────
-
-function polishedMetal(): THREE.MeshPhysicalMaterial {
-  return new THREE.MeshPhysicalMaterial({
-    color: 0xe9edf2,
-    metalness: 1,
-    roughness: 0.3,
-    roughnessMap: getMetalRoughnessMap(),
-    envMap: getStudioEnv(),
-    envMapIntensity: 1.15,
-  });
-}
-
-function satinMetal(): THREE.MeshPhysicalMaterial {
-  return new THREE.MeshPhysicalMaterial({
-    color: 0xc9d0da,
-    metalness: 1,
-    roughness: 0.38,
-    envMap: getStudioEnv(),
-    envMapIntensity: 1,
-  });
-}
-
-/**
- * 透明塑料：普通的半透明混合会把反射也一起按不透明度减弱，看起来像一层蓝色薄膜。
- * 这里在着色器末尾按菲涅尔（掠射角）和高光亮度提高不透明度：
- * 正对视线的部分透出下面的结构，边缘和高光处更实，读起来像有厚度的透明件。
- * 没有使用 transmission（需要额外渲染一遍整个场景，iPhone 上开销太大）。
- */
-function clearPlastic(params: THREE.MeshPhysicalMaterialParameters, edge: number, highlight: number): THREE.MeshPhysicalMaterial {
-  const m = new THREE.MeshPhysicalMaterial({
-    transparent: true,
-    depthWrite: false,
-    side: THREE.DoubleSide,
-    // 单遍绘制：双面透明默认拆成两遍，每帧都会改 material.side 触发着色器参数重算（P2.2 性能问题）
-    forceSinglePass: true,
-    envMap: getStudioEnv(),
-    ...params,
-  });
-  m.onBeforeCompile = (shader) => {
-    shader.fragmentShader = shader.fragmentShader.replace(
-      '#include <opaque_fragment>',
-      `float gNV = abs( dot( geometryNormal, geometryViewDir ) );
-float gFres = pow( 1.0 - gNV, 2.5 );
-vec3 gSpec = reflectedLight.directSpecular + reflectedLight.indirectSpecular;
-float gHi = dot( gSpec, vec3( 0.2126, 0.7152, 0.0722 ) );
-diffuseColor.a = clamp( diffuseColor.a + gFres * ${edge.toFixed(3)} + gHi * ${highlight.toFixed(3)}, 0.0, 1.0 );
-#include <opaque_fragment>`,
-    );
-  };
-  m.customProgramCacheKey = () => `gale-clear-${edge}-${highlight}`;
-  return m;
-}
-
-function bluePlastic(): THREE.MeshPhysicalMaterial {
-  return clearPlastic(
-    {
-      // ACES 色调映射会把高亮的纯蓝推向紫色：底色压暗，主要颜色来自自发光，渲染出来是深宝蓝
-      color: 0x062590,
-      emissive: 0x0a3ccc,
-      emissiveIntensity: 0.5,
-      metalness: 0,
-      roughness: 0.1,
-      ior: 1.49,
-      specularIntensity: 1,
-      envMapIntensity: 0.32,
-      opacity: 0.62,
-    },
-    0.45,
-    0.9,
-  );
-}
-
-function clearDome(): THREE.MeshPhysicalMaterial {
-  return clearPlastic(
-    { color: 0xffffff, opacity: 0.04, roughness: 0.02, metalness: 0, ior: 1.5, specularIntensity: 1, envMapIntensity: 0.25 },
-    0.05,
-    0.25,
-  );
-}
-
-function darkPlastic(): THREE.MeshPhysicalMaterial {
-  // 深色注塑件：带一层清漆，反射里能看到柔光箱
-  return new THREE.MeshPhysicalMaterial({
-    color: 0x0b0f19,
-    metalness: 0,
-    roughness: 0.45,
-    clearcoat: 0.6,
-    clearcoatRoughness: 0.25,
-    envMap: getStudioEnv(),
-    envMapIntensity: 0.8,
-  });
-}
-
-// ───────────────────────── 几何工具 ─────────────────────────
-
-/** 把一组顶点（每 3 个一个三角形）和 UV 转成带锐利棱线的网格 */
-function creased(pos: number[], uv: number[]): THREE.BufferGeometry {
-  const geo = new THREE.BufferGeometry();
-  geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
-  geo.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
-  return toCreasedNormals(geo, CREASE);
-}
-
-/**
- * 旋转体：profile 为闭合截面 [r, y]。截面的拐角保持锐利（每条边单独成带），
- * 绕轴方向平滑——不再是多边形棱面。
- */
-function lathe(profile: [number, number][], segments: number): THREE.BufferGeometry {
-  const pts = profile.map(([r, y]) => new THREE.Vector2(r, y));
-  pts.push(pts[0].clone());
-  const geo = new THREE.LatheGeometry(pts, segments);
-  geo.deleteAttribute('normal');
-  return toCreasedNormals(geo, CREASE);
-}
-
-/** 截面拐角做倒角：每个指定拐角换成两个点，各沿相邻边退 c */
-function chamfer(profile: [number, number][], c: number, corners?: number[]): [number, number][] {
-  const out: [number, number][] = [];
-  const n = profile.length;
-  for (let i = 0; i < n; i++) {
-    const p = profile[i];
-    if (corners && !corners.includes(i)) {
-      out.push(p);
-      continue;
-    }
-    const a = profile[(i - 1 + n) % n];
-    const b = profile[(i + 1) % n];
-    const da = Math.hypot(a[0] - p[0], a[1] - p[1]);
-    const db = Math.hypot(b[0] - p[0], b[1] - p[1]);
-    const ka = da > 1e-9 ? Math.min(c, da * 0.4) / da : 0;
-    const kb = db > 1e-9 ? Math.min(c, db * 0.4) / db : 0;
-    out.push([p[0] + (a[0] - p[0]) * ka, p[1] + (a[1] - p[1]) * ka]);
-    out.push([p[0] + (b[0] - p[0]) * kb, p[1] + (b[1] - p[1]) * kb]);
-  }
-  return out;
-}
-
-/** 水平厚片（Shape 挤出，圆角倒边），底面在 y=0 */
-function slab(shape: THREE.Shape, depth: number, bevel: number, bevelSegments = 2, curveSegments = 32): THREE.BufferGeometry {
-  const geo = new THREE.ExtrudeGeometry(shape, {
-    depth: Math.max(0.001, depth - bevel * 2),
-    bevelEnabled: bevel > 0,
-    bevelThickness: bevel,
-    bevelSize: bevel,
-    bevelSegments,
-    curveSegments,
-  });
-  geo.rotateX(-Math.PI / 2);
-  geo.translate(0, bevel, 0);
-  geo.deleteAttribute('normal');
-  return toCreasedNormals(geo, CREASE);
-}
-
-/** 极坐标点 → Shape 平面坐标（放平后 shape 的 y 对应 -z） */
-const P = (r: number, a: number) => new THREE.Vector2(Math.cos(a) * r, -Math.sin(a) * r);
-
-function mesh(geo: THREE.BufferGeometry, mat: THREE.Material, y = 0, order = 0): THREE.Mesh {
-  const m = new THREE.Mesh(geo, mat);
-  m.position.y = y;
-  // 固定透明件的绘制顺序（底盘 → 骨架 → 护罩），旋转时不会因为排序翻转而闪烁
-  m.renderOrder = order;
-  return m;
-}
-
-/** 合并前统一属性（mergeGeometries 要求相同的属性集合和索引方式） */
-function norm(geo: THREE.BufferGeometry): THREE.BufferGeometry {
-  const g = geo.index ? geo.toNonIndexed() : geo;
-  if (!g.getAttribute('uv')) {
-    const n = g.getAttribute('position').count;
-    g.setAttribute('uv', new THREE.Float32BufferAttribute(new Float32Array(n * 2), 2));
-  }
-  if (!g.getAttribute('normal')) g.computeVertexNormals();
-  for (const k of Object.keys(g.attributes)) if (!['position', 'normal', 'uv'].includes(k)) g.deleteAttribute(k);
-  return g;
-}
-
-function merge(list: THREE.BufferGeometry[]): THREE.BufferGeometry {
-  const g = mergeGeometries(list.map(norm));
-  if (!g) throw new Error('galeBlade: mergeGeometries failed');
-  return g;
-}
 
 // ───────────────────────── 爪刃几何 ─────────────────────────
 
@@ -410,8 +224,9 @@ export function buildGaleBlade(spec: BladeSpec): THREE.Group {
   const ribs: THREE.BufferGeometry[] = [];
   for (let i = 0; i < 10; i++) {
     const a = (i / 10) * TAU + (dir * TAU) / 20;
-    const rib = new THREE.BoxGeometry(R * 0.4, H * 0.12, R * 0.022);
-    rib.translate(R * 0.64, H * 0.16, 0);
+    // 顶面 0.218H，略低于小爪底面 0.22H（共面会在透明底盘里闪烁；外观无变化）
+    const rib = new THREE.BoxGeometry(R * 0.4, H * 0.118, R * 0.022);
+    rib.translate(R * 0.64, H * 0.159, 0);
     rib.rotateY(-a);
     ribs.push(rib);
   }
@@ -471,8 +286,9 @@ export function buildGaleBlade(spec: BladeSpec): THREE.Group {
   const satinParts: THREE.BufferGeometry[] = [];
   for (let i = 0; i < 8; i++) {
     const a = (i / 8) * TAU;
-    const head = new THREE.CylinderGeometry(R * 0.03, R * 0.034, H * 0.05, 16);
-    head.translate(Math.cos(a) * R * 0.53, H * 0.725, Math.sin(a) * R * 0.53);
+    // 螺丝头底面埋进骨架 0.002H（与透明骨架顶面共面会闪烁）；顶面位置不变
+    const head = new THREE.CylinderGeometry(R * 0.03, R * 0.034, H * 0.052, 16);
+    head.translate(Math.cos(a) * R * 0.53, H * 0.724, Math.sin(a) * R * 0.53);
     satinParts.push(head);
   }
   // 滚花压圈：48 齿的齿形圈，齿顶倒角
@@ -516,10 +332,7 @@ export function buildGaleBlade(spec: BladeSpec): THREE.Group {
   g.add(mesh(merge(darkParts), mDark));
 
   // 7) 原创徽标（带清漆的印刷贴片）+ 透明护罩
-  const emblemMat = new THREE.MeshPhysicalMaterial({ color: 0xffffff, roughness: 0.45, metalness: 0, clearcoat: 0.35, clearcoatRoughness: 0.2, envMap: getStudioEnv(), envMapIntensity: 0.3 });
-  // 单元测试在 Node 里构建模型，没有 Canvas 时只用纯色
-  if (typeof document !== 'undefined') emblemMat.map = createGaleEmblemTexture();
-  else emblemMat.color.set(0x16233f);
+  const emblemMat = galeEmblem();
   const emblem = new THREE.Mesh(new THREE.CircleGeometry(R * 0.355, 64), emblemMat);
   emblem.rotation.x = -Math.PI / 2;
   // 徽标随旋转方向镜像，前掠方向与刀刃一致
