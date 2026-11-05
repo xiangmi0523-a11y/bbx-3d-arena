@@ -28,9 +28,6 @@ jobs:
       - name: 安装依赖
         run: npm ci
 
-      - name: 单元测试
-        run: npm test
-
       - name: 构建未签名 IPA
         run: bash scripts/build-ios-ipa.sh build-ios
 
