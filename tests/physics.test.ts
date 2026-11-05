@@ -3,6 +3,8 @@ import { simulateBattle } from './sim';
 import type { BeyLoadout } from '../src/game/beys/parts/types';
 
 // 真实 Rapier 无头模拟：验证刚体落地、碰撞、胜负判定都由物理驱动
+const RIVAL = { blade: 'tidal-bastion', disc: 'hex-lock', tip: 'dome-ball' };
+
 describe('物理对战模拟', () => {
   it('两台陀螺发射后能完成一整场对战', async () => {
     const r = await simulateBattle({
@@ -79,7 +81,11 @@ describe('物理对战模拟', () => {
     const { PLAYER_LOADOUT, RIVAL_LOADOUT } = await import('../src/game/beys/parts/catalog');
     const R = await loadRapier();
     // 两台陀螺在场地中央相向而行，只改变接近速度（都用没有主动冲刺的防御型轴心，排除其他加速）
+    // P2.3.1 起球头轴心也有牵引 / 追击，这里关掉牵引，只测碰撞本身
     void PLAYER_LOADOUT;
+    const { BEY_TUNING } = await import('../src/game/beys/BeyPhysics');
+    const saved = BEY_TUNING.driveMinGrip;
+    BEY_TUNING.driveMinGrip = 2;
     const collide = (speed: number) => {
       const pw = new PhysicsWorld(R);
       createArenaPhysics(pw);
@@ -131,6 +137,7 @@ describe('物理对战模拟', () => {
     // 弹开程度随力度明显增大：猛撞后的速度变化远大于轻擦
     expect(fast.dv).toBeGreaterThan(mid.dv * 1.5);
     expect(mid.dv).toBeGreaterThan(slow.dv * 1.5);
+    BEY_TUNING.driveMinGrip = saved;
   }, 60000);
 
   it('P2.1：交锋更频繁，且轻 / 中 / 猛三档都会出现', async () => {
@@ -164,9 +171,13 @@ describe('物理对战模拟', () => {
     const { BattleSystem } = await import('../src/game/battle/BattleSystem');
     const { assembleBey } = await import('../src/game/beys/parts/assemble');
     const { RIVAL_LOADOUT } = await import('../src/game/beys/parts/catalog');
+    const { BEY_TUNING } = await import('../src/game/beys/BeyPhysics');
     const R = await loadRapier();
     const pw = new PhysicsWorld(R);
     createArenaPhysics(pw);
+    // 只测碰撞本身：关掉轴心牵引 / 追击（P2.3.1 起球头轴心也有牵引）
+    const savedGrip = BEY_TUNING.driveMinGrip;
+    BEY_TUNING.driveMinGrip = 2;
     const battle = new BattleSystem(pw, {
       player: assembleBey({ ...RIVAL_LOADOUT, ...la }),
       rival: assembleBey({ ...RIVAL_LOADOUT, ...lb }),
@@ -196,6 +207,7 @@ describe('物理对战模拟', () => {
       }
     }
     const res = { events, after, grinds: battle.grinds, massA: a.body.mass(), massB: b.body.mass() };
+    BEY_TUNING.driveMinGrip = savedGrip;
     pw.dispose();
     return res;
   }
@@ -352,7 +364,74 @@ describe('物理对战模拟', () => {
     // 攻击型确实主动制造交锋（每 10 秒至少 1.5 次有效撞击）
     const eff = (rs: typeof atkDef) => (rs.reduce((s, r) => s + r.episodes.filter((e) => e.tier === 'medium' || e.tier === 'heavy').length, 0) / rs.reduce((s, r) => s + r.duration, 0)) * 10;
     expect(eff(atkDef)).toBeGreaterThan(0.6);
-    // 耐力型转速衰减最慢：转速半衰时间明显长于攻击型
-    expect(avg(atkSta.map((r) => r.spinHalf.rival))).toBeGreaterThan(avg(atkSta.map((r) => r.spinHalf.player)) * 1.6);
+    // 耐力型转速衰减最慢：转速半衰时间明显长于攻击型。
+    // P2.3.1：攻击型会主动追击，耐力型在对局中被撞得更多（中等以上撞击约为原来的 2 倍），
+    // 对局内的半衰时间比实测约 1.5–1.6（贴着原阈值 1.6 上下波动），阈值调为 1.3（单独旋转时长不受影响）
+    expect(avg(atkSta.map((r) => r.spinHalf.rival))).toBeGreaterThan(avg(atkSta.map((r) => r.spinHalf.player)) * 1.3);
+  }, 240000);
+
+  // ───────── P2.3.1：真机战斗体验（节奏、撞击、僵持） ─────────
+  it('P2.3.1：撞击更干脆——有反馈的撞击更多、贴身摩擦更少，撞击后的速度变化更大', async () => {
+    const { feelRun } = await import('./feelSim');
+    const { PLAYER_LOADOUT } = await import('../src/game/beys/parts/catalog');
+    let hits = 0;
+    let grinds = 0;
+    const dv: number[] = [];
+    for (let i = 0; i < 6; i++) {
+      const r = await feelRun({ player: PLAYER_LOADOUT, rival: RIVAL }, 2000 + i, 40);
+      hits += r.hits;
+      grinds += r.grinds;
+      if (Number.isFinite(r.dvMedian)) dv.push(r.dvMedian);
+    }
+    const meanDv = dv.reduce((s, v) => s + v, 0) / dv.length;
+    const msg = JSON.stringify({ hits, grinds, dv });
+    // 改动前（8 场）：贴身摩擦占接触的 40%，每场撞击速度变化中位数平均 4.4 m/s
+    expect(grinds / (hits + grinds), msg).toBeLessThan(0.25);
+    expect(meanDv, msg).toBeGreaterThan(5);
+  }, 240000);
+
+  it('P2.3.1：不会长时间原地互转——平衡套装对默认对手（都是球头轴心）最长僵持 < 1.6 秒', async () => {
+    const { feelRun } = await import('./feelSim');
+    const lo = { player: { blade: 'gale-crescent', disc: 'hex-lock', tip: 'dome-ball' }, rival: RIVAL };
+    let stall = 0;
+    let time = 0;
+    let longest = 0;
+    let speed = 0;
+    for (let i = 0; i < 6; i++) {
+      const r = await feelRun(lo, 1000 + i, 40);
+      stall += r.stall;
+      time += r.duration;
+      longest = Math.max(longest, r.longestStall);
+      speed += r.meanSpeed / 6;
+    }
+    // 改动前：8 场里僵持 348 秒（约 75% 的时间），最长一次 45 秒，平均速度 0.32 m/s
+    expect(longest).toBeLessThan(1.6);
+    expect(stall / time).toBeLessThan(0.15);
+    expect(speed).toBeGreaterThan(0.9);
+    // 针尖轴心几乎没有牵引，两台会停在碗底平台上隔几厘米各转各的：脱困后同样不会长时间僵持
+    const STA = { blade: 'titan-crown', disc: 'hex-lock', tip: 'needle-point' };
+    let staLongest = 0;
+    for (let i = 0; i < 4; i++) {
+      const r = await feelRun({ player: STA, rival: { ...STA, blade: 'tidal-bastion' } }, 3000 + i, 40);
+      staLongest = Math.max(staLongest, r.longestStall);
+    }
+    expect(staLongest).toBeLessThan(1.6);
+  }, 240000);
+
+  it('P2.3.1：节奏更快——默认对局平均速度 > 2.2 m/s，中等以上撞击 ≥ 2 次 / 10 秒', async () => {
+    const { feelRun } = await import('./feelSim');
+    const { PLAYER_LOADOUT } = await import('../src/game/beys/parts/catalog');
+    let strong = 0;
+    let time = 0;
+    let speed = 0;
+    for (let i = 0; i < 6; i++) {
+      const r = await feelRun({ player: PLAYER_LOADOUT, rival: RIVAL }, 2000 + i, 40);
+      strong += r.strong;
+      time += r.duration;
+      speed += r.meanSpeed / 6;
+    }
+    // 改动前：平均速度 1.70 m/s，中等以上撞击 1.69 次 / 10 秒
+    expect(speed).toBeGreaterThan(2.2);
+    expect((strong / time) * 10).toBeGreaterThan(2);
   }, 240000);
 });

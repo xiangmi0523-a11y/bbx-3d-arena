@@ -55,9 +55,35 @@ export const BEY_TUNING = {
    * 转动的接触面与地面的摩擦把陀螺推向“垂直于倾斜方向”，倾斜方向随进动旋转 → 花瓣形轨迹。
    * 目标速度与加速度都按齿轮咬合度和剩余转速缩放。
    */
-  driveSpeed: 8.5,
-  driveAccel: 24,
+  // P2.3.1：8.5 / 24 → 10 / 30，真机反馈移动迟缓（基线平均水平速度 1.7 m/s）
+  driveSpeed: 10,
+  driveAccel: 30,
   driveSpinCost: 0.35,
+  /**
+   * P2.3.1 追击：轴心牵引方向向对手偏转的比例（再乘 0.4 + 0.6 × 刀刃攻击值）。
+   * 只改变牵引力的方向，大小仍受轴心咬合度和剩余转速限制，没有额外推力。
+   */
+  pursuit: 0.8,
+  /** 离中心超过这个半径时，拉开方向不再朝外（避免退到墙边） */
+  backoffEdge: 2.0,
+  /** 拉开阶段最长持续时间（秒），超时就直接冲 */
+  backoffMax: 0.8,
+  /** 撞击后拉开到两台外缘相距这么远再冲（助跑距离，米） */
+  runup: 0.3,
+  /** 拉开方向相对“背向对手”的偏转角（弧度），走弧线而不是直线后退 */
+  runupAngle: 0.9,
+  /** 僵持（两台都几乎不动、贴在一起）多久后触发脱困（秒） */
+  stallTime: 0.6,
+  /** 脱困持续时间（秒） */
+  breakoutTime: 0.7,
+  /** 脱困时牵引按不低于这个转速比例计算 */
+  breakoutRatio: 0.8,
+  /** 脱困时轴心咬合度至少按这个值（针尖平时 0.1，没有牵引） */
+  breakoutGrip: 0.35,
+  /** 撞击后先拉开、不再冲向对手的时间（秒） */
+  recoilTime: 0.45,
+  /** 低于这个咬合度的轴心（针尖）没有牵引。P2.2.1 为 0.5，球头（0.35）完全没有牵引，会停在碗底 */
+  driveMinGrip: 0.2,
   /**
    * 轴心滚动 / 滑动阻力：水平减速度 = (rollBase + rollFriction × 轴心摩擦) × g。
    * 没有这一项时，陀螺在碗边的离心轨道几乎不损失能量，会长时间绕外圈（P2.1 诊断：最长 24 秒没有交锋）。
@@ -225,6 +251,15 @@ export class BeyPhysics {
   /** 陀螺自稳强度倍率（√(I / 参考惯量)） */
   private readonly gyroFactor: number;
   private ccdOn = false;
+  /** 对手位置（由对战系统每步写入），用于追击 */
+  target: Vec3 | null = null;
+  /** 撞击后的回弹计时（秒），大于 0 时先拉开距离 */
+  recoil = 0;
+  /** 脱困计时（秒） */
+  breakout = 0;
+  /** 追击状态：true = 冲向对手，false = 先拉开助跑距离 */
+  private charging = true;
+  private backoff = 0;
 
   /** 每个物理步之前调用 */
   preStep(dt: number): void {
@@ -239,6 +274,8 @@ export class BeyPhysics {
     this.prevUp.y = up.y;
     this.prevUp.z = up.z;
     this.hasPrev = true;
+    if (this.recoil > 0) this.recoil -= dt;
+    if (this.breakout > 0) this.breakout -= dt;
     const lv = body.linvel();
     const needCcd = lv.y < -3.5 || lv.x * lv.x + lv.z * lv.z > 100;
     if (needCcd !== this.ccdOn) {
@@ -289,16 +326,70 @@ export class BeyPhysics {
       }
     }
     // 轴心牵引（花瓣轨迹）：方向垂直于当前倾斜方向，随进动旋转
-    if (grip >= 0.5 && this.grounded && !this.dashing && mag > T.minStableSpin * 2) {
+    // 脱困时针尖这类几乎没有牵引的轴心也按 breakoutGrip 计算（低转速晃动时轴心与碗面接触点外移，能“走”起来）
+    const driveGrip = this.breakout > 0 ? Math.max(grip, T.breakoutGrip) : grip;
+    if (driveGrip >= T.driveMinGrip && this.grounded && !this.dashing && mag > T.minStableSpin * 2) {
       const ratio = Math.min(1, mag / this.launchSpin);
       const v = body.linvel();
-      const dx = -Math.sin(this.precession) * this.spinSign;
-      const dz = Math.cos(this.precession) * this.spinSign;
+      let dx = -Math.sin(this.precession) * this.spinSign;
+      let dz = Math.cos(this.precession) * this.spinSign;
+      // 追击：牵引方向向对手偏转（攻击值越高偏得越多），只改方向不加力
+      if (this.target) {
+        const ox = this.target.x - pos.x;
+        const oz = this.target.z - pos.z;
+        const ol = Math.hypot(ox, oz);
+        if (ol > 1e-3) {
+          const k = this.breakout > 0 ? 1 : T.pursuit * (0.4 + 0.6 * this.spec.blade.attack);
+          let gx = ox / ol;
+          let gz = oz / ol;
+          // 刚撞完先斜着拉开（留出助跑距离），再冲回来，不会一直压在对手身上变成持续摩擦。
+          // 冲撞 / 拉开两种状态带滞回：拉开到助跑距离（或拉开超时）才转为冲撞，冲撞一直到撞上为止。
+          // 只按距离切换会在临界距离上来回翻转，变成绕着对手打转（P2.3.1 调试中出现过 15 秒不碰的绕圈）。
+          if (this.breakout > 0 || this.recoil > 0) {
+            this.charging = false;
+            this.backoff = 0;
+          } else if (!this.charging) {
+            this.backoff += dt;
+            if (ol > this.spec.outerRadius * 2 + T.runup || this.backoff > T.backoffMax) this.charging = true;
+          }
+          if (!this.charging) {
+            const c = Math.cos(T.runupAngle);
+            const s = Math.sin(T.runupAngle) * this.spinSign;
+            const ax = -gx;
+            const az = -gz;
+            gx = ax * c - az * s;
+            gz = ax * s + az * c;
+            // 靠外圈时不往墙的方向退：去掉朝外的分量（拉开只在场内绕一小段弧）
+            if (r > T.backoffEdge) {
+              const ex = pos.x / r;
+              const ez = pos.z / r;
+              const out = gx * ex + gz * ez;
+              if (out > 0) {
+                const w = Math.min(1, (r - T.backoffEdge) / 1.5);
+                gx -= ex * out * w;
+                gz -= ez * out * w;
+                const gl = Math.hypot(gx, gz) || 1;
+                gx /= gl;
+                gz /= gl;
+              }
+            }
+          }
+          dx = dx * (1 - k) + gx * k;
+          dz = dz * (1 - k) + gz * k;
+          const dl = Math.hypot(dx, dz) || 1;
+          dx /= dl;
+          dz /= dl;
+        }
+      }
       const along = v.x * dx + v.z * dz;
-      if (along < T.driveSpeed * grip * (0.35 + 0.65 * ratio)) {
-        const a = T.driveAccel * grip * ratio * body.mass() * dt;
+      if (along < T.driveSpeed * driveGrip * (0.35 + 0.65 * (this.breakout > 0 ? Math.max(ratio, T.breakoutRatio) : ratio))) {
+        // 脱困（辅助机制）：低转速的球头 / 针尖轴心牵引很弱，停在碗底会一直原地互转。
+        // 僵持一段时间后，按“至少 breakoutRatio 的转速、breakoutGrip 的咬合度”给 0.7 秒牵引，方向背离对手；
+        // 力的大小仍按轴心牵引公式与速度上限计算，拉开后由碗面重力拉回、真实碰撞
+        const r2 = this.breakout > 0 ? Math.max(ratio, T.breakoutRatio) : ratio;
+        const a = T.driveAccel * driveGrip * r2 * body.mass() * dt;
         body.applyImpulse({ x: dx * a, y: 0, z: dz * a }, true);
-        decay += T.driveSpinCost * grip;
+        decay += T.driveSpinCost * driveGrip;
       }
     }
 

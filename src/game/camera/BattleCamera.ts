@@ -1,4 +1,4 @@
-import { ARENA_SCALE } from '../arena/arenaSpec';
+import { ARENA, ARENA_SCALE, rimHeight } from '../arena/arenaSpec';
 import * as THREE from 'three';
 
 export interface CameraTarget {
@@ -82,6 +82,10 @@ export class BattleCamera {
     }
   }
 
+  private clearHeight(pos: THREE.Vector3, targets: CameraTarget[]): number {
+    return wallClearHeight(pos, targets);
+  }
+
   update(dt: number, targets: CameraTarget[], snap = false): void {
     this.time += dt;
     // 竖屏时水平视野变窄，按宽高比拉远镜头保证场地横向完整
@@ -126,12 +130,14 @@ export class BattleCamera {
         this.orbitVel += (0.1 + pull - this.orbitVel) * (1 - Math.exp(-dt * 1.5));
         this.orbit += this.orbitVel * dt;
         const dist = THREE.MathUtils.clamp(4.2 + spread * 0.85, 5, 10.5 * ARENA_SCALE) * portrait;
-        const height = dist * 0.48;
+        // P2.3.1：俯角 25.6° → 30°（0.48 → 0.58），并在下面按护墙高度动态抬高，避免墙挡住陀螺
+        const height = dist * 0.58;
         this.desiredPos.set(
           this.desiredFocus.x + Math.cos(this.orbit) * dist,
           this.desiredFocus.y + height,
           this.desiredFocus.z + Math.sin(this.orbit) * dist,
         );
+        this.desiredPos.y = Math.max(this.desiredPos.y, this.clearHeight(this.desiredPos, targets));
       } else {
         // 结算：环绕特写
         this.orbit += dt * 0.35;
@@ -150,6 +156,8 @@ export class BattleCamera {
     const kFocus = snap ? 1 : 1 - Math.exp(-dt * 5);
     this.basePos.lerp(this.desiredPos, kPos);
     this.focus.lerp(this.desiredFocus, kFocus);
+    // 平滑跟随会滞后：实际镜头位置也保证视线越过墙顶（只抬高，不跳变方向）
+    if (this.mode === 'battle') this.basePos.y = Math.max(this.basePos.y, this.clearHeight(this.basePos, targets));
 
     // 震动
     this.shake = Math.max(0, this.shake - dt * 4);
@@ -174,6 +182,38 @@ export class BattleCamera {
       this.camera.updateProjectionMatrix();
     }
   }
+}
+
+/** 护墙内沿半径、外侧底座外沿半径与墙顶高度（视觉模型：透明墙 + 发光边） */
+const WALL_IN = ARENA.radius - 0.02;
+const WALL_TOP = rimHeight(ARENA) + ARENA.wallHeight;
+/** 视线越过墙顶的余量 */
+const WALL_CLEAR = 0.25;
+
+/**
+ * 镜头在水平位置 cam 时，要让到每个目标（陀螺顶部）的视线越过护墙，镜头至少要多高。
+ * 视线从陀螺往镜头方向上升，最低点在穿过墙内沿的地方：解 |T + s(C − T)| = R 求 s，
+ * 要求那里的高度 ≥ 墙顶 + 余量。镜头在墙内时没有限制。
+ */
+export function wallClearHeight(cam: { x: number; z: number }, targets: { position: THREE.Vector3 }[]): number {
+  let need = -Infinity;
+  if (Math.hypot(cam.x, cam.z) <= WALL_IN) return need;
+  for (const t of targets) {
+    const tx = t.position.x;
+    const tz = t.position.z;
+    const ty = t.position.y + 0.25;
+    const dx = cam.x - tx;
+    const dz = cam.z - tz;
+    const a = dx * dx + dz * dz;
+    const b = 2 * (tx * dx + tz * dz);
+    const c = tx * tx + tz * tz - WALL_IN * WALL_IN;
+    const disc = b * b - 4 * a * c;
+    if (a < 1e-9 || disc < 0) continue;
+    const s = (-b + Math.sqrt(disc)) / (2 * a);
+    if (s <= 0.02 || s >= 1) continue;
+    need = Math.max(need, ty + (WALL_TOP + WALL_CLEAR - ty) / s);
+  }
+  return need;
 }
 
 function wrap(a: number): number {

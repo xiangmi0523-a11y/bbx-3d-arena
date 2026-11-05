@@ -1,6 +1,6 @@
 import { ARENA, pocketAtAngle } from '../arena/arenaSpec';
 import { TABLE_Y } from '../arena/ArenaPhysics';
-import { BeyPhysics } from '../beys/BeyPhysics';
+import { BEY_TUNING, BeyPhysics } from '../beys/BeyPhysics';
 import type { AssembledBey } from '../beys/parts/assemble';
 import { computeLaunch, type Side } from '../launcher/launch';
 import type { LaunchCommand } from '../launcher/PullStringGesture';
@@ -118,6 +118,8 @@ export class BattleSystem {
     for (const side of ['player', 'rival'] as Side[]) {
       const b = this.beys[side];
       if (!b) continue;
+      const other = this.beys[side === 'player' ? 'rival' : 'player'];
+      b.target = other ? other.body.translation() : null;
       b.preStep(dt);
       const v = b.body.linvel();
       this.preVel[side].x = v.x;
@@ -141,7 +143,33 @@ export class BattleSystem {
       }
     }
 
+    this.watchStall(a, b, dt);
     if (!this.result) this.judge(dt);
+  }
+
+  /** 僵持时长（秒）与触发脱困次数 */
+  stallFor = 0;
+  breakouts = 0;
+
+  /** 两台都几乎不动、贴在一起仍在转：累计一段时间后让双方轴心按脱困牵引拉开 */
+  private watchStall(a: BeyPhysics, b: BeyPhysics, dt: number): void {
+    const pa = a.body.translation();
+    const pb = b.body.translation();
+    const va = a.body.linvel();
+    const vb = b.body.linvel();
+    const d = Math.hypot(pa.x - pb.x, pa.z - pb.z);
+    const stalled =
+      Math.hypot(va.x, va.z) < 0.8 &&
+      Math.hypot(vb.x, vb.z) < 0.8 &&
+      d < a.spec.outerRadius + b.spec.outerRadius + 0.4 &&
+      a.spin > 10 &&
+      b.spin > 10;
+    this.stallFor = stalled ? this.stallFor + dt : 0;
+    if (this.stallFor > BEY_TUNING.stallTime) {
+      this.stallFor = 0;
+      this.breakouts++;
+      a.breakout = b.breakout = BEY_TUNING.breakoutTime;
+    }
   }
 
   /** Rapier 本步在两台陀螺之间施加的法向接触冲量总和 */
@@ -217,6 +245,7 @@ export class BattleSystem {
     // 金属刀刃互相刮擦的摩擦损失：冲量作用在刀刃外缘，角冲量 = 冲量 × 半径，
     // 掉速 = 角冲量 / 转动惯量（惯量大、重量在外缘的陀螺被撞后掉速少）
     const jSmash = Math.hypot(jn, jt);
+    a.recoil = b.recoil = BEY_TUNING.recoilTime;
     a.loseSpin((T.spinLoss * jSmash * ra) / a.spec.spinInertia);
     b.loseSpin((T.spinLoss * jSmash * rb) / b.spec.spinInertia);
 
