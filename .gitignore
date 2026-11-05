@@ -4,6 +4,5 @@ dist-preview
 *.log
 .DS_Store
 test-results
-ios
 android
 dist-before

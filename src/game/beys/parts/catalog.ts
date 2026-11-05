@@ -47,7 +47,7 @@ export const BLADES: Record<string, BladeSpec> = {
     id: 'gale-crescent',
     name: '疾风新月',
     code: 'GALE CRESCENT',
-    desc: '两片新月形大翼，重量集中在翼尖，攻守平衡。',
+    desc: '银色双层前掠爪刃配蓝色透明骨架，攻守平衡。',
     role: 'balance',
     spin: 'right',
     mass: 3.1,
@@ -58,7 +58,7 @@ export const BLADES: Record<string, BladeSpec> = {
     restitution: 0.5,
     attack: 0.65,
     defense: 0.45,
-    visual: { style: 'crescent', lobes: 2, primary: 0x2fd27a, secondary: 0xf2f5f8, metal: 0xc8d0da, accent: 0xb6ff3a },
+    visual: { style: 'gale', lobes: 10, primary: 0x1f5cff, secondary: 0x0c111d, metal: 0xdfe4ec, accent: 0x7fb4ff },
   },
   'titan-crown': {
     kind: 'blade',
@@ -105,7 +105,7 @@ export const DISCS: Record<string, DiscSpec> = {
     radius: 0.32,
     height: 0.12,
     burstResistance: 0.75,
-    visual: { points: 6, sharpness: 0.35, color: 0x2a2e36, accent: 0x1f7cf0 },
+    visual: { style: 'ratchet', points: 6, sharpness: 0.35, color: 0x0b1c4a, accent: 0x1f5cff },
   },
   'quad-edge': {
     kind: 'disc',

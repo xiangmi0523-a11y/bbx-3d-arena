@@ -24,7 +24,8 @@ export interface PartBase {
   mass: number;
 }
 
-export type BladeStyle = 'fang' | 'bastion' | 'crescent' | 'crown';
+/** gale = P2.3 按设计参考图重制的银蓝平衡型（疾风新月） */
+export type BladeStyle = 'fang' | 'bastion' | 'crescent' | 'crown' | 'gale';
 
 export interface BladeVisual {
   style: BladeStyle;
@@ -59,6 +60,8 @@ export interface BladeSpec extends PartBase {
 }
 
 export interface DiscVisual {
+  /** 外观样式：'ratchet' = P2.3 阶段 2 的锁齿式写实模型；省略 = 旧的简化模型 */
+  style?: 'ratchet';
   /** 固锁盘凸起数（0 = 圆盘） */
   points: number;
   /** 凸起的尖锐程度 0..1 */

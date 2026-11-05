@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>陀螺模型检视页</title>
+    <style>
+      html, body { margin: 0; background: #070b14; color: #d8e2f2; font: 13px/1.4 -apple-system, "PingFang SC", "Noto Sans SC", sans-serif; overflow: hidden; }
+      canvas { display: block; }
+      .cell { position: absolute; pointer-events: none; border: 1px solid #1b2538; box-sizing: border-box; }
+      .cell b { position: absolute; left: 10px; top: 8px; font-size: 14px; color: #fff; }
+      .cell i { position: absolute; left: 10px; top: 28px; font-style: normal; color: #8fa3c4; font-size: 12px; }
+      #info { position: absolute; right: 0; top: 0; bottom: 0; box-sizing: border-box; padding: 14px 16px; overflow: auto; border-left: 1px solid #1b2538; background: #0a1020; }
+      #info h1 { font-size: 16px; margin: 0 0 4px; }
+      #info h2 { font-size: 13px; margin: 14px 0 6px; color: #9fc4ff; }
+      #info table { border-collapse: collapse; width: 100%; font-size: 12px; }
+      #info td, #info th { border-bottom: 1px solid #1b2538; padding: 3px 4px; text-align: right; }
+      #info td:first-child, #info th:first-child { text-align: left; }
+      .warn { color: #ffb04a; }
+      .ok { color: #6be38f; }
+      .sw { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; vertical-align: -1px; }
+    </style>
+  </head>
+  <body>
+    <script type="module" src="./bey-sheet.ts"></script>
+  </body>
+</html>

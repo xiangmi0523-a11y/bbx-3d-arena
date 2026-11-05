@@ -62,6 +62,12 @@ scripts/e2e.mjs            Playwright 端到端测试
 - **清晰旋转**：陀螺倾斜姿态来自刚体，绕轴转角用封顶的“视觉转速”，60fps 下不频闪；残影只在刀刃外缘。
 - **打击感**：撞击力度由碰撞前一刻的接近速度 + 转速计算，分为轻擦 / 中等 / 猛撞三档（`battle/impactTiers.ts`），分别驱动火花、冲击波层数、闪光、震屏、Hit-stop、慢动作、音效和振动；猛撞约 0.07 秒定格 + 0.2~0.3 秒慢动作。
 - 对比截图：`node scripts/compare.mjs <构建目录> <前缀>`，输出到 `test-results/compare/`。
+- **模型检视页**（P2.3，开发用，不进正式构建）：`npx vite` 后打开 `/tools/bey-sheet.html?set=balance|attack|defense|stamina`
+  （或 `?blade=&disc=&tip=` 任意组合），一屏显示顶视 / 侧视 / 底视 / 爆炸图，以及叠加 Rapier 实际碰撞体的两个视图，
+  右侧列出视觉外径与碰撞体的比值和渲染开销。
+- **视觉护栏测试**：`tests/visual-bounds.test.ts` 检查每个零件的视觉外径 / 高度 / 底面 / 形心相对碰撞体的范围，
+  并把全部物理参数与 `tests/fixtures/physics-snapshot.json` 对比（视觉重制不得改物理）；
+  基线报告：`npx vitest run --config vitest.diag.config.ts tests/diag/visual-report.diag.ts`。
 - **iOS 准备**：`base: './'`、`capacitor.config.json`（webDir = dist）、安全区适配、禁止缩放和回弹。
 
 ## Capacitor（后续阶段）

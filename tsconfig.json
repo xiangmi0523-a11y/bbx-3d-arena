@@ -15,6 +15,6 @@
     "noEmit": true,
     "types": ["vite/client"]
   },
-  "include": ["src", "tests"],
+  "include": ["src", "tests", "tools"],
   "exclude": ["tests/diag"]
 }
