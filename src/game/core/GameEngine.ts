@@ -20,6 +20,8 @@ import { ImpactFX } from '../render/ImpactFX';
 import { initialQuality, QualityController, type QualityLevel, type QualityPreset } from '../render/Quality';
 import { SaveStore, type SaveData } from '../storage/SaveStore';
 import { Store } from './Store';
+import { DIAG } from '../diag/flag';
+import { perfDiag } from '../diag/PerfRecorder';
 
 export type GamePhase = 'loading' | 'title' | 'garage' | 'aim' | 'battle' | 'paused' | 'result' | 'error';
 
@@ -492,6 +494,14 @@ export class GameEngine {
     this.cam = new BattleCamera(Math.max(0.1, rect.width / Math.max(1, rect.height)));
     this.quality.onChange = (p) => this.applyQuality(p);
     this.resize();
+    // Stage 0 诊断构建：记录器只读渲染器 / 画质状态（非诊断构建整段删除）
+    if (DIAG) {
+      perfDiag.attach({
+        renderer: this.renderer,
+        quality: () => ({ level: this.quality.level, locked: this.quality.locked }),
+        shadowMapSize: () => this.keyLight?.shadow.mapSize.x ?? 0,
+      });
+    }
     this.resizeObserver = new ResizeObserver(() => this.resize());
     this.resizeObserver.observe(this.container);
     window.addEventListener('orientationchange', () => setTimeout(this.resize, 250));
@@ -658,7 +668,11 @@ export class GameEngine {
     const elapsed = now - this.last;
     // 帧率上限 60：120Hz 屏幕上隔帧渲染，降低发热。
     // 门槛留 3ms 余量：60Hz 屏幕的帧间隔有抖动，门槛太紧会随机跳帧、被误判为卡顿而自动降画质。
-    if (elapsed < 1000 / 60 - 3) return;
+    if (elapsed < 1000 / 60 - 3) {
+      if (DIAG) perfDiag.skip();
+      return;
+    }
+    if (DIAG) perfDiag.begin(now, elapsed, this.perf);
     const dt = Math.min(0.05, elapsed / 1000);
     this.last = now;
     this.fpsAcc.frames++;
@@ -674,6 +688,7 @@ export class GameEngine {
     if (this.phase === 'garage' && this.garage) {
       this.garage.update(dt);
       this.renderer.render(this.garage.scene, this.garage.camera);
+      if (DIAG) perfDiag.end(this.perf, 'garage');
       return;
     }
     const t0 = performance.now();
@@ -688,6 +703,7 @@ export class GameEngine {
     pf.maxFrame = Math.max(pf.maxFrame, t2 - t0);
     pf.interval.push(elapsed);
     if (pf.interval.length > 600) pf.interval.shift();
+    if (DIAG) perfDiag.end(pf, this.phase);
   };
 
   /**

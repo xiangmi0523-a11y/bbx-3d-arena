@@ -1,6 +1,6 @@
 {
-  "appId": "com.bbx3d.arena",
-  "appName": "BBX 3D Arena",
+  "appId": "com.bbx3d.arena.diag",
+  "appName": "BBX Diag",
   "webDir": "dist",
   "ios": {
     "contentInset": "never",

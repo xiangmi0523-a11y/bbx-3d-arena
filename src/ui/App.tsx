@@ -4,6 +4,8 @@ import { GameEngine, type BeyHud, type GameSnapshot } from '../game/core/GameEng
 import { GarageScreen } from './GarageScreen';
 import { LauncherPad } from './LauncherPad';
 import type { QualityLevel } from '../game/render/Quality';
+import { DIAG } from '../game/diag/flag';
+import { DiagPanel } from './DiagPanel';
 
 declare global {
   interface Window {
@@ -165,6 +167,8 @@ function Overlay({ engine }: { engine: GameEngine }) {
         </div>
       )}
       {s.fps > 0 && s.phase !== "garage" && <PerfBadge engine={engine} fps={s.fps} quality={s.quality} />}
+      {/* Stage 0：仅诊断构建（VITE_PERF_DIAG=1）显示性能诊断面板，其他构建打包时删除 */}
+      {DIAG && <DiagPanel engine={engine} />}
     </div>
   );
 }
