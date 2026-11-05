@@ -14,12 +14,15 @@
     "test:e2e": "node scripts/e2e.mjs"
   },
   "dependencies": {
+    "@capacitor/core": "^8.6.0",
     "@dimforge/rapier3d-compat": "^0.19.3",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "three": "^0.181.2"
   },
   "devDependencies": {
+    "@capacitor/cli": "^8.6.0",
+    "@capacitor/ios": "^8.6.0",
     "@types/react": "^19.2.2",
     "@types/react-dom": "^19.2.2",
     "@types/three": "^0.181.0",
