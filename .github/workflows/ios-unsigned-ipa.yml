@@ -16,7 +16,7 @@ permissions:
 
 jobs:
   build:
-    runs-on: macos-15  # Stage 0 诊断分支：macos-latest 连续三次排队 15 分钟被取消，改用明确的 macOS 15 机器
+    runs-on: macos-14  # Stage 0 诊断分支：macos-latest 三次、macos-15 一次都排队 15 分钟被取消，改试 macOS 14 机器
     timeout-minutes: 40
     steps:
       - uses: actions/checkout@v4
