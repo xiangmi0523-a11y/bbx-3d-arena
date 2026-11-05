@@ -13,6 +13,8 @@ export interface SimOptions {
   playerLoadout?: BeyLoadout;
   rivalLoadout?: BeyLoadout;
   trace?: (t: number, b: BattleSystem) => void;
+  /** trace 每隔多少个物理步调用一次（默认 60 步 = 0.5 秒） */
+  every?: number;
 }
 
 /** 无头模拟一整场对战（不渲染），返回战斗系统 */
@@ -43,7 +45,7 @@ export async function simulateBattle(opts: SimOptions) {
       const p = b!.body.translation();
       maxAbs = Math.max(maxAbs, Math.abs(p.x), Math.abs(p.z));
     }
-    if (opts.trace && steps % 60 === 0) opts.trace(steps / 120, battle);
+    if (opts.trace && steps % (opts.every ?? 60) === 0) opts.trace(steps / 120, battle);
   }
   const out = { battle, steps, maxAbs, impactLog };
   return { ...out, step: () => pw.step(), dispose: () => pw.dispose() };

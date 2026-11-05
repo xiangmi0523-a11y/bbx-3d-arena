@@ -4,8 +4,9 @@ name: iOS 未签名 IPA
 on:
   workflow_dispatch:
   push:
-    branches: [feat/p2.3-visual-balance]
+    branches: [feat/p2.3-visual-balance, feat/p2.3.1-battle-feel]
     paths:
+      - 'src/**'
       - 'ios/**'
       - 'scripts/build-ios-ipa.sh'
       - '.github/workflows/ios-unsigned-ipa.yml'
