@@ -25,6 +25,22 @@ export class AudioFX {
     return c;
   })();
   private hum: { osc: OscillatorNode; osc2: OscillatorNode; gain: GainNode } | null = null;
+  /** 持续摩擦声：一条常驻音频链（循环噪声 + 带通 + 刀刃颤动调幅 + 金属啸叫），按强度调制，不按帧新建节点 */
+  private grindChain: {
+    src: AudioBufferSourceNode;
+    bpA: BiquadFilterNode;
+    bpB: BiquadFilterNode;
+    lfo: OscillatorNode;
+    squeal: OscillatorNode;
+    squealGain: GainNode;
+    out: GainNode;
+    nodes: AudioNode[];
+  } | null = null;
+  private grindSent = 0;
+  private grindSentAt = -1;
+  private grindIdleSince = -1;
+  /** 统计：摩擦音频链创建次数（测试用） */
+  grindChainsCreated = 0;
   muted = false;
 
   /** 在触摸 / 点击事件里调用 */
@@ -44,7 +60,118 @@ export class AudioFX {
       const d = this.noiseBuf.getChannelData(0);
       for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
     }
-    if (this.ctx.state === 'suspended') void this.ctx.resume();
+    // iOS 来电 / 切后台后 AudioContext 会停在 'interrupted'（Stage 0 真机发现），只恢复 'suspended' 会一直无声
+    if (this.ctx.state !== 'running' && this.ctx.state !== 'closed') void this.ctx.resume().catch(() => {});
+  }
+
+  /** 统计：同时发声的撞击数、摩擦音频链是否存在（测试 / 性能面板用） */
+  stats() {
+    return { voices: this.voices, grind: !!this.grindChain, grindLevel: this.grindSent };
+  }
+
+  /**
+   * 持续摩擦声。level 0..1（已包含强碰撞时的压低）；slide 接触面滑动速度 m/s；spin 两台平均转速 rad/s。
+   * 每帧可调用，内部限频（约 30 次/秒或变化明显时）才改音频参数。level 为 0 超过 1.5 秒后释放整条音频链。
+   */
+  setGrind(level: number, slide: number, spin: number): void {
+    if (!this.ready) {
+      // 静音 / 被系统中断：不能让常驻摩擦声停在最后一次的音量上
+      if (this.grindChain) this.stopGrind();
+      return;
+    }
+    const ctx = this.ctx!;
+    const now = ctx.currentTime;
+    const lv = level > 0.01 ? Math.min(1, level) : 0;
+    if (lv === 0) {
+      if (!this.grindChain) return;
+      if (this.grindIdleSince < 0) this.grindIdleSince = now;
+      if (now - this.grindIdleSince > 1.5) {
+        this.stopGrind();
+        return;
+      }
+    } else this.grindIdleSince = -1;
+    if (!this.grindChain) {
+      if (lv === 0) return;
+      this.createGrind(ctx);
+    }
+    const g = this.grindChain!;
+    if (Math.abs(lv - this.grindSent) < 0.04 && now - this.grindSentAt < 1 / 30) return;
+    const rising = lv > this.grindSent;
+    this.grindSent = lv;
+    this.grindSentAt = now;
+    const sn = Math.min(1, slide / 45);
+    const tc = rising ? 0.015 : 0.05;
+    // 音量：感知响度约按平方根，弱摩擦也听得见，但始终明显低于撞击
+    g.out.gain.setTargetAtTime(lv > 0 ? 0.08 + 0.32 * Math.sqrt(lv) * lv : 0, now, tc);
+    g.bpA.frequency.setTargetAtTime(2200 + 2600 * sn + 900 * lv, now, 0.04);
+    g.bpB.frequency.setTargetAtTime(6000 + 2500 * sn, now, 0.04);
+    // 刀刃凸起颤动频率：约 3 个凸起 × 两台转速之和 / 2π，限制在可听的“沙沙 / 嘎嘎”范围
+    g.lfo.frequency.setTargetAtTime(Math.max(18, Math.min(95, (spin * 3) / (2 * Math.PI) / 2)), now, 0.05);
+    g.squeal.frequency.setTargetAtTime(1700 + 1100 * sn, now, 0.05);
+    g.squealGain.gain.setTargetAtTime(0.05 * lv * sn, now, tc);
+  }
+
+  private createGrind(ctx: AudioContext): void {
+    const src = ctx.createBufferSource();
+    src.buffer = this.noiseBuf;
+    src.loop = true;
+    const bpA = ctx.createBiquadFilter();
+    bpA.type = 'bandpass';
+    bpA.Q.value = 1.6;
+    bpA.frequency.value = 3000;
+    const bpB = ctx.createBiquadFilter();
+    bpB.type = 'bandpass';
+    bpB.Q.value = 0.8;
+    bpB.frequency.value = 7000;
+    const gB = ctx.createGain();
+    gB.gain.value = 0.35;
+    // 调幅：am.gain = 0.6 + 0.4 × LFO
+    const am = ctx.createGain();
+    am.gain.value = 0.6;
+    const lfo = ctx.createOscillator();
+    lfo.type = 'triangle';
+    lfo.frequency.value = 40;
+    const depth = ctx.createGain();
+    depth.gain.value = 0.4;
+    lfo.connect(depth).connect(am.gain);
+    const squeal = ctx.createOscillator();
+    squeal.type = 'triangle';
+    squeal.frequency.value = 2200;
+    const squealGain = ctx.createGain();
+    squealGain.gain.value = 0;
+    const out = ctx.createGain();
+    out.gain.value = 0;
+    src.connect(bpA).connect(am);
+    src.connect(bpB).connect(gB).connect(am);
+    squeal.connect(squealGain).connect(am);
+    am.connect(out).connect(this.master!);
+    const t = ctx.currentTime;
+    src.start(t, Math.random() * 0.3);
+    lfo.start(t);
+    squeal.start(t);
+    this.grindChain = { src, bpA, bpB, lfo, squeal, squealGain, out, nodes: [src, bpA, bpB, gB, am, lfo, depth, squeal, squealGain, out] };
+    this.grindSent = 0;
+    this.grindSentAt = -1;
+    this.grindChainsCreated++;
+  }
+
+  /** 立即停止并释放摩擦音频链（对战结束 / 暂停 / 重开时调用） */
+  stopGrind(): void {
+    const g = this.grindChain;
+    if (!g || !this.ctx) {
+      this.grindChain = null;
+      return;
+    }
+    this.grindChain = null;
+    this.grindSent = 0;
+    this.grindIdleSince = -1;
+    const t = this.ctx.currentTime;
+    g.out.gain.setTargetAtTime(0, t, 0.02);
+    for (const n of [g.src, g.lfo, g.squeal]) n.stop(t + 0.12);
+    // 停止后断开，节点交给 GC
+    g.src.onended = () => {
+      for (const n of g.nodes) n.disconnect();
+    };
   }
 
   get ready(): boolean {

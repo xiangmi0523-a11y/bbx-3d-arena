@@ -2,10 +2,10 @@ import * as THREE from 'three';
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 import { createArenaPhysics } from '../arena/ArenaPhysics';
 import { createArenaVisual } from '../arena/ArenaVisual';
-import { ARENA_SCALE, floorHeight } from '../arena/arenaSpec';
+import { ARENA_SCALE } from '../arena/arenaSpec';
 import { AudioFX } from '../audio/AudioFX';
 import { BattleSystem, type BattleResult, type ImpactEvent } from '../battle/BattleSystem';
-import { impactFeedback, impactTier, type ImpactTier } from '../battle/impactTiers';
+import { impactTier } from '../battle/impactTiers';
 import { createBeyVisual, type BeyVisual } from '../beys/BeyVisualFactory';
 import { assembleBey, swapPart, type AssembledBey } from '../beys/parts/assemble';
 import { listParts, PLAYER_LOADOUT, RIVAL_LOADOUT, sanitizeLoadout } from '../beys/parts/catalog';
@@ -17,6 +17,7 @@ import { LauncherModel } from '../launcher/LauncherModel';
 import { IDLE_PULL, PullStringGesture, type LaunchCommand, type PullState } from '../launcher/PullStringGesture';
 import { loadRapier, PhysicsWorld, PHYSICS_DT, type Rapier } from '../physics/PhysicsWorld';
 import { ImpactFX } from '../render/ImpactFX';
+import { BattleFeedback } from './BattleFeedback';
 import { initialQuality, QualityController, type QualityLevel, type QualityPreset } from '../render/Quality';
 import { SaveStore, type SaveData } from '../storage/SaveStore';
 import { Store } from './Store';
@@ -94,6 +95,7 @@ export class GameEngine {
   private visuals: Partial<Record<Side, BeyVisual>> = {};
   private launchers: Record<Side, LauncherModel>;
   private fx = new ImpactFX();
+  private feedback!: BattleFeedback;
   private garage: GarageView | null = null;
   private garageFocus: FocusRect | null = null;
   private aimArrow!: THREE.Mesh;
@@ -108,7 +110,6 @@ export class GameEngine {
    * 撞击力度只通过真实的物理结果（速度 / 方向变化）和火花、音效、镜头表现。
    */
   /** 最近一次撞击（调试 / 测试用） */
-  private lastImpact: { strength: number; tier: ImpactTier } | null = null;
   /** 视觉转角：与物理转速解耦，避免 60fps 下高速旋转出现频闪 / 糊成一团 */
   private visualYaw: Record<Side, number> = { player: 0, rival: 0 };
   private dprQuery: MediaQueryList | null = null;
@@ -230,6 +231,7 @@ export class GameEngine {
       this.pausedFrom = this.phase;
       this.gesture.cancel();
       this.audio.stopHum();
+      this.audio.stopGrind();
       this.setPhase('paused');
     }
   }
@@ -343,6 +345,8 @@ export class GameEngine {
     window.removeEventListener('pointerdown', this.unlockAudio, { capture: true });
     window.removeEventListener('touchend', this.unlockAudio, { capture: true });
     this.resizeObserver?.disconnect();
+    this.audio.stopGrind();
+    this.fx.dispose();
     this.battle?.dispose();
     this.pw?.dispose();
     this.garage?.dispose();
@@ -407,25 +411,46 @@ export class GameEngine {
   /** 调试：手动触发一次撞击特效（不影响物理） */
   debugImpact(strength: number): void {
     this.playImpact(
-      { strength, tier: impactTier(strength), approach: 0, impulse: 0, dvRel: strength * 12, x: 0, y: 0.5, z: 0, nx: 1, nz: 0 },
+      {
+        strength,
+        tier: impactTier(strength),
+        approach: 0,
+        impulse: 0,
+        dvRel: strength * 12,
+        x: 0,
+        y: 0.5,
+        z: 0,
+        nx: 1,
+        nz: 0,
+        episode: 0,
+        feedback: 'play',
+      },
     );
   }
 
   /** 调试：最近一次撞击的反馈参数 */
   debugLastImpact() {
-    return this.lastImpact ? { ...this.lastImpact } : null;
+    const l = this.feedback.lastImpact;
+    return l ? { ...l } : null;
   }
 
-  /** 一次撞击的全部反馈：特效、镜头、音效、振动、Hit-stop、慢动作（按等级区分） */
+  /** 调试：接触反馈状态（持续摩擦层、特效与音频的数量统计） */
+  debugContact() {
+    const c = this.battle?.contact;
+    return {
+      state: c ? { ...c.state } : null,
+      episodes: c?.episodes ?? 0,
+      grindEpisodes: c?.grindEpisodes ?? 0,
+      merged: c?.merged ?? 0,
+      absorbed: c?.absorbed ?? 0,
+      mergedSkipped: this.feedback.mergedSkipped,
+      fx: this.fx.stats(),
+      audio: this.audio.stats(),
+    };
+  }
+
   private playImpact(imp: ImpactEvent): void {
-    const fb = impactFeedback(imp.strength);
-    this.fx.impact(imp.x, imp.y, imp.z, imp.strength, { x: imp.nx, z: imp.nz }, floorHeight(Math.hypot(imp.x, imp.z)));
-    this.cam.impact(fb.shake, fb.fovKick, { x: imp.nx, z: imp.nz });
-    this.audio.clash(imp.strength);
-    // 振动：iPhone Safari 没有实现 Vibration API（navigator.vibrate 不存在），这里只在 Android 浏览器生效。
-    // iPhone 上的触感反馈要等 Capacitor 打包后用原生 Haptics 插件实现。
-    if (fb.vibrate > 0 && typeof navigator.vibrate === 'function') navigator.vibrate(fb.vibrate);
-    this.lastImpact = { strength: imp.strength, tier: fb.tier };
+    this.feedback.playImpact(imp);
   }
 
   // ───────────────────────── 内部 ─────────────────────────
@@ -490,6 +515,7 @@ export class GameEngine {
     this.container.appendChild(this.renderer.domElement);
     const rect = this.container.getBoundingClientRect();
     this.cam = new BattleCamera(Math.max(0.1, rect.width / Math.max(1, rect.height)));
+    this.feedback = new BattleFeedback(this.fx, this.audio, this.cam);
     this.quality.onChange = (p) => this.applyQuality(p);
     this.resize();
     this.resizeObserver = new ResizeObserver(() => this.resize());
@@ -601,6 +627,7 @@ export class GameEngine {
     this.pw?.dispose();
     this.fx.clear();
     this.audio.stopHum();
+    this.audio.stopGrind();
     this.resultRecorded = false;
     this.previewSpin = 0;
     this.gesture.cancel();
@@ -695,7 +722,7 @@ export class GameEngine {
    * 渲染一栏只是 CPU 提交 WebGL 指令的时间，GPU 实际耗时浏览器拿不到（iOS 也不支持计时查询）。
    */
   private readonly perf = {
-    frames: 0, tick: 0, render: 0, physics: 0, physSteps: 0, sync: 0, fx: 0, cam: 0, ui: 0, maxFrame: 0, dtSum: 0,
+    frames: 0, tick: 0, render: 0, physics: 0, physSteps: 0, sync: 0, fx: 0, grind: 0, cam: 0, ui: 0, maxFrame: 0, dtSum: 0,
     interval: [] as number[],
   };
 
@@ -714,6 +741,8 @@ export class GameEngine {
       timeRatio: p.dtSum > 0 ? (p.physSteps * PHYSICS_DT) / p.dtSum : 1,
       syncMs: p.sync / n,
       fxMs: p.fx / n,
+      grindMs: p.grind / n,
+      sparks: this.fx.stats().live,
       camMs: p.cam / n,
       uiMs: p.ui / n,
       renderSubmitMs: p.render / n,
@@ -732,7 +761,7 @@ export class GameEngine {
       heapMB: ((performance as unknown as { memory?: { usedJSHeapSize: number } }).memory?.usedJSHeapSize ?? 0) / 1048576,
     };
     if (reset) {
-      p.frames = p.tick = p.render = p.physics = p.physSteps = p.sync = p.fx = p.cam = p.ui = p.maxFrame = p.dtSum = 0;
+      p.frames = p.tick = p.render = p.physics = p.physSteps = p.sync = p.fx = p.grind = p.cam = p.ui = p.maxFrame = p.dtSum = 0;
       p.interval.length = 0;
     }
     return out;
@@ -759,8 +788,10 @@ export class GameEngine {
       this.perf.dtSum += dt;
       this.perf.physSteps += this.pw!.advance(dt);
       const a1 = performance.now();
-      for (const imp of battle.impacts) this.playImpact(imp);
-      battle.impacts.length = 0;
+      // 撞击反馈 + 持续摩擦层（BattleFeedback：特效、音频、镜头）
+      const g0 = performance.now();
+      this.feedback.frame(battle, dt);
+      this.perf.grind += performance.now() - g0;
       this.syncBeys();
       this.perf.physics += a1 - a0;
       this.perf.sync += performance.now() - a1;

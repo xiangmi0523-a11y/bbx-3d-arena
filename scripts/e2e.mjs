@@ -264,6 +264,13 @@ try {
   check('撞击分级：三档分别为轻擦 / 中等 / 猛撞', lt.tier === 'light' && mt.tier === 'medium' && ht.tier === 'heavy', `${lt.tier} / ${mt.tier} / ${ht.tier}`);
   check('P2.2.1 无慢动作：连续猛撞期间物理时间与真实时间同速', Math.abs(tr.timeRatio - 1) < 0.15, `物理时间 / 帧时间 = ${tr.timeRatio.toFixed(3)}（${tr.frames} 帧）`);
   check('P2.2.1 无慢动作：没有慢动作暗角', (await page.locator('.slowmo-vignette').count()) === 0);
+  // P2.3.2 接触反馈：状态机在浏览器里运行，粒子数量在上限内
+  const ct = await page.evaluate(() => window.__game.debugContact());
+  check(
+    'P2.3.2 接触反馈：接触状态机运行、粒子数在上限内',
+    !!ct.state && ct.fx.live <= 900 && ct.fx.grindLive <= 140,
+    `接触段 ${ct.episodes}，持续摩擦段 ${ct.grindEpisodes}，火花 ${ct.fx.live}（摩擦 ${ct.fx.grindLive}），本帧上传 ${ct.fx.uploadedFloats} 个浮点`,
+  );
 
   // 暂停：物理时间不再前进
   await page.tap('[data-testid=pause]');
@@ -290,6 +297,8 @@ try {
   await page.waitForFunction(() => window.__game.store.get().phase === 'aim');
   const r = await page.evaluate(() => window.__game.debugState());
   check('重新开始：回到发射准备，物理世界已重置', r.player === null && r.time === 0);
+  const rc = await page.evaluate(() => window.__game.debugContact());
+  check('P2.3.2 重新开始：摩擦层清空（无火花、无摩擦音频链）', rc.fx.grindLive === 0 && !rc.fx.glow && !rc.audio.grind, JSON.stringify(rc.fx));
 
   // 竖屏布局
   await page.setViewportSize({ width: 390, height: 844 });

@@ -9,6 +9,12 @@ import { impactFeedback } from '../battle/impactTiers';
  *  - 冲击波：贴地扩散，中等 1 层，猛撞 2~3 层（亮环 + 延迟的宽环 + 柔和气浪）。
  * 每次撞击各自占用独立的粒子 / 闪光 / 冲击波槽位，连续撞击不会互相覆盖。
  * 粒子池固定容量，不在运行时分配内存，避免 iPhone 上 GC 卡顿。
+ *
+ * P2.3.2：
+ *  - 持续摩擦（grind）：贴身刮擦时按接触强度连续喷出细碎火花 + 接触点辉光，有独立数量上限，
+ *    不挤占撞击火花（总池里给撞击留出余量）；
+ *  - 活跃粒子压缩在缓冲区前部（死亡时与末尾交换），每帧只遍历 / 上传活跃部分，并用 drawRange 只画活跃部分；
+ *    没有火花时两个网格直接隐藏、不上传。旧版每帧遍历 900 个槽位、整块上传约 108 KB 顶点数据并提交 3600 个顶点。
  */
 
 function radialTexture(stops: [number, string][], size = 128): THREE.CanvasTexture {
@@ -27,6 +33,42 @@ function radialTexture(stops: [number, string][], size = 128): THREE.CanvasTextu
 const SPARKS = 900;
 const FLASHES = 8;
 const WAVES = 12;
+/** 持续摩擦火花的同时存在上限（高画质；按 sparkScale 缩放，最低 40） */
+export const GRIND_SPARK_CAP = 140;
+/** 摩擦火花不使用总池最后这么多槽位，保证摩擦中突然猛撞也有完整的火花 */
+const IMPACT_RESERVE = 300;
+/** 摩擦火花喷射速率（个 / 秒，强度 1、高画质） */
+const GRIND_RATE = 420;
+const KIND_IMPACT = 0;
+const KIND_GRIND = 1;
+
+/** 持续摩擦输入（BattleSystem.contact.state 的子集） */
+export interface GrindInput {
+  level: number;
+  x: number;
+  y: number;
+  z: number;
+  nx: number;
+  nz: number;
+  tx: number;
+  tz: number;
+}
+
+export interface FxStats {
+  /** 活跃火花数（总） */
+  live: number;
+  /** 其中摩擦火花 */
+  grindLive: number;
+  /** 上一帧上传到 GPU 的浮点数（四个动态属性合计） */
+  uploadedFloats: number;
+  /** 上一帧更新的火花数 */
+  updated: number;
+  /** 摩擦辉光是否可见 */
+  glow: boolean;
+  /** 正在播放的闪光 / 冲击波数 */
+  flashes: number;
+  waves: number;
+}
 
 export interface ImpactQuality {
   /** 火花数量倍率 */
@@ -46,6 +88,18 @@ export class ImpactFX {
   private readonly sWidth = new Float32Array(SPARKS);
   private readonly sFloor = new Float32Array(SPARKS);
   private readonly sTrail = new Float32Array(SPARKS);
+  private readonly sKind = new Uint8Array(SPARKS);
+  /** 活跃火花数：活跃火花始终压缩在 [0, live) */
+  private live = 0;
+  private grindLive = 0;
+  /** 池满时被覆盖的槽位游标 */
+  private overwrite = 0;
+  private grindAcc = 0;
+  private lastUpload = 0;
+  private lastUpdated = 0;
+  private readonly ranges = [{ start: 0, count: 0 }, { start: 0, count: 0 }];
+  private readonly grindGlow: THREE.Sprite;
+  private glowLevel = 0;
   /** 每个火花 4 个顶点（头左、头右、尾左、尾右） */
   private readonly trailPos = new Float32Array(SPARKS * 12);
   private readonly trailCol = new Float32Array(SPARKS * 12);
@@ -54,7 +108,6 @@ export class ImpactFX {
   private readonly trails: THREE.Mesh;
   private readonly camPos = new THREE.Vector3();
   private readonly heads: THREE.Points;
-  private nextSpark = 0;
 
   // 闪光
   private readonly flashes: { sprite: THREE.Sprite; life: number; max: number; size: number }[] = [];
@@ -66,7 +119,6 @@ export class ImpactFX {
   private readonly softWaves: { mesh: THREE.Mesh; life: number; max: number; size: number; delay: number; alpha: number }[] = [];
 
   constructor() {
-    this.sPos.fill(-999);
     const tGeo = new THREE.BufferGeometry();
     tGeo.setAttribute('position', new THREE.BufferAttribute(this.trailPos, 3).setUsage(THREE.DynamicDrawUsage));
     tGeo.setAttribute('color', new THREE.BufferAttribute(this.trailCol, 3).setUsage(THREE.DynamicDrawUsage));
@@ -92,6 +144,7 @@ export class ImpactFX {
     );
     this.trails.frustumCulled = false;
     this.trails.renderOrder = 5;
+    this.trails.visible = false;
 
     const hGeo = new THREE.BufferGeometry();
     hGeo.setAttribute('position', new THREE.BufferAttribute(this.headPos, 3).setUsage(THREE.DynamicDrawUsage));
@@ -113,6 +166,7 @@ export class ImpactFX {
     );
     this.heads.frustumCulled = false;
     this.heads.renderOrder = 5;
+    this.heads.visible = false;
     this.root.add(this.trails, this.heads);
 
     const flashTex = radialTexture([
@@ -150,6 +204,14 @@ export class ImpactFX {
       this.root.add(sprite);
       this.flashes.push({ sprite, life: 0, max: 1, size: 1 });
     }
+
+    // 持续摩擦的接触点辉光：一张常驻精灵，只在摩擦时可见
+    this.grindGlow = new THREE.Sprite(
+      new THREE.SpriteMaterial({ map: flashTex, color: 0xffc070, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, opacity: 0 }),
+    );
+    this.grindGlow.visible = false;
+    this.grindGlow.renderOrder = 6;
+    this.root.add(this.grindGlow);
 
     this.light = new THREE.PointLight(0xffd9a0, 0, 4, 2);
     this.root.add(this.light);
@@ -214,13 +276,14 @@ export class ImpactFX {
     }
 
     // 火花：两束沿切向（刀刃擦过的方向）+ 一部分向四周
-    const n = Math.max(3, Math.round(fb.sparks * this.quality.sparkScale));
+    // 低画质也保证猛撞火花不少于高画质的 60%，重击不能被削弱到认不出
+    const scale = heavy ? Math.max(0.6, this.quality.sparkScale) : this.quality.sparkScale;
+    const n = Math.max(3, Math.round(fb.sparks * scale));
     const tx = -normal.z;
     const tz = normal.x;
     const width = fb.tier === 'light' ? 0.012 : heavy ? 0.024 : 0.018;
     for (let i = 0; i < n; i++) {
-      const k = this.nextSpark;
-      this.nextSpark = (this.nextSpark + 1) % SPARKS;
+      const k = this.alloc(KIND_IMPACT);
       const r = Math.random();
       let dx: number;
       let dz: number;
@@ -265,22 +328,125 @@ export class ImpactFX {
     if (fb.waves >= 3) spawn(this.softWaves, 3.2 + 0.8 * fb.local, 0.7, 0.02, 0.8);
   }
 
+  /** 取一个火花槽位：有空位用空位，池满时按游标覆盖（与旧版环形缓冲一致：最老的先被覆盖） */
+  private alloc(kind: number): number {
+    let k: number;
+    if (this.live < SPARKS) k = this.live++;
+    else {
+      k = this.overwrite;
+      this.overwrite = (this.overwrite + 1) % SPARKS;
+      if (this.sKind[k] === KIND_GRIND) this.grindLive--;
+    }
+    this.sKind[k] = kind;
+    if (kind === KIND_GRIND) this.grindLive++;
+    return k;
+  }
+
+  /** 火花 k 死亡：用末尾的活跃火花填上它的位置，保持活跃火花连续 */
+  private kill(k: number): void {
+    if (this.sKind[k] === KIND_GRIND) this.grindLive--;
+    const last = --this.live;
+    if (k === last) return;
+    const k3 = k * 3;
+    const l3 = last * 3;
+    for (let c = 0; c < 3; c++) {
+      this.sPos[k3 + c] = this.sPos[l3 + c];
+      this.sVel[k3 + c] = this.sVel[l3 + c];
+    }
+    this.sLife[k] = this.sLife[last];
+    this.sMax[k] = this.sMax[last];
+    this.sHeat[k] = this.sHeat[last];
+    this.sWidth[k] = this.sWidth[last];
+    this.sFloor[k] = this.sFloor[last];
+    this.sTrail[k] = this.sTrail[last];
+    this.sKind[k] = this.sKind[last];
+  }
+
+  /**
+   * 持续摩擦反馈，每帧调用一次（不在接触时传 level = 0）。
+   * 火花数量 = 强度 × 速率 × 帧时间，同时存在的摩擦火花有上限；辉光亮度随强度变化。
+   */
+  grind(g: GrindInput, dt: number, floorY: number): void {
+    const level = g.level > 0.01 ? g.level : 0;
+    // 辉光：快速跟随强度，带一点闪烁
+    this.glowLevel += (level - this.glowLevel) * Math.min(1, dt * 30);
+    const glow = this.grindGlow;
+    if (this.glowLevel > 0.02) {
+      glow.visible = true;
+      glow.position.set(g.x, g.y, g.z);
+      const flicker = 0.75 + 0.25 * Math.random();
+      const mat = glow.material as THREE.SpriteMaterial;
+      mat.opacity = Math.min(0.85, this.glowLevel * 0.9) * flicker;
+      mat.rotation = Math.random() * Math.PI;
+      const sc = (0.1 + 0.2 * this.glowLevel) * (0.85 + 0.3 * flicker);
+      glow.scale.set(sc, sc, 1);
+    } else {
+      glow.visible = false;
+      this.glowLevel = level;
+    }
+    if (level <= 0) {
+      this.grindAcc = 0;
+      return;
+    }
+    const scale = this.quality.sparkScale;
+    const cap = Math.max(40, Math.round(GRIND_SPARK_CAP * scale));
+    this.grindAcc += level * GRIND_RATE * scale * dt;
+    let n = Math.floor(this.grindAcc);
+    this.grindAcc -= n;
+    // 上限：摩擦火花数量和总池余量都不能超
+    n = Math.min(n, cap - this.grindLive, SPARKS - IMPACT_RESERVE - this.live);
+    for (let i = 0; i < n; i++) {
+      const k = this.alloc(KIND_GRIND);
+      const side = Math.random() < 0.5 ? 1 : -1;
+      const spread = (Math.random() - 0.5) * 0.9;
+      let dx = g.tx * side + g.nx * spread;
+      let dz = g.tz * side + g.nz * spread;
+      const len = Math.hypot(dx, dz) || 1;
+      dx /= len;
+      dz /= len;
+      const sp = (1.5 + Math.random() * 3.5) * (0.6 + 0.8 * level);
+      this.sVel[k * 3] = dx * sp;
+      this.sVel[k * 3 + 1] = 0.3 + Math.random() * (1 + 2 * level);
+      this.sVel[k * 3 + 2] = dz * sp;
+      this.sPos[k * 3] = g.x + (Math.random() - 0.5) * 0.04;
+      this.sPos[k * 3 + 1] = g.y + (Math.random() - 0.5) * 0.04;
+      this.sPos[k * 3 + 2] = g.z + (Math.random() - 0.5) * 0.04;
+      this.sMax[k] = this.sLife[k] = (0.08 + Math.random() * 0.18) * (0.7 + 0.6 * level);
+      this.sHeat[k] = 0.85 + Math.random() * 0.15;
+      this.sWidth[k] = (0.007 + Math.random() * 0.005) * (0.8 + 0.5 * level);
+      this.sFloor[k] = floorY;
+      this.sTrail[k] = 0.025 * (0.7 + Math.random() * 0.6);
+    }
+  }
+
+  /** 统计（测试 / 性能面板用） */
+  stats(): FxStats {
+    return {
+      live: this.live,
+      grindLive: this.grindLive,
+      uploadedFloats: this.lastUpload,
+      updated: this.lastUpdated,
+      glow: this.grindGlow.visible,
+      flashes: this.flashes.filter((f) => f.life > 0).length,
+      waves: this.waves.filter((w) => w.life > 0).length + this.softWaves.filter((w) => w.life > 0).length,
+    };
+  }
+
   /** 每帧更新；camera 用于让火花拖尾条带始终朝向镜头 */
   update(dt: number, camera?: THREE.Camera): void {
     if (camera) this.camPos.setFromMatrixPosition(camera.matrixWorld);
-    // 火花
+    // 火花：只遍历活跃部分 [0, live)
     const cp = this.camPos;
-    for (let k = 0; k < SPARKS; k++) {
+    this.lastUpdated = 0;
+    for (let k = 0; k < this.live; ) {
       const i3 = k * 3;
       const i12 = k * 12;
-      if (this.sLife[k] <= 0) {
-        if (this.trailPos[i12 + 1] !== -999) {
-          for (let v = 0; v < 4; v++) this.trailPos[i12 + v * 3 + 1] = -999;
-          this.headPos[i3 + 1] = -999;
-        }
-        continue;
-      }
       this.sLife[k] -= dt;
+      if (this.sLife[k] <= 0) {
+        this.kill(k);
+        continue; // 末尾的火花被换到 k，本帧还没更新，继续处理同一个 k
+      }
+      this.lastUpdated++;
       this.sVel[i3 + 1] -= 16 * dt;
       // 空气阻力
       const drag = Math.exp(-dt * 2.2);
@@ -349,11 +515,9 @@ export class ImpactFX {
       this.headCol[i3] = r;
       this.headCol[i3 + 1] = g;
       this.headCol[i3 + 2] = b;
+      k++;
     }
-    this.trails.geometry.attributes.position.needsUpdate = true;
-    this.trails.geometry.attributes.color.needsUpdate = true;
-    this.heads.geometry.attributes.position.needsUpdate = true;
-    this.heads.geometry.attributes.color.needsUpdate = true;
+    this.upload();
 
     // 闪光
     for (const f of this.flashes) {
@@ -376,6 +540,32 @@ export class ImpactFX {
     // 冲击波（两组分别遍历，不再每帧拼接新数组）
     this.updateWaves(this.waves, dt);
     this.updateWaves(this.softWaves, dt);
+  }
+
+  /** 只上传活跃火花对应的顶点范围；没有火花时隐藏网格、不上传 */
+  private upload(): void {
+    const n = this.live;
+    const visible = n > 0;
+    this.trails.visible = this.heads.visible = visible;
+    this.lastUpload = 0;
+    if (!visible) return;
+    this.trails.geometry.setDrawRange(0, n * 6);
+    this.heads.geometry.setDrawRange(0, n);
+    const t = this.trails.geometry.attributes;
+    const h = this.heads.geometry.attributes;
+    this.ranges[0].count = n * 12;
+    this.ranges[1].count = n * 3;
+    for (const [attr, range] of [
+      [t.position, this.ranges[0]],
+      [t.color, this.ranges[0]],
+      [h.position, this.ranges[1]],
+      [h.color, this.ranges[1]],
+    ] as [THREE.BufferAttribute, { start: number; count: number }][]) {
+      attr.updateRanges.length = 0;
+      attr.updateRanges.push(range);
+      attr.needsUpdate = true;
+      this.lastUpload += range.count;
+    }
   }
 
   private updateWaves(list: typeof this.waves, dt: number): void {
@@ -404,14 +594,20 @@ export class ImpactFX {
     for (const f of this.flashes) f.sprite.visible = true;
     for (const w of this.waves) w.mesh.visible = true;
     for (const w of this.softWaves) w.mesh.visible = true;
+    this.grindGlow.visible = this.trails.visible = this.heads.visible = true;
     renderer.compile(scene, camera);
     for (const f of this.flashes) f.sprite.visible = false;
     for (const w of this.waves) w.mesh.visible = false;
     for (const w of this.softWaves) w.mesh.visible = false;
+    this.grindGlow.visible = false;
+    this.trails.visible = this.heads.visible = this.live > 0;
   }
 
   clear(): void {
     this.sLife.fill(0);
+    this.live = this.grindLive = this.overwrite = 0;
+    this.grindAcc = this.glowLevel = 0;
+    this.grindGlow.visible = false;
     for (const f of this.flashes) {
       f.life = 0;
       f.sprite.visible = false;
@@ -423,5 +619,27 @@ export class ImpactFX {
     }
     this.light.intensity = 0;
     this.update(0);
+  }
+
+  /** 释放 GPU 资源（引擎销毁时调用） */
+  dispose(): void {
+    const seen = new Set<unknown>();
+    this.root.traverse((o) => {
+      const m = o as THREE.Mesh;
+      // Sprite 的几何体是 three.js 全局共用的，不能释放
+      if (m.geometry && !(o instanceof THREE.Sprite) && !seen.has(m.geometry)) {
+        seen.add(m.geometry);
+        m.geometry.dispose();
+      }
+      const mat = m.material as THREE.Material & { map?: THREE.Texture | null };
+      if (mat && !seen.has(mat)) {
+        seen.add(mat);
+        if (mat.map && !seen.has(mat.map)) {
+          seen.add(mat.map);
+          mat.map.dispose();
+        }
+        mat.dispose();
+      }
+    });
   }
 }

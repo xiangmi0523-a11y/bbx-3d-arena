@@ -5,6 +5,7 @@ import type { AssembledBey } from '../beys/parts/assemble';
 import { computeLaunch, type Side } from '../launcher/launch';
 import type { LaunchCommand } from '../launcher/PullStringGesture';
 import type { PhysicsWorld } from '../physics/PhysicsWorld';
+import { ContactFeedback, type ContactSample, type ImpactDecision } from './contactFeedback';
 import { impactTier, type ImpactTier } from './impactTiers';
 
 export type FinishType = 'spin' | 'over' | 'xtreme';
@@ -41,6 +42,10 @@ export interface ImpactEvent {
   impulse: number;
   /** 冲量折算的相对速度变化（m/s） */
   dvRel: number;
+  /** 所属接触段（与持续摩擦共用同一生命周期，见 contactFeedback） */
+  episode: number;
+  /** play = 播放反馈；merge = 同一接触段内紧跟着的更弱强碰撞，物理照常但不重复播放 */
+  feedback: ImpactDecision;
 }
 
 /**
@@ -90,6 +95,11 @@ export class BattleSystem {
   /** 贴身摩擦接触次数（不产生撞击反馈） */
   grinds = 0;
   result: BattleResult | null = null;
+  /** 接触反馈（轻擦 / 持续摩擦 / 强碰撞共用的接触生命周期）。只读物理，不施加力 */
+  readonly contact = new ContactFeedback();
+  /** 诊断：本场查询接触流形的物理步数 */
+  contactQueries = 0;
+  private readonly sample: ContactSample = { touching: false, force: 0, slide: 0, x: 0, y: 0, z: 0, nx: 1, nz: 0, tx: 0, tz: 1 };
   private lastHit = -1;
   private readonly pw: PhysicsWorld;
   private readonly specs: Record<Side, AssembledBey>;
@@ -97,10 +107,14 @@ export class BattleSystem {
   /** 物理步之前的线速度：Rapier 求解碰撞后两者已经分开，接近速度必须用碰撞前的值 */
   private readonly preVel: Record<Side, { x: number; z: number }> = { player: { x: 0, z: 0 }, rival: { x: 0, z: 0 } };
 
-  constructor(pw: PhysicsWorld, specs: Record<Side, AssembledBey>) {
+  /** contactFeedback = false 时不读取接触（只给“读取接触不改变物理”的对照测试用） */
+  constructor(pw: PhysicsWorld, specs: Record<Side, AssembledBey>, opts: { contactFeedback?: boolean } = {}) {
     this.pw = pw;
     this.specs = specs;
+    this.sampling = opts.contactFeedback !== false;
   }
+
+  private readonly sampling: boolean;
 
   launch(side: Side, cmd: LaunchCommand): BeyPhysics {
     this.beys[side]?.dispose();
@@ -134,12 +148,21 @@ export class BattleSystem {
     if (!a || !b) return;
     this.time += dt;
 
+    // 接触反馈先于撞击结算读取本步接触（只读：接触流形不受 resolveSmash 施加的冲量影响）
+    if (this.sampling) this.contact.step(dt, this.sampleContact(a, b, dt));
+
     for (const pair of this.pw.startedContacts) {
       const hitAB =
         (a.ownsCollider(pair.a) && b.ownsCollider(pair.b)) || (a.ownsCollider(pair.b) && b.ownsCollider(pair.a));
       if (hitAB && this.time - this.lastHit > SMASH_TUNING.cooldown) {
         this.lastHit = this.time;
+        const n = this.impacts.length;
         this.resolveSmash(a, b);
+        if (this.impacts.length > n) {
+          const ev = this.impacts[n];
+          ev.episode = this.contact.state.episode;
+          ev.feedback = this.contact.impact(ev.tier, ev.strength);
+        }
       }
     }
 
@@ -170,6 +193,48 @@ export class BattleSystem {
       this.breakouts++;
       a.breakout = b.breakout = BEY_TUNING.breakoutTime;
     }
+  }
+
+  /**
+   * 读取本步两台陀螺之间的真实接触（只读）：Rapier 法向接触冲量 → 法向力，
+   * 碰撞前速度 + 转速 → 接触面切向滑动速度。两台离得远（外缘间距 > 0.12 m）时不查询，返回 null。
+   */
+  private sampleContact(a: BeyPhysics, b: BeyPhysics, dt: number): ContactSample | null {
+    const pa = a.body.translation();
+    const pb = b.body.translation();
+    let nx = pb.x - pa.x;
+    let nz = pb.z - pa.z;
+    const len = Math.hypot(nx, nz) || 1;
+    if (len > a.spec.outerRadius + b.spec.outerRadius + 0.12) return null;
+    this.contactQueries++;
+    const impulse = this.contactImpulse(a, b);
+    const s = this.sample;
+    s.touching = impulse > 0;
+    if (!s.touching) return s;
+    nx /= len;
+    nz /= len;
+    const va = a.body.linvel();
+    const vb = b.body.linvel();
+    const ra = Math.min(a.spec.outerRadius, len / 2);
+    const rb = Math.min(b.spec.outerRadius, len / 2);
+    const wa = a.spinDirection * a.spin;
+    const wb = b.spinDirection * b.spin;
+    const ux = va.x + wa * ra * nz - (vb.x - wb * rb * nz);
+    const uz = va.z - wa * ra * nx - (vb.z + wb * rb * nx);
+    const un = ux * nx + uz * nz;
+    const tx = ux - un * nx;
+    const tz = uz - un * nz;
+    const slide = Math.hypot(tx, tz);
+    s.force = impulse / dt;
+    s.slide = slide;
+    s.tx = slide > 1e-6 ? tx / slide : -nz;
+    s.tz = slide > 1e-6 ? tz / slide : nx;
+    s.nx = nx;
+    s.nz = nz;
+    s.x = pa.x + nx * ra;
+    s.z = pa.z + nz * ra;
+    s.y = (pa.y + a.spec.layers.blade.center + pb.y + b.spec.layers.blade.center) / 2;
+    return s;
   }
 
   /** Rapier 本步在两台陀螺之间施加的法向接触冲量总和 */
@@ -269,6 +334,8 @@ export class BattleSystem {
       z: cz,
       nx,
       nz,
+      episode: 0,
+      feedback: 'play',
     });
   }
 
@@ -315,6 +382,7 @@ export class BattleSystem {
   }
 
   dispose(): void {
+    this.contact.reset();
     for (const b of Object.values(this.beys)) b?.dispose();
     this.beys.player = undefined;
     this.beys.rival = undefined;
