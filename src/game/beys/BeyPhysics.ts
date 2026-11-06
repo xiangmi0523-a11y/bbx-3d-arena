@@ -1,6 +1,7 @@
 import type RAPIER from '@dimforge/rapier3d-compat';
 import { ARENA, floorHeight } from '../arena/arenaSpec';
 import { GRAVITY, type PhysicsWorld } from '../physics/PhysicsWorld';
+import { MotionIntent } from './motionIntent';
 import { REF_INERTIA, type AssembledBey } from './parts/assemble';
 
 export interface Vec3 {
@@ -18,6 +19,8 @@ export interface LaunchParams {
   /** 发射倾角（弧度），绕 tiltAxis 倾斜 */
   tilt?: number;
   tiltAxis?: Vec3;
+  /** 战术意图的随机种子（省略则取 Math.random） */
+  seed?: number;
 }
 
 /** 陀螺物理调参（集中在这里，方便后续平衡性调整） */
@@ -60,17 +63,20 @@ export const BEY_TUNING = {
   driveAccel: 30,
   driveSpinCost: 0.35,
   /**
-   * P2.3.1 追击：轴心牵引方向向对手偏转的比例（再乘 0.4 + 0.6 × 刀刃攻击值）。
-   * 只改变牵引力的方向，大小仍受轴心咬合度和剩余转速限制，没有额外推力。
+   * 自主运动重构：战术意图只调制进动相位的转速（见 motionIntent.ts），不再直接混合牵引方向。
+   * 调制深度上限 < 1，相位永远沿自然方向转动；转向需要改变轴的倾斜方向，按调制深度额外消耗转速（rad/s²）。
    */
-  pursuit: 0.8,
-  /** 离中心超过这个半径时，拉开方向不再朝外（避免退到墙边） */
+  steerSpinCost: 0.25,
+  /**
+   * 碰撞改变轴心倾斜：被撞歪后，实际倾斜超过目标倾角这么多（弧度）时，进动相位跟随实际倾斜方向，
+   * 牵引方向因此改变（被撞后的轨迹由真实倾斜决定，而不是继续沿撞前的相位）。
+   */
+  knockResync: 0.12,
+  /** 相位跟随实际倾斜的速率（1/s） */
+  knockRate: 15,
+  /** 脱困方向：离中心超过这个半径时不再朝外（避免退到墙边） */
   backoffEdge: 2.0,
-  /** 拉开阶段最长持续时间（秒），超时就直接冲 */
-  backoffMax: 0.8,
-  /** 撞击后拉开到两台外缘相距这么远再冲（助跑距离，米） */
-  runup: 0.3,
-  /** 拉开方向相对“背向对手”的偏转角（弧度），走弧线而不是直线后退 */
+  /** 脱困方向相对“背向对手”的偏转角（弧度） */
   runupAngle: 0.9,
   /** 僵持（两台都几乎不动、贴在一起）多久后触发脱困（秒） */
   stallTime: 0.6,
@@ -80,8 +86,6 @@ export const BEY_TUNING = {
   breakoutRatio: 0.8,
   /** 脱困时轴心咬合度至少按这个值（针尖平时 0.1，没有牵引） */
   breakoutGrip: 0.35,
-  /** 撞击后先拉开、不再冲向对手的时间（秒） */
-  recoilTime: 0.45,
   /** 低于这个咬合度的轴心（针尖）没有牵引。P2.2.1 为 0.5，球头（0.35）完全没有牵引，会停在碗底 */
   driveMinGrip: 0.2,
   /**
@@ -122,10 +126,16 @@ export class BeyPhysics {
   private readonly spinSign: number;
   /** 进动相位（倾斜方向） */
   private precession = Math.random() * Math.PI * 2;
+  /** 被撞歪后相位跟随实际倾斜的累计次数（诊断） */
+  knockResyncs = 0;
+  /** 本步进动相位是否在跟随被撞歪的实际倾斜 */
+  knocked = false;
 
   constructor(pw: PhysicsWorld, spec: AssembledBey, launch: LaunchParams) {
     this.pw = pw;
     this.spec = spec;
+    // 战术意图的随机种子：游戏里来自 Math.random（每局不同），测试里由固定种子决定
+    this.intent = new MotionIntent(spec, launch.seed ?? Math.floor(Math.random() * 2 ** 32));
     const { R, world } = pw;
     this.spinSign = spec.blade.spin === 'right' ? -1 : 1; // 右旋 = 俯视顺时针 = 绕 +Y 负方向
     this.inertiaRatio = REF_INERTIA / spec.spinInertia;
@@ -251,15 +261,16 @@ export class BeyPhysics {
   /** 陀螺自稳强度倍率（√(I / 参考惯量)） */
   private readonly gyroFactor: number;
   private ccdOn = false;
-  /** 对手位置（由对战系统每步写入），用于追击 */
-  target: Vec3 | null = null;
-  /** 撞击后的回弹计时（秒），大于 0 时先拉开距离 */
-  recoil = 0;
+  /** 对手（由对战系统写入），战术意图读取它的位置、速度和转速 */
+  opponent: BeyPhysics | null = null;
   /** 脱困计时（秒） */
   breakout = 0;
-  /** 追击状态：true = 冲向对手，false = 先拉开助跑距离 */
-  private charging = true;
-  private backoff = 0;
+  /** 战术意图（有状态、确定性随机）。只调制进动相位转速，不施加力 */
+  readonly intent: MotionIntent;
+  /** 当前战术状态名（诊断 / 测试读取） */
+  get intentState(): string {
+    return this.intent.state;
+  }
 
   /** 每个物理步之前调用 */
   preStep(dt: number): void {
@@ -274,7 +285,6 @@ export class BeyPhysics {
     this.prevUp.y = up.y;
     this.prevUp.z = up.z;
     this.hasPrev = true;
-    if (this.recoil > 0) this.recoil -= dt;
     if (this.breakout > 0) this.breakout -= dt;
     const lv = body.linvel();
     const needCcd = lv.y < -3.5 || lv.x * lv.x + lv.z * lv.z > 100;
@@ -325,62 +335,69 @@ export class BeyPhysics {
         this.dashing = true;
       }
     }
-    // 轴心牵引（花瓣轨迹）：方向垂直于当前倾斜方向，随进动旋转
+    // 战术意图：决定“希望牵引指向哪里”和调制深度（不施力）
+    const opp = this.opponent;
+    if (opp) {
+      const op = opp.body.translation();
+      const ov = opp.body.linvel();
+      const v0 = body.linvel();
+      this.intent.update({
+        dt,
+        px: pos.x,
+        pz: pos.z,
+        vx: v0.x,
+        vz: v0.z,
+        ox: op.x,
+        oz: op.z,
+        ovx: ov.x,
+        ovz: ov.z,
+        bladeSum: this.spec.blade.radius + opp.spec.blade.radius,
+        outerSum: this.spec.outerRadius + opp.spec.outerRadius,
+        spinRatio: this.spinRatio,
+        oppSpinRatio: opp.spinRatio,
+        oppAggression: opp.intent.profile.aggression,
+      });
+    }
+
+    // 轴心牵引（花瓣轨迹）：方向垂直于当前倾斜方向，随进动旋转。
+    // 方向只由进动相位决定；战术意图通过调节相位转速间接影响它（见下方自稳部分）。
     // 脱困时针尖这类几乎没有牵引的轴心也按 breakoutGrip 计算（低转速晃动时轴心与碗面接触点外移，能“走”起来）
     const driveGrip = this.breakout > 0 ? Math.max(grip, T.breakoutGrip) : grip;
+    let steering = 0;
     if (driveGrip >= T.driveMinGrip && this.grounded && !this.dashing && mag > T.minStableSpin * 2) {
       const ratio = Math.min(1, mag / this.launchSpin);
       const v = body.linvel();
       let dx = -Math.sin(this.precession) * this.spinSign;
       let dz = Math.cos(this.precession) * this.spinSign;
-      // 追击：牵引方向向对手偏转（攻击值越高偏得越多），只改方向不加力
-      if (this.target) {
-        const ox = this.target.x - pos.x;
-        const oz = this.target.z - pos.z;
+      // 脱困（P2.3.1 辅助机制，保持原样）：牵引方向背离对手并偏开 runupAngle，靠外圈时不朝墙
+      if (this.breakout > 0 && opp) {
+        const op = opp.body.translation();
+        const ox = op.x - pos.x;
+        const oz = op.z - pos.z;
         const ol = Math.hypot(ox, oz);
         if (ol > 1e-3) {
-          const k = this.breakout > 0 ? 1 : T.pursuit * (0.4 + 0.6 * this.spec.blade.attack);
-          let gx = ox / ol;
-          let gz = oz / ol;
-          // 刚撞完先斜着拉开（留出助跑距离），再冲回来，不会一直压在对手身上变成持续摩擦。
-          // 冲撞 / 拉开两种状态带滞回：拉开到助跑距离（或拉开超时）才转为冲撞，冲撞一直到撞上为止。
-          // 只按距离切换会在临界距离上来回翻转，变成绕着对手打转（P2.3.1 调试中出现过 15 秒不碰的绕圈）。
-          if (this.breakout > 0 || this.recoil > 0) {
-            this.charging = false;
-            this.backoff = 0;
-          } else if (!this.charging) {
-            this.backoff += dt;
-            if (ol > this.spec.outerRadius * 2 + T.runup || this.backoff > T.backoffMax) this.charging = true;
-          }
-          if (!this.charging) {
-            const c = Math.cos(T.runupAngle);
-            const s = Math.sin(T.runupAngle) * this.spinSign;
-            const ax = -gx;
-            const az = -gz;
-            gx = ax * c - az * s;
-            gz = ax * s + az * c;
-            // 靠外圈时不往墙的方向退：去掉朝外的分量（拉开只在场内绕一小段弧）
-            if (r > T.backoffEdge) {
-              const ex = pos.x / r;
-              const ez = pos.z / r;
-              const out = gx * ex + gz * ez;
-              if (out > 0) {
-                const w = Math.min(1, (r - T.backoffEdge) / 1.5);
-                gx -= ex * out * w;
-                gz -= ez * out * w;
-                const gl = Math.hypot(gx, gz) || 1;
-                gx /= gl;
-                gz /= gl;
-              }
+          const c = Math.cos(T.runupAngle);
+          const sn = Math.sin(T.runupAngle) * this.spinSign;
+          const ax = -ox / ol;
+          const az = -oz / ol;
+          let gx = ax * c - az * sn;
+          let gz = ax * sn + az * c;
+          if (r > T.backoffEdge) {
+            const ex = pos.x / r;
+            const ez = pos.z / r;
+            const out = gx * ex + gz * ez;
+            if (out > 0) {
+              const w = Math.min(1, (r - T.backoffEdge) / 1.5);
+              gx -= ex * out * w;
+              gz -= ez * out * w;
             }
           }
-          dx = dx * (1 - k) + gx * k;
-          dz = dz * (1 - k) + gz * k;
-          const dl = Math.hypot(dx, dz) || 1;
-          dx /= dl;
-          dz /= dl;
+          const gl = Math.hypot(gx, gz) || 1;
+          dx = gx / gl;
+          dz = gz / gl;
         }
       }
+      steering = this.breakout > 0 ? 0 : this.intent.authority;
       const along = v.x * dx + v.z * dz;
       if (along < T.driveSpeed * driveGrip * (0.35 + 0.65 * (this.breakout > 0 ? Math.max(ratio, T.breakoutRatio) : ratio))) {
         // 脱困（辅助机制）：低转速的球头 / 针尖轴心牵引很弱，停在碗底会一直原地互转。
@@ -391,6 +408,8 @@ export class BeyPhysics {
         body.applyImpulse({ x: dx * a, y: 0, z: dz * a }, true);
         decay += T.driveSpinCost * driveGrip;
       }
+      // 改变轴的倾斜方向需要力矩：按调制深度额外消耗转速
+      decay += T.steerSpinCost * steering * driveGrip;
     }
 
     // 轴心滚动 / 滑动阻力：在碗面上持续损失水平速度，绕圈的陀螺会慢慢滑回中央与对手相遇
@@ -414,8 +433,26 @@ export class BeyPhysics {
       // 目标姿态：轴心类型决定的“自然倾角”，倾斜方向以进动角速度绕竖直轴旋转。
       // 倾斜的轴心与地面的接触点偏离转轴，摩擦力方向随进动旋转，
       // 由 Rapier 的摩擦自然产生花瓣形移动轨迹（攻击型轴心倾角大、移动激烈）。
-      this.precession += dt * this.spinSign * -(T.precessBase + T.precessSpin / Math.max(20, mag));
       const lean = this.spec.tip.drift * Math.min(1, mag / (this.launchSpin * 0.5));
+      // 自然进动角速度（只由转速决定）
+      let rate = this.spinSign * -(T.precessBase + T.precessSpin / Math.max(20, mag));
+      // 战术意图：牵引方向（= 倾斜方向 + 90°·旋向）接近期望方向时进动放慢、背离时加快。
+      // rate × (1 − a·cosΔ)，a < 1 → 相位永远沿自然方向转动，不会锁死；平均下来牵引偏向期望方向 (1−√(1−a²))/a
+      if (steering > 0) {
+        const psi = this.precession + (this.spinSign * Math.PI) / 2;
+        const d = Math.atan2(Math.sin(this.intent.heading - psi), Math.cos(this.intent.heading - psi));
+        rate *= 1 - steering * Math.cos(d);
+      }
+      this.precession += dt * rate;
+      // 碰撞把轴撞歪：实际倾斜明显大于目标倾角时，进动相位跟随实际倾斜方向（牵引方向随之改变）
+      const excess = this.tilt - lean - T.knockResync;
+      if (excess > 0) {
+        const az = Math.atan2(up.z, up.x);
+        const k = Math.min(1, excess / 0.15) * (1 - Math.exp(-dt * T.knockRate));
+        this.precession += Math.atan2(Math.sin(az - this.precession), Math.cos(az - this.precession)) * k;
+        if (!this.knocked) this.knockResyncs++;
+        this.knocked = true;
+      } else this.knocked = false;
       const tx = Math.sin(lean) * Math.cos(this.precession);
       const tz = Math.sin(lean) * Math.sin(this.precession);
       const ty = Math.cos(lean);

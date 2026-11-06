@@ -201,39 +201,46 @@ describe('接触反馈：真实物理场景', () => {
 
   it('2. 轻微擦碰：真实对战里的轻擦接触段不触发强碰撞反馈，只有少量火花和轻的摩擦声', async () => {
     // 刚体引擎里转动中的陀螺一碰就有很大的刀刃咬合冲量，人工摆放很难得到“轻擦”；
-    // 这里用固定种子的真实对战，挑出整段只有轻擦撞击（或没有撞击事件）的接触段逐一检查
+    // 这里用固定种子的真实对战，挑出整段只有轻擦撞击（或没有撞击事件）的接触段逐一检查。
+    // 自主运动重构后对局轨迹变了：从原种子 1003 起依次往后跑（最多 8 场，全部固定种子），
+    // 直到收集到至少 3 段轻擦接触段为止；对每一段的检查条件与原测试完全相同
     const p = await makePipeline(timers);
     const orig = Math.random;
-    Math.random = seeded(1003);
     interface Ep { tiers: string[]; maxShake: number; sparksAdded: number; maxLevel: number; grind: boolean }
-    const eps = new Map<number, Ep>();
+    const eps = new Map<string, Ep>();
+    const isLight = (e: Ep) => e.tiers.every((t) => t === 'light');
     try {
-      const rnd = Math.random;
-      const b = p.startBattle(LO, {
-        player: { power: 0.6 + rnd() * 0.35, aim: (rnd() - 0.5) * 0.8, tilt: 0 },
-        rival: { power: 0.55 + rnd() * 0.4, aim: (rnd() - 0.5) * 1.2, tilt: 0 },
-      });
-      const origPlay = p.feedback.playImpact.bind(p.feedback);
-      p.feedback.playImpact = (e: ImpactEvent) => {
-        if (!eps.has(e.episode)) eps.set(e.episode, { tiers: [], maxShake: 0, sparksAdded: 0, maxLevel: 0, grind: false });
-        eps.get(e.episode)!.tiers.push(e.tier);
-        origPlay(e);
-      };
-      for (let f = 0; f < 60 * 40 && !b.result; f++) {
-        const ep = b.contact.state.episode;
-        const shakes0 = p.camShakes.length;
-        const live0 = p.fx.stats().live;
-        const fr = p.frame();
-        const cur = b.contact.state.episode;
-        if (cur > 0 && fr.phase !== 'idle') {
-          if (!eps.has(cur)) eps.set(cur, { tiers: [], maxShake: 0, sparksAdded: 0, maxLevel: 0, grind: false });
-          const e = eps.get(cur)!;
-          e.maxShake = Math.max(e.maxShake, ...p.camShakes.slice(shakes0), 0);
-          e.sparksAdded += Math.max(0, p.fx.stats().live - live0);
-          e.maxLevel = Math.max(e.maxLevel, fr.level);
-          e.grind ||= fr.phase === 'grind';
+      for (let seed = 1003; seed < 1011 && [...eps.values()].filter(isLight).length < 3; seed++) {
+        Math.random = seeded(seed);
+        const rnd = Math.random;
+        const b = p.startBattle(LO, {
+          player: { power: 0.6 + rnd() * 0.35, aim: (rnd() - 0.5) * 0.8, tilt: 0 },
+          rival: { power: 0.55 + rnd() * 0.4, aim: (rnd() - 0.5) * 1.2, tilt: 0 },
+        });
+        const key = (ep: number) => `${seed}:${ep}`;
+        const origPlay = p.feedback.playImpact.bind(p.feedback);
+        p.feedback.playImpact = (e: ImpactEvent) => {
+          const k = key(e.episode);
+          if (!eps.has(k)) eps.set(k, { tiers: [], maxShake: 0, sparksAdded: 0, maxLevel: 0, grind: false });
+          eps.get(k)!.tiers.push(e.tier);
+          origPlay(e);
+        };
+        for (let f = 0; f < 60 * 40 && !b.result; f++) {
+          const shakes0 = p.camShakes.length;
+          const live0 = p.fx.stats().live;
+          const fr = p.frame();
+          const cur = b.contact.state.episode;
+          if (cur > 0 && fr.phase !== 'idle') {
+            const k = key(cur);
+            if (!eps.has(k)) eps.set(k, { tiers: [], maxShake: 0, sparksAdded: 0, maxLevel: 0, grind: false });
+            const e = eps.get(k)!;
+            e.maxShake = Math.max(e.maxShake, ...p.camShakes.slice(shakes0), 0);
+            e.sparksAdded += Math.max(0, p.fx.stats().live - live0);
+            e.maxLevel = Math.max(e.maxLevel, fr.level);
+            e.grind ||= fr.phase === 'grind';
+          }
         }
-        void ep;
+        p.feedback.playImpact = origPlay;
       }
     } finally {
       Math.random = orig;
@@ -331,10 +338,12 @@ describe('接触反馈：真实物理场景', () => {
   });
 
   it('7. 双方低速卡住：与 watchStall 兼容——脱困照常触发，次数与关闭接触反馈时完全相同', async () => {
-    // 种子 1018：默认组合会出现 > 0.6 s 的贴身僵持（tests/feelSim 的同一套发射方式）
-    const run = async (on: boolean) => {
+    // 需要一场出现 > 0.6 s 贴身僵持、触发脱困的对局（tests/feelSim 的同一套发射方式）。
+    // 基线用种子 1018；自主运动重构后轨迹变了，从 1018 起依次往后找第一场触发脱困的种子（全部固定种子），
+    // 再对这一场比较开 / 关接触反馈，比较条件与原测试完全相同
+    const run = async (on: boolean, seed: number) => {
       const orig = Math.random;
-      Math.random = seeded(1018);
+      Math.random = seeded(seed);
       const { createArenaPhysics } = await import('../src/game/arena/ArenaPhysics');
       const { BattleSystem } = await import('../src/game/battle/BattleSystem');
       const { assembleBey } = await import('../src/game/beys/parts/assemble');
@@ -363,8 +372,10 @@ describe('接触反馈：真实物理场景', () => {
       Math.random = orig;
       return out;
     };
-    const on = await run(true);
-    const off = await run(false);
+    let seed = 1018;
+    let on = await run(true, seed);
+    while (on.breakouts < 1 && seed < 1060) on = await run(true, ++seed);
+    const off = await run(false, seed);
     expect(on.breakouts).toBeGreaterThanOrEqual(1);
     expect(on.breakouts).toBe(off.breakouts);
     expect(on.stalledSteps).toBe(off.stalledSteps);

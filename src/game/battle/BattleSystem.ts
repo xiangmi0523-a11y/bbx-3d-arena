@@ -133,7 +133,7 @@ export class BattleSystem {
       const b = this.beys[side];
       if (!b) continue;
       const other = this.beys[side === 'player' ? 'rival' : 'player'];
-      b.target = other ? other.body.translation() : null;
+      b.opponent = other ?? null;
       b.preStep(dt);
       const v = b.body.linvel();
       this.preVel[side].x = v.x;
@@ -192,6 +192,8 @@ export class BattleSystem {
       this.stallFor = 0;
       this.breakouts++;
       a.breakout = b.breakout = BEY_TUNING.breakoutTime;
+      a.intent.forceBreakout(BEY_TUNING.breakoutTime);
+      b.intent.forceBreakout(BEY_TUNING.breakoutTime);
     }
   }
 
@@ -310,7 +312,6 @@ export class BattleSystem {
     // 金属刀刃互相刮擦的摩擦损失：冲量作用在刀刃外缘，角冲量 = 冲量 × 半径，
     // 掉速 = 角冲量 / 转动惯量（惯量大、重量在外缘的陀螺被撞后掉速少）
     const jSmash = Math.hypot(jn, jt);
-    a.recoil = b.recoil = BEY_TUNING.recoilTime;
     a.loseSpin((T.spinLoss * jSmash * ra) / a.spec.spinInertia);
     b.loseSpin((T.spinLoss * jSmash * rb) / b.spec.spinInertia);
 
