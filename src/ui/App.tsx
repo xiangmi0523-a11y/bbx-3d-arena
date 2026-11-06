@@ -191,6 +191,9 @@ function PerfBadge({ engine, fps, quality }: { engine: GameEngine; fps: number; 
         <div className="perf-panel">
           <div>帧间隔 中位 {f(p.intervalP50)} · P95 {f(p.intervalP95)} · P99 {f(p.intervalP99)} · 最长逻辑+提交 {f(p.maxFrameMs)} ms</div>
           <div>
+            刷新基准 {p.cadenceHz.toFixed(1)} Hz{p.cadenceMeasured ? '' : '（默认）'} · 漏帧率 {(p.missRatio * 100).toFixed(1)}%
+          </div>
+          <div>
             CPU/帧：物理 {f(p.physicsMs)}（{f(p.physStepsPerFrame)} 步）· 同步 {f(p.syncMs)} · 特效 {f(p.fxMs)} · 镜头 {f(p.camMs)} · UI {f(p.uiMs)} · 渲染提交 {f(p.renderSubmitMs)} ms
           </div>
           <div>
