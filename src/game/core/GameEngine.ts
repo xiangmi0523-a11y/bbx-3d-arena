@@ -721,6 +721,10 @@ export class GameEngine {
       intervalP50: q(0.5),
       intervalP95: q(0.95),
       intervalP99: q(0.99),
+      /** 自动画质估算的刷新基准（次/秒）与相对它的漏帧率 */
+      cadenceHz: 1000 / this.quality.cadence.baseMs,
+      cadenceMeasured: this.quality.cadence.hasBase,
+      missRatio: this.quality.missRatio,
       calls: this.renderer.info.render.calls,
       triangles: this.renderer.info.render.triangles,
       geometries: this.renderer.info.memory.geometries,
