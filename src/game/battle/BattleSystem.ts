@@ -120,6 +120,12 @@ export class BattleSystem {
     this.beys[side]?.dispose();
     const bey = new BeyPhysics(this.pw, this.specs[side], computeLaunch(this.specs[side], side, cmd));
     this.beys[side] = bey;
+    // 发射过渡：两台都在场时设定各自的初始倾斜方向（只在第一步之前生效一次）
+    const other = this.beys[side === 'player' ? 'rival' : 'player'];
+    if (other) {
+      bey.alignLaunch(other);
+      other.alignLaunch(bey);
+    }
     return bey;
   }
 
@@ -173,6 +179,10 @@ export class BattleSystem {
   /** 僵持时长（秒）与触发脱困次数 */
   stallFor = 0;
   breakouts = 0;
+  /** 死亡摇摆贴靠时长、冷却与触发次数（诊断） */
+  wobbleFor = 0;
+  wobbleCool = 0;
+  wobbleBreaks = 0;
 
   /** 两台都几乎不动、贴在一起仍在转：累计一段时间后让双方轴心按脱困牵引拉开 */
   private watchStall(a: BeyPhysics, b: BeyPhysics, dt: number): void {
@@ -194,6 +204,30 @@ export class BattleSystem {
       a.breakout = b.breakout = BEY_TUNING.breakoutTime;
       a.intent.forceBreakout(BEY_TUNING.breakoutTime);
       b.intent.forceBreakout(BEY_TUNING.breakoutTime);
+    }
+    // 死亡摇摆：低转速 + 明显倾斜 + 持续贴靠 + 对方还有余力 → 只让较健康的一台按脱困机制离开
+    const T = BEY_TUNING;
+    if (T.wobbleBreak > 0) {
+      const low = a.spinRatio <= b.spinRatio ? a : b;
+      const high = low === a ? b : a;
+      const wobbling = isDeathWobble({
+        touching: d < a.spec.blade.radius + b.spec.blade.radius + 0.05,
+        lowSpin: low.spinRatio,
+        lowTiltExcess: low.tilt - low.spec.tip.drift,
+        highSpin: high.spinRatio,
+        highCanDrive: high.spin > T.minStableSpin * 2,
+        highInBreakout: high.breakout > 0,
+      });
+      this.wobbleFor = wobbling ? this.wobbleFor + dt : 0;
+      if (this.wobbleCool > 0) this.wobbleCool -= dt;
+      if (this.wobbleFor > T.wobbleTime && this.wobbleCool <= 0) {
+        this.wobbleFor = 0;
+        this.wobbleCool = T.wobbleCooldown;
+        this.wobbleBreaks++;
+        this.breakouts++;
+        high.breakout = T.breakoutTime;
+        high.intent.forceBreakout(T.breakoutTime);
+      }
     }
   }
 
@@ -388,4 +422,13 @@ export class BattleSystem {
     this.beys.player = undefined;
     this.beys.rival = undefined;
   }
+}
+
+/**
+ * 死亡摇摆判定（第二轮修正 4）：较弱一台转速比例 < wobbleSpin、实际倾斜比轴心自然倾角大 wobbleTilt 以上、两台刀刃贴着、
+ * 较强一台转速比例高出 wobbleMargin 以上且还有牵引能力、不在脱困中。高转速摩擦不满足第一条，低速但竖直的互磨不满足第二条。
+ */
+export function isDeathWobble(s: { touching: boolean; lowSpin: number; lowTiltExcess: number; highSpin: number; highCanDrive: boolean; highInBreakout: boolean }): boolean {
+  const T = BEY_TUNING;
+  return s.touching && s.lowSpin < T.wobbleSpin && s.lowTiltExcess > T.wobbleTilt && s.highSpin > s.lowSpin + T.wobbleMargin && s.highCanDrive && !s.highInBreakout;
 }

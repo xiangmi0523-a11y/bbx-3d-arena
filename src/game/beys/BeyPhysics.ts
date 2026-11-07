@@ -74,6 +74,22 @@ export const BEY_TUNING = {
   knockResync: 0.12,
   /** 相位跟随实际倾斜的速率（1/s） */
   knockRate: 15,
+  /**
+   * 第二轮修正 2：发射过渡（由 INTENT_TUNING.launchAssist 开关，见 alignLaunch）。
+   * 发射器把陀螺沿发射方向甩出，落地时的初始倾斜方向由发射决定（牵引沿发射方向），而不是随机相位；
+   * 初始牵引方向可以向拦截方向偏，但偏角不超过发射方向 ±launchBias（弧度）。默认（launchHold 0）只设定这个初相，之后照常自由进动。
+   * launchHold 1 是试过但没采用的方案：过渡期内把倾斜方向按至多 launchSlew（rad/s）保持在该方向，
+   * 实测牵引持续顺着发射方向，错过对手时会一路加速冲出场外（96 场里 3–7 场出界）。
+   * 牵引力大小、上限、转速消耗仍按轴心牵引公式计算，不改速度、不加额外冲量。
+   */
+  launchBias: 0.35,
+  launchSlew: 3,
+  /** 1 = 过渡期内倾斜方向保持在发射方向附近（不自由进动）；0 = 只决定初相，之后照常自由进动 */
+  launchHold: 0,
+  /** launchHold 0 时：初相往回退 自然进动角速度 × launchPre / 2，让前 launchPre 秒的牵引对称地扫过目标方向 */
+  launchPre: 0.4,
+  /** 进攻倾向（刀刃 attack − 0.5·defense）低于这个值的配置（防御 / 耐力刀刃）不设定发射初相，保持随机初相（与第一轮相同） */
+  launchMinAggr: 0.2,
   /** 脱困方向：离中心超过这个半径时不再朝外（避免退到墙边） */
   backoffEdge: 2.0,
   /** 脱困方向相对“背向对手”的偏转角（弧度） */
@@ -82,10 +98,28 @@ export const BEY_TUNING = {
   stallTime: 0.6,
   /** 脱困持续时间（秒） */
   breakoutTime: 0.7,
+  /**
+   * 第二轮修正 4：死亡摇摆脱离（BattleSystem.watchStall）。同时满足才算：
+   * 一台转速比例 < wobbleSpin 且实际倾斜比轴心自然倾角大 wobbleTilt（弧度）以上、两台刀刃持续接触 wobbleTime 秒、
+   * 另一台转速比例比它高 wobbleMargin 以上且还有牵引能力。只让较健康的一台按原有脱困机制离开，摇摆的一台不受干预。
+   * 高转速正常摩擦（转速高、轴基本竖直）不满足前两条。wobbleBreak 0 = 关闭。
+   */
+  wobbleBreak: 1,
+  wobbleSpin: 0.25,
+  wobbleTilt: 0.25,
+  wobbleTime: 0.8,
+  wobbleMargin: 0.04,
+  /** 触发后至少隔这么久才会再次触发（秒） */
+  wobbleCooldown: 1.5,
   /** 脱困时牵引按不低于这个转速比例计算 */
   breakoutRatio: 0.8,
   /** 脱困时轴心咬合度至少按这个值（针尖平时 0.1，没有牵引） */
   breakoutGrip: 0.35,
+  /**
+   * 第二轮修正 1：墙边保护对没有牵引的轴心（针尖）也要有作用。深入外圈时按至多 edgeGrip 的咬合度计算牵引
+   * （与脱困 breakoutGrip 同一假设），方向仍由进动相位 + 墙边修正决定。0 = 关闭。
+   */
+  edgeGrip: 0.3,
   /** 低于这个咬合度的轴心（针尖）没有牵引。P2.2.1 为 0.5，球头（0.35）完全没有牵引，会停在碗底 */
   driveMinGrip: 0.2,
   /**
@@ -126,6 +160,11 @@ export class BeyPhysics {
   private readonly spinSign: number;
   /** 进动相位（倾斜方向） */
   private precession = Math.random() * Math.PI * 2;
+  /** 发射方向（水平，弧度） */
+  private readonly launchHeading: number;
+  private launchAligned = false;
+  /** 设定发射初相前的随机初相：第一步时若已经贴着对手（不在 launch 状态），恢复它 */
+  private launchPhase0: number | null = null;
   /** 被撞歪后相位跟随实际倾斜的累计次数（诊断） */
   knockResyncs = 0;
   /** 本步进动相位是否在跟随被撞歪的实际倾斜 */
@@ -200,6 +239,7 @@ export class BeyPhysics {
     this.bladeCollider = world.createCollider(bladeDesc, this.body);
     this.colliders.push(this.bladeCollider);
 
+    this.launchHeading = Math.atan2(launch.velocity.z, launch.velocity.x);
     this.spin = launch.spin;
     this.launchSpin = Math.max(1, launch.spin);
     this.body.setLinvel(launch.velocity, true);
@@ -273,8 +313,37 @@ export class BeyPhysics {
   }
 
   /** 每个物理步之前调用 */
+  /**
+   * 发射过渡（第二轮修正 2）：两台都发射后由 BattleSystem 调用一次，在第一步之前设定落地时的初始倾斜方向（进动初相）。
+   * 发射器沿发射方向甩出陀螺，倾斜方向由发射决定：牵引方向 = 发射方向向对手拦截方向偏，但不超过 ±launchBias。
+   * launchHold 0（默认）时初相再往回退 自然进动 × launchPre / 2，之后照常自由进动，前 launchPre 秒的牵引对称扫过该方向。
+   * 只改初相（一个本来就是随机数的初始条件），不改速度、不加冲量；牵引力大小与上限仍按轴心公式。
+   */
+  alignLaunch(opp: BeyPhysics): void {
+    if (this.launchAligned) return;
+    this.launchAligned = true;
+    if (this.intent.state !== 'launch' || this.intent.profile.aggression < BEY_TUNING.launchMinAggr) return;
+    this.launchPhase0 = this.precession;
+    const p = this.body.translation();
+    const v = this.body.linvel();
+    const op = opp.body.translation();
+    const ov = opp.body.linvel();
+    const d = Math.hypot(op.x - p.x, op.z - p.z);
+    const lead = Math.min(0.6, d / Math.max(2, Math.hypot(v.x, v.z)));
+    const ih = Math.atan2(op.z + ov.z * lead - p.z, op.x + ov.x * lead - p.x);
+    const T = BEY_TUNING;
+    const off = Math.atan2(Math.sin(ih - this.launchHeading), Math.cos(ih - this.launchHeading));
+    this.precession = this.launchHeading + Math.max(-T.launchBias, Math.min(T.launchBias, off)) - (this.spinSign * Math.PI) / 2;
+    if (T.launchHold <= 0) {
+      const rate0 = this.spinSign * -(T.precessBase + T.precessSpin / Math.max(20, Math.abs(this.spin)));
+      this.precession -= (rate0 * T.launchPre) / 2;
+    }
+  }
+
   preStep(dt: number): void {
     const T = BEY_TUNING;
+    // 已经开始运动后不再设定初相
+    this.launchAligned = true;
     const body = this.body;
     const up = this.up();
     const p0 = body.translation();
@@ -358,11 +427,18 @@ export class BeyPhysics {
         oppAggression: opp.intent.profile.aggression,
       });
     }
+    // 第一步就已经贴着对手（意图直接进入 contact，例如测试里发射后摆放成接触），发射初相不适用，恢复原随机初相
+    if (this.launchPhase0 !== null) {
+      if (this.intent.state !== 'launch') this.precession = this.launchPhase0;
+      this.launchPhase0 = null;
+    }
 
     // 轴心牵引（花瓣轨迹）：方向垂直于当前倾斜方向，随进动旋转。
     // 方向只由进动相位决定；战术意图通过调节相位转速间接影响它（见下方自稳部分）。
     // 脱困时针尖这类几乎没有牵引的轴心也按 breakoutGrip 计算（低转速晃动时轴心与碗面接触点外移，能“走”起来）
-    const driveGrip = this.breakout > 0 ? Math.max(grip, T.breakoutGrip) : grip;
+    let driveGrip = this.breakout > 0 ? Math.max(grip, T.breakoutGrip) : grip;
+    // 墙边：没有牵引的轴心（针尖）贴近外圈时，与脱困同理按 edgeGrip 计算牵引（倾斜着压在陡坡上，接触点外移）
+    if (T.edgeGrip > 0 && this.intent.edgeW > 0) driveGrip = Math.max(driveGrip, T.edgeGrip * Math.min(1, this.intent.edgeW * 2));
     let steering = 0;
     if (driveGrip >= T.driveMinGrip && this.grounded && !this.dashing && mag > T.minStableSpin * 2) {
       const ratio = Math.min(1, mag / this.launchSpin);
@@ -399,7 +475,11 @@ export class BeyPhysics {
       }
       steering = this.breakout > 0 ? 0 : this.intent.authority;
       const along = v.x * dx + v.z * dz;
-      if (along < T.driveSpeed * driveGrip * (0.35 + 0.65 * (this.breakout > 0 ? Math.max(ratio, T.breakoutRatio) : ratio))) {
+      // 借来的墙边咬合（轴心本身没有牵引）只在牵引方向与墙边修正方向夹角 < 90° 时起作用：
+      // 否则针尖会在外圈获得随相位乱转的推力，越转越快（实测耐力型游走从 1 m/s 加速到 6 m/s 沿墙绕）
+      const edgeOnly = this.breakout <= 0 && grip < T.driveMinGrip;
+      const edgeHelps = !edgeOnly || dx * Math.cos(this.intent.heading) + dz * Math.sin(this.intent.heading) > 0;
+      if (edgeHelps && along < T.driveSpeed * driveGrip * (0.35 + 0.65 * (this.breakout > 0 ? Math.max(ratio, T.breakoutRatio) : ratio))) {
         // 脱困（辅助机制）：低转速的球头 / 针尖轴心牵引很弱，停在碗底会一直原地互转。
         // 僵持一段时间后，按“至少 breakoutRatio 的转速、breakoutGrip 的咬合度”给 0.7 秒牵引，方向背离对手；
         // 力的大小仍按轴心牵引公式与速度上限计算，拉开后由碗面重力拉回、真实碰撞
@@ -443,7 +523,13 @@ export class BeyPhysics {
         const d = Math.atan2(Math.sin(this.intent.heading - psi), Math.cos(this.intent.heading - psi));
         rate *= 1 - steering * Math.cos(d);
       }
-      this.precession += dt * rate;
+      if (this.intent.state === 'launch' && T.launchHold > 0) {
+        // 发射过渡：倾斜方向由发射决定，只在发射方向 ±launchBias 内以有限速率偏向拦截方向（不自由进动）
+        const off = Math.atan2(Math.sin(this.intent.heading - this.launchHeading), Math.cos(this.intent.heading - this.launchHeading));
+        const want = this.launchHeading + Math.max(-T.launchBias, Math.min(T.launchBias, off)) - (this.spinSign * Math.PI) / 2;
+        const e = Math.atan2(Math.sin(want - this.precession), Math.cos(want - this.precession));
+        this.precession += Math.max(-T.launchSlew * dt, Math.min(T.launchSlew * dt, e));
+      } else this.precession += dt * rate;
       // 碰撞把轴撞歪：实际倾斜明显大于目标倾角时，进动相位跟随实际倾斜方向（牵引方向随之改变）
       const excess = this.tilt - lean - T.knockResync;
       if (excess > 0) {

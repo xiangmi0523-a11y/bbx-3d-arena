@@ -2,6 +2,7 @@
  * 开发用：基线 / 新版本对局回放对比页（自主运动可视化验收，不进正式构建）。
  *
  *   1. 录制：tests/diag/replay.diag.ts（两个版本各跑一遍，同一组固定种子）→ test-results/replays/*.json
+ *      ?pair=new,v2 选择左右两个槽位的版本（默认 base,new；录像文件 <场景>.<版本>.json）
  *   2. npx vite → 打开 /tools/replay.html?s=AvD_1
  *
  * 回放只读录下来的逐帧物理状态（位置、自转轴、转速），不在浏览器里重新模拟，所以两边看到的就是
@@ -23,9 +24,16 @@ import { getPart } from '../src/game/beys/parts/catalog';
 import type { Replay } from '../tests/motion/recorder';
 import { STATES } from '../tests/motion/recorder';
 
+/** 左 / 右两个画面槽位 */
 type Ver = 'base' | 'new';
 const VERS: Ver[] = ['base', 'new'];
-const VER_LABEL: Record<Ver, string> = { base: '基线 0dac2ad', new: '新版本 b3d0b1d' };
+/** 每个槽位放哪个版本的录像：?pair=new,v2 = 左第一轮、右第二轮（默认 base,new） */
+const FILE_LABEL: Record<string, string> = { base: '基线 0dac2ad', new: '第一轮 b3d0b1d', v2: '第二轮 v2' };
+const FILE_SHORT: Record<string, string> = { base: '基线', new: '第一轮', v2: '第二轮' };
+const PAIR = (new URLSearchParams(location.search).get('pair') ?? 'base,new').split(',');
+const SLOT_FILE: Record<Ver, string> = { base: PAIR[0] ?? 'base', new: PAIR[1] ?? 'new' };
+const VER_LABEL: Record<Ver, string> = { base: FILE_LABEL[SLOT_FILE.base] ?? SLOT_FILE.base, new: FILE_LABEL[SLOT_FILE.new] ?? SLOT_FILE.new };
+const VER_SHORT: Record<Ver, string> = { base: FILE_SHORT[SLOT_FILE.base] ?? SLOT_FILE.base, new: FILE_SHORT[SLOT_FILE.new] ?? SLOT_FILE.new };
 const STATE_CN: Record<string, string> = {
   cut: '斜切',
   orbit: '绕行',
@@ -77,7 +85,7 @@ interface Track {
 // ---------- 数据 ----------
 declare global {
   interface Window {
-    __REPLAYS?: Record<string, Record<Ver, Replay>>;
+    __REPLAYS?: Record<string, Record<string, Replay>>;
     __REPLAY_INDEX?: string[];
     renderAt?: (t: number) => void;
     replayReady?: Promise<{ duration: number }>;
@@ -90,8 +98,9 @@ async function loadIndex(): Promise<string[]> {
   return r.json();
 }
 async function loadPair(key: string): Promise<Record<Ver, Replay>> {
-  if (window.__REPLAYS?.[key]) return window.__REPLAYS[key];
-  const [b, n] = await Promise.all(VERS.map((v) => fetch(`/test-results/replays/${key}.${v}.json`).then((r) => r.json())));
+  const pre = window.__REPLAYS?.[key];
+  if (pre) return { base: pre[SLOT_FILE.base], new: pre[SLOT_FILE.new] };
+  const [b, n] = await Promise.all(VERS.map((v) => fetch(`/test-results/replays/${key}.${SLOT_FILE[v]}.json`).then((r) => r.json())));
   return { base: b, new: n };
 }
 
@@ -481,7 +490,7 @@ function drawTopDown(v: Ver, x0: number, y0: number, size: number, t: number) {
   }
   ctx.font = '600 12px -apple-system, "PingFang SC", "Noto Sans SC", sans-serif';
   ctx.fillStyle = v === 'base' ? '#9fc4ff' : '#ffb04a';
-  ctx.fillText(`俯视 · ${v === 'base' ? '基线' : '新版本'}`, x0 + 8, y0 + 16);
+  ctx.fillText(`俯视 · ${VER_SHORT[v]}`, x0 + 8, y0 + 16);
   ctx.fillStyle = '#8fa3c4';
   ctx.font = '11px -apple-system, "PingFang SC", "Noto Sans SC", sans-serif';
   ctx.fillText('白箭头 = 0.25 s 位移  ✕ = 撞墙', x0 + 8, y0 + size - 8);
@@ -542,7 +551,7 @@ function drawTimeline(x0: number, y0: number, w: number, h: number, t: number) {
   };
   reps.forEach((rep, k) => {
     const vc = k === 0 ? '#9fc4ff' : '#ffb04a';
-    const tag = k === 0 ? '基线' : '新版';
+    const tag = VER_SHORT[VERS[k]];
     // 接触
     strip(`${tag} 接触`, vc);
     for (const c of rep.contacts) {
@@ -678,7 +687,7 @@ function renderAt(t: number) {
   } else {
     ctx.font = '600 13px -apple-system, "PingFang SC", "Noto Sans SC", sans-serif';
     ctx.fillStyle = '#8fa3c4';
-    ctx.fillText('单屏切换模式：Tab 在基线 / 新版本之间切换，时间不变', W - 400, HEAD + 50);
+    ctx.fillText('单屏切换模式：Tab 在左右两个版本之间切换，时间不变', W - 400, HEAD + 50);
   }
   const by = HEAD + VIEW_H;
   drawTopDown('base', 0, by, BOT, t);
@@ -715,7 +724,7 @@ async function main() {
     sel.onchange = () => {
       t = 0;
       void loadKey(sel.value);
-      history.replaceState(null, '', `?s=${sel.value}`);
+      history.replaceState(null, '', `?s=${sel.value}${q.get('pair') ? `&pair=${q.get('pair')}` : ''}`);
     };
     const btn = (txt: string, fn: () => void) => {
       const b = document.createElement('button');
@@ -745,10 +754,10 @@ async function main() {
     });
     const verBtn = btn('', () => {
       single = single === 'base' ? 'new' : 'base';
-      verBtn.textContent = `当前：${single === 'base' ? '基线' : '新版本'}（Tab 切换）`;
+      verBtn.textContent = `当前：${VER_SHORT[single]}（Tab 切换）`;
       renderAt(t);
     });
-    verBtn.textContent = `当前：${single === 'base' ? '基线' : '新版本'}（Tab 切换）`;
+    verBtn.textContent = `当前：${VER_SHORT[single]}（Tab 切换）`;
     verBtn.style.display = mode === 'single' ? '' : 'none';
     slider = document.createElement('input');
     slider.type = 'range';

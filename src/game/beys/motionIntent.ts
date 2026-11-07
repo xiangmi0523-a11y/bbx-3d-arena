@@ -15,7 +15,7 @@ import type { AssembledBey } from './parts/assemble';
  * 随机选择（环绕方向、切入角、持续时间）来自每台陀螺自己的确定性随机数（mulberry32），固定种子可复现。
  */
 
-export type IntentState = 'roam' | 'orbit' | 'cut' | 'contact' | 'disengage' | 'guard' | 'evade' | 'breakout';
+export type IntentState = 'launch' | 'roam' | 'orbit' | 'cut' | 'contact' | 'disengage' | 'guard' | 'evade' | 'breakout';
 
 /** 意图调参（物理含义见报告） */
 export const INTENT_TUNING = {
@@ -56,6 +56,12 @@ export const INTENT_TUNING = {
   edgePull: 1.0,
   /** 墙边判断用的预测时间（秒） */
   edgeLook: 0.45,
+  /**
+   * 第二轮修正 1：墙边保护独立于战术状态。1 = 任何状态（包括游走 / 守中）进入外圈都按深入程度获得
+   * 至少 edgeA × 深度 的调制深度去修正朝外的速度；0 = 第一轮行为（只在状态本身有调制深度时修正）。
+   */
+  edgeGuard: 1,
+  edgeA: 0.6,
   /** 期望速度（m/s）：切入 = cutSpeed + cutSpeedAttack × 攻击值；环绕同理 */
   cutSpeed: 2.0,
   /** 切入时额外抵消的绕行切向速度比例 */
@@ -68,6 +74,32 @@ export const INTENT_TUNING = {
   cutA1: 0.35,
   orbitA0: 0.45,
   orbitA1: 0.3,
+  /**
+   * 第二轮修正 3：切入方式。1 = 斜向掠过式：按当前相对运动预测最近点，只修正“会让最近点偏离期望掠过点”的那部分
+   * 横向速度，期望掠过点在连心线一侧 sin(切入角) × 刀刃半径和处（接触瞬间仍保持该切入角）；
+   * 不在接近时（绕圈 / 远离）才抵消远离对手的径向分量和部分切向分量（cutCancelFar）。0 = 第一轮（一律抵消 cutCancel 倍切向）。
+   */
+  cutMode: 1,
+  /** 横向修正的响应时间下限（秒）：越小修正越猛 */
+  cutLatTime: 0.25,
+  /** 横向修正增益：进动调制只能产生平均意义上的偏置，需要比“恰好补偿”更大的期望横向速度 */
+  cutLatGain: 1,
+  /** 没在接近时抵消的切向比例（第一轮为 3，绕防御型 13 秒不接触就是靠它解决的） */
+  cutCancelFar: 1.5,
+  /**
+   * 第二轮修正 2：发射过渡。发射后的 launch 状态里，不调制进动转速（authority = 0，自然进动），
+   * 只给出拦截方向 heading；落地时的初始倾斜方向由 BeyPhysics.alignLaunch 在发射方向 ±launchBias 内向拦截方向偏。
+   * 遇到接触、超时 launchTime、或正在向外走且预测将进入外圈时结束（launchJudge > 0 时还有大角度提前结束），进入正常决策。0 = 关闭（第一轮：直接游走）。
+   */
+  launchAssist: 1,
+  launchTime: 0.8,
+  /** 发射后 launchJudge 秒内，拦截方向与当前运动方向夹角超过 launchExitOff（弧度）就提前结束过渡。
+   * 默认 0 = 不用：初相偏置已经限制在发射方向 ±launchBias 内，大角度发射本来就不会被拉回对手方向；
+   * 实测提前结束反而让开局对撞变成高速擦撞后飞向墙边（撞墙专项通过率下降） */
+  launchExitOff: 0.8,
+  launchJudge: 0,
+  /** 1 = 正在向外走（径向速度 > 0.5 m/s）且预测 edgeLook 秒后进入外圈时结束过渡，交给墙边保护 */
+  launchEdgeExit: 1,
   /** 速度误差达到这个值（m/s）时意图满量 */
   errFull: 0.5,
   /** 接触判定的额外间隙（米），与诊断一致 */
@@ -132,13 +164,15 @@ const wrap = (a: number) => Math.atan2(Math.sin(a), Math.cos(a));
 const DEG = Math.PI / 180;
 
 export class MotionIntent {
-  state: IntentState = 'roam';
+  state: IntentState = INTENT_TUNING.launchAssist > 0 ? 'launch' : 'roam';
   /** 在当前状态已停留的时间（秒） */
   time = 0;
   /** 当前状态计划持续时间（秒） */
-  private hold = 0.5;
+  private hold = INTENT_TUNING.launchAssist > 0 ? INTENT_TUNING.launchTime : 0.5;
   heading = 0;
   authority = 0;
+  /** 墙边保护的深入程度 0..1（本步），BeyPhysics 用它决定低咬合轴心是否借用脱困咬合度 */
+  edgeW = 0;
   /** 环绕 / 切入的方向（+1 / −1） */
   private side = 1;
   private cutAngle = 40 * DEG;
@@ -214,7 +248,17 @@ export class MotionIntent {
     const closing = -((inp.ovx - inp.vx) * dx + (inp.ovz - inp.vz) * dz) / d;
 
     // 1) 物理事件驱动的切换：接触 → contact，分开 → disengage
-    if (this.state === 'breakout') {
+    if (this.state === 'launch') {
+      // 发射过渡：碰到对手（进入 contact）、超时、拦截方向偏离当前运动方向太多（大角度发射：尊重玩家的方向，
+      // 交给自然进动）、或预测 edgeLook 秒后进入外圈（交给墙边保护）时结束
+      const sp = Math.hypot(inp.vx, inp.vz);
+      const lead = Math.min(0.6, d / Math.max(2, sp));
+      const ih = Math.atan2(inp.oz + inp.ovz * lead - inp.pz, inp.ox + inp.ovx * lead - inp.px);
+      const off = sp > 1 ? Math.abs(wrap(ih - Math.atan2(inp.vz, inp.vx))) : 0;
+      const fr = Math.hypot(inp.px + inp.vx * T.edgeLook, inp.pz + inp.vz * T.edgeLook);
+      if (touching) this.enter('contact', 0);
+      else if (this.time >= this.hold || (this.time < T.launchJudge && off > T.launchExitOff) || (T.launchEdgeExit > 0 && fr > T.edgeR && inp.vx * inp.px + inp.vz * inp.pz > 0.5 * Math.hypot(inp.px, inp.pz))) this.decide(inp, gap);
+    } else if (this.state === 'breakout') {
       if (this.time >= this.hold) this.enter('disengage', T.disengageMin);
     } else if (touching) {
       if (this.state !== 'contact') this.enter('contact', 0);
@@ -254,11 +298,58 @@ export class MotionIntent {
     let a = 0;
     const speed = Math.hypot(inp.vx, inp.vz);
     switch (this.state) {
+      case 'launch': {
+        // 发射过渡：只给出拦截方向（对手预判位置），调制深度为 0；初始倾斜的偏置由 BeyPhysics 处理
+        const lead = Math.min(0.6, d / Math.max(2, speed));
+        this.heading = Math.atan2(inp.oz + inp.ovz * lead - inp.pz, inp.ox + inp.ovx * lead - inp.px);
+        this.authority = 0;
+        return;
+      }
       case 'cut': {
         // 斜向切入：瞄对手的预判位置，远处偏开 cutAngle 走弧线，越近越正
         const lead = Math.min(0.5, d / Math.max(2, speed));
         const ax = inp.ox + inp.ovx * lead - inp.px;
         const az = inp.oz + inp.ovz * lead - inp.pz;
+        if (T.cutMode === 1) {
+          const ux = dx / d;
+          const uz = dz / d;
+          // 横向基：连心线左侧
+          const nx = -uz;
+          const nz = ux;
+          const rvx = inp.vx - inp.ovx;
+          const rvz = inp.vz - inp.ovz;
+          const vr2 = rvx * rvx + rvz * rvz;
+          const closingNow = (rvx * ux + rvz * uz);
+          // 期望掠过点：连心线 side 一侧，偏移 sin(切入角) × 刀刃半径和（接触时相对速度与连心线夹角 ≈ 切入角）
+          const want = this.side * Math.sin(this.cutAngle) * inp.bladeSum;
+          const vCut = T.cutSpeed + T.cutSpeedAttack * P.attack;
+          if (closingNow > 0.3 && vr2 > 0.09) {
+            // 按当前相对运动，最近点出现在 t* 后；最近点横向偏移 s（相对位置 = 我 − 对手）
+            const tStar = Math.max(0.05, Math.min(1.5, (closingNow * d) / vr2));
+            const mx = -dx + rvx * tStar;
+            const mz = -dz + rvz * tStar;
+            // 最近点（我相对对手的位置）在横向基上的分量
+            const sMiss = mx * nx + mz * nz;
+            const dvLat = ((want - sMiss) / Math.max(T.cutLatTime, tStar)) * T.cutLatGain;
+            // 只修正横向偏差（会让我错过或撞得太正的那部分），接近速度不够时沿连心线补足，不刹车
+            wx = inp.vx + nx * dvLat + ux * Math.max(0, vCut - closingNow);
+            wz = inp.vz + nz * dvLat + uz * Math.max(0, vCut - closingNow);
+          } else {
+            // 还没在接近（绕圈 / 远离）：朝对手侧面的掠过点走弧线，抵消远离对手的径向分量和部分切向分量
+            const k = Math.max(0, Math.min(1, (gap - T.cutNear) / (T.cutFar - T.cutNear)));
+            const h = Math.atan2(az, ax) + this.side * this.cutAngle * k;
+            wx = Math.cos(h) * vCut;
+            wz = Math.sin(h) * vCut;
+            const away = Math.min(0, closingNow);
+            wx -= ux * away;
+            wz -= uz * away;
+            const rt = rvx * nx + rvz * nz;
+            wx -= nx * rt * T.cutCancelFar;
+            wz -= nz * rt * T.cutCancelFar;
+          }
+          a = T.cutA0 + T.cutA1 * P.attack;
+          break;
+        }
         const k = Math.max(0, Math.min(1, (gap - T.cutNear) / (T.cutFar - T.cutNear)));
         const h = Math.atan2(az, ax) + this.side * this.cutAngle * k;
         // 切入时不刹车：沿切入方向已经比期望速度快就保持（撞击力度来自接近速度），只修正偏离的分量
@@ -330,16 +421,20 @@ export class MotionIntent {
         break;
       }
       default:
+        // 游走：不设期望（保持当前速度 = 不调制），只有墙边保护会产生修正
+        wx = inp.vx;
+        wz = inp.vz;
         a = 0;
     }
 
     // 3) 墙边：期望速度去掉朝外的分量，并按深入外圈的程度加一点朝内的分量。
     // 期望方向 = 期望速度 − 当前速度，所以正在冲向墙时牵引会转成刹车（轴心摩擦），而不是继续推着撞墙
     // 用 edgeLook 秒后的预测位置判断（高速时提前开始修正，牵引转向需要时间）
+    let edgeW = 0;
     const fx = inp.px + inp.vx * T.edgeLook;
     const fz = inp.pz + inp.vz * T.edgeLook;
     const r = Math.max(Math.hypot(inp.px, inp.pz), Math.hypot(fx, fz));
-    if (a > 0 && r > T.edgeR) {
+    if ((a > 0 || T.edgeGuard > 0) && r > T.edgeR) {
       const fr = Math.hypot(fx, fz) || 1;
       const ex = fx / fr;
       const ez = fz / fr;
@@ -349,6 +444,11 @@ export class MotionIntent {
       if (out > -pull) {
         wx -= ex * (out + pull);
         wz -= ez * (out + pull);
+        // 墙边保护的调制深度只取决于深入外圈的程度，不取决于当前战术状态
+        if (T.edgeGuard > 0) {
+          a = Math.max(a, T.edgeA * w);
+          edgeW = w;
+        }
       }
     }
     const ex0 = wx - inp.vx;
@@ -362,5 +462,6 @@ export class MotionIntent {
     const spinK = Math.max(0, Math.min(1, (inp.spinRatio - 0.1) / (T.spinFloor - 0.1)));
     this.authority = Math.min(T.authorityCap, a * P.tipAuthority * spinK);
     this.heading = heading;
+    this.edgeW = edgeW;
   }
 }

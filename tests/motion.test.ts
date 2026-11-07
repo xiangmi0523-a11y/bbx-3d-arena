@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { createArenaPhysics } from '../src/game/arena/ArenaPhysics';
-import { BattleSystem } from '../src/game/battle/BattleSystem';
+import { BattleSystem, isDeathWobble } from '../src/game/battle/BattleSystem';
 import { BEY_TUNING } from '../src/game/beys/BeyPhysics';
 import { INTENT_TUNING, MotionIntent, profileOf } from '../src/game/beys/motionIntent';
 import { assembleBey } from '../src/game/beys/parts/assemble';
@@ -216,4 +216,51 @@ describe('自主运动：行为（固定种子，与基线 0dac2ad 对照）', (
     expect(avg(rs.map((r) => r.wall10))).toBeLessThan(1);
     expect(avg(rs.flatMap((r) => [r.p.edgeFrac, r.r.edgeFrac]))).toBeLessThan(0.04);
   }, 120000);
+});
+
+describe('自主运动第二轮修正（固定种子）', () => {
+  it('死亡摇摆判定不会误判高转速摩擦：只有「低转速 + 明显倾斜 + 持续贴靠 + 对方明显更健康」同时满足才算', () => {
+    const T = BEY_TUNING;
+    const base = { touching: true, lowSpin: 0.15, lowTiltExcess: 0.35, highSpin: 0.4, highCanDrive: true, highInBreakout: false };
+    expect(isDeathWobble(base)).toBe(true);
+    // 高转速贴身摩擦（哪怕撞歪、倾斜很大）
+    for (const lowSpin of [0.3, 0.5, 0.8]) expect(isDeathWobble({ ...base, lowSpin, highSpin: Math.min(1, lowSpin + 0.2) })).toBe(false);
+    // 低转速但轴基本竖直（正常的低速互磨，不是摇摆）
+    expect(isDeathWobble({ ...base, lowTiltExcess: T.wobbleTilt - 0.01 })).toBe(false);
+    // 双方一样虚弱（谁也没有余力脱离）
+    expect(isDeathWobble({ ...base, highSpin: base.lowSpin + T.wobbleMargin / 2 })).toBe(false);
+    // 没贴着 / 对方已经在脱困 / 对方没有牵引能力
+    expect(isDeathWobble({ ...base, touching: false })).toBe(false);
+    expect(isDeathWobble({ ...base, highInBreakout: true })).toBe(false);
+    expect(isDeathWobble({ ...base, highCanDrive: false })).toBe(false);
+  });
+
+  it('发射初相：进攻型的初始牵引方向在发射方向 ±launchBias 内；防御 / 耐力刀刃保持随机初相', async () => {
+    const R = await loadRapier();
+    for (const [lo, aligned] of [
+      [{ player: ATK, rival: DEF }, [true, false]],
+      [{ player: STA, rival: BAL }, [false, true]],
+    ] as const) {
+      const pw = new PhysicsWorld(R);
+      createArenaPhysics(pw);
+      const orig = Math.random;
+      Math.random = seeded(5);
+      const b = new BattleSystem(pw, { player: assembleBey(lo.player), rival: assembleBey(lo.rival) });
+      const beys = [b.launch('player', { power: 1, aim: 1, tilt: 0 })];
+      const p0 = (beys[0] as unknown as { precession: number }).precession;
+      beys.push(b.launch('rival', { power: 0.8, aim: -0.6, tilt: 0 }));
+      Math.random = orig;
+      beys.forEach((x, i) => {
+        const prec = (x as unknown as { precession: number }).precession;
+        const v = x.body.linvel();
+        const drive = prec + (x.spinDirection * Math.PI) / 2;
+        const rate0 = x.spinDirection * -(BEY_TUNING.precessBase + BEY_TUNING.precessSpin / Math.max(20, x.spin));
+        // 初相 = 发射方向 + 偏置（≤ launchBias）− 自然进动 × launchPre / 2
+        const off = Math.atan2(Math.sin(drive + (rate0 * BEY_TUNING.launchPre) / 2 - Math.atan2(v.z, v.x)), Math.cos(drive + (rate0 * BEY_TUNING.launchPre) / 2 - Math.atan2(v.z, v.x)));
+        if (aligned[i]) expect(Math.abs(off)).toBeLessThanOrEqual(BEY_TUNING.launchBias + 1e-6);
+        else if (i === 0) expect(prec).toBe(p0);
+      });
+      pw.dispose();
+    }
+  }, 60000);
 });

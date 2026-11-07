@@ -36,7 +36,7 @@ test('contact mix', async () => {
   }
   const version = process.env.CM_VERSION ?? 'now';
   const out = process.env.CM_OUT ?? `test-results/motion/cm-${version}.json`;
-  const only = process.env.CM_ONLY?.split(',') ?? ['AvD', 'DvA', 'SvA', 'BvB', 'AvA', 'DFLT', 'WALL'];
+  const only = process.env.CM_ONLY?.split(',') ?? null;
   const res: Record<string, unknown[]> = {};
   // WALLX：撞墙对阵（与 WALL 组同一配置和发射规律）扩到 60 场，种子 1100–1159，样本更大
   const gs = [
@@ -50,11 +50,22 @@ test('contact mix', async () => {
     },
   ];
   for (const g of gs) {
-    if (!only.includes(g.key)) continue;
+    if (only && !only.includes(g.key)) continue;
     res[g.key] = [];
     for (const sc of g.scenarios) {
       const r = await recordReplay(sc, version);
-      res[g.key].push({ name: sc.name, result: r.result, duration: r.duration, hits: r.hits, strong: r.strong, contacts: r.contacts, walls: r.walls, impacts: r.impacts });
+      // 死亡阶段：输家转速比例首次 < 20% 到对局结束，接触帧占比
+      const loser = r.result.startsWith('player') ? 1 : r.result.startsWith('rival') ? 0 : -1;
+      let death = NaN;
+      if (loser >= 0) {
+        const o = 3 + loser * 13 + 7;
+        const i0 = r.frames.findIndex((f) => f[o] < 0.2);
+        if (i0 >= 0) {
+          const tail = r.frames.slice(i0);
+          death = tail.filter((f) => f[2]).length / tail.length;
+        }
+      }
+      res[g.key].push({ name: sc.name, result: r.result, duration: r.duration, hits: r.hits, strong: r.strong, contacts: r.contacts, walls: r.walls, impacts: r.impacts, death });
     }
   }
   mkdirSync(dirname(out), { recursive: true });

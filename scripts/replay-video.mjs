@@ -18,6 +18,7 @@ const QUERY = process.env.QUERY ?? 'aa=0';
 const browser = await chromium.launch({ args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'] });
 for (const key of keys) {
   const page = await browser.newPage({ viewport: { width: 1600, height: 960 } });
+  page.setDefaultTimeout(180000);
   page.on('pageerror', (e) => console.log('pageerror', e.message));
   await page.goto(`http://localhost:${PORT}/tools/replay.html?record=1&${QUERY}&s=${encodeURIComponent(key)}`);
   const { duration } = await page.evaluate(() => window.replayReady);

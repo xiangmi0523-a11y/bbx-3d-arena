@@ -111,6 +111,9 @@ export async function recordReplay(sc: MotionScenario, version: string): Promise
     const pw = new PhysicsWorld(R);
     const arena = createArenaPhysics(pw);
     const wallSet = new Set(arena.walls.map((c) => c.handle));
+    // 诊断消融：改外墙摩擦（只在诊断进程里，验证“贴墙骑行”的能量来源）
+    const wf = (globalThis as { process?: { env: Record<string, string | undefined> } }).process?.env.DIAG_WALLFRIC;
+    if (wf !== undefined) for (const c of arena.walls) c.setFriction(Number(wf));
     const battle = new BattleSystem(pw, { player: assembleBey(sc.player), rival: assembleBey(sc.rival) });
     pw.beforeStep = (dt) => battle.preStep(dt);
     pw.afterStep = (dt) => battle.postStep(dt);
