@@ -28,9 +28,9 @@ import { STATES } from '../tests/motion/recorder';
 type Ver = 'base' | 'new';
 const VERS: Ver[] = ['base', 'new'];
 /** 每个槽位放哪个版本的录像：?pair=new,v2 = 左第一轮、右第二轮（默认 base,new） */
-const FILE_LABEL: Record<string, string> = { base: '基线 0dac2ad', new: '第一轮 b3d0b1d', v2: '第二轮 v2' };
-const FILE_SHORT: Record<string, string> = { base: '基线', new: '第一轮', v2: '第二轮' };
-const PAIR = (new URLSearchParams(location.search).get('pair') ?? 'base,new').split(',');
+const FILE_LABEL: Record<string, string> = { base: '基线 0dac2ad', new: '第一轮 b3d0b1d', v2: '第二轮 v2', v3A: 'A 0c30c09 僵持开', v3B: 'B v3 僵持关' };
+const FILE_SHORT: Record<string, string> = { base: '基线', new: '第一轮', v2: '第二轮', v3A: 'A 基准', v3B: 'B 第三轮' };
+const PAIR = (new URLSearchParams(location.search).get('pair') ?? (window as unknown as { __REPLAY_PAIR?: string }).__REPLAY_PAIR ?? 'base,new').split(',');
 const SLOT_FILE: Record<Ver, string> = { base: PAIR[0] ?? 'base', new: PAIR[1] ?? 'new' };
 const VER_LABEL: Record<Ver, string> = { base: FILE_LABEL[SLOT_FILE.base] ?? SLOT_FILE.base, new: FILE_LABEL[SLOT_FILE.new] ?? SLOT_FILE.new };
 const VER_SHORT: Record<Ver, string> = { base: FILE_SHORT[SLOT_FILE.base] ?? SLOT_FILE.base, new: FILE_SHORT[SLOT_FILE.new] ?? SLOT_FILE.new };

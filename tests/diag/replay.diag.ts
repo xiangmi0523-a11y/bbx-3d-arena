@@ -10,6 +10,8 @@ import { groups } from '../motion/scenarios';
  * 每场输出 <out>/<场景名>.<version>.json
  */
 test('record replays', async () => {
+  // DIAG_TUNE：只在诊断进程里覆盖 BEY_TUNING（第三轮 A 配置用 {"stallBreak":1}）
+  if (process.env.DIAG_TUNE) Object.assign((await import('../../src/game/beys/BeyPhysics')).BEY_TUNING, JSON.parse(process.env.DIAG_TUNE));
   const version = process.env.REPLAY_VERSION ?? 'now';
   const out = process.env.REPLAY_OUT ?? 'test-results/replays';
   const only = (process.env.REPLAY_ONLY ?? '').split(',').filter(Boolean);

@@ -191,7 +191,9 @@ export class BattleSystem {
     const va = a.body.linvel();
     const vb = b.body.linvel();
     const d = Math.hypot(pa.x - pb.x, pa.z - pb.z);
+    // 第三轮实验：stallBreak 0 时通用僵持不计时、不触发（死亡摇摆分支照常运行）
     const stalled =
+      BEY_TUNING.stallBreak > 0 &&
       Math.hypot(va.x, va.z) < 0.8 &&
       Math.hypot(vb.x, vb.z) < 0.8 &&
       d < a.spec.outerRadius + b.spec.outerRadius + 0.4 &&
