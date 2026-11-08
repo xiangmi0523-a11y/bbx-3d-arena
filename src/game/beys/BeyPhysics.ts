@@ -136,6 +136,25 @@ export const BEY_TUNING = {
   rollFriction: 0.02,
 };
 
+/** 只读探针：一步内轴心牵引的判定过程（见 BeyPhysics.probe） */
+export interface TractionProbe {
+  grip: number;
+  driveGrip: number;
+  /** 咬合、接地、未冲刺、转速 > 2×minStableSpin 全部满足 */
+  eligible: boolean;
+  gripOk: boolean;
+  edgeOnly: boolean;
+  edgeHelps: boolean;
+  /** 沿牵引方向的速度未超过上限 */
+  capOk: boolean;
+  applied: boolean;
+  /** 牵引方向（单位向量，水平） */
+  dx: number;
+  dz: number;
+  /** 本步施加的水平加速度（m/s²），未施加为 0 */
+  accel: number;
+}
+
 /**
  * 陀螺的刚体与碰撞体（与视觉模型分离）。
  * 本地原点在轴心最底部，Y 轴为旋转轴。
@@ -173,6 +192,11 @@ export class BeyPhysics {
   private launchPhase0: number | null = null;
   /** 被撞歪后相位跟随实际倾斜的累计次数（诊断） */
   knockResyncs = 0;
+  /**
+   * 只读探针（低速停滞探针阶段）：非 null 时，preStep 把本步牵引的判定过程写进这个对象。
+   * 只写不读，不参与任何物理计算；默认 null（游戏与测试不开启）。
+   */
+  probe: TractionProbe | null = null;
   /** 本步进动相位是否在跟随被撞歪的实际倾斜 */
   knocked = false;
 
@@ -446,6 +470,20 @@ export class BeyPhysics {
     // 墙边：没有牵引的轴心（针尖）贴近外圈时，与脱困同理按 edgeGrip 计算牵引（倾斜着压在陡坡上，接触点外移）
     if (T.edgeGrip > 0 && this.intent.edgeW > 0) driveGrip = Math.max(driveGrip, T.edgeGrip * Math.min(1, this.intent.edgeW * 2));
     let steering = 0;
+    const pr = this.probe;
+    if (pr) {
+      pr.grip = grip;
+      pr.driveGrip = driveGrip;
+      pr.eligible = driveGrip >= T.driveMinGrip && this.grounded && !this.dashing && mag > T.minStableSpin * 2;
+      pr.gripOk = driveGrip >= T.driveMinGrip;
+      pr.applied = false;
+      pr.edgeOnly = false;
+      pr.edgeHelps = true;
+      pr.capOk = false;
+      pr.dx = -Math.sin(this.precession) * this.spinSign;
+      pr.dz = Math.cos(this.precession) * this.spinSign;
+      pr.accel = 0;
+    }
     if (driveGrip >= T.driveMinGrip && this.grounded && !this.dashing && mag > T.minStableSpin * 2) {
       const ratio = Math.min(1, mag / this.launchSpin);
       const v = body.linvel();
@@ -485,7 +523,15 @@ export class BeyPhysics {
       // 否则针尖会在外圈获得随相位乱转的推力，越转越快（实测耐力型游走从 1 m/s 加速到 6 m/s 沿墙绕）
       const edgeOnly = this.breakout <= 0 && grip < T.driveMinGrip;
       const edgeHelps = !edgeOnly || dx * Math.cos(this.intent.heading) + dz * Math.sin(this.intent.heading) > 0;
-      if (edgeHelps && along < T.driveSpeed * driveGrip * (0.35 + 0.65 * (this.breakout > 0 ? Math.max(ratio, T.breakoutRatio) : ratio))) {
+      const capOk = along < T.driveSpeed * driveGrip * (0.35 + 0.65 * (this.breakout > 0 ? Math.max(ratio, T.breakoutRatio) : ratio));
+      if (pr) {
+        pr.edgeOnly = edgeOnly;
+        pr.edgeHelps = edgeHelps;
+        pr.capOk = capOk;
+        pr.dx = dx;
+        pr.dz = dz;
+      }
+      if (edgeHelps && capOk) {
         // 脱困（辅助机制）：低转速的球头 / 针尖轴心牵引很弱，停在碗底会一直原地互转。
         // 僵持一段时间后，按“至少 breakoutRatio 的转速、breakoutGrip 的咬合度”给 0.7 秒牵引，方向背离对手；
         // 力的大小仍按轴心牵引公式与速度上限计算，拉开后由碗面重力拉回、真实碰撞
@@ -493,6 +539,10 @@ export class BeyPhysics {
         const a = T.driveAccel * driveGrip * r2 * body.mass() * dt;
         body.applyImpulse({ x: dx * a, y: 0, z: dz * a }, true);
         decay += T.driveSpinCost * driveGrip;
+        if (pr) {
+          pr.applied = true;
+          pr.accel = a / (body.mass() * dt);
+        }
       }
       // 改变轴的倾斜方向需要力矩：按调制深度额外消耗转速
       decay += T.steerSpinCost * steering * driveGrip;
