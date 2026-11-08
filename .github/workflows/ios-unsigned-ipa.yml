@@ -1,0 +1,67 @@
+name: iOS 未签名 IPA
+
+# 只产出未签名 IPA（Actions Artifact），不使用任何签名证书或 Secrets，不部署。
+on:
+  workflow_dispatch:
+  push:
+    branches: [feat/p2.3-visual-balance, feat/p2.3.1-battle-feel]
+    paths:
+      - 'src/**'
+      - 'ios/**'
+      - 'scripts/build-ios-ipa.sh'
+      - '.github/workflows/ios-unsigned-ipa.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: macos-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: 安装依赖
+        run: npm ci
+
+      - name: 构建未签名 IPA
+        run: bash scripts/build-ios-ipa.sh build-ios
+
+      - name: 校验产物并记录版本信息
+        run: |
+          set -euo pipefail
+          IPA=build-ios/BBX-3D-Arena-unsigned.ipa
+          unzip -q -o "$IPA" -d build-ios/check
+          APP=build-ios/check/Payload/App.app
+          test -f "$APP/Info.plist"
+          test -f "$APP/public/index.html"
+          test -f "$APP/capacitor.config.json"
+          if [ -d "$APP/_CodeSignature" ]; then echo "不应包含签名" >&2; exit 1; fi
+          PL=/usr/libexec/PlistBuddy
+          {
+            echo "commit:        $GITHUB_SHA"
+            echo "branch:        $GITHUB_REF_NAME"
+            echo "run:           $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+            echo "bundle id:     $($PL -c 'Print :CFBundleIdentifier' $APP/Info.plist)"
+            echo "version:       $($PL -c 'Print :CFBundleShortVersionString' $APP/Info.plist) ($($PL -c 'Print :CFBundleVersion' $APP/Info.plist))"
+            echo "min iOS:       $($PL -c 'Print :MinimumOSVersion' $APP/Info.plist)"
+            echo "sha256:        $(shasum -a 256 $IPA | cut -d' ' -f1)"
+            echo "size:          $(stat -f%z $IPA) bytes"
+            echo "signed:        no"
+          } | tee build-ios/BUILD-INFO.txt
+          unzip -l "$IPA" | tail -n 25
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: BBX-3D-Arena-unsigned-ipa-${{ github.sha }}
+          path: |
+            build-ios/BBX-3D-Arena-unsigned.ipa
+            build-ios/BUILD-INFO.txt
+            build-ios/xcodebuild.log
+          retention-days: 30
+          if-no-files-found: error

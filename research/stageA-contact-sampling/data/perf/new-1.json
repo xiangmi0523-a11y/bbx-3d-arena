@@ -1,0 +1,1807 @@
+{
+ "head": "cb4c2c4694315957c1a36b9f2f446750caaecb5d",
+ "trackedDirty": "M src/game/battle/BattleSystem.ts\n M src/game/battle/contactFeedback.ts",
+ "tune": null,
+ "runs": [
+  {
+   "name": "AvD#0",
+   "group": "AvD",
+   "seed": 100,
+   "hash": "7775c5b87607837449ab15a2f47c770a1a052d4406e681a7035a11c81af73b60",
+   "steps": 1361,
+   "result": "rival:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "AvD#1",
+   "group": "AvD",
+   "seed": 101,
+   "hash": "5f5a59b94283b051fa95b23e486993f95a970a44f8147033ec311c0fdc726ed5",
+   "steps": 1431,
+   "result": "rival:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "AvD#2",
+   "group": "AvD",
+   "seed": 102,
+   "hash": "9bd0d0ff923cb2e08afcff179e15357a2b9dd8955d9894468ba3ff3ec794bd3a",
+   "steps": 1727,
+   "result": "rival:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "AvD#3",
+   "group": "AvD",
+   "seed": 103,
+   "hash": "d9edb80640b838eb503a1558d003cc55d0af800aff4a2958ecab1f409d2285fb",
+   "steps": 1405,
+   "result": "rival:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "AvD#4",
+   "group": "AvD",
+   "seed": 104,
+   "hash": "e61c44a16aae5397dff7ad5c8b6bd27ed03a000864e68db8cf4f343db959d26f",
+   "steps": 1880,
+   "result": "rival:spin",
+   "breakouts": 1,
+   "wobbleBreaks": 1
+  },
+  {
+   "name": "AvD#5",
+   "group": "AvD",
+   "seed": 105,
+   "hash": "c07db8d642a305599d70a4582da737ca612856261f169fbe94ffef62cba293e3",
+   "steps": 2113,
+   "result": "rival:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "AvD#6",
+   "group": "AvD",
+   "seed": 106,
+   "hash": "5d966671610bc90b39fa61e3d4c8d7d0ba1d770100eca3391d152a0d8e262b0b",
+   "steps": 1198,
+   "result": "rival:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "AvD#7",
+   "group": "AvD",
+   "seed": 107,
+   "hash": "e37f8d260ad4b0c1a2ae2ad19489ec69611217364ce55c86a3d9c34dab486fdd",
+   "steps": 1351,
+   "result": "rival:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "AvD#8",
+   "group": "AvD",
+   "seed": 108,
+   "hash": "901dfc858c340df78d8d54672b16ea0794b654081ee812d8f50f62677af7e5c0",
+   "steps": 1894,
+   "result": "rival:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "AvD#9",
+   "group": "AvD",
+   "seed": 109,
+   "hash": "c132b8c7872e01a0a5d9e917a17e2f689ce21ff0e48824492c30e6b31e05e09e",
+   "steps": 1365,
+   "result": "rival:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "AvD#10",
+   "group": "AvD",
+   "seed": 110,
+   "hash": "3010a10507837c5c4ef8235cd5dbd9057c68b26ca9684e698be1a6ad4cbbc317",
+   "steps": 1745,
+   "result": "rival:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "AvD#11",
+   "group": "AvD",
+   "seed": 111,
+   "hash": "467a4319051ae9505ea4ecb7d00d3fbac349fba4d150c70e3e6cb8f32c6bf7cb",
+   "steps": 1693,
+   "result": "rival:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "AvD#12",
+   "group": "AvD",
+   "seed": 112,
+   "hash": "248379e49d9d9044eaf0a5af051c9dd61583321ffbbc64f55a3a98ef6aee332e",
+   "steps": 1694,
+   "result": "rival:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "AvD#13",
+   "group": "AvD",
+   "seed": 113,
+   "hash": "c48b9cd3b6ecf638f57c69c42fb522f03ef27459ab47cbf8018e91c3815a5d34",
+   "steps": 1528,
+   "result": "rival:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "AvD#14",
+   "group": "AvD",
+   "seed": 114,
+   "hash": "90a8b91dc909c28c241175cd9fcb43b8d253c651f42f8bdc78a97e38a0e715ea",
+   "steps": 1807,
+   "result": "rival:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "AvD#15",
+   "group": "AvD",
+   "seed": 115,
+   "hash": "c0799ca74b93020c410f71969e01a1c13a316ce2590f82b30b9fb9e2bc9821ef",
+   "steps": 1196,
+   "result": "rival:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "DvA#0",
+   "group": "DvA",
+   "seed": 200,
+   "hash": "a4af8563f9f8281be038af13352cecef17d724b897ab5e79fdd8260a0b70e5a0",
+   "steps": 1398,
+   "result": "player:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "DvA#1",
+   "group": "DvA",
+   "seed": 201,
+   "hash": "7d528a303d3bc95a455740c077c106525898fae32fa56137e24980a2bf6ecc13",
+   "steps": 2039,
+   "result": "player:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "DvA#2",
+   "group": "DvA",
+   "seed": 202,
+   "hash": "c13d4b19b10a6778c48cbdb42d346bf7db290bb45ffd66b0001777fe9d542484",
+   "steps": 1206,
+   "result": "player:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "DvA#3",
+   "group": "DvA",
+   "seed": 203,
+   "hash": "a1364deba7bdccc23407f656d2505cb33d334034b74dbb3a8ad5407c3ffb472d",
+   "steps": 1741,
+   "result": "player:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "DvA#4",
+   "group": "DvA",
+   "seed": 204,
+   "hash": "9f9019ce2b707c96d0a6cc0dfee356a3340e85becc51933d567042586f854327",
+   "steps": 1764,
+   "result": "player:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "DvA#5",
+   "group": "DvA",
+   "seed": 205,
+   "hash": "0f9702dda315a4a962aa6d732ff514c101a50ea3bd3695e7a3c561d60941213d",
+   "steps": 1227,
+   "result": "player:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "DvA#6",
+   "group": "DvA",
+   "seed": 206,
+   "hash": "a4de48ad4ccc817e74d26d2ca4c6b2fb8f24884030d292033a8665c6bf0cfe64",
+   "steps": 1900,
+   "result": "player:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "DvA#7",
+   "group": "DvA",
+   "seed": 207,
+   "hash": "7038a00f13317135bf0f996ec882de183407ebc812a493e1f89522e8ec8b2db6",
+   "steps": 1729,
+   "result": "player:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "DvA#8",
+   "group": "DvA",
+   "seed": 208,
+   "hash": "442ce2a74b6700ef37a5a59587fb9a0ba6a4f5de1525c79d648f0ac5f88467a7",
+   "steps": 1334,
+   "result": "player:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "DvA#9",
+   "group": "DvA",
+   "seed": 209,
+   "hash": "3d86c7fc4640ff4137426c95d0853398c8dc2a7980d3ab5801ae088234d95a24",
+   "steps": 1840,
+   "result": "player:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "DvA#10",
+   "group": "DvA",
+   "seed": 210,
+   "hash": "cee223d5697d466971a5cd24d10fd32767be45b4e3bd3211c95e90c3c1a8821d",
+   "steps": 2067,
+   "result": "player:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "DvA#11",
+   "group": "DvA",
+   "seed": 211,
+   "hash": "9ae834573f0eb36e8b4a3ba452fd8e509f04aa52971cf5734e0bd530f9bf2851",
+   "steps": 1293,
+   "result": "player:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "DvA#12",
+   "group": "DvA",
+   "seed": 212,
+   "hash": "751b829987b463e6e7e4210aa625576ecf479a869f03f20e26fd96f4c699ce6e",
+   "steps": 1202,
+   "result": "player:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "DvA#13",
+   "group": "DvA",
+   "seed": 213,
+   "hash": "330a78e02793524f754c241a03a8ae9b518647fa0b1a2be36f522c40f29e5808",
+   "steps": 2193,
+   "result": "player:spin",
+   "breakouts": 1,
+   "wobbleBreaks": 1
+  },
+  {
+   "name": "DvA#14",
+   "group": "DvA",
+   "seed": 214,
+   "hash": "c95d099fa159717e705abf75acc2abfaf0741b174f79b5a432c38f37d094db80",
+   "steps": 1218,
+   "result": "player:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "DvA#15",
+   "group": "DvA",
+   "seed": 215,
+   "hash": "790e9004b648c10cd72325714cc690c44606722f496235eaadd3bbcfecdc53fa",
+   "steps": 1353,
+   "result": "player:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "SvA#0",
+   "group": "SvA",
+   "seed": 300,
+   "hash": "0942c5e35b4d8e4d7ce64a113f6df40cdbdda01ff1f1ed0764f00fc77d53ec8b",
+   "steps": 1585,
+   "result": "player:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "SvA#1",
+   "group": "SvA",
+   "seed": 301,
+   "hash": "6a4a4c9b50a64bca7e08b9a54af21744382e2b5dc1e404a975f7797f669a5578",
+   "steps": 2137,
+   "result": "player:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "SvA#2",
+   "group": "SvA",
+   "seed": 302,
+   "hash": "c2b9783a6e873bfc1969439b2eaa3d6471275a28722debe5c5003039391ae247",
+   "steps": 1557,
+   "result": "player:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "SvA#3",
+   "group": "SvA",
+   "seed": 303,
+   "hash": "d0623cac3be74a14ed6c638cd55a600b5d76907439e24c225e6a652b918b9bc0",
+   "steps": 1905,
+   "result": "player:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "SvA#4",
+   "group": "SvA",
+   "seed": 304,
+   "hash": "bb86cc5704eefc52f877b5a4fafb156d8abe788ac24e2c34ce4ff3806dffc0ae",
+   "steps": 1948,
+   "result": "player:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "SvA#5",
+   "group": "SvA",
+   "seed": 305,
+   "hash": "7d7261e14c6a228788475e2e1f498def7415e73dd0152ee3b4ea2a28c7dea1fb",
+   "steps": 1668,
+   "result": "player:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "SvA#6",
+   "group": "SvA",
+   "seed": 306,
+   "hash": "ec09d61055158a0956754b5ca9fd604ffe944cb03f9e081fc7f55832a900207d",
+   "steps": 2245,
+   "result": "player:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "SvA#7",
+   "group": "SvA",
+   "seed": 307,
+   "hash": "10f9d1f21976b4e36fbd11050d811e3ff1ce35fe9acc2949f3a7518ee5dd3f1d",
+   "steps": 1875,
+   "result": "player:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "SvA#8",
+   "group": "SvA",
+   "seed": 308,
+   "hash": "9effac1180b6466d3e48dc4c0ea8674a6d79e59a89e577a5ba87603b56199677",
+   "steps": 1469,
+   "result": "player:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "SvA#9",
+   "group": "SvA",
+   "seed": 309,
+   "hash": "abe95549378b1fb84590fbb737f5ec176e161bef7198011f7d06c09f8a129904",
+   "steps": 1734,
+   "result": "player:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "SvA#10",
+   "group": "SvA",
+   "seed": 310,
+   "hash": "39016bd351c53e5b55a423721f55746631d9bb50e9cbc137fd27c9b3eca703e2",
+   "steps": 2454,
+   "result": "player:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "SvA#11",
+   "group": "SvA",
+   "seed": 311,
+   "hash": "f6949e41774c78c174f425483b436345d92fcd08ae2972edb75d5d69f73f643c",
+   "steps": 1472,
+   "result": "player:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "SvA#12",
+   "group": "SvA",
+   "seed": 312,
+   "hash": "2a7aa1e07fa712a4c6b3ae6fb971225eb175749224dd86761d1b769cff8ede31",
+   "steps": 1802,
+   "result": "player:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "SvA#13",
+   "group": "SvA",
+   "seed": 313,
+   "hash": "554e61cc21a28ea70961dc5297ff69bcebe975d5256eb13f0c872bafb8d7e5cf",
+   "steps": 2079,
+   "result": "player:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "SvA#14",
+   "group": "SvA",
+   "seed": 314,
+   "hash": "a22a35f211134009fc369424cff3f32a753808b755cbb55556e98c86ae1dcb56",
+   "steps": 1814,
+   "result": "player:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "SvA#15",
+   "group": "SvA",
+   "seed": 315,
+   "hash": "b2732cf1773ae9b80e9e842183bd95db26b9d71c0eeb85894d57c3f294b012a1",
+   "steps": 1933,
+   "result": "player:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "BvB#0",
+   "group": "BvB",
+   "seed": 400,
+   "hash": "5c971e975ad1a3b5064e3dbef4a1c5463fbab126c34410b5b3c182f1575494bc",
+   "steps": 3064,
+   "result": "rival:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "BvB#1",
+   "group": "BvB",
+   "seed": 401,
+   "hash": "140152ec48a054df76a341d0587f5073ef66a44b79b678a162754899e985ca5e",
+   "steps": 3001,
+   "result": "rival:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "BvB#2",
+   "group": "BvB",
+   "seed": 402,
+   "hash": "04e962fc6177e72abe896f721624c3034a1d8643f1c50f1396f34dd2621b2545",
+   "steps": 2551,
+   "result": "player:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "BvB#3",
+   "group": "BvB",
+   "seed": 403,
+   "hash": "422b36041d150745bb9e417645668b354983a938361c8a82ff5cc65909f20e5d",
+   "steps": 2646,
+   "result": "rival:spin",
+   "breakouts": 1,
+   "wobbleBreaks": 1
+  },
+  {
+   "name": "BvB#4",
+   "group": "BvB",
+   "seed": 404,
+   "hash": "d0d29f30d93d808fc9a8b271792c72c3110c584e9f90ee2308c03b77336800fd",
+   "steps": 3684,
+   "result": "player:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "BvB#5",
+   "group": "BvB",
+   "seed": 405,
+   "hash": "8c7729e25679006679bf793740a55968134b89306da7239fd5a570ed64c1a809",
+   "steps": 2253,
+   "result": "player:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "BvB#6",
+   "group": "BvB",
+   "seed": 406,
+   "hash": "ea89dc2564e9a48a18bb324131486b5accc863c40e21af5e38041b0a4ce137b0",
+   "steps": 2734,
+   "result": "rival:spin",
+   "breakouts": 1,
+   "wobbleBreaks": 1
+  },
+  {
+   "name": "BvB#7",
+   "group": "BvB",
+   "seed": 407,
+   "hash": "20a3203fcc0b9721a4e03bafda57bcdce738914bf04880a9fb1105f329ef0602",
+   "steps": 2684,
+   "result": "rival:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "BvB#8",
+   "group": "BvB",
+   "seed": 408,
+   "hash": "378759c2addf4642cc9a4d06ed1ca5813721e2dd039b28d9dc9e9deb22b93527",
+   "steps": 2107,
+   "result": "player:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "BvB#9",
+   "group": "BvB",
+   "seed": 409,
+   "hash": "9f3c2d31d7e3e33a986da4f36d11043648003f8ae076a2bb0f5d4450f63057a7",
+   "steps": 2488,
+   "result": "rival:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "BvB#10",
+   "group": "BvB",
+   "seed": 410,
+   "hash": "7f0b3cf2d76f63f19d8431a10309638fa54e876287449a8d3e0eaf8649b0482c",
+   "steps": 2517,
+   "result": "rival:spin",
+   "breakouts": 1,
+   "wobbleBreaks": 1
+  },
+  {
+   "name": "BvB#11",
+   "group": "BvB",
+   "seed": 411,
+   "hash": "0fb7da512f15d5d9806ff3e6116e5ae61badf97e4dae9cfa4d348a508e3626a8",
+   "steps": 3118,
+   "result": "player:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "BvB#12",
+   "group": "BvB",
+   "seed": 412,
+   "hash": "b843de4482e18b4ce1926ee12fd858abc1b453b2a320b3c023ee7c9d93f0158f",
+   "steps": 3029,
+   "result": "rival:spin",
+   "breakouts": 1,
+   "wobbleBreaks": 1
+  },
+  {
+   "name": "BvB#13",
+   "group": "BvB",
+   "seed": 413,
+   "hash": "aff029c35e2db7904608782c107a52dcfa8676cd4a48f1328350d1ca96eaa8f3",
+   "steps": 2955,
+   "result": "rival:spin",
+   "breakouts": 1,
+   "wobbleBreaks": 1
+  },
+  {
+   "name": "BvB#14",
+   "group": "BvB",
+   "seed": 414,
+   "hash": "2c753a3d6a8db3bd97ac42e3a8df38465665a0e03cc3e2c56972b3013bbd2764",
+   "steps": 2265,
+   "result": "player:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "BvB#15",
+   "group": "BvB",
+   "seed": 415,
+   "hash": "94170e2831ecc81bcb8515f04fa595b317277d7671e1e672f82013e532dbe5a6",
+   "steps": 2799,
+   "result": "rival:spin",
+   "breakouts": 1,
+   "wobbleBreaks": 1
+  },
+  {
+   "name": "AvA#0",
+   "group": "AvA",
+   "seed": 500,
+   "hash": "e350de97a70ef73acabafc6a5c8df4555e10edd968257005f46239d9f2dc2704",
+   "steps": 1475,
+   "result": "player:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "AvA#1",
+   "group": "AvA",
+   "seed": 501,
+   "hash": "cd6adaa8ade5622a152aa8833d7ad94d2cb3eaf9489090b67e5f31c536d4f4e8",
+   "steps": 1279,
+   "result": "rival:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "AvA#2",
+   "group": "AvA",
+   "seed": 502,
+   "hash": "626c5584d45d077c024db6b8ad519af790e46ec01f4dfbe83d2b76af9209bf9e",
+   "steps": 1109,
+   "result": "player:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "AvA#3",
+   "group": "AvA",
+   "seed": 503,
+   "hash": "bfae24efd1df7d256c43068184bb495efcc98bfe37120980f18db5eeb2d1c5fe",
+   "steps": 1172,
+   "result": "rival:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "AvA#4",
+   "group": "AvA",
+   "seed": 504,
+   "hash": "b12ec012b1f23ac0f74b92ce63b3ba3057013f1b37c3a412900e29cf45babffd",
+   "steps": 1171,
+   "result": "player:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "AvA#5",
+   "group": "AvA",
+   "seed": 505,
+   "hash": "8bbde3565cc08d1a303e73afa76479e284624914bee84072be67dd38704b6dd2",
+   "steps": 889,
+   "result": "player:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "AvA#6",
+   "group": "AvA",
+   "seed": 506,
+   "hash": "f5e1c340526a3bbff3b0a99dc9b4adf19c0b18e1c177841a7a91cf4b77a2b22a",
+   "steps": 1393,
+   "result": "player:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "AvA#7",
+   "group": "AvA",
+   "seed": 507,
+   "hash": "bbdf004fce8fc992cd961e21d5a6154922ccccc40f5f3c3ac30e2a191b3de540",
+   "steps": 1312,
+   "result": "rival:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "AvA#8",
+   "group": "AvA",
+   "seed": 508,
+   "hash": "49e2b27112bd2877cd821ac79accd96eb66ffea8b2c9606b2d8d080b0c4fce43",
+   "steps": 1222,
+   "result": "player:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "AvA#9",
+   "group": "AvA",
+   "seed": 509,
+   "hash": "d3285e18569811473453d46f3477d0edf633997692d2734173c2135b711a6909",
+   "steps": 926,
+   "result": "rival:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "AvA#10",
+   "group": "AvA",
+   "seed": 510,
+   "hash": "4983db79c7a2f7f0fc53979cee114f662bc547db7685065e7bc5d147bed84d1f",
+   "steps": 1432,
+   "result": "rival:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "AvA#11",
+   "group": "AvA",
+   "seed": 511,
+   "hash": "c1c23c9516c33fa06b0131808078d579b0059fba4adf0e5a1635514d81adcebe",
+   "steps": 1116,
+   "result": "player:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "AvA#12",
+   "group": "AvA",
+   "seed": 512,
+   "hash": "b9f25ba0a854eb4cf5c2e79cf4acf25993eb82951495fce39b35e84d10fbb66b",
+   "steps": 1118,
+   "result": "player:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "AvA#13",
+   "group": "AvA",
+   "seed": 513,
+   "hash": "2c52e0fdbda47941164b6e459c3ee386c0596f1d44bd7cadd018a23069408801",
+   "steps": 1420,
+   "result": "rival:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "AvA#14",
+   "group": "AvA",
+   "seed": 514,
+   "hash": "b8861240a2a497da96cac4b60f6d097128e65a9801e615c38796b4333f179943",
+   "steps": 1205,
+   "result": "player:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "AvA#15",
+   "group": "AvA",
+   "seed": 515,
+   "hash": "7a2cf7661d637b3221aaecb77751b1fdda13d6c6f50619f5cf506c593146f33d",
+   "steps": 1331,
+   "result": "rival:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "DFLT#0",
+   "group": "DFLT",
+   "seed": 600,
+   "hash": "2004ac164900e7157a10f09685fdf0eda963cb1abcae7b47559e575d78cec48c",
+   "steps": 1352,
+   "result": "rival:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "DFLT#1",
+   "group": "DFLT",
+   "seed": 601,
+   "hash": "f7134dc1ea3439b1af5928697892a137c6a091579a3c7cc737c5e5ef07bb9c00",
+   "steps": 1504,
+   "result": "rival:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "DFLT#2",
+   "group": "DFLT",
+   "seed": 602,
+   "hash": "6339afefaa537ca7791ed994bcde5df961bd1b7f51552b9d850a6fc1f7126b6c",
+   "steps": 2206,
+   "result": "rival:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "DFLT#3",
+   "group": "DFLT",
+   "seed": 603,
+   "hash": "798e63a8733f187de1f42352813220433315266f7024af18e1b4ebde14ea44d5",
+   "steps": 1334,
+   "result": "rival:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "DFLT#4",
+   "group": "DFLT",
+   "seed": 604,
+   "hash": "e673f3f37e1c90d3185f6684378ec9b4345d6003f15208c03bea45c34925c375",
+   "steps": 1666,
+   "result": "rival:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "DFLT#5",
+   "group": "DFLT",
+   "seed": 605,
+   "hash": "e9066ae3c7d65de27ce0bf6b1ae63ae27cc9a0e06fd3dd7454446e79daae6ab8",
+   "steps": 1566,
+   "result": "player:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "DFLT#6",
+   "group": "DFLT",
+   "seed": 606,
+   "hash": "b851b247a8f9aa1f07827f791384cb74e0d5cf236369d7f4f5bc73ec41803e1e",
+   "steps": 1382,
+   "result": "rival:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "DFLT#7",
+   "group": "DFLT",
+   "seed": 607,
+   "hash": "816f31bdd504f3783bc472fc1628fe50af821b682b72a5c4bcaf9aae3177c1dd",
+   "steps": 1441,
+   "result": "rival:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "DFLT#8",
+   "group": "DFLT",
+   "seed": 608,
+   "hash": "61281552cfe94cbe6856cb378d06a79a6339f5f7eaccbed324ff2919def90952",
+   "steps": 1591,
+   "result": "player:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "DFLT#9",
+   "group": "DFLT",
+   "seed": 609,
+   "hash": "70d59850781e037b8d7f621b5b5e3c974522f2e55f0163f5bebe8f9152d8e841",
+   "steps": 1520,
+   "result": "rival:spin",
+   "breakouts": 1,
+   "wobbleBreaks": 1
+  },
+  {
+   "name": "DFLT#10",
+   "group": "DFLT",
+   "seed": 610,
+   "hash": "8520866bf2017041694840e70825ca8a44590be3b8ac855537886caa001e7b97",
+   "steps": 1288,
+   "result": "rival:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "DFLT#11",
+   "group": "DFLT",
+   "seed": 611,
+   "hash": "4bc2750debb7458eb9ab8d787c98d642f550dd660cb86ffc74f897cbbd585748",
+   "steps": 1365,
+   "result": "rival:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "DFLT#12",
+   "group": "DFLT",
+   "seed": 612,
+   "hash": "6aa7b329c160dea61a4ac37404c315887b462a374bfbf46f7db8458f08fe8db2",
+   "steps": 1336,
+   "result": "rival:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "DFLT#13",
+   "group": "DFLT",
+   "seed": 613,
+   "hash": "e208711cb7da35d09eed5cadfb20148437f4191ba83807ef35881edb96e0c8ec",
+   "steps": 1344,
+   "result": "rival:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "DFLT#14",
+   "group": "DFLT",
+   "seed": 614,
+   "hash": "2b74ec1d06e95a5d75e501370d4b5df7689c316b7fa33853d911ca4479d43110",
+   "steps": 1901,
+   "result": "rival:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "DFLT#15",
+   "group": "DFLT",
+   "seed": 615,
+   "hash": "b6df559138f0fd417fe0f759981f76c175ba043911e5495bccaaa9dddbeeab83",
+   "steps": 1414,
+   "result": "rival:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "WALL#0",
+   "group": "WALL",
+   "seed": 1100,
+   "hash": "a76f1eeec4e457af8e511280a215778f92ce49cde9916dda4e4299c5f6ed5e6f",
+   "steps": 1471,
+   "result": "player:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "WALL#1",
+   "group": "WALL",
+   "seed": 1101,
+   "hash": "e5824699380c144d73a0a6d32ef8ea7cc276072178adaa4897ba516bf306e46b",
+   "steps": 1157,
+   "result": "player:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "WALL#2",
+   "group": "WALL",
+   "seed": 1102,
+   "hash": "234f7ee39d3c35d35d2c11ad627e33eef60f79244210cac7ba221bf64c213c65",
+   "steps": 1323,
+   "result": "player:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "WALL#3",
+   "group": "WALL",
+   "seed": 1103,
+   "hash": "5cbdc87d23b0a5d16814d2ff5ebe1ba522cd16bb501f4db23e38f8ad4c799d03",
+   "steps": 1668,
+   "result": "player:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "WALL#4",
+   "group": "WALL",
+   "seed": 1104,
+   "hash": "b66fcb89c614de2d529ec8a82cb73d1f399fd422b7e8220d52b04373d35aaa8e",
+   "steps": 1019,
+   "result": "player:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "WALL#5",
+   "group": "WALL",
+   "seed": 1105,
+   "hash": "f45613b9402e3ec74f55faa6f240b4f28369df938250349777126de32c15709e",
+   "steps": 1252,
+   "result": "player:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "WALL#6",
+   "group": "WALL",
+   "seed": 1106,
+   "hash": "f0a3faeb41aa893ea42607038a3c517542139ff92dc42ec7349d7019dba57f86",
+   "steps": 1339,
+   "result": "rival:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "WALL#7",
+   "group": "WALL",
+   "seed": 1107,
+   "hash": "d4fdf36fa8a3ff807ed39077c144e65e9e40a3c94108ace8cb86809ea693aef3",
+   "steps": 1122,
+   "result": "player:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "WALL#8",
+   "group": "WALL",
+   "seed": 1108,
+   "hash": "2177e16be094417d3f138ab16a40e4f3c10850d481d9a977934392cc788d0035",
+   "steps": 1388,
+   "result": "player:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "WALL#9",
+   "group": "WALL",
+   "seed": 1109,
+   "hash": "3385ef4f9aa2ed1008105ff2162361029abfdfa023c60abffe87d7ed192b711b",
+   "steps": 1144,
+   "result": "player:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "WALL#10",
+   "group": "WALL",
+   "seed": 1110,
+   "hash": "ab2ec073691198685d1ce4ab116b3195aa011172fd0d0eab1421b785085b4b8d",
+   "steps": 1170,
+   "result": "player:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "WALL#11",
+   "group": "WALL",
+   "seed": 1111,
+   "hash": "bbeb92301482bca391e2bb12a919ecd9ae2073b49ff21910645cca4b9df677a0",
+   "steps": 1154,
+   "result": "player:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "AIM -1#0",
+   "group": "AIM",
+   "seed": 700,
+   "hash": "725b69e27ef3d21e1677287302c4653d2ece67bea853af0ef8ae5ab4e5168cee",
+   "steps": 1481,
+   "result": "rival:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "AIM -1#1",
+   "group": "AIM",
+   "seed": 701,
+   "hash": "b28bf5cf5310147c5fe5ede9c94442faa3c138a7b981c6c1b413a15ebc7d8add",
+   "steps": 1448,
+   "result": "rival:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "AIM -0.5#0",
+   "group": "AIM",
+   "seed": 702,
+   "hash": "54988061e3ee8c661a792ddabdb2e0a721d16c63aa561cdfaff5009ffaad2302",
+   "steps": 1555,
+   "result": "rival:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "AIM -0.5#1",
+   "group": "AIM",
+   "seed": 703,
+   "hash": "afc6d39af658ea84cdd4d9711aa01670de78ddb110ac3aa3c8d69a2abc9bde8f",
+   "steps": 1987,
+   "result": "rival:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "AIM 0#0",
+   "group": "AIM",
+   "seed": 704,
+   "hash": "ca3b9734ff84b527d0120863c9808b8ce22a4b8c102c7607eab59a94681b7947",
+   "steps": 1456,
+   "result": "rival:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "AIM 0#1",
+   "group": "AIM",
+   "seed": 705,
+   "hash": "b5cf7a00ec7d459f0b1d535732deb1fd7a1ef742bac5d87dbe06e7de52e9f2a6",
+   "steps": 1257,
+   "result": "rival:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "AIM 0.5#0",
+   "group": "AIM",
+   "seed": 706,
+   "hash": "bbea8c3af76c4c74b2d38c973592cb720c0ec5212803bdced7255bc3f48dcd55",
+   "steps": 1257,
+   "result": "rival:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "AIM 0.5#1",
+   "group": "AIM",
+   "seed": 707,
+   "hash": "59ebe6db9a1ba93dff270f31787bf72a673a0c10602ad07e635de815b6580298",
+   "steps": 1838,
+   "result": "rival:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "AIM 1#0",
+   "group": "AIM",
+   "seed": 708,
+   "hash": "0e0749a7a9ea570bf5dd4e2b30502cb0c338ebd23878691922a8d38e2237f330",
+   "steps": 1491,
+   "result": "rival:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "AIM 1#1",
+   "group": "AIM",
+   "seed": 709,
+   "hash": "7e856f1530a6291ebbbd3947f64d83266facf4be56131f68fdfe00bcf1ac322c",
+   "steps": 1223,
+   "result": "rival:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "PHASE 0",
+   "group": "PHASE",
+   "seed": 800,
+   "hash": "3c5fb911e9feee9d996677dddca25d8166726910f2335170b441392858576be9",
+   "steps": 1655,
+   "result": "rival:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "PHASE 1",
+   "group": "PHASE",
+   "seed": 800,
+   "hash": "e0e7b007677fb83306a9e481ac8a440eeac13a5527e7daaae6016eed845a88ac",
+   "steps": 1607,
+   "result": "rival:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "PHASE 2",
+   "group": "PHASE",
+   "seed": 800,
+   "hash": "098f22710e024d40c30be875e47ab3597577ddc35530d3d4d93a1c5d46668b39",
+   "steps": 1291,
+   "result": "rival:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "PHASE 3",
+   "group": "PHASE",
+   "seed": 800,
+   "hash": "a576b084f8f1c89f80d121b08d285f0a68029d214050f79cf267848ddd275b21",
+   "steps": 1099,
+   "result": "rival:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "PHASE 4",
+   "group": "PHASE",
+   "seed": 800,
+   "hash": "d43490c7947c8c5acad3ec0a869e1e369d0d46db4a8c8af42981f0da13c4aab6",
+   "steps": 1412,
+   "result": "rival:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "PHASE 5",
+   "group": "PHASE",
+   "seed": 800,
+   "hash": "c78b049d49dc78dacac768df0c97f11c7e09f4d12b7dd6ccebeed17c32f0bc5c",
+   "steps": 1622,
+   "result": "rival:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "POWER 0.3#0",
+   "group": "POWER",
+   "seed": 900,
+   "hash": "d138253657c56a6cae852b44237a4e60bdce5bb2a8b36de486d0dce320cc600c",
+   "steps": 2009,
+   "result": "rival:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "POWER 0.3#1",
+   "group": "POWER",
+   "seed": 901,
+   "hash": "79e021d301143aa36dedd9ae97eac13352d2c92810ea55c00aededb2ade59c50",
+   "steps": 1947,
+   "result": "rival:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "POWER 0.5#0",
+   "group": "POWER",
+   "seed": 902,
+   "hash": "369453d7caf51fca19648cdcb14b605da7dc866765319a7c194c398778e04682",
+   "steps": 2533,
+   "result": "rival:spin",
+   "breakouts": 1,
+   "wobbleBreaks": 1
+  },
+  {
+   "name": "POWER 0.5#1",
+   "group": "POWER",
+   "seed": 903,
+   "hash": "660a9a36abc8f217db307e5a3c6f3f818990491de67e94852e172e60361e1426",
+   "steps": 2866,
+   "result": "rival:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "POWER 0.7#0",
+   "group": "POWER",
+   "seed": 904,
+   "hash": "e11bb903bb4767cdb01ccc34eb80233330b219bd25935b724f55f1a81d0ba2d7",
+   "steps": 3511,
+   "result": "rival:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "POWER 0.7#1",
+   "group": "POWER",
+   "seed": 905,
+   "hash": "ed980870cc57cfe51cfdb4ca390a9742f9526547fe37717f9cc1677cf5fb66c4",
+   "steps": 3528,
+   "result": "player:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "POWER 0.85#0",
+   "group": "POWER",
+   "seed": 906,
+   "hash": "9bdfbb9b01c9ebc79fdd2c62ec87472565d1103b92aa85aeb30dd85e1a1fb2b8",
+   "steps": 3096,
+   "result": "player:spin",
+   "breakouts": 1,
+   "wobbleBreaks": 1
+  },
+  {
+   "name": "POWER 0.85#1",
+   "group": "POWER",
+   "seed": 907,
+   "hash": "b2d4356f55d7c86056c931841fb8a89d2bc37f40706e530a7c30633cbed20905",
+   "steps": 3687,
+   "result": "player:spin",
+   "breakouts": 1,
+   "wobbleBreaks": 1
+  },
+  {
+   "name": "POWER 1#0",
+   "group": "POWER",
+   "seed": 908,
+   "hash": "3d500b9d4cb1883f0010b6441d34935cd48808fdb27586b4a5f128ee8bb1b460",
+   "steps": 2882,
+   "result": "player:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "POWER 1#1",
+   "group": "POWER",
+   "seed": 909,
+   "hash": "c1138433609cd7a3855347059e577cf9722f7c0063ea42c678c31fcbc0d4ffd9",
+   "steps": 3096,
+   "result": "player:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "EDGE A/D aim 1",
+   "group": "LONG",
+   "seed": 1000,
+   "hash": "03b397c8d72472274ea7b4b93c017ffe0364a239c0f6eb5b7d31dcaf36804c68",
+   "steps": 1550,
+   "result": "rival:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "EDGE A/D aim -1",
+   "group": "LONG",
+   "seed": 1001,
+   "hash": "30b5dcbc50495a9a093e51a92b84fc3faf30e27a2c5e8c2724a60bed6370d0dd",
+   "steps": 1691,
+   "result": "rival:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "LONG S/S#0",
+   "group": "LONG",
+   "seed": 1010,
+   "hash": "3779179a7c0fd5e5f81605978ad06ac9ff59873ae85184e8451555a3a42d3d94",
+   "steps": 11592,
+   "result": "player:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "LONG S/S#1",
+   "group": "LONG",
+   "seed": 1011,
+   "hash": "408a72a3ba2c0788ef9912144fc89db7b738b13aa1a91971bca746e4eec3e5c8",
+   "steps": 9374,
+   "result": "player:spin",
+   "breakouts": 1,
+   "wobbleBreaks": 1
+  },
+  {
+   "name": "LONG A/A#0",
+   "group": "LONG",
+   "seed": 1020,
+   "hash": "25e09aebd11ad04795626f5be72d799932302f4759a1607c1be81b9d956eef67",
+   "steps": 1104,
+   "result": "player:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "LONG A/A#1",
+   "group": "LONG",
+   "seed": 1021,
+   "hash": "5ea59b48c8c7b9b58da2206d9b21000b83afb7d812126e2f423a2a6b3bffb3eb",
+   "steps": 1204,
+   "result": "player:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "FEELBAL#1000",
+   "group": "FEELBAL",
+   "seed": 1000,
+   "hash": "41c9633c275b87a9f0438e9d33fa255bdf64e44f6fed2885b9352a5c515cf264",
+   "steps": 2630,
+   "result": "player:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "FEELBAL#1001",
+   "group": "FEELBAL",
+   "seed": 1001,
+   "hash": "2792c16d4564b58f0efa5112cdfefb936213d3658e692a2d4d0d0b2aaf557df4",
+   "steps": 3354,
+   "result": "rival:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "FEELBAL#1002",
+   "group": "FEELBAL",
+   "seed": 1002,
+   "hash": "4325c189f904a2128db4b989e3271f25859b67fb868ca36264176bc6377d383e",
+   "steps": 3393,
+   "result": "player:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "FEELBAL#1003",
+   "group": "FEELBAL",
+   "seed": 1003,
+   "hash": "52e40a2d447725033b8fc9fef94511a96949dbe41bdca408c5cdb12ede59ea6b",
+   "steps": 3270,
+   "result": "player:spin",
+   "breakouts": 1,
+   "wobbleBreaks": 1
+  },
+  {
+   "name": "FEELBAL#1004",
+   "group": "FEELBAL",
+   "seed": 1004,
+   "hash": "8f18e8e69469e897f59a5e5b4ab31fd5f6c479c0f1ba6a8f42dedf49f0611c5d",
+   "steps": 3723,
+   "result": "rival:spin",
+   "breakouts": 1,
+   "wobbleBreaks": 1
+  },
+  {
+   "name": "FEELBAL#1005",
+   "group": "FEELBAL",
+   "seed": 1005,
+   "hash": "c4f1e7024b4e4b4f2f1fc22091a2d766b69e1758ec1d3639826c92c2819109d4",
+   "steps": 3384,
+   "result": "rival:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "FEELSTA#3000",
+   "group": "FEELSTA",
+   "seed": 3000,
+   "hash": "b41cc977e78f155ac48504e199667f5d48e98258a43f6e99fc17efaa3f21c444",
+   "steps": 11022,
+   "result": "player:spin",
+   "breakouts": 2,
+   "wobbleBreaks": 2
+  },
+  {
+   "name": "FEELSTA#3001",
+   "group": "FEELSTA",
+   "seed": 3001,
+   "hash": "2121e92d77f6e3636634fb1207efe2da338436957f560ea6f90d4745375914ea",
+   "steps": 8261,
+   "result": "player:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "FEELSTA#3002",
+   "group": "FEELSTA",
+   "seed": 3002,
+   "hash": "222e30f08b0ba259cc5ef0d06ef88b1f346b5fff4354f483ebb65c8643f93590",
+   "steps": 10706,
+   "result": "player:spin",
+   "breakouts": 1,
+   "wobbleBreaks": 1
+  },
+  {
+   "name": "FEELSTA#3003",
+   "group": "FEELSTA",
+   "seed": 3003,
+   "hash": "b74dfa2608be24e7dc724ded322a672747e89b2ed050b9b83d3f46d6fd035cbe",
+   "steps": 9580,
+   "result": "player:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "NNPOW 0.3#0",
+   "group": "NNPOW",
+   "seed": 4000,
+   "hash": "e66a4f09c3c0eb4bfcdb8f9445bbd99c5759de1a44d66fca83aba2859eb36051",
+   "steps": 7452,
+   "result": "player:spin",
+   "breakouts": 1,
+   "wobbleBreaks": 1
+  },
+  {
+   "name": "NNPOW 0.3#1",
+   "group": "NNPOW",
+   "seed": 4001,
+   "hash": "aaad8cc214221c2d71327a189770139c18f14113ba4ad3b7e4b2b16574cee57c",
+   "steps": 7649,
+   "result": "player:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "NNPOW 0.3#2",
+   "group": "NNPOW",
+   "seed": 4002,
+   "hash": "c168ea3e886d7c7123ae07ce795ecf48f342c0cad7631f5bbf8ce3311135ae42",
+   "steps": 9121,
+   "result": "player:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "NNPOW 0.3#3",
+   "group": "NNPOW",
+   "seed": 4003,
+   "hash": "a70a6bafdf6371a20cd06f0e196444832b04f6f2264bb51eec2779a78a7aaca8",
+   "steps": 7917,
+   "result": "player:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "NNPOW 0.45#0",
+   "group": "NNPOW",
+   "seed": 4010,
+   "hash": "754820a0f396756d98a180b7729aa1dd7bf8e35df079b72a6c6dec7deef73bf6",
+   "steps": 8362,
+   "result": "player:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "NNPOW 0.45#1",
+   "group": "NNPOW",
+   "seed": 4011,
+   "hash": "f32273e757d06db74d7ec843430d6757666312dfaee669959e1fb5cc8a3aea93",
+   "steps": 8658,
+   "result": "player:spin",
+   "breakouts": 1,
+   "wobbleBreaks": 1
+  },
+  {
+   "name": "NNPOW 0.45#2",
+   "group": "NNPOW",
+   "seed": 4012,
+   "hash": "2ae8c148926fbd216dc5b173341590fe1be3449496bec773976abcd8f44b98f0",
+   "steps": 8602,
+   "result": "player:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "NNPOW 0.45#3",
+   "group": "NNPOW",
+   "seed": 4013,
+   "hash": "aeb53202884ea5d068acd499be5011fb2a700e14be0881c0036eafa6c7d818a9",
+   "steps": 8830,
+   "result": "player:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "NNPOW 0.9#0",
+   "group": "NNPOW",
+   "seed": 4020,
+   "hash": "2a2b87191b7eaff3f2501d12d32ad855ba5284a1c9525851798428943b5cff63",
+   "steps": 11594,
+   "result": "player:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "NNPOW 0.9#1",
+   "group": "NNPOW",
+   "seed": 4021,
+   "hash": "69767b795bf0176cfa8b65bc45817a8d33dbb2d3409843a63550c04a6bffc4ae",
+   "steps": 11495,
+   "result": "player:spin",
+   "breakouts": 1,
+   "wobbleBreaks": 1
+  },
+  {
+   "name": "NNPOW 0.9#2",
+   "group": "NNPOW",
+   "seed": 4022,
+   "hash": "25d13311099e817396a701dd5caba40e335a78d8582a3b5710aed7a9f0fe31c8",
+   "steps": 11575,
+   "result": "player:spin",
+   "breakouts": 1,
+   "wobbleBreaks": 1
+  },
+  {
+   "name": "NNPOW 0.9#3",
+   "group": "NNPOW",
+   "seed": 4023,
+   "hash": "4ab790d28031400c20dbaae61c0e48bb8425389def4531ff139ffb5499f6e64b",
+   "steps": 11868,
+   "result": "player:spin",
+   "breakouts": 2,
+   "wobbleBreaks": 2
+  },
+  {
+   "name": "CTRL center NN#0",
+   "group": "CTRL",
+   "seed": 5000,
+   "hash": "082951ef282a4373125de6b2770c7e72f33ceb13510d4097379f32062820185d",
+   "steps": 7200,
+   "result": "timeout",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "CTRL center NN#1",
+   "group": "CTRL",
+   "seed": 5001,
+   "hash": "0c27caf09129217ccef9f18b0bbc12c1a92542298b3da3791ac00384b62d1e41",
+   "steps": 7200,
+   "result": "timeout",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "CTRL center BB#0",
+   "group": "CTRL",
+   "seed": 5010,
+   "hash": "2fed5b548e94dbce06c2f14bd9ea6350700cbe4420290c1a69f466b2b1b6827a",
+   "steps": 3379,
+   "result": "player:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "CTRL center BB#1",
+   "group": "CTRL",
+   "seed": 5011,
+   "hash": "7ef1fc3e2b6e3837990ccb6beda7113e297c44cb120936320f29511be51bc815",
+   "steps": 3206,
+   "result": "player:spin",
+   "breakouts": 1,
+   "wobbleBreaks": 1
+  },
+  {
+   "name": "CTRL center NR#0",
+   "group": "CTRL",
+   "seed": 5020,
+   "hash": "7088ed839fcc1198792eb60e8024d55910538efc287826a79b4f5dac4a25ac40",
+   "steps": 1842,
+   "result": "player:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "CTRL center NR#1",
+   "group": "CTRL",
+   "seed": 5021,
+   "hash": "837fc0cb10fe614736fb33a08b4916ec54281913a25b872eb10d5ce7ba58e7b4",
+   "steps": 1657,
+   "result": "player:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "CTRL wall NN#0",
+   "group": "CTRL",
+   "seed": 5100,
+   "hash": "a2d86b5cd57c064838444b17936f14c6e24c8fc230404c58dba1a7fe37a60e52",
+   "steps": 7200,
+   "result": "timeout",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "CTRL wall NN#1",
+   "group": "CTRL",
+   "seed": 5101,
+   "hash": "4f69a535c1459fe8440d0942df731b9e80e767d0976f5e30157b8b03453c4494",
+   "steps": 7200,
+   "result": "timeout",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "CTRL wall BB#0",
+   "group": "CTRL",
+   "seed": 5110,
+   "hash": "3e3e4e86087cc5d1b66a0ae1e8393b2c92b12eff672f6c8391fdf90b838a0cc0",
+   "steps": 2815,
+   "result": "player:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "CTRL wall BB#1",
+   "group": "CTRL",
+   "seed": 5111,
+   "hash": "e413d4c0bcf65f3ce47956fab04e531b07c1be083dadb72a8d9fadb7a0ce53d1",
+   "steps": 3282,
+   "result": "player:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "CTRL wall NR#0",
+   "group": "CTRL",
+   "seed": 5120,
+   "hash": "5a2de94922a6ce32c44cf9c00901198158fc2b5e368b25b628876bcdb8bf75a1",
+   "steps": 1378,
+   "result": "player:spin",
+   "breakouts": 1,
+   "wobbleBreaks": 1
+  },
+  {
+   "name": "CTRL wall NR#1",
+   "group": "CTRL",
+   "seed": 5121,
+   "hash": "ad058b246116615e201b68d6065d4d38908e5e04e8e17ad93f472f09c3289134",
+   "steps": 1546,
+   "result": "player:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "CTRL graze NN#0",
+   "group": "CTRL",
+   "seed": 5200,
+   "hash": "afa96c524ca364398fbeb6e13193a48d7e5704ddebbfc8885d26668cfbb7b945",
+   "steps": 7200,
+   "result": "timeout",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "CTRL graze NN#1",
+   "group": "CTRL",
+   "seed": 5201,
+   "hash": "1bb3526d413bd2dc8494a2ebf9b5450ace4229e6ea3868aac0c3256ef448bb20",
+   "steps": 7200,
+   "result": "timeout",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "CTRL graze BB#0",
+   "group": "CTRL",
+   "seed": 5210,
+   "hash": "3dc392b385a47025bd25d4a4467588a4c961ad5d7108cd515d8b4a3830515344",
+   "steps": 3100,
+   "result": "player:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "CTRL graze BB#1",
+   "group": "CTRL",
+   "seed": 5211,
+   "hash": "a9dde0a21e52cbf85cab278efec93a4f687c7fa51d48f9f99278362124c1966d",
+   "steps": 3321,
+   "result": "player:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "CTRL graze NR#0",
+   "group": "CTRL",
+   "seed": 5220,
+   "hash": "2b7db5067665dbffc880fc943b340f54714a61eb27fc95ae84b949283057c81f",
+   "steps": 1562,
+   "result": "player:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  },
+  {
+   "name": "CTRL graze NR#1",
+   "group": "CTRL",
+   "seed": 5221,
+   "hash": "fec70720a24d8af99756381e609e51fb0e5b70ef592ac186fe6a9b177b848065",
+   "steps": 1869,
+   "result": "player:spin",
+   "breakouts": 0,
+   "wobbleBreaks": 0
+  }
+ ]
+}

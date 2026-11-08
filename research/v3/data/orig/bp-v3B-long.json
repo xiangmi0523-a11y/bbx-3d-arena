@@ -1,0 +1,610 @@
+{
+ "summary": {
+  "version": "v3B-long",
+  "tune": null,
+  "runs": 6,
+  "totalStall": 0,
+  "totalWobble": 1,
+  "matchesWithStall": 0,
+  "matchesWithWobble": 1,
+  "timeouts": 0
+ },
+ "matches": [
+  {
+   "name": "EDGE A/D aim 1",
+   "group": "LONG",
+   "seed": 1000,
+   "player": "blaze-fang/rush-rubber",
+   "rival": "tidal-bastion/dome-ball",
+   "result": "rival:spin",
+   "duration": 12.92,
+   "nStall": 0,
+   "nWobble": 0,
+   "triggers": [],
+   "episodes": [
+    {
+     "t0": 0.39,
+     "t1": 0.43,
+     "dur": 0.03,
+     "maxTilt": 0.13,
+     "minRatio": 0.901,
+     "triggers": 0
+    },
+    {
+     "t0": 1.89,
+     "t1": 2.04,
+     "dur": 0.15,
+     "maxTilt": 0.12,
+     "minRatio": 0.661,
+     "triggers": 0
+    },
+    {
+     "t0": 6.22,
+     "t1": 6.25,
+     "dur": 0.03,
+     "maxTilt": 0.12,
+     "minRatio": 0.424,
+     "triggers": 0
+    },
+    {
+     "t0": 7.93,
+     "t1": 8.01,
+     "dur": 0.08,
+     "maxTilt": 0.18,
+     "minRatio": 0.299,
+     "triggers": 0
+    },
+    {
+     "t0": 9.32,
+     "t1": 9.38,
+     "dur": 0.05,
+     "maxTilt": 0.15,
+     "minRatio": 0.202,
+     "triggers": 0
+    }
+   ],
+   "death": {
+    "start": 9.68,
+    "dur": 3.23,
+    "contactFrac": 0
+   },
+   "endSpin": [
+    0,
+    71.48
+   ],
+   "endTilt": [
+    0.96,
+    0.02
+   ]
+  },
+  {
+   "name": "EDGE A/D aim -1",
+   "group": "LONG",
+   "seed": 1001,
+   "player": "blaze-fang/rush-rubber",
+   "rival": "tidal-bastion/dome-ball",
+   "result": "rival:spin",
+   "duration": 14.09,
+   "nStall": 0,
+   "nWobble": 0,
+   "triggers": [],
+   "episodes": [
+    {
+     "t0": 0.62,
+     "t1": 0.64,
+     "dur": 0.02,
+     "maxTilt": 0.1,
+     "minRatio": 0.869,
+     "triggers": 0
+    },
+    {
+     "t0": 1.55,
+     "t1": 1.58,
+     "dur": 0.03,
+     "maxTilt": 0.16,
+     "minRatio": 0.707,
+     "triggers": 0
+    },
+    {
+     "t0": 3.31,
+     "t1": 3.42,
+     "dur": 0.11,
+     "maxTilt": 0.08,
+     "minRatio": 0.634,
+     "triggers": 0
+    },
+    {
+     "t0": 3.97,
+     "t1": 4.02,
+     "dur": 0.05,
+     "maxTilt": 0.19,
+     "minRatio": 0.577,
+     "triggers": 0
+    },
+    {
+     "t0": 4.71,
+     "t1": 4.76,
+     "dur": 0.05,
+     "maxTilt": 0.12,
+     "minRatio": 0.484,
+     "triggers": 0
+    },
+    {
+     "t0": 5.54,
+     "t1": 5.63,
+     "dur": 0.08,
+     "maxTilt": 0.23,
+     "minRatio": 0.388,
+     "triggers": 0
+    },
+    {
+     "t0": 6.98,
+     "t1": 7.51,
+     "dur": 0.53,
+     "maxTilt": 0.17,
+     "minRatio": 0.258,
+     "triggers": 0
+    },
+    {
+     "t0": 8.72,
+     "t1": 8.98,
+     "dur": 0.26,
+     "maxTilt": 0.15,
+     "minRatio": 0.209,
+     "triggers": 0
+    },
+    {
+     "t0": 9.95,
+     "t1": 10.63,
+     "dur": 0.68,
+     "maxTilt": 0.11,
+     "minRatio": 0.161,
+     "triggers": 0
+    },
+    {
+     "t0": 11.53,
+     "t1": 11.88,
+     "dur": 0.36,
+     "maxTilt": 0.17,
+     "minRatio": 0.116,
+     "triggers": 0
+    }
+   ],
+   "death": {
+    "start": 9.32,
+    "dur": 4.78,
+    "contactFrac": 0.218
+   },
+   "endSpin": [
+    0,
+    43.46
+   ],
+   "endTilt": [
+    0.63,
+    0
+   ]
+  },
+  {
+   "name": "LONG S/S#0",
+   "group": "LONG",
+   "seed": 1010,
+   "player": "titan-crown/needle-point",
+   "rival": "tidal-bastion/needle-point",
+   "result": "player:spin",
+   "duration": 96.6,
+   "nStall": 0,
+   "nWobble": 0,
+   "triggers": [],
+   "episodes": [
+    {
+     "t0": 0.36,
+     "t1": 0.4,
+     "dur": 0.04,
+     "maxTilt": 0.06,
+     "minRatio": 0.918,
+     "triggers": 0
+    },
+    {
+     "t0": 2.62,
+     "t1": 2.83,
+     "dur": 0.22,
+     "maxTilt": 0.14,
+     "minRatio": 0.873,
+     "triggers": 0
+    },
+    {
+     "t0": 4.65,
+     "t1": 5.75,
+     "dur": 1.1,
+     "maxTilt": 0.09,
+     "minRatio": 0.817,
+     "triggers": 0
+    },
+    {
+     "t0": 5.79,
+     "t1": 7.11,
+     "dur": 1.32,
+     "maxTilt": 0.03,
+     "minRatio": 0.794,
+     "triggers": 0
+    },
+    {
+     "t0": 7.74,
+     "t1": 8.91,
+     "dur": 1.17,
+     "maxTilt": 0.03,
+     "minRatio": 0.777,
+     "triggers": 0
+    },
+    {
+     "t0": 9.66,
+     "t1": 10.38,
+     "dur": 0.72,
+     "maxTilt": 0.03,
+     "minRatio": 0.764,
+     "triggers": 0
+    },
+    {
+     "t0": 13.21,
+     "t1": 13.55,
+     "dur": 0.34,
+     "maxTilt": 0.03,
+     "minRatio": 0.736,
+     "triggers": 0
+    },
+    {
+     "t0": 82.68,
+     "t1": 82.86,
+     "dur": 0.17,
+     "maxTilt": 0.03,
+     "minRatio": 0.19,
+     "triggers": 0
+    },
+    {
+     "t0": 83.55,
+     "t1": 83.99,
+     "dur": 0.44,
+     "maxTilt": 0.02,
+     "minRatio": 0.182,
+     "triggers": 0
+    },
+    {
+     "t0": 86.32,
+     "t1": 86.87,
+     "dur": 0.55,
+     "maxTilt": 0.02,
+     "minRatio": 0.163,
+     "triggers": 0
+    },
+    {
+     "t0": 87.38,
+     "t1": 92.25,
+     "dur": 4.88,
+     "maxTilt": 0.09,
+     "minRatio": 0.121,
+     "triggers": 0
+    },
+    {
+     "t0": 93.57,
+     "t1": 94.3,
+     "dur": 0.73,
+     "maxTilt": 0.54,
+     "minRatio": 0.071,
+     "triggers": 0
+    },
+    {
+     "t0": 94.93,
+     "t1": 95.58,
+     "dur": 0.64,
+     "maxTilt": 0.46,
+     "minRatio": 0.054,
+     "triggers": 0
+    }
+   ],
+   "death": {
+    "start": 81.41,
+    "dur": 15.19,
+    "contactFrac": 0.488
+   },
+   "endSpin": [
+    30.29,
+    0
+   ],
+   "endTilt": [
+    0.1,
+    0.7
+   ]
+  },
+  {
+   "name": "LONG S/S#1",
+   "group": "LONG",
+   "seed": 1011,
+   "player": "titan-crown/needle-point",
+   "rival": "tidal-bastion/needle-point",
+   "result": "player:spin",
+   "duration": 78.12,
+   "nStall": 0,
+   "nWobble": 1,
+   "triggers": [
+    {
+     "idx": 0,
+     "t": 77.508,
+     "type": "wobble",
+     "pre": {
+      "t": 77.5,
+      "d": 1.006,
+      "touching": true,
+      "nearStall": true,
+      "aSpin": 39.98,
+      "bSpin": 6.15,
+      "aRatio": 0.26,
+      "bRatio": 0.04,
+      "aTilt": 0.086,
+      "bTilt": 0.785,
+      "aTiltEx": 0.056,
+      "bTiltEx": 0.755,
+      "aSpeed": 0.02,
+      "bSpeed": 0.84,
+      "aBO": 0,
+      "bBO": 0,
+      "aState": "contact",
+      "bState": "contact",
+      "stallFor": 0,
+      "wobbleFor": 0.8,
+      "wobbleCool": 0
+     },
+     "contactDur": 0.81,
+     "low": "b",
+     "cond": {
+      "touching": true,
+      "lowSpin": 0.04,
+      "lowTiltEx": 0.755,
+      "highSpin": 0.26,
+      "highCanDrive": true
+     },
+     "post": {
+      "p02": {
+       "t": 77.708,
+       "d": 1.067,
+       "touching": false,
+       "nearStall": true,
+       "aSpin": 39.77,
+       "bSpin": 0.91,
+       "aRatio": 0.259,
+       "bRatio": 0.006,
+       "aTilt": 0.122,
+       "bTilt": 0.76,
+       "aTiltEx": 0.092,
+       "bTiltEx": 0.73,
+       "aSpeed": 1.01,
+       "bSpeed": 0.54,
+       "aBO": 0.5,
+       "bBO": 0,
+       "aState": "breakout",
+       "bState": "disengage",
+       "stallFor": 0,
+       "wobbleFor": 0,
+       "wobbleCool": 1.3
+      },
+      "p05": {
+       "t": 78.008,
+       "d": 1.381,
+       "touching": false,
+       "nearStall": true,
+       "aSpin": 39.4,
+       "bSpin": 0,
+       "aRatio": 0.256,
+       "bRatio": 0,
+       "aTilt": 0.2,
+       "bTilt": 0.745,
+       "aTiltEx": 0.17,
+       "bTiltEx": 0.715,
+       "aSpeed": 2.08,
+       "bSpeed": 0.05,
+       "aBO": 0.2,
+       "bBO": 0,
+       "aState": "breakout",
+       "bState": "disengage",
+       "stallFor": 0,
+       "wobbleFor": 0,
+       "wobbleCool": 1
+      },
+      "p07": null,
+      "p10": null
+     },
+     "sepAfter": 0.16,
+     "reAfter": null
+    }
+   ],
+   "episodes": [
+    {
+     "t0": 4.36,
+     "t1": 12.99,
+     "dur": 8.63,
+     "maxTilt": 0.29,
+     "minRatio": 0.727,
+     "triggers": 0
+    },
+    {
+     "t0": 13.24,
+     "t1": 26.18,
+     "dur": 12.94,
+     "maxTilt": 0.05,
+     "minRatio": 0.59,
+     "triggers": 0
+    },
+    {
+     "t0": 26.63,
+     "t1": 27.93,
+     "dur": 1.29,
+     "maxTilt": 0.05,
+     "minRatio": 0.575,
+     "triggers": 0
+    },
+    {
+     "t0": 28.06,
+     "t1": 29.51,
+     "dur": 1.45,
+     "maxTilt": 0.04,
+     "minRatio": 0.562,
+     "triggers": 0
+    },
+    {
+     "t0": 29.96,
+     "t1": 32.44,
+     "dur": 2.48,
+     "maxTilt": 0.03,
+     "minRatio": 0.538,
+     "triggers": 0
+    },
+    {
+     "t0": 33.4,
+     "t1": 74.51,
+     "dur": 41.11,
+     "maxTilt": 0.31,
+     "minRatio": 0.167,
+     "triggers": 0
+    },
+    {
+     "t0": 76.7,
+     "t1": 77.66,
+     "dur": 0.96,
+     "maxTilt": 0.79,
+     "minRatio": 0.008,
+     "triggers": 1
+    }
+   ],
+   "death": {
+    "start": 72.1,
+    "dur": 6.02,
+    "contactFrac": 0.56
+   },
+   "endSpin": [
+    39.25,
+    0
+   ],
+   "endTilt": [
+    0.24,
+    0.75
+   ]
+  },
+  {
+   "name": "LONG A/A#0",
+   "group": "LONG",
+   "seed": 1020,
+   "player": "blaze-fang/rush-rubber",
+   "rival": "blaze-fang/rush-rubber",
+   "result": "player:spin",
+   "duration": 9.2,
+   "nStall": 0,
+   "nWobble": 0,
+   "triggers": [],
+   "episodes": [
+    {
+     "t0": 2.88,
+     "t1": 2.94,
+     "dur": 0.06,
+     "maxTilt": 0.33,
+     "minRatio": 0.499,
+     "triggers": 0
+    },
+    {
+     "t0": 4.53,
+     "t1": 4.62,
+     "dur": 0.08,
+     "maxTilt": 0.23,
+     "minRatio": 0.334,
+     "triggers": 0
+    },
+    {
+     "t0": 5.93,
+     "t1": 5.99,
+     "dur": 0.06,
+     "maxTilt": 0.2,
+     "minRatio": 0.209,
+     "triggers": 0
+    },
+    {
+     "t0": 7.48,
+     "t1": 7.56,
+     "dur": 0.08,
+     "maxTilt": 0.16,
+     "minRatio": 0.131,
+     "triggers": 0
+    }
+   ],
+   "death": {
+    "start": 6.31,
+    "dur": 2.89,
+    "contactFrac": 0.026
+   },
+   "endSpin": [
+    34.54,
+    0.29
+   ],
+   "endTilt": [
+    0.07,
+    0.61
+   ]
+  },
+  {
+   "name": "LONG A/A#1",
+   "group": "LONG",
+   "seed": 1021,
+   "player": "blaze-fang/rush-rubber",
+   "rival": "blaze-fang/rush-rubber",
+   "result": "player:spin",
+   "duration": 10.03,
+   "nStall": 0,
+   "nWobble": 0,
+   "triggers": [],
+   "episodes": [
+    {
+     "t0": 4.14,
+     "t1": 4.18,
+     "dur": 0.04,
+     "maxTilt": 0.1,
+     "minRatio": 0.425,
+     "triggers": 0
+    },
+    {
+     "t0": 5.07,
+     "t1": 5.13,
+     "dur": 0.06,
+     "maxTilt": 0.17,
+     "minRatio": 0.307,
+     "triggers": 0
+    },
+    {
+     "t0": 6.67,
+     "t1": 6.78,
+     "dur": 0.12,
+     "maxTilt": 0.24,
+     "minRatio": 0.229,
+     "triggers": 0
+    },
+    {
+     "t0": 7.96,
+     "t1": 8.07,
+     "dur": 0.11,
+     "maxTilt": 0.24,
+     "minRatio": 0.142,
+     "triggers": 0
+    }
+   ],
+   "death": {
+    "start": 7.91,
+    "dur": 2.13,
+    "contactFrac": 0.051
+   },
+   "endSpin": [
+    47.4,
+    0
+   ],
+   "endTilt": [
+    0.11,
+    0.75
+   ]
+  }
+ ]
+}
