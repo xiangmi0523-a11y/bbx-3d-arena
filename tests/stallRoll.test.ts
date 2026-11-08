@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { STALL_ROLL, StallRollGate, type StallRollInput } from '../src/game/battle/stallRoll';
+import { BEY_TUNING } from '../src/game/beys/BeyPhysics';
 import { loadRapier, PHYSICS_DT } from '../src/game/physics/PhysicsWorld';
 import { seeded } from './motion/motionSim';
 import { scenariosV2, setup } from './diag/stallprobe2.shared';
@@ -62,6 +63,10 @@ describe('针尖僵持自适应滚动阻力门控', () => {
 
   it('对局：只在确认僵持时降低针尖滚动阻力，非针尖组合从不触发', async () => {
     const R = await loadRapier();
+    // 通用僵持脱困开启时针尖对针尖不会进入确认僵持；这里临时关闭它，只为覆盖门控路径
+    const savedBreak = BEY_TUNING.stallBreak;
+    BEY_TUNING.stallBreak = 0;
+    try {
     const scs = scenariosV2();
     for (const name of ['NNPOW 0.3#0', 'CTRL center BB#0', 'CTRL center NR#0']) {
       const sc = scs.find((x) => x.name === name)!;
@@ -71,7 +76,7 @@ describe('针尖僵持自适应滚动阻力门控', () => {
         const { pw, b, A, B } = setup(R, sc);
         let scaled = 0;
         let wrong = 0;
-        for (let s = 0; s < 20 / PHYSICS_DT && !b.result; s++) {
+        for (let s = 0; s < 60 / PHYSICS_DT && !b.result; s++) {
           pw.step();
           for (const x of [A, B]) {
             if (x.rollScale !== 1) scaled++;
@@ -85,6 +90,9 @@ describe('针尖僵持自适应滚动阻力门控', () => {
       } finally {
         Math.random = orig;
       }
+    }
+    } finally {
+      BEY_TUNING.stallBreak = savedBreak;
     }
   });
 });

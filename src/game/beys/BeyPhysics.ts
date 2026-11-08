@@ -99,7 +99,7 @@ export const BEY_TUNING = {
    * 0 = 关闭：不再因“双方低速 + 中心距接近”而给双方脱困牵引，僵持计时 stallFor 保持 0。
    * 关闭只影响通用僵持；死亡摇摆脱离（wobbleBreak）不受影响。
    */
-  stallBreak: 0,
+  stallBreak: 1,
   /** 僵持（两台都几乎不动、贴在一起）多久后触发脱困（秒） */
   stallTime: 0.6,
   /** 脱困持续时间（秒） */

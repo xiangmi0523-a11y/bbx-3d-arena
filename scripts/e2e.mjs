@@ -148,7 +148,7 @@ try {
     bl.player.loadout.blade === 'titan-crown' && bl.playerVisual.blade === 'blade:titan-crown' && bl.playerVisual.disc === 'disc:quad-edge' && bl.playerVisual.tip === 'tip:needle-point',
     JSON.stringify(bl.playerVisual),
   );
-  check('画质：iPhone 3x 屏起始为“高清”档', bl.initialQuality === 'high', `起始=${bl.initialQuality}，当前=${bl.quality}（软件渲染帧率低，会自动降档）`);
+  check('画质：iPhone 起始为“均衡”档（流畅优先）', bl.initialQuality === 'medium', `起始=${bl.initialQuality}，当前=${bl.quality}（软件渲染帧率低，会自动降档）`);
   check('画质：渲染像素比与当前档位一致', Math.abs(bl.pixelRatio - bl.expectedPixelRatio) < 0.01, `pixelRatio=${bl.pixelRatio}`);
   // ── P2.1 清晰度：画布缓冲区必须与屏幕物理像素 1:1 ──
   await page.evaluate(() => window.__game.setQuality('high'));
@@ -166,12 +166,12 @@ try {
   await page.evaluate(() => window.__game.setQuality('medium'));
   await page.waitForTimeout(200);
   const md = await page.evaluate(() => window.__game.debugState());
-  check('清晰度：中档仍为原生 3x（只降阴影和粒子）', md.pixelRatio === 3, `pixelRatio=${md.pixelRatio}`);
+  check('清晰度：均衡档 2x（省开销光照）', md.pixelRatio === 2, `pixelRatio=${md.pixelRatio}`);
   await page.evaluate(() => window.__game.setQuality('low'));
   await page.waitForTimeout(200);
   const low = await page.evaluate(() => window.__game.debugState());
-  check('清晰度：最低档不低于 2x', low.pixelRatio >= 2, `pixelRatio=${low.pixelRatio}`);
-  // 软件渲染（无 GPU）下 3x 截图非常慢，后续截图用最低档 2x；真机按自动档位运行
+  check('清晰度：流畅档 1.5x', low.pixelRatio === 1.5, `pixelRatio=${low.pixelRatio}`);
+  // 软件渲染（无 GPU）下 3x 截图非常慢，后续截图用流畅档 1.5x；真机按自动档位运行
   page.setDefaultTimeout(90000);
 
   // ── P2.1 性能：满粒子时特效更新的 CPU 开销、绘制调用数 ──

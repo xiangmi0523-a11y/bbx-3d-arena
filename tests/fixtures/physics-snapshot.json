@@ -163,7 +163,7 @@
     "launchMinAggr": 0.2,
     "backoffEdge": 2,
     "runupAngle": 0.9,
-    "stallBreak": 0,
+    "stallBreak": 1,
     "stallTime": 0.6,
     "breakoutTime": 0.7,
     "wobbleBreak": 1,
