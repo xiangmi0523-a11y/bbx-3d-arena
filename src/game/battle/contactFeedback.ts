@@ -6,7 +6,8 @@
  * 微接触（刀刃凸起一下下地碰），大部分低于撞击事件门槛，没有任何声音和火花。
  *
  * 这里把三层反馈放进同一个接触生命周期里：
- *  - 接触段（episode）：本步 Rapier 接触流形里有法向冲量 = 真实接触。
+ *  - 接触段（episode）：本步有几何接触（求解器 signed distance ≤ 0，含零冲量穿透）或求解器给出了法向冲量
+ *    （分类与原始证据见 contactSampling.ts / BattleSystem.contactEvidence）。
  *    最后一次真实接触后 holdTime 内再次接触，算同一段（刀刃凸起的颤动接触），超过就结束；
  *  - A 轻擦（graze）：接触段刚开始、累计接触时间还很短。反馈强度按真实法向力和滑动速度，再乘 grazeGain；
  *  - B 持续摩擦（grind）：接触段持续超过 grindOnset 且真实接触步数够多。强度连续变化，
@@ -23,9 +24,9 @@ import type { ImpactTier } from './impactTiers';
 export type ContactPhase = 'idle' | 'graze' | 'grind';
 
 export interface ContactSample {
-  /** 本步是否有真实接触（Rapier 法向接触冲量 > 0） */
+  /** 本步是否有接触：几何接触（求解器 signed distance ≤ 0，零冲量穿透也算）或 法向接触冲量 > 0。由 BattleSystem 从独立的证据维度得出 */
   touching: boolean;
-  /** 本步法向接触力（N）= 法向冲量 / 步长 */
+  /** 本步法向接触力（N）= 法向冲量 / 步长（零冲量穿透时为 0） */
   force: number;
   /** 接触面切向相对滑动速度（m/s，包含转速带来的表面速度） */
   slide: number;

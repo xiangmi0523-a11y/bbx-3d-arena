@@ -6,6 +6,7 @@ import { computeLaunch, type Side } from '../launcher/launch';
 import type { LaunchCommand } from '../launcher/PullStringGesture';
 import type { PhysicsWorld } from '../physics/PhysicsWorld';
 import { ContactFeedback, type ContactSample, type ImpactDecision } from './contactFeedback';
+import { boundingRadius, canSkip, classifyContact, emptyEvidence, queryContact, type ContactClass, type ContactEvidence } from './contactSampling';
 import { impactTier, type ImpactTier } from './impactTiers';
 
 export type FinishType = 'spin' | 'over' | 'xtreme';
@@ -99,6 +100,13 @@ export class BattleSystem {
   readonly contact = new ContactFeedback();
   /** 诊断：本场查询接触流形的物理步数 */
   contactQueries = 0;
+  /** 本步接触观测（只读）：原始证据与分类，各维度独立；未采样的步 valid = false */
+  readonly contactEvidence: ContactEvidence = emptyEvidence();
+  contactClass: ContactClass = classifyContact(this.contactEvidence);
+  /** 诊断计数（步）：包围球门槛跳过、几何接触、预测间隙、冲量响应、几何接触但零冲量、有冲量但无几何接触 */
+  readonly contactStats = { skipped: 0, geometric: 0, predictive: 0, impulse: 0, geometricZeroImpulse: 0, impulseNoGeometric: 0 };
+  /** 两台刚体的包围球半径（首次采样时由碰撞体计算） */
+  private bound: { a: BeyPhysics; b: BeyPhysics; ra: number; rb: number } | null = null;
   private readonly sample: ContactSample = { touching: false, force: 0, slide: 0, x: 0, y: 0, z: 0, nx: 1, nz: 0, tx: 0, tz: 1 };
   private lastHit = -1;
   private readonly pw: PhysicsWorld;
@@ -234,20 +242,42 @@ export class BattleSystem {
   }
 
   /**
-   * 读取本步两台陀螺之间的真实接触（只读）：Rapier 法向接触冲量 → 法向力，
-   * 碰撞前速度 + 转速 → 接触面切向滑动速度。两台离得远（外缘间距 > 0.12 m）时不查询，返回 null。
+   * 读取本步两台陀螺之间的接触（只读，见 contactSampling.ts）。
+   * 先用包围球门槛排除物理上不可能有接触流形的步（与姿态无关，倾斜的刀刃边缘也覆盖），再查询全部碰撞体对。
+   * 原始证据写进 contactEvidence，分类写进 contactClass，二者各维度独立。
+   * 交给接触反馈的 touching = 几何接触（求解器 signed distance ≤ 0，包括零冲量穿透）或 求解器给出了法向冲量；
+   * 力 = 法向冲量 / 步长（零冲量穿透时为 0）。没有查询的步返回 null。
    */
   private sampleContact(a: BeyPhysics, b: BeyPhysics, dt: number): ContactSample | null {
+    const e = this.contactEvidence;
+    Object.assign(e, emptyEvidence());
+    if (!this.bound || this.bound.a !== a || this.bound.b !== b) {
+      const R = this.pw.R;
+      this.bound = { a, b, ra: boundingRadius(R, a.colliders), rb: boundingRadius(R, b.colliders) };
+    }
     const pa = a.body.translation();
     const pb = b.body.translation();
+    const ip = this.pw.world.integrationParameters;
+    if (canSkip(pa, pb, a.body.linvel(), b.body.linvel(), this.bound.ra, this.bound.rb, dt, ip.normalizedPredictionDistance * ip.lengthUnit)) {
+      e.skipped = 'bound';
+      this.contactClass = classifyContact(e);
+      this.contactStats.skipped++;
+      return null;
+    }
+    this.contactQueries++;
+    queryContact(this.pw.world, a.colliders, b.colliders, e);
+    const c = (this.contactClass = classifyContact(e));
+    const st = this.contactStats;
+    if (c.geometric) st.geometric++;
+    if (c.predictive) st.predictive++;
+    if (c.impulseResponse) st.impulse++;
+    if (c.geometric && !c.impulseResponse) st.geometricZeroImpulse++;
+    if (c.impulseResponse && !c.geometric) st.impulseNoGeometric++;
     let nx = pb.x - pa.x;
     let nz = pb.z - pa.z;
     const len = Math.hypot(nx, nz) || 1;
-    if (len > a.spec.outerRadius + b.spec.outerRadius + 0.12) return null;
-    this.contactQueries++;
-    const impulse = this.contactImpulse(a, b);
     const s = this.sample;
-    s.touching = impulse > 0;
+    s.touching = c.geometric || c.impulseResponse;
     if (!s.touching) return s;
     nx /= len;
     nz /= len;
@@ -263,7 +293,7 @@ export class BattleSystem {
     const tx = ux - un * nx;
     const tz = uz - un * nz;
     const slide = Math.hypot(tx, tz);
-    s.force = impulse / dt;
+    s.force = e.impulse / dt;
     s.slide = slide;
     s.tx = slide > 1e-6 ? tx / slide : -nz;
     s.tz = slide > 1e-6 ? tz / slide : nx;
