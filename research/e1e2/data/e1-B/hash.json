@@ -1,0 +1,126 @@
+{
+ "tag": "B",
+ "grip": 0.05,
+ "runs": [
+  {
+   "name": "LONG S/S#0",
+   "hash": "435f2b4b3b6a566dc67af1b726e25af476c92721d4e5a6eb5addfb4fded0ae5f",
+   "steps": 9793
+  },
+  {
+   "name": "LONG S/S#1",
+   "hash": "d3a03739ec2605e90367480d8ab4f54b7f43399ba27e8f6093afbf084a16b808",
+   "steps": 2958
+  },
+  {
+   "name": "FEELSTA#3000",
+   "hash": "92c07c0b7f944acf55ead08fd6912c5facb3105e75e6ee58270e190c86dee84a",
+   "steps": 2688
+  },
+  {
+   "name": "FEELSTA#3001",
+   "hash": "a57d7dff6e625057049f9ba4f921eb866d3abb632918601952692399726e05ac",
+   "steps": 6691
+  },
+  {
+   "name": "FEELSTA#3002",
+   "hash": "9b6de462225f76f500a93103fe848b93b3b81fd57e6c3cbc315f379674bc275e",
+   "steps": 8239
+  },
+  {
+   "name": "FEELSTA#3003",
+   "hash": "6c0e65df1a5b9c2b4234b2f16331566cb6d28c9f0c061d3e07e1a423432acc10",
+   "steps": 7709
+  },
+  {
+   "name": "NNPOW 0.3#0",
+   "hash": "8801f8057f84291502df1be9ed693967d25dbf6d439e317e1a50094b07139109",
+   "steps": 5743
+  },
+  {
+   "name": "NNPOW 0.3#1",
+   "hash": "3449cb8ca2a5a849b5795a2ffb33cb81cec08064593766081e973ad5f2758168",
+   "steps": 5425
+  },
+  {
+   "name": "NNPOW 0.3#2",
+   "hash": "6a9e60d199dbcff6a19b7e36b96acdbc872d5fc5fdc92b3e51863881c4b71491",
+   "steps": 5556
+  },
+  {
+   "name": "NNPOW 0.3#3",
+   "hash": "ff2cebe3827bd7db6ad961e4820792f53a9775a61f5202e65facd30b867ea010",
+   "steps": 5510
+  },
+  {
+   "name": "NNPOW 0.45#0",
+   "hash": "d8ff6aa8e76298ac25fec48898845f557247e46155ac99dababaf1171621c615",
+   "steps": 6272
+  },
+  {
+   "name": "NNPOW 0.45#1",
+   "hash": "ece6753443e0d2d0a1f01245010c9861d46cc5204dc30b71f88651c0b517d18f",
+   "steps": 6446
+  },
+  {
+   "name": "NNPOW 0.45#2",
+   "hash": "0d67601df6bd0d52a8fc8b26c1e2d6882206688e80d3a7ac0209984b41713af6",
+   "steps": 6441
+  },
+  {
+   "name": "NNPOW 0.45#3",
+   "hash": "2807aa142dd8da7c7c4b506d6aac047718903027e48f0db176d337e64ca0b973",
+   "steps": 6518
+  },
+  {
+   "name": "NNPOW 0.9#0",
+   "hash": "fba8fad61ec2de52b6b0cd22bd5c0868cbf1e7005b8a63c1b728e45aaf49af34",
+   "steps": 9292
+  },
+  {
+   "name": "NNPOW 0.9#1",
+   "hash": "c221ee3b30fdf6943be0b450d651db1f1a12cd71901485d0fc6343b3e1a496a3",
+   "steps": 9336
+  },
+  {
+   "name": "NNPOW 0.9#2",
+   "hash": "3c89fa3f7d0912554f728cca76f3bfce6d165a347e2831470e2e366b4f29750c",
+   "steps": 9789
+  },
+  {
+   "name": "NNPOW 0.9#3",
+   "hash": "d91446fbd11a8c19a86dbd0835b549cc832fe70281e65d84e622eaac96d20b52",
+   "steps": 9207
+  },
+  {
+   "name": "CTRL center NN#0",
+   "hash": "2b2edbee666b75723503786ed67a7db71f8113a16c3abb5bc3797e61414169fb",
+   "steps": 7200
+  },
+  {
+   "name": "CTRL center NN#1",
+   "hash": "2437a4988613fc4971ce9548214375d0992449e503cf685e39c223fdc6d19f77",
+   "steps": 7200
+  },
+  {
+   "name": "CTRL wall NN#0",
+   "hash": "509c2a792b0dcbf1a006ba1b4115481f9222ca76f7586b8feabe1b05e8289d35",
+   "steps": 7200
+  },
+  {
+   "name": "CTRL wall NN#1",
+   "hash": "193cec55d26a114f89e71a1ab1432487873e927ed52aa880d102cb070e8ed845",
+   "steps": 7200
+  },
+  {
+   "name": "CTRL graze NN#0",
+   "hash": "f477a9e8af7c1f6d3801762d4048a39bc87edc94ee398d22c24fc9a2f5c5ff9a",
+   "steps": 7200
+  },
+  {
+   "name": "CTRL graze NN#1",
+   "hash": "51faf232659a5fc4914a7681a810da66fd37011a982d3045c9bb6886e667b444",
+   "steps": 7200
+  }
+ ]
+}
