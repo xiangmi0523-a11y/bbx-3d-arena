@@ -214,6 +214,7 @@ export class ImpactFX {
     this.root.add(this.grindGlow);
 
     this.light = new THREE.PointLight(0xffd9a0, 0, 4, 2);
+    this.light.name = 'impact-light';
     this.root.add(this.light);
 
     const ringTex = radialTexture([

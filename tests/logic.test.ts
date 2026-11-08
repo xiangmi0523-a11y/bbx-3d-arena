@@ -130,19 +130,24 @@ describe('P2：部件系统', () => {
 });
 
 describe('P2：画质分级', () => {
-  it('iPhone 3x 屏从高清档起步，按原生 3x 渲染（不做非整数缩放）', async () => {
-    const { initialQuality, QualityController } = await import('../src/game/render/Quality');
+  it('iPhone 从均衡档起步（2x、省开销光照），高清档仍按原生 3x 渲染', async () => {
+    const { initialQuality, QualityController, PRESETS } = await import('../src/game/render/Quality');
     const lvl = initialQuality('Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X)', 3, 6);
-    expect(lvl).toBe('high');
-    expect(new QualityController(lvl).pixelRatio(3)).toBe(3);
+    expect(lvl).toBe('medium');
+    expect(new QualityController(lvl).pixelRatio(3)).toBe(2);
+    expect(PRESETS.medium.accentLights).toBe(false);
+    expect(new QualityController('high').pixelRatio(3)).toBe(3);
   });
-  it('P2.1：中/高/超档都是原生分辨率，最低档也不低于 2x', async () => {
+  it('流畅优先（2026-11-08）：高/超档原生分辨率；均衡 2x；流畅 1.5x，且低 / 中档关闭补光、软阴影与碗面清漆', async () => {
     const { QualityController, PRESETS } = await import('../src/game/render/Quality');
-    for (const lvl of ['medium', 'high', 'ultra'] as const) {
+    for (const lvl of ['high', 'ultra'] as const) {
       expect(new QualityController(lvl).pixelRatio(3)).toBe(3);
       expect(new QualityController(lvl).pixelRatio(2)).toBe(2);
+      expect(PRESETS[lvl].accentLights && PRESETS[lvl].softShadows && PRESETS[lvl].floorClearcoat).toBe(true);
     }
-    expect(new QualityController('low').pixelRatio(3)).toBe(2);
+    expect(new QualityController('medium').pixelRatio(3)).toBe(2);
+    expect(new QualityController('low').pixelRatio(3)).toBe(1.5);
+    for (const lvl of ['low', 'medium'] as const) expect(PRESETS[lvl].accentLights || PRESETS[lvl].softShadows || PRESETS[lvl].floorClearcoat).toBe(false);
     // 1x 屏不会被放大渲染
     expect(new QualityController('low').pixelRatio(1)).toBe(1);
     // 降档时先降粒子和阴影

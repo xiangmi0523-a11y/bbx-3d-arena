@@ -37,6 +37,11 @@ export function createArenaVisual(spec: ArenaSpec = ARENA): THREE.Group {
     }),
   );
   floor.receiveShadow = true;
+  // 低 / 中档用的无清漆碗面（同一贴图与粗糙度），由 GameEngine.applyQuality 切换
+  floor.name = 'arena-floor';
+  const rich = floor.material as THREE.MeshPhysicalMaterial;
+  floor.userData.rich = rich;
+  floor.userData.cheap = new THREE.MeshStandardMaterial({ map: rich.map, roughness: rich.roughness, metalness: rich.metalness });
   group.add(floor);
 
   // 2) 极限轨道：沿外缘一圈齿条（实例化网格），口袋处断开

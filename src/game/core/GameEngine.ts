@@ -87,6 +87,8 @@ export class GameEngine {
   private readonly scene = new THREE.Scene();
   private envTexture: THREE.Texture | null = null;
   private keyLight!: THREE.DirectionalLight;
+  /** 氛围补光（低 / 中档关闭，见 QualityPreset.accentLights） */
+  private accentLights: THREE.Light[] = [];
   private cam!: BattleCamera;
   private R!: Rapier;
   private pw: PhysicsWorld | null = null;
@@ -527,6 +529,21 @@ export class GameEngine {
     this.renderer.setPixelRatio(this.quality.pixelRatio(window.devicePixelRatio || 1));
     this.resize();
     this.renderer.shadowMap.enabled = p.shadows;
+    const shadowType = p.softShadows ? THREE.PCFSoftShadowMap : THREE.PCFShadowMap;
+    // 灯光数量、阴影类型、碗面材质变化都要重新编译着色器：只在真正变化时标记
+    let relink = this.renderer.shadowMap.type !== shadowType;
+    this.renderer.shadowMap.type = shadowType;
+    for (const l of this.accentLights) {
+      if (l.visible !== p.accentLights) relink = true;
+      l.visible = p.accentLights;
+    }
+    const floor = this.scene.getObjectByName('arena-floor') as THREE.Mesh | undefined;
+    const fm = floor && (p.floorClearcoat ? floor.userData.rich : floor.userData.cheap);
+    if (floor && fm && floor.material !== fm) floor.material = fm;
+    if (relink) this.scene.traverse((o) => {
+      const m = (o as THREE.Mesh).material;
+      if (m) for (const x of Array.isArray(m) ? m : [m]) x.needsUpdate = true;
+    });
     if (this.keyLight && this.keyLight.shadow.mapSize.x !== p.shadowMapSize) {
       this.keyLight.shadow.mapSize.set(p.shadowMapSize, p.shadowMapSize);
       this.keyLight.shadow.map?.dispose();
@@ -600,6 +617,8 @@ export class GameEngine {
 
     s.add(createArenaVisual());
     s.add(this.fx.root);
+    // 撞击闪光点光（impact-light）是战斗反馈的一部分，不放进 accentLights，各画质档都保留（产品决定 2026-11-08）
+    this.accentLights = [spotA, spotB, top];
     for (const l of Object.values(this.launchers)) s.add(l.root);
 
     // 瞄准指示箭头

@@ -25,6 +25,15 @@ export interface QualityPreset {
   sparkScale: number;
   /** 镜面反射环境贴图强度 */
   envIntensity: number;
+  /**
+   * 氛围补光（两侧彩色聚光 + 顶部点光）。每盏灯都要在全屏碗面的每个像素上计算一次，只在高 / 超高档开启。
+   * 撞击闪光点光不属于补光：它是战斗反馈，所有档位都保留。
+   */
+  accentLights: boolean;
+  /** 柔和阴影（PCFSoft）；关闭时用普通 PCF，阴影边缘稍硬，约省 10% */
+  softShadows: boolean;
+  /** 碗面清漆层（MeshPhysical clearcoat）；关闭时碗面用标准 PBR 材质，约省 12% */
+  floorClearcoat: boolean;
 }
 
 /**
@@ -34,10 +43,12 @@ export interface QualityPreset {
  * 性能不够时优先降阴影和粒子，只有最低档才降到 2x。
  */
 export const PRESETS: Record<QualityLevel, QualityPreset> = {
-  low: { level: 'low', maxPixelRatio: 2, minPixelRatio: 2, shadowMapSize: 1024, shadows: true, sparkScale: 0.45, envIntensity: 0.85 },
-  medium: { level: 'medium', maxPixelRatio: 3, minPixelRatio: 2, shadowMapSize: 1024, shadows: true, sparkScale: 0.65, envIntensity: 1 },
-  high: { level: 'high', maxPixelRatio: 3, minPixelRatio: 2, shadowMapSize: 1536, shadows: true, sparkScale: 0.9, envIntensity: 1 },
-  ultra: { level: 'ultra', maxPixelRatio: 3, minPixelRatio: 2, shadowMapSize: 2048, shadows: true, sparkScale: 1, envIntensity: 1 },
+  // 真机视频（2026-11-08）：旧低档（2x + 全部灯光 + 软阴影 + 清漆碗面）仍只有约 41 fps。
+  // 低 / 中档改为省像素开销的光照配置；最低档再降到 1.5x，保证流畅优先。
+  low: { level: 'low', maxPixelRatio: 1.5, minPixelRatio: 1.5, shadowMapSize: 1024, shadows: true, sparkScale: 0.45, envIntensity: 0.9, accentLights: false, softShadows: false, floorClearcoat: false },
+  medium: { level: 'medium', maxPixelRatio: 2, minPixelRatio: 2, shadowMapSize: 1024, shadows: true, sparkScale: 0.65, envIntensity: 1, accentLights: false, softShadows: false, floorClearcoat: false },
+  high: { level: 'high', maxPixelRatio: 3, minPixelRatio: 2, shadowMapSize: 1536, shadows: true, sparkScale: 0.9, envIntensity: 1, accentLights: true, softShadows: true, floorClearcoat: true },
+  ultra: { level: 'ultra', maxPixelRatio: 3, minPixelRatio: 2, shadowMapSize: 2048, shadows: true, sparkScale: 1, envIntensity: 1, accentLights: true, softShadows: true, floorClearcoat: true },
 };
 
 const ORDER: QualityLevel[] = ['low', 'medium', 'high', 'ultra'];
@@ -45,8 +56,8 @@ const ORDER: QualityLevel[] = ['low', 'medium', 'high', 'ultra'];
 export function initialQuality(ua: string, dpr: number, cores: number): QualityLevel {
   const mobile = /iPhone|iPad|iPod|Android/i.test(ua);
   if (!mobile) return dpr >= 2 ? 'high' : 'ultra';
-  // 新款 iPhone（6 核以上 / 3x 屏）从 high 起步，旧机从 medium 起步
-  if (/iPhone|iPad/.test(ua)) return cores >= 6 || dpr >= 3 ? 'high' : 'medium';
+  // iPhone 从 medium 起步：真机上 high 起步后要连降两档（每次 2 秒漏帧 + 着色器重编），开局帧率明显波动
+  if (/iPhone|iPad/.test(ua)) return 'medium';
   return cores >= 8 ? 'medium' : 'low';
 }
 
