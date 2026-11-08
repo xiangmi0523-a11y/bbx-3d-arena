@@ -1,0 +1,4154 @@
+{
+ "baselineHead": "cb4c2c4694315957c1a36b9f2f446750caaecb5d",
+ "baselineTrackedDirty": "",
+ "tune": [
+  "{\"stallBreak\":1}",
+  "{\"stallBreak\":1}"
+ ],
+ "total": 180,
+ "same": 180,
+ "differ": [],
+ "missingInProbe": [],
+ "rows": [
+  {
+   "name": "AvD#0",
+   "seed": 100,
+   "probeHash": "7775c5b87607837449ab15a2f47c770a1a052d4406e681a7035a11c81af73b60",
+   "baselineHash": "7775c5b87607837449ab15a2f47c770a1a052d4406e681a7035a11c81af73b60",
+   "steps": [
+    1361,
+    1361
+   ],
+   "result": [
+    "rival:spin",
+    "rival:spin"
+   ],
+   "breakouts": [
+    0,
+    0
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "AvD#1",
+   "seed": 101,
+   "probeHash": "5f5a59b94283b051fa95b23e486993f95a970a44f8147033ec311c0fdc726ed5",
+   "baselineHash": "5f5a59b94283b051fa95b23e486993f95a970a44f8147033ec311c0fdc726ed5",
+   "steps": [
+    1431,
+    1431
+   ],
+   "result": [
+    "rival:spin",
+    "rival:spin"
+   ],
+   "breakouts": [
+    0,
+    0
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "AvD#2",
+   "seed": 102,
+   "probeHash": "e2610d3201d7bc3d0c76c9ba4f6f09ed1dde26047df784e34b3e1e00d28c0fc6",
+   "baselineHash": "e2610d3201d7bc3d0c76c9ba4f6f09ed1dde26047df784e34b3e1e00d28c0fc6",
+   "steps": [
+    1457,
+    1457
+   ],
+   "result": [
+    "rival:spin",
+    "rival:spin"
+   ],
+   "breakouts": [
+    1,
+    1
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "AvD#3",
+   "seed": 103,
+   "probeHash": "d9edb80640b838eb503a1558d003cc55d0af800aff4a2958ecab1f409d2285fb",
+   "baselineHash": "d9edb80640b838eb503a1558d003cc55d0af800aff4a2958ecab1f409d2285fb",
+   "steps": [
+    1405,
+    1405
+   ],
+   "result": [
+    "rival:spin",
+    "rival:spin"
+   ],
+   "breakouts": [
+    0,
+    0
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "AvD#4",
+   "seed": 104,
+   "probeHash": "e61c44a16aae5397dff7ad5c8b6bd27ed03a000864e68db8cf4f343db959d26f",
+   "baselineHash": "e61c44a16aae5397dff7ad5c8b6bd27ed03a000864e68db8cf4f343db959d26f",
+   "steps": [
+    1880,
+    1880
+   ],
+   "result": [
+    "rival:spin",
+    "rival:spin"
+   ],
+   "breakouts": [
+    1,
+    1
+   ],
+   "wobbleBreaks": [
+    1,
+    1
+   ],
+   "same": true
+  },
+  {
+   "name": "AvD#5",
+   "seed": 105,
+   "probeHash": "72fc323db479bdcd2a50657bed4b526747b5e9fbd4c78818e653ef66e91f4879",
+   "baselineHash": "72fc323db479bdcd2a50657bed4b526747b5e9fbd4c78818e653ef66e91f4879",
+   "steps": [
+    1785,
+    1785
+   ],
+   "result": [
+    "rival:spin",
+    "rival:spin"
+   ],
+   "breakouts": [
+    1,
+    1
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "AvD#6",
+   "seed": 106,
+   "probeHash": "5d966671610bc90b39fa61e3d4c8d7d0ba1d770100eca3391d152a0d8e262b0b",
+   "baselineHash": "5d966671610bc90b39fa61e3d4c8d7d0ba1d770100eca3391d152a0d8e262b0b",
+   "steps": [
+    1198,
+    1198
+   ],
+   "result": [
+    "rival:spin",
+    "rival:spin"
+   ],
+   "breakouts": [
+    0,
+    0
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "AvD#7",
+   "seed": 107,
+   "probeHash": "e37f8d260ad4b0c1a2ae2ad19489ec69611217364ce55c86a3d9c34dab486fdd",
+   "baselineHash": "e37f8d260ad4b0c1a2ae2ad19489ec69611217364ce55c86a3d9c34dab486fdd",
+   "steps": [
+    1351,
+    1351
+   ],
+   "result": [
+    "rival:spin",
+    "rival:spin"
+   ],
+   "breakouts": [
+    0,
+    0
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "AvD#8",
+   "seed": 108,
+   "probeHash": "563616f85ee7ac5120e3b1ac5ed7af02a36c76f3193597f4d6d07b62428441ba",
+   "baselineHash": "563616f85ee7ac5120e3b1ac5ed7af02a36c76f3193597f4d6d07b62428441ba",
+   "steps": [
+    1515,
+    1515
+   ],
+   "result": [
+    "rival:spin",
+    "rival:spin"
+   ],
+   "breakouts": [
+    1,
+    1
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "AvD#9",
+   "seed": 109,
+   "probeHash": "c132b8c7872e01a0a5d9e917a17e2f689ce21ff0e48824492c30e6b31e05e09e",
+   "baselineHash": "c132b8c7872e01a0a5d9e917a17e2f689ce21ff0e48824492c30e6b31e05e09e",
+   "steps": [
+    1365,
+    1365
+   ],
+   "result": [
+    "rival:spin",
+    "rival:spin"
+   ],
+   "breakouts": [
+    0,
+    0
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "AvD#10",
+   "seed": 110,
+   "probeHash": "3010a10507837c5c4ef8235cd5dbd9057c68b26ca9684e698be1a6ad4cbbc317",
+   "baselineHash": "3010a10507837c5c4ef8235cd5dbd9057c68b26ca9684e698be1a6ad4cbbc317",
+   "steps": [
+    1745,
+    1745
+   ],
+   "result": [
+    "rival:spin",
+    "rival:spin"
+   ],
+   "breakouts": [
+    0,
+    0
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "AvD#11",
+   "seed": 111,
+   "probeHash": "369c4b98960308994eccafb3cb125ccac231aaa531ac4ebe54d48b8f66cf020b",
+   "baselineHash": "369c4b98960308994eccafb3cb125ccac231aaa531ac4ebe54d48b8f66cf020b",
+   "steps": [
+    1620,
+    1620
+   ],
+   "result": [
+    "rival:spin",
+    "rival:spin"
+   ],
+   "breakouts": [
+    1,
+    1
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "AvD#12",
+   "seed": 112,
+   "probeHash": "248379e49d9d9044eaf0a5af051c9dd61583321ffbbc64f55a3a98ef6aee332e",
+   "baselineHash": "248379e49d9d9044eaf0a5af051c9dd61583321ffbbc64f55a3a98ef6aee332e",
+   "steps": [
+    1694,
+    1694
+   ],
+   "result": [
+    "rival:spin",
+    "rival:spin"
+   ],
+   "breakouts": [
+    0,
+    0
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "AvD#13",
+   "seed": 113,
+   "probeHash": "acd1cfbd0a5c380fb8c6ad87f1bca500ec1e646642dc9b9e5a1c2186f12c29c3",
+   "baselineHash": "acd1cfbd0a5c380fb8c6ad87f1bca500ec1e646642dc9b9e5a1c2186f12c29c3",
+   "steps": [
+    1517,
+    1517
+   ],
+   "result": [
+    "rival:spin",
+    "rival:spin"
+   ],
+   "breakouts": [
+    1,
+    1
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "AvD#14",
+   "seed": 114,
+   "probeHash": "efed687f49f72c693484c5af467820fb9f375e2e699b3e5f94afe7b1c098faf6",
+   "baselineHash": "efed687f49f72c693484c5af467820fb9f375e2e699b3e5f94afe7b1c098faf6",
+   "steps": [
+    1513,
+    1513
+   ],
+   "result": [
+    "rival:spin",
+    "rival:spin"
+   ],
+   "breakouts": [
+    1,
+    1
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "AvD#15",
+   "seed": 115,
+   "probeHash": "c0799ca74b93020c410f71969e01a1c13a316ce2590f82b30b9fb9e2bc9821ef",
+   "baselineHash": "c0799ca74b93020c410f71969e01a1c13a316ce2590f82b30b9fb9e2bc9821ef",
+   "steps": [
+    1196,
+    1196
+   ],
+   "result": [
+    "rival:spin",
+    "rival:spin"
+   ],
+   "breakouts": [
+    0,
+    0
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "DvA#0",
+   "seed": 200,
+   "probeHash": "a4af8563f9f8281be038af13352cecef17d724b897ab5e79fdd8260a0b70e5a0",
+   "baselineHash": "a4af8563f9f8281be038af13352cecef17d724b897ab5e79fdd8260a0b70e5a0",
+   "steps": [
+    1398,
+    1398
+   ],
+   "result": [
+    "player:spin",
+    "player:spin"
+   ],
+   "breakouts": [
+    0,
+    0
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "DvA#1",
+   "seed": 201,
+   "probeHash": "aa12a12bf7cc743524a787ceed52245a81c95726b3c45a85d707296119c93870",
+   "baselineHash": "aa12a12bf7cc743524a787ceed52245a81c95726b3c45a85d707296119c93870",
+   "steps": [
+    1781,
+    1781
+   ],
+   "result": [
+    "player:spin",
+    "player:spin"
+   ],
+   "breakouts": [
+    1,
+    1
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "DvA#2",
+   "seed": 202,
+   "probeHash": "c13d4b19b10a6778c48cbdb42d346bf7db290bb45ffd66b0001777fe9d542484",
+   "baselineHash": "c13d4b19b10a6778c48cbdb42d346bf7db290bb45ffd66b0001777fe9d542484",
+   "steps": [
+    1206,
+    1206
+   ],
+   "result": [
+    "player:spin",
+    "player:spin"
+   ],
+   "breakouts": [
+    0,
+    0
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "DvA#3",
+   "seed": 203,
+   "probeHash": "a1364deba7bdccc23407f656d2505cb33d334034b74dbb3a8ad5407c3ffb472d",
+   "baselineHash": "a1364deba7bdccc23407f656d2505cb33d334034b74dbb3a8ad5407c3ffb472d",
+   "steps": [
+    1741,
+    1741
+   ],
+   "result": [
+    "player:spin",
+    "player:spin"
+   ],
+   "breakouts": [
+    0,
+    0
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "DvA#4",
+   "seed": 204,
+   "probeHash": "9f9019ce2b707c96d0a6cc0dfee356a3340e85becc51933d567042586f854327",
+   "baselineHash": "9f9019ce2b707c96d0a6cc0dfee356a3340e85becc51933d567042586f854327",
+   "steps": [
+    1764,
+    1764
+   ],
+   "result": [
+    "player:spin",
+    "player:spin"
+   ],
+   "breakouts": [
+    0,
+    0
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "DvA#5",
+   "seed": 205,
+   "probeHash": "0f9702dda315a4a962aa6d732ff514c101a50ea3bd3695e7a3c561d60941213d",
+   "baselineHash": "0f9702dda315a4a962aa6d732ff514c101a50ea3bd3695e7a3c561d60941213d",
+   "steps": [
+    1227,
+    1227
+   ],
+   "result": [
+    "player:spin",
+    "player:spin"
+   ],
+   "breakouts": [
+    0,
+    0
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "DvA#6",
+   "seed": 206,
+   "probeHash": "aad8a2bccbb49acd7cedd77e90ffc261594637075d2c7b0162b8f8cfedff1caa",
+   "baselineHash": "aad8a2bccbb49acd7cedd77e90ffc261594637075d2c7b0162b8f8cfedff1caa",
+   "steps": [
+    1901,
+    1901
+   ],
+   "result": [
+    "player:spin",
+    "player:spin"
+   ],
+   "breakouts": [
+    1,
+    1
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "DvA#7",
+   "seed": 207,
+   "probeHash": "a42bab49add71805256c3467885c0ac6deaab00584739d35f96556d7f98faea5",
+   "baselineHash": "a42bab49add71805256c3467885c0ac6deaab00584739d35f96556d7f98faea5",
+   "steps": [
+    1628,
+    1628
+   ],
+   "result": [
+    "player:spin",
+    "player:spin"
+   ],
+   "breakouts": [
+    1,
+    1
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "DvA#8",
+   "seed": 208,
+   "probeHash": "442ce2a74b6700ef37a5a59587fb9a0ba6a4f5de1525c79d648f0ac5f88467a7",
+   "baselineHash": "442ce2a74b6700ef37a5a59587fb9a0ba6a4f5de1525c79d648f0ac5f88467a7",
+   "steps": [
+    1334,
+    1334
+   ],
+   "result": [
+    "player:spin",
+    "player:spin"
+   ],
+   "breakouts": [
+    0,
+    0
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "DvA#9",
+   "seed": 209,
+   "probeHash": "e27e4398a64650dfc4e7a1b29d69579c1e1ef2e5f094cee900118b09c88d60c0",
+   "baselineHash": "e27e4398a64650dfc4e7a1b29d69579c1e1ef2e5f094cee900118b09c88d60c0",
+   "steps": [
+    1401,
+    1401
+   ],
+   "result": [
+    "player:spin",
+    "player:spin"
+   ],
+   "breakouts": [
+    1,
+    1
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "DvA#10",
+   "seed": 210,
+   "probeHash": "600fe37132d9382893c26486fa89ddc9b80c2f32785fd7e8d6e572c8efb193a3",
+   "baselineHash": "600fe37132d9382893c26486fa89ddc9b80c2f32785fd7e8d6e572c8efb193a3",
+   "steps": [
+    1826,
+    1826
+   ],
+   "result": [
+    "player:spin",
+    "player:spin"
+   ],
+   "breakouts": [
+    1,
+    1
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "DvA#11",
+   "seed": 211,
+   "probeHash": "9ae834573f0eb36e8b4a3ba452fd8e509f04aa52971cf5734e0bd530f9bf2851",
+   "baselineHash": "9ae834573f0eb36e8b4a3ba452fd8e509f04aa52971cf5734e0bd530f9bf2851",
+   "steps": [
+    1293,
+    1293
+   ],
+   "result": [
+    "player:spin",
+    "player:spin"
+   ],
+   "breakouts": [
+    0,
+    0
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "DvA#12",
+   "seed": 212,
+   "probeHash": "751b829987b463e6e7e4210aa625576ecf479a869f03f20e26fd96f4c699ce6e",
+   "baselineHash": "751b829987b463e6e7e4210aa625576ecf479a869f03f20e26fd96f4c699ce6e",
+   "steps": [
+    1202,
+    1202
+   ],
+   "result": [
+    "player:spin",
+    "player:spin"
+   ],
+   "breakouts": [
+    0,
+    0
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "DvA#13",
+   "seed": 213,
+   "probeHash": "e40fd62c7aa61bb0754b5d7a96c691913ff731c24d4d13a63d87ff9313c81e8a",
+   "baselineHash": "e40fd62c7aa61bb0754b5d7a96c691913ff731c24d4d13a63d87ff9313c81e8a",
+   "steps": [
+    1926,
+    1926
+   ],
+   "result": [
+    "player:spin",
+    "player:spin"
+   ],
+   "breakouts": [
+    1,
+    1
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "DvA#14",
+   "seed": 214,
+   "probeHash": "c95d099fa159717e705abf75acc2abfaf0741b174f79b5a432c38f37d094db80",
+   "baselineHash": "c95d099fa159717e705abf75acc2abfaf0741b174f79b5a432c38f37d094db80",
+   "steps": [
+    1218,
+    1218
+   ],
+   "result": [
+    "player:spin",
+    "player:spin"
+   ],
+   "breakouts": [
+    0,
+    0
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "DvA#15",
+   "seed": 215,
+   "probeHash": "790e9004b648c10cd72325714cc690c44606722f496235eaadd3bbcfecdc53fa",
+   "baselineHash": "790e9004b648c10cd72325714cc690c44606722f496235eaadd3bbcfecdc53fa",
+   "steps": [
+    1353,
+    1353
+   ],
+   "result": [
+    "player:spin",
+    "player:spin"
+   ],
+   "breakouts": [
+    0,
+    0
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "SvA#0",
+   "seed": 300,
+   "probeHash": "54c8c12e1df8ec05d034edf4fb330fa2fa782326e66d652e4991a22bd1780d1b",
+   "baselineHash": "54c8c12e1df8ec05d034edf4fb330fa2fa782326e66d652e4991a22bd1780d1b",
+   "steps": [
+    1381,
+    1381
+   ],
+   "result": [
+    "player:spin",
+    "player:spin"
+   ],
+   "breakouts": [
+    1,
+    1
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "SvA#1",
+   "seed": 301,
+   "probeHash": "161f65627ea51d9627a0317b2cc33e135523543257fc2ab968a946bebe2ce4a4",
+   "baselineHash": "161f65627ea51d9627a0317b2cc33e135523543257fc2ab968a946bebe2ce4a4",
+   "steps": [
+    1676,
+    1676
+   ],
+   "result": [
+    "player:spin",
+    "player:spin"
+   ],
+   "breakouts": [
+    1,
+    1
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "SvA#2",
+   "seed": 302,
+   "probeHash": "6278c26e66e6911624843b66264447f9552330a670889330c7b31b2b0fe16577",
+   "baselineHash": "6278c26e66e6911624843b66264447f9552330a670889330c7b31b2b0fe16577",
+   "steps": [
+    1347,
+    1347
+   ],
+   "result": [
+    "player:spin",
+    "player:spin"
+   ],
+   "breakouts": [
+    1,
+    1
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "SvA#3",
+   "seed": 303,
+   "probeHash": "fb94ed67982f0f8075db274854b8f8d1daf7953c125239c8c9782bf26365755a",
+   "baselineHash": "fb94ed67982f0f8075db274854b8f8d1daf7953c125239c8c9782bf26365755a",
+   "steps": [
+    1518,
+    1518
+   ],
+   "result": [
+    "player:spin",
+    "player:spin"
+   ],
+   "breakouts": [
+    1,
+    1
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "SvA#4",
+   "seed": 304,
+   "probeHash": "d31153bf42f1c7a82b9fba987dcefcf2a5dc4b835ecfa8889a8e2d793bcc62af",
+   "baselineHash": "d31153bf42f1c7a82b9fba987dcefcf2a5dc4b835ecfa8889a8e2d793bcc62af",
+   "steps": [
+    1641,
+    1641
+   ],
+   "result": [
+    "player:spin",
+    "player:spin"
+   ],
+   "breakouts": [
+    1,
+    1
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "SvA#5",
+   "seed": 305,
+   "probeHash": "e77e5eb5a4945ac0bca3a499cdfc7f49b13b731c930f1feca5bdccb45359493d",
+   "baselineHash": "e77e5eb5a4945ac0bca3a499cdfc7f49b13b731c930f1feca5bdccb45359493d",
+   "steps": [
+    1505,
+    1505
+   ],
+   "result": [
+    "player:spin",
+    "player:spin"
+   ],
+   "breakouts": [
+    1,
+    1
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "SvA#6",
+   "seed": 306,
+   "probeHash": "32289b69dfcd0cbffb522bcae7cd2658e4b62b2fd862b265e7f19bc5b1f6282b",
+   "baselineHash": "32289b69dfcd0cbffb522bcae7cd2658e4b62b2fd862b265e7f19bc5b1f6282b",
+   "steps": [
+    1940,
+    1940
+   ],
+   "result": [
+    "player:spin",
+    "player:spin"
+   ],
+   "breakouts": [
+    1,
+    1
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "SvA#7",
+   "seed": 307,
+   "probeHash": "d73bc5d31a8e88d73afb824b378e2b87cb113bcc9f862b9815e03b96601c1dfc",
+   "baselineHash": "d73bc5d31a8e88d73afb824b378e2b87cb113bcc9f862b9815e03b96601c1dfc",
+   "steps": [
+    1493,
+    1493
+   ],
+   "result": [
+    "player:spin",
+    "player:spin"
+   ],
+   "breakouts": [
+    1,
+    1
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "SvA#8",
+   "seed": 308,
+   "probeHash": "1de93446d1f5110ae2c617c77a58472bcb7fc1a769cc533fd1bc8b80003dbf91",
+   "baselineHash": "1de93446d1f5110ae2c617c77a58472bcb7fc1a769cc533fd1bc8b80003dbf91",
+   "steps": [
+    1425,
+    1425
+   ],
+   "result": [
+    "player:spin",
+    "player:spin"
+   ],
+   "breakouts": [
+    1,
+    1
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "SvA#9",
+   "seed": 309,
+   "probeHash": "8434a018c651447e1ed1b1c0aa1d14615cdd6950c3c3fb70e1f3d138787b8e1e",
+   "baselineHash": "8434a018c651447e1ed1b1c0aa1d14615cdd6950c3c3fb70e1f3d138787b8e1e",
+   "steps": [
+    1465,
+    1465
+   ],
+   "result": [
+    "player:spin",
+    "player:spin"
+   ],
+   "breakouts": [
+    1,
+    1
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "SvA#10",
+   "seed": 310,
+   "probeHash": "885f4ee523b3954aadfce53ef51adb383b0c59f30895409357962e5bc03c37bb",
+   "baselineHash": "885f4ee523b3954aadfce53ef51adb383b0c59f30895409357962e5bc03c37bb",
+   "steps": [
+    2117,
+    2117
+   ],
+   "result": [
+    "player:spin",
+    "player:spin"
+   ],
+   "breakouts": [
+    1,
+    1
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "SvA#11",
+   "seed": 311,
+   "probeHash": "4356d98f1a93c1a39833787d278e4baa8ed0ae94bb629dae0147e7a36aadc753",
+   "baselineHash": "4356d98f1a93c1a39833787d278e4baa8ed0ae94bb629dae0147e7a36aadc753",
+   "steps": [
+    1350,
+    1350
+   ],
+   "result": [
+    "player:spin",
+    "player:spin"
+   ],
+   "breakouts": [
+    1,
+    1
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "SvA#12",
+   "seed": 312,
+   "probeHash": "0d32646a7a80b9372bcf299a190aec7090c4d306c839bad566686927209d7501",
+   "baselineHash": "0d32646a7a80b9372bcf299a190aec7090c4d306c839bad566686927209d7501",
+   "steps": [
+    1507,
+    1507
+   ],
+   "result": [
+    "player:spin",
+    "player:spin"
+   ],
+   "breakouts": [
+    1,
+    1
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "SvA#13",
+   "seed": 313,
+   "probeHash": "21a40a6c199b15fbf291e19507ee2f11eeef6b9bc33c10351f7db25169501f90",
+   "baselineHash": "21a40a6c199b15fbf291e19507ee2f11eeef6b9bc33c10351f7db25169501f90",
+   "steps": [
+    1758,
+    1758
+   ],
+   "result": [
+    "player:spin",
+    "player:spin"
+   ],
+   "breakouts": [
+    1,
+    1
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "SvA#14",
+   "seed": 314,
+   "probeHash": "dc5112d61ba3f940ef4f35c78344c47589b979e0ed9377ac9642fba9cab679b7",
+   "baselineHash": "dc5112d61ba3f940ef4f35c78344c47589b979e0ed9377ac9642fba9cab679b7",
+   "steps": [
+    1423,
+    1423
+   ],
+   "result": [
+    "player:spin",
+    "player:spin"
+   ],
+   "breakouts": [
+    1,
+    1
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "SvA#15",
+   "seed": 315,
+   "probeHash": "49e13744f2577f7c345591e5d035cb7f35fbf65c76868b6b895c3742a186130f",
+   "baselineHash": "49e13744f2577f7c345591e5d035cb7f35fbf65c76868b6b895c3742a186130f",
+   "steps": [
+    1686,
+    1686
+   ],
+   "result": [
+    "player:spin",
+    "player:spin"
+   ],
+   "breakouts": [
+    1,
+    1
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "BvB#0",
+   "seed": 400,
+   "probeHash": "9f57a4d86a5e3bf92c12f5d04acfe006d00932676d9ef3de71d2f66a57d6147f",
+   "baselineHash": "9f57a4d86a5e3bf92c12f5d04acfe006d00932676d9ef3de71d2f66a57d6147f",
+   "steps": [
+    2789,
+    2789
+   ],
+   "result": [
+    "rival:spin",
+    "rival:spin"
+   ],
+   "breakouts": [
+    2,
+    2
+   ],
+   "wobbleBreaks": [
+    1,
+    1
+   ],
+   "same": true
+  },
+  {
+   "name": "BvB#1",
+   "seed": 401,
+   "probeHash": "b94856282aa0c076b94e7d354e5d0bc319e8d9ed9c3f353aaf1aa8531d2bf6fc",
+   "baselineHash": "b94856282aa0c076b94e7d354e5d0bc319e8d9ed9c3f353aaf1aa8531d2bf6fc",
+   "steps": [
+    2659,
+    2659
+   ],
+   "result": [
+    "rival:spin",
+    "rival:spin"
+   ],
+   "breakouts": [
+    2,
+    2
+   ],
+   "wobbleBreaks": [
+    1,
+    1
+   ],
+   "same": true
+  },
+  {
+   "name": "BvB#2",
+   "seed": 402,
+   "probeHash": "3b36e61d4ef265ca0b9ae7bc706245c261c70e70d5d6f15cbd6be34f39e22a67",
+   "baselineHash": "3b36e61d4ef265ca0b9ae7bc706245c261c70e70d5d6f15cbd6be34f39e22a67",
+   "steps": [
+    2364,
+    2364
+   ],
+   "result": [
+    "player:spin",
+    "player:spin"
+   ],
+   "breakouts": [
+    1,
+    1
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "BvB#3",
+   "seed": 403,
+   "probeHash": "62797a76aeec29591b403f41476d36075af1dbf2bfcfba52f13414c6efa376ed",
+   "baselineHash": "62797a76aeec29591b403f41476d36075af1dbf2bfcfba52f13414c6efa376ed",
+   "steps": [
+    2496,
+    2496
+   ],
+   "result": [
+    "rival:spin",
+    "rival:spin"
+   ],
+   "breakouts": [
+    2,
+    2
+   ],
+   "wobbleBreaks": [
+    1,
+    1
+   ],
+   "same": true
+  },
+  {
+   "name": "BvB#4",
+   "seed": 404,
+   "probeHash": "5a7c9456ae3c65a5f6573da1179703b41da9d56a7c2223adac8d42f6ca75792b",
+   "baselineHash": "5a7c9456ae3c65a5f6573da1179703b41da9d56a7c2223adac8d42f6ca75792b",
+   "steps": [
+    2964,
+    2964
+   ],
+   "result": [
+    "player:spin",
+    "player:spin"
+   ],
+   "breakouts": [
+    2,
+    2
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "BvB#5",
+   "seed": 405,
+   "probeHash": "73ed37bcc6763c61e026c178db1158a4389485d8e4350f5036555deb0bdff070",
+   "baselineHash": "73ed37bcc6763c61e026c178db1158a4389485d8e4350f5036555deb0bdff070",
+   "steps": [
+    2428,
+    2428
+   ],
+   "result": [
+    "player:spin",
+    "player:spin"
+   ],
+   "breakouts": [
+    2,
+    2
+   ],
+   "wobbleBreaks": [
+    1,
+    1
+   ],
+   "same": true
+  },
+  {
+   "name": "BvB#6",
+   "seed": 406,
+   "probeHash": "be11dc202f1c5222b31ed7e249524064f28da9fd452f57e6b31724d0b6888426",
+   "baselineHash": "be11dc202f1c5222b31ed7e249524064f28da9fd452f57e6b31724d0b6888426",
+   "steps": [
+    2540,
+    2540
+   ],
+   "result": [
+    "rival:spin",
+    "rival:spin"
+   ],
+   "breakouts": [
+    2,
+    2
+   ],
+   "wobbleBreaks": [
+    1,
+    1
+   ],
+   "same": true
+  },
+  {
+   "name": "BvB#7",
+   "seed": 407,
+   "probeHash": "938142e60cc98da0271a9756a74126b229317746e3b5af1abe7e61c8ac1a7344",
+   "baselineHash": "938142e60cc98da0271a9756a74126b229317746e3b5af1abe7e61c8ac1a7344",
+   "steps": [
+    2480,
+    2480
+   ],
+   "result": [
+    "rival:spin",
+    "rival:spin"
+   ],
+   "breakouts": [
+    2,
+    2
+   ],
+   "wobbleBreaks": [
+    1,
+    1
+   ],
+   "same": true
+  },
+  {
+   "name": "BvB#8",
+   "seed": 408,
+   "probeHash": "ae430c0251a6a644a667934134183aa177da7a6e195a34d048d51e5b325c1614",
+   "baselineHash": "ae430c0251a6a644a667934134183aa177da7a6e195a34d048d51e5b325c1614",
+   "steps": [
+    1928,
+    1928
+   ],
+   "result": [
+    "player:spin",
+    "player:spin"
+   ],
+   "breakouts": [
+    1,
+    1
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "BvB#9",
+   "seed": 409,
+   "probeHash": "5754e1f5bb260919ad6d2b768c199291f8943365f8fa7f561b8e5bf6f2be59f9",
+   "baselineHash": "5754e1f5bb260919ad6d2b768c199291f8943365f8fa7f561b8e5bf6f2be59f9",
+   "steps": [
+    2238,
+    2238
+   ],
+   "result": [
+    "rival:spin",
+    "rival:spin"
+   ],
+   "breakouts": [
+    2,
+    2
+   ],
+   "wobbleBreaks": [
+    1,
+    1
+   ],
+   "same": true
+  },
+  {
+   "name": "BvB#10",
+   "seed": 410,
+   "probeHash": "bc43cb857f11101869cdd26b1c5f2690672a9156f381ef7da25c389cb010af94",
+   "baselineHash": "bc43cb857f11101869cdd26b1c5f2690672a9156f381ef7da25c389cb010af94",
+   "steps": [
+    2073,
+    2073
+   ],
+   "result": [
+    "rival:spin",
+    "rival:spin"
+   ],
+   "breakouts": [
+    1,
+    1
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "BvB#11",
+   "seed": 411,
+   "probeHash": "d8c8be2b2796733961908e703e284a6b63446a3b48e892001bd3d190e6f856f8",
+   "baselineHash": "d8c8be2b2796733961908e703e284a6b63446a3b48e892001bd3d190e6f856f8",
+   "steps": [
+    2846,
+    2846
+   ],
+   "result": [
+    "player:spin",
+    "player:spin"
+   ],
+   "breakouts": [
+    2,
+    2
+   ],
+   "wobbleBreaks": [
+    1,
+    1
+   ],
+   "same": true
+  },
+  {
+   "name": "BvB#12",
+   "seed": 412,
+   "probeHash": "46473ed507b970e9bfe211f169b5a38203dcc340300ff59cb3901182ae8abd85",
+   "baselineHash": "46473ed507b970e9bfe211f169b5a38203dcc340300ff59cb3901182ae8abd85",
+   "steps": [
+    2596,
+    2596
+   ],
+   "result": [
+    "rival:spin",
+    "rival:spin"
+   ],
+   "breakouts": [
+    2,
+    2
+   ],
+   "wobbleBreaks": [
+    1,
+    1
+   ],
+   "same": true
+  },
+  {
+   "name": "BvB#13",
+   "seed": 413,
+   "probeHash": "b8a2a9d42fb64fbe9e236ce2306f7b4c922570d3de2f6416ee69804d4a363564",
+   "baselineHash": "b8a2a9d42fb64fbe9e236ce2306f7b4c922570d3de2f6416ee69804d4a363564",
+   "steps": [
+    2593,
+    2593
+   ],
+   "result": [
+    "rival:spin",
+    "rival:spin"
+   ],
+   "breakouts": [
+    2,
+    2
+   ],
+   "wobbleBreaks": [
+    1,
+    1
+   ],
+   "same": true
+  },
+  {
+   "name": "BvB#14",
+   "seed": 414,
+   "probeHash": "6fc3692f04e2ca594183e5bdd89265c56541a6e8c770be8719b5d0e17ee58794",
+   "baselineHash": "6fc3692f04e2ca594183e5bdd89265c56541a6e8c770be8719b5d0e17ee58794",
+   "steps": [
+    2257,
+    2257
+   ],
+   "result": [
+    "player:spin",
+    "player:spin"
+   ],
+   "breakouts": [
+    2,
+    2
+   ],
+   "wobbleBreaks": [
+    1,
+    1
+   ],
+   "same": true
+  },
+  {
+   "name": "BvB#15",
+   "seed": 415,
+   "probeHash": "5fd40900fb36db50042adae8f2b2920b5161337a90274547bd284d07886f1d3a",
+   "baselineHash": "5fd40900fb36db50042adae8f2b2920b5161337a90274547bd284d07886f1d3a",
+   "steps": [
+    2447,
+    2447
+   ],
+   "result": [
+    "rival:spin",
+    "rival:spin"
+   ],
+   "breakouts": [
+    3,
+    3
+   ],
+   "wobbleBreaks": [
+    1,
+    1
+   ],
+   "same": true
+  },
+  {
+   "name": "AvA#0",
+   "seed": 500,
+   "probeHash": "576e7797a29ee98948254af8935e0c5fad91642f72dc517143e7b2f1afdfdf4b",
+   "baselineHash": "576e7797a29ee98948254af8935e0c5fad91642f72dc517143e7b2f1afdfdf4b",
+   "steps": [
+    1455,
+    1455
+   ],
+   "result": [
+    "player:spin",
+    "player:spin"
+   ],
+   "breakouts": [
+    1,
+    1
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "AvA#1",
+   "seed": 501,
+   "probeHash": "db144c01caf8a5a42e8c65b5c2cc655c4c2fa2b6d80f888a7b9bd23bb164bea2",
+   "baselineHash": "db144c01caf8a5a42e8c65b5c2cc655c4c2fa2b6d80f888a7b9bd23bb164bea2",
+   "steps": [
+    1251,
+    1251
+   ],
+   "result": [
+    "rival:spin",
+    "rival:spin"
+   ],
+   "breakouts": [
+    1,
+    1
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "AvA#2",
+   "seed": 502,
+   "probeHash": "626c5584d45d077c024db6b8ad519af790e46ec01f4dfbe83d2b76af9209bf9e",
+   "baselineHash": "626c5584d45d077c024db6b8ad519af790e46ec01f4dfbe83d2b76af9209bf9e",
+   "steps": [
+    1109,
+    1109
+   ],
+   "result": [
+    "player:spin",
+    "player:spin"
+   ],
+   "breakouts": [
+    0,
+    0
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "AvA#3",
+   "seed": 503,
+   "probeHash": "bfae24efd1df7d256c43068184bb495efcc98bfe37120980f18db5eeb2d1c5fe",
+   "baselineHash": "bfae24efd1df7d256c43068184bb495efcc98bfe37120980f18db5eeb2d1c5fe",
+   "steps": [
+    1172,
+    1172
+   ],
+   "result": [
+    "rival:spin",
+    "rival:spin"
+   ],
+   "breakouts": [
+    0,
+    0
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "AvA#4",
+   "seed": 504,
+   "probeHash": "b12ec012b1f23ac0f74b92ce63b3ba3057013f1b37c3a412900e29cf45babffd",
+   "baselineHash": "b12ec012b1f23ac0f74b92ce63b3ba3057013f1b37c3a412900e29cf45babffd",
+   "steps": [
+    1171,
+    1171
+   ],
+   "result": [
+    "player:spin",
+    "player:spin"
+   ],
+   "breakouts": [
+    0,
+    0
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "AvA#5",
+   "seed": 505,
+   "probeHash": "8bbde3565cc08d1a303e73afa76479e284624914bee84072be67dd38704b6dd2",
+   "baselineHash": "8bbde3565cc08d1a303e73afa76479e284624914bee84072be67dd38704b6dd2",
+   "steps": [
+    889,
+    889
+   ],
+   "result": [
+    "player:spin",
+    "player:spin"
+   ],
+   "breakouts": [
+    0,
+    0
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "AvA#6",
+   "seed": 506,
+   "probeHash": "1c93d3914e66ece28435e7098657a2f6cf174b45542a02a64da7e0167d7bc18f",
+   "baselineHash": "1c93d3914e66ece28435e7098657a2f6cf174b45542a02a64da7e0167d7bc18f",
+   "steps": [
+    1150,
+    1150
+   ],
+   "result": [
+    "rival:spin",
+    "rival:spin"
+   ],
+   "breakouts": [
+    1,
+    1
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "AvA#7",
+   "seed": 507,
+   "probeHash": "bbdf004fce8fc992cd961e21d5a6154922ccccc40f5f3c3ac30e2a191b3de540",
+   "baselineHash": "bbdf004fce8fc992cd961e21d5a6154922ccccc40f5f3c3ac30e2a191b3de540",
+   "steps": [
+    1312,
+    1312
+   ],
+   "result": [
+    "rival:spin",
+    "rival:spin"
+   ],
+   "breakouts": [
+    0,
+    0
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "AvA#8",
+   "seed": 508,
+   "probeHash": "49e2b27112bd2877cd821ac79accd96eb66ffea8b2c9606b2d8d080b0c4fce43",
+   "baselineHash": "49e2b27112bd2877cd821ac79accd96eb66ffea8b2c9606b2d8d080b0c4fce43",
+   "steps": [
+    1222,
+    1222
+   ],
+   "result": [
+    "player:spin",
+    "player:spin"
+   ],
+   "breakouts": [
+    0,
+    0
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "AvA#9",
+   "seed": 509,
+   "probeHash": "d3285e18569811473453d46f3477d0edf633997692d2734173c2135b711a6909",
+   "baselineHash": "d3285e18569811473453d46f3477d0edf633997692d2734173c2135b711a6909",
+   "steps": [
+    926,
+    926
+   ],
+   "result": [
+    "rival:spin",
+    "rival:spin"
+   ],
+   "breakouts": [
+    0,
+    0
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "AvA#10",
+   "seed": 510,
+   "probeHash": "68cc78b0487bcdd2f0422ae71756f70692c68991bc6e10d2dcc55e183962341f",
+   "baselineHash": "68cc78b0487bcdd2f0422ae71756f70692c68991bc6e10d2dcc55e183962341f",
+   "steps": [
+    1432,
+    1432
+   ],
+   "result": [
+    "rival:spin",
+    "rival:spin"
+   ],
+   "breakouts": [
+    1,
+    1
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "AvA#11",
+   "seed": 511,
+   "probeHash": "c1c23c9516c33fa06b0131808078d579b0059fba4adf0e5a1635514d81adcebe",
+   "baselineHash": "c1c23c9516c33fa06b0131808078d579b0059fba4adf0e5a1635514d81adcebe",
+   "steps": [
+    1116,
+    1116
+   ],
+   "result": [
+    "player:spin",
+    "player:spin"
+   ],
+   "breakouts": [
+    0,
+    0
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "AvA#12",
+   "seed": 512,
+   "probeHash": "b9f25ba0a854eb4cf5c2e79cf4acf25993eb82951495fce39b35e84d10fbb66b",
+   "baselineHash": "b9f25ba0a854eb4cf5c2e79cf4acf25993eb82951495fce39b35e84d10fbb66b",
+   "steps": [
+    1118,
+    1118
+   ],
+   "result": [
+    "player:spin",
+    "player:spin"
+   ],
+   "breakouts": [
+    0,
+    0
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "AvA#13",
+   "seed": 513,
+   "probeHash": "a14a8b2b804ad0ae96df959b38074d2248aa71fa6b633e20cc14443665180948",
+   "baselineHash": "a14a8b2b804ad0ae96df959b38074d2248aa71fa6b633e20cc14443665180948",
+   "steps": [
+    1359,
+    1359
+   ],
+   "result": [
+    "rival:spin",
+    "rival:spin"
+   ],
+   "breakouts": [
+    1,
+    1
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "AvA#14",
+   "seed": 514,
+   "probeHash": "b8861240a2a497da96cac4b60f6d097128e65a9801e615c38796b4333f179943",
+   "baselineHash": "b8861240a2a497da96cac4b60f6d097128e65a9801e615c38796b4333f179943",
+   "steps": [
+    1205,
+    1205
+   ],
+   "result": [
+    "player:spin",
+    "player:spin"
+   ],
+   "breakouts": [
+    0,
+    0
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "AvA#15",
+   "seed": 515,
+   "probeHash": "7a2cf7661d637b3221aaecb77751b1fdda13d6c6f50619f5cf506c593146f33d",
+   "baselineHash": "7a2cf7661d637b3221aaecb77751b1fdda13d6c6f50619f5cf506c593146f33d",
+   "steps": [
+    1331,
+    1331
+   ],
+   "result": [
+    "rival:spin",
+    "rival:spin"
+   ],
+   "breakouts": [
+    0,
+    0
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "DFLT#0",
+   "seed": 600,
+   "probeHash": "2004ac164900e7157a10f09685fdf0eda963cb1abcae7b47559e575d78cec48c",
+   "baselineHash": "2004ac164900e7157a10f09685fdf0eda963cb1abcae7b47559e575d78cec48c",
+   "steps": [
+    1352,
+    1352
+   ],
+   "result": [
+    "rival:spin",
+    "rival:spin"
+   ],
+   "breakouts": [
+    0,
+    0
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "DFLT#1",
+   "seed": 601,
+   "probeHash": "ec1ebfbd5cc807340de8e7ae0d6733360ebc1428b23ffd90220aa62c91dcbef5",
+   "baselineHash": "ec1ebfbd5cc807340de8e7ae0d6733360ebc1428b23ffd90220aa62c91dcbef5",
+   "steps": [
+    1400,
+    1400
+   ],
+   "result": [
+    "rival:spin",
+    "rival:spin"
+   ],
+   "breakouts": [
+    1,
+    1
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "DFLT#2",
+   "seed": 602,
+   "probeHash": "30b71a01c0686469b239f0b805c2411f287537b9a83e820c98cc98a5bddb2ce0",
+   "baselineHash": "30b71a01c0686469b239f0b805c2411f287537b9a83e820c98cc98a5bddb2ce0",
+   "steps": [
+    2167,
+    2167
+   ],
+   "result": [
+    "rival:spin",
+    "rival:spin"
+   ],
+   "breakouts": [
+    1,
+    1
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "DFLT#3",
+   "seed": 603,
+   "probeHash": "798e63a8733f187de1f42352813220433315266f7024af18e1b4ebde14ea44d5",
+   "baselineHash": "798e63a8733f187de1f42352813220433315266f7024af18e1b4ebde14ea44d5",
+   "steps": [
+    1334,
+    1334
+   ],
+   "result": [
+    "rival:spin",
+    "rival:spin"
+   ],
+   "breakouts": [
+    0,
+    0
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "DFLT#4",
+   "seed": 604,
+   "probeHash": "e673f3f37e1c90d3185f6684378ec9b4345d6003f15208c03bea45c34925c375",
+   "baselineHash": "e673f3f37e1c90d3185f6684378ec9b4345d6003f15208c03bea45c34925c375",
+   "steps": [
+    1666,
+    1666
+   ],
+   "result": [
+    "rival:spin",
+    "rival:spin"
+   ],
+   "breakouts": [
+    0,
+    0
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "DFLT#5",
+   "seed": 605,
+   "probeHash": "e9066ae3c7d65de27ce0bf6b1ae63ae27cc9a0e06fd3dd7454446e79daae6ab8",
+   "baselineHash": "e9066ae3c7d65de27ce0bf6b1ae63ae27cc9a0e06fd3dd7454446e79daae6ab8",
+   "steps": [
+    1566,
+    1566
+   ],
+   "result": [
+    "player:spin",
+    "player:spin"
+   ],
+   "breakouts": [
+    0,
+    0
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "DFLT#6",
+   "seed": 606,
+   "probeHash": "29e04e2ee0bd344372b3bc71d184048482d21bd233b411c9e2eb2101eafc3769",
+   "baselineHash": "29e04e2ee0bd344372b3bc71d184048482d21bd233b411c9e2eb2101eafc3769",
+   "steps": [
+    1315,
+    1315
+   ],
+   "result": [
+    "rival:spin",
+    "rival:spin"
+   ],
+   "breakouts": [
+    1,
+    1
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "DFLT#7",
+   "seed": 607,
+   "probeHash": "816f31bdd504f3783bc472fc1628fe50af821b682b72a5c4bcaf9aae3177c1dd",
+   "baselineHash": "816f31bdd504f3783bc472fc1628fe50af821b682b72a5c4bcaf9aae3177c1dd",
+   "steps": [
+    1441,
+    1441
+   ],
+   "result": [
+    "rival:spin",
+    "rival:spin"
+   ],
+   "breakouts": [
+    0,
+    0
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "DFLT#8",
+   "seed": 608,
+   "probeHash": "9e64a573798cfb4cde74e0d6f4984cef25bbbbb309f3041fb0ec37d9c6e0fd4c",
+   "baselineHash": "9e64a573798cfb4cde74e0d6f4984cef25bbbbb309f3041fb0ec37d9c6e0fd4c",
+   "steps": [
+    1626,
+    1626
+   ],
+   "result": [
+    "player:spin",
+    "player:spin"
+   ],
+   "breakouts": [
+    1,
+    1
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "DFLT#9",
+   "seed": 609,
+   "probeHash": "f5a195a626da7d7a397262890439e6c54da2924e85ca55201b8af17bc2656f69",
+   "baselineHash": "f5a195a626da7d7a397262890439e6c54da2924e85ca55201b8af17bc2656f69",
+   "steps": [
+    1433,
+    1433
+   ],
+   "result": [
+    "rival:spin",
+    "rival:spin"
+   ],
+   "breakouts": [
+    1,
+    1
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "DFLT#10",
+   "seed": 610,
+   "probeHash": "8520866bf2017041694840e70825ca8a44590be3b8ac855537886caa001e7b97",
+   "baselineHash": "8520866bf2017041694840e70825ca8a44590be3b8ac855537886caa001e7b97",
+   "steps": [
+    1288,
+    1288
+   ],
+   "result": [
+    "rival:spin",
+    "rival:spin"
+   ],
+   "breakouts": [
+    0,
+    0
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "DFLT#11",
+   "seed": 611,
+   "probeHash": "4bc2750debb7458eb9ab8d787c98d642f550dd660cb86ffc74f897cbbd585748",
+   "baselineHash": "4bc2750debb7458eb9ab8d787c98d642f550dd660cb86ffc74f897cbbd585748",
+   "steps": [
+    1365,
+    1365
+   ],
+   "result": [
+    "rival:spin",
+    "rival:spin"
+   ],
+   "breakouts": [
+    0,
+    0
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "DFLT#12",
+   "seed": 612,
+   "probeHash": "6aa7b329c160dea61a4ac37404c315887b462a374bfbf46f7db8458f08fe8db2",
+   "baselineHash": "6aa7b329c160dea61a4ac37404c315887b462a374bfbf46f7db8458f08fe8db2",
+   "steps": [
+    1336,
+    1336
+   ],
+   "result": [
+    "rival:spin",
+    "rival:spin"
+   ],
+   "breakouts": [
+    0,
+    0
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "DFLT#13",
+   "seed": 613,
+   "probeHash": "e208711cb7da35d09eed5cadfb20148437f4191ba83807ef35881edb96e0c8ec",
+   "baselineHash": "e208711cb7da35d09eed5cadfb20148437f4191ba83807ef35881edb96e0c8ec",
+   "steps": [
+    1344,
+    1344
+   ],
+   "result": [
+    "rival:spin",
+    "rival:spin"
+   ],
+   "breakouts": [
+    0,
+    0
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "DFLT#14",
+   "seed": 614,
+   "probeHash": "2b74ec1d06e95a5d75e501370d4b5df7689c316b7fa33853d911ca4479d43110",
+   "baselineHash": "2b74ec1d06e95a5d75e501370d4b5df7689c316b7fa33853d911ca4479d43110",
+   "steps": [
+    1901,
+    1901
+   ],
+   "result": [
+    "rival:spin",
+    "rival:spin"
+   ],
+   "breakouts": [
+    0,
+    0
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "DFLT#15",
+   "seed": 615,
+   "probeHash": "b6df559138f0fd417fe0f759981f76c175ba043911e5495bccaaa9dddbeeab83",
+   "baselineHash": "b6df559138f0fd417fe0f759981f76c175ba043911e5495bccaaa9dddbeeab83",
+   "steps": [
+    1414,
+    1414
+   ],
+   "result": [
+    "rival:spin",
+    "rival:spin"
+   ],
+   "breakouts": [
+    0,
+    0
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "WALL#0",
+   "seed": 1100,
+   "probeHash": "a76f1eeec4e457af8e511280a215778f92ce49cde9916dda4e4299c5f6ed5e6f",
+   "baselineHash": "a76f1eeec4e457af8e511280a215778f92ce49cde9916dda4e4299c5f6ed5e6f",
+   "steps": [
+    1471,
+    1471
+   ],
+   "result": [
+    "player:spin",
+    "player:spin"
+   ],
+   "breakouts": [
+    0,
+    0
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "WALL#1",
+   "seed": 1101,
+   "probeHash": "e5824699380c144d73a0a6d32ef8ea7cc276072178adaa4897ba516bf306e46b",
+   "baselineHash": "e5824699380c144d73a0a6d32ef8ea7cc276072178adaa4897ba516bf306e46b",
+   "steps": [
+    1157,
+    1157
+   ],
+   "result": [
+    "player:spin",
+    "player:spin"
+   ],
+   "breakouts": [
+    0,
+    0
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "WALL#2",
+   "seed": 1102,
+   "probeHash": "234f7ee39d3c35d35d2c11ad627e33eef60f79244210cac7ba221bf64c213c65",
+   "baselineHash": "234f7ee39d3c35d35d2c11ad627e33eef60f79244210cac7ba221bf64c213c65",
+   "steps": [
+    1323,
+    1323
+   ],
+   "result": [
+    "player:spin",
+    "player:spin"
+   ],
+   "breakouts": [
+    0,
+    0
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "WALL#3",
+   "seed": 1103,
+   "probeHash": "333a9bb04faf1a57f28ea377c59d5e2c8e6b1aab9b5579cdc3ff53fac4be3c65",
+   "baselineHash": "333a9bb04faf1a57f28ea377c59d5e2c8e6b1aab9b5579cdc3ff53fac4be3c65",
+   "steps": [
+    1666,
+    1666
+   ],
+   "result": [
+    "player:spin",
+    "player:spin"
+   ],
+   "breakouts": [
+    1,
+    1
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "WALL#4",
+   "seed": 1104,
+   "probeHash": "b66fcb89c614de2d529ec8a82cb73d1f399fd422b7e8220d52b04373d35aaa8e",
+   "baselineHash": "b66fcb89c614de2d529ec8a82cb73d1f399fd422b7e8220d52b04373d35aaa8e",
+   "steps": [
+    1019,
+    1019
+   ],
+   "result": [
+    "player:spin",
+    "player:spin"
+   ],
+   "breakouts": [
+    0,
+    0
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "WALL#5",
+   "seed": 1105,
+   "probeHash": "f45613b9402e3ec74f55faa6f240b4f28369df938250349777126de32c15709e",
+   "baselineHash": "f45613b9402e3ec74f55faa6f240b4f28369df938250349777126de32c15709e",
+   "steps": [
+    1252,
+    1252
+   ],
+   "result": [
+    "player:spin",
+    "player:spin"
+   ],
+   "breakouts": [
+    0,
+    0
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "WALL#6",
+   "seed": 1106,
+   "probeHash": "f0a3faeb41aa893ea42607038a3c517542139ff92dc42ec7349d7019dba57f86",
+   "baselineHash": "f0a3faeb41aa893ea42607038a3c517542139ff92dc42ec7349d7019dba57f86",
+   "steps": [
+    1339,
+    1339
+   ],
+   "result": [
+    "rival:spin",
+    "rival:spin"
+   ],
+   "breakouts": [
+    0,
+    0
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "WALL#7",
+   "seed": 1107,
+   "probeHash": "d4fdf36fa8a3ff807ed39077c144e65e9e40a3c94108ace8cb86809ea693aef3",
+   "baselineHash": "d4fdf36fa8a3ff807ed39077c144e65e9e40a3c94108ace8cb86809ea693aef3",
+   "steps": [
+    1122,
+    1122
+   ],
+   "result": [
+    "player:spin",
+    "player:spin"
+   ],
+   "breakouts": [
+    0,
+    0
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "WALL#8",
+   "seed": 1108,
+   "probeHash": "2177e16be094417d3f138ab16a40e4f3c10850d481d9a977934392cc788d0035",
+   "baselineHash": "2177e16be094417d3f138ab16a40e4f3c10850d481d9a977934392cc788d0035",
+   "steps": [
+    1388,
+    1388
+   ],
+   "result": [
+    "player:spin",
+    "player:spin"
+   ],
+   "breakouts": [
+    0,
+    0
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "WALL#9",
+   "seed": 1109,
+   "probeHash": "3385ef4f9aa2ed1008105ff2162361029abfdfa023c60abffe87d7ed192b711b",
+   "baselineHash": "3385ef4f9aa2ed1008105ff2162361029abfdfa023c60abffe87d7ed192b711b",
+   "steps": [
+    1144,
+    1144
+   ],
+   "result": [
+    "player:spin",
+    "player:spin"
+   ],
+   "breakouts": [
+    0,
+    0
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "WALL#10",
+   "seed": 1110,
+   "probeHash": "ab2ec073691198685d1ce4ab116b3195aa011172fd0d0eab1421b785085b4b8d",
+   "baselineHash": "ab2ec073691198685d1ce4ab116b3195aa011172fd0d0eab1421b785085b4b8d",
+   "steps": [
+    1170,
+    1170
+   ],
+   "result": [
+    "player:spin",
+    "player:spin"
+   ],
+   "breakouts": [
+    0,
+    0
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "WALL#11",
+   "seed": 1111,
+   "probeHash": "bbeb92301482bca391e2bb12a919ecd9ae2073b49ff21910645cca4b9df677a0",
+   "baselineHash": "bbeb92301482bca391e2bb12a919ecd9ae2073b49ff21910645cca4b9df677a0",
+   "steps": [
+    1154,
+    1154
+   ],
+   "result": [
+    "player:spin",
+    "player:spin"
+   ],
+   "breakouts": [
+    0,
+    0
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "AIM -1#0",
+   "seed": 700,
+   "probeHash": "725b69e27ef3d21e1677287302c4653d2ece67bea853af0ef8ae5ab4e5168cee",
+   "baselineHash": "725b69e27ef3d21e1677287302c4653d2ece67bea853af0ef8ae5ab4e5168cee",
+   "steps": [
+    1481,
+    1481
+   ],
+   "result": [
+    "rival:spin",
+    "rival:spin"
+   ],
+   "breakouts": [
+    0,
+    0
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "AIM -1#1",
+   "seed": 701,
+   "probeHash": "b28bf5cf5310147c5fe5ede9c94442faa3c138a7b981c6c1b413a15ebc7d8add",
+   "baselineHash": "b28bf5cf5310147c5fe5ede9c94442faa3c138a7b981c6c1b413a15ebc7d8add",
+   "steps": [
+    1448,
+    1448
+   ],
+   "result": [
+    "rival:spin",
+    "rival:spin"
+   ],
+   "breakouts": [
+    0,
+    0
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "AIM -0.5#0",
+   "seed": 702,
+   "probeHash": "16bdf395bb5bb568d8066dfbe0f7ecc3082b4d5cc0f9eee7183ceda60b3bf59a",
+   "baselineHash": "16bdf395bb5bb568d8066dfbe0f7ecc3082b4d5cc0f9eee7183ceda60b3bf59a",
+   "steps": [
+    1499,
+    1499
+   ],
+   "result": [
+    "rival:spin",
+    "rival:spin"
+   ],
+   "breakouts": [
+    1,
+    1
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "AIM -0.5#1",
+   "seed": 703,
+   "probeHash": "afc6d39af658ea84cdd4d9711aa01670de78ddb110ac3aa3c8d69a2abc9bde8f",
+   "baselineHash": "afc6d39af658ea84cdd4d9711aa01670de78ddb110ac3aa3c8d69a2abc9bde8f",
+   "steps": [
+    1987,
+    1987
+   ],
+   "result": [
+    "rival:spin",
+    "rival:spin"
+   ],
+   "breakouts": [
+    0,
+    0
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "AIM 0#0",
+   "seed": 704,
+   "probeHash": "ca3b9734ff84b527d0120863c9808b8ce22a4b8c102c7607eab59a94681b7947",
+   "baselineHash": "ca3b9734ff84b527d0120863c9808b8ce22a4b8c102c7607eab59a94681b7947",
+   "steps": [
+    1456,
+    1456
+   ],
+   "result": [
+    "rival:spin",
+    "rival:spin"
+   ],
+   "breakouts": [
+    0,
+    0
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "AIM 0#1",
+   "seed": 705,
+   "probeHash": "b5cf7a00ec7d459f0b1d535732deb1fd7a1ef742bac5d87dbe06e7de52e9f2a6",
+   "baselineHash": "b5cf7a00ec7d459f0b1d535732deb1fd7a1ef742bac5d87dbe06e7de52e9f2a6",
+   "steps": [
+    1257,
+    1257
+   ],
+   "result": [
+    "rival:spin",
+    "rival:spin"
+   ],
+   "breakouts": [
+    0,
+    0
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "AIM 0.5#0",
+   "seed": 706,
+   "probeHash": "bbea8c3af76c4c74b2d38c973592cb720c0ec5212803bdced7255bc3f48dcd55",
+   "baselineHash": "bbea8c3af76c4c74b2d38c973592cb720c0ec5212803bdced7255bc3f48dcd55",
+   "steps": [
+    1257,
+    1257
+   ],
+   "result": [
+    "rival:spin",
+    "rival:spin"
+   ],
+   "breakouts": [
+    0,
+    0
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "AIM 0.5#1",
+   "seed": 707,
+   "probeHash": "cb8111d319ae794acc8dbd11553bcdadf7cd1f08728c035d2849754cc1cfcb24",
+   "baselineHash": "cb8111d319ae794acc8dbd11553bcdadf7cd1f08728c035d2849754cc1cfcb24",
+   "steps": [
+    1772,
+    1772
+   ],
+   "result": [
+    "rival:spin",
+    "rival:spin"
+   ],
+   "breakouts": [
+    1,
+    1
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "AIM 1#0",
+   "seed": 708,
+   "probeHash": "a762107d6b77f3f97ea21830e877cd43668d8aa40e893428423b5dec73532c70",
+   "baselineHash": "a762107d6b77f3f97ea21830e877cd43668d8aa40e893428423b5dec73532c70",
+   "steps": [
+    1438,
+    1438
+   ],
+   "result": [
+    "rival:spin",
+    "rival:spin"
+   ],
+   "breakouts": [
+    1,
+    1
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "AIM 1#1",
+   "seed": 709,
+   "probeHash": "7e856f1530a6291ebbbd3947f64d83266facf4be56131f68fdfe00bcf1ac322c",
+   "baselineHash": "7e856f1530a6291ebbbd3947f64d83266facf4be56131f68fdfe00bcf1ac322c",
+   "steps": [
+    1223,
+    1223
+   ],
+   "result": [
+    "rival:spin",
+    "rival:spin"
+   ],
+   "breakouts": [
+    0,
+    0
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "PHASE 0",
+   "seed": 800,
+   "probeHash": "3c5fb911e9feee9d996677dddca25d8166726910f2335170b441392858576be9",
+   "baselineHash": "3c5fb911e9feee9d996677dddca25d8166726910f2335170b441392858576be9",
+   "steps": [
+    1655,
+    1655
+   ],
+   "result": [
+    "rival:spin",
+    "rival:spin"
+   ],
+   "breakouts": [
+    0,
+    0
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "PHASE 1",
+   "seed": 800,
+   "probeHash": "ed5d2674ef204b67ad86e396591933a4364ae3cf25ba68f842cc77ece578b3ef",
+   "baselineHash": "ed5d2674ef204b67ad86e396591933a4364ae3cf25ba68f842cc77ece578b3ef",
+   "steps": [
+    1633,
+    1633
+   ],
+   "result": [
+    "rival:spin",
+    "rival:spin"
+   ],
+   "breakouts": [
+    1,
+    1
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "PHASE 2",
+   "seed": 800,
+   "probeHash": "098f22710e024d40c30be875e47ab3597577ddc35530d3d4d93a1c5d46668b39",
+   "baselineHash": "098f22710e024d40c30be875e47ab3597577ddc35530d3d4d93a1c5d46668b39",
+   "steps": [
+    1291,
+    1291
+   ],
+   "result": [
+    "rival:spin",
+    "rival:spin"
+   ],
+   "breakouts": [
+    0,
+    0
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "PHASE 3",
+   "seed": 800,
+   "probeHash": "a576b084f8f1c89f80d121b08d285f0a68029d214050f79cf267848ddd275b21",
+   "baselineHash": "a576b084f8f1c89f80d121b08d285f0a68029d214050f79cf267848ddd275b21",
+   "steps": [
+    1099,
+    1099
+   ],
+   "result": [
+    "rival:spin",
+    "rival:spin"
+   ],
+   "breakouts": [
+    0,
+    0
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "PHASE 4",
+   "seed": 800,
+   "probeHash": "9e1f7819f3328bb5f33b55e8e99a4f250042e4101aae6ac88bdf09a4ca0107ed",
+   "baselineHash": "9e1f7819f3328bb5f33b55e8e99a4f250042e4101aae6ac88bdf09a4ca0107ed",
+   "steps": [
+    1343,
+    1343
+   ],
+   "result": [
+    "rival:spin",
+    "rival:spin"
+   ],
+   "breakouts": [
+    1,
+    1
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "PHASE 5",
+   "seed": 800,
+   "probeHash": "c78b049d49dc78dacac768df0c97f11c7e09f4d12b7dd6ccebeed17c32f0bc5c",
+   "baselineHash": "c78b049d49dc78dacac768df0c97f11c7e09f4d12b7dd6ccebeed17c32f0bc5c",
+   "steps": [
+    1622,
+    1622
+   ],
+   "result": [
+    "rival:spin",
+    "rival:spin"
+   ],
+   "breakouts": [
+    0,
+    0
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "POWER 0.3#0",
+   "seed": 900,
+   "probeHash": "d138253657c56a6cae852b44237a4e60bdce5bb2a8b36de486d0dce320cc600c",
+   "baselineHash": "d138253657c56a6cae852b44237a4e60bdce5bb2a8b36de486d0dce320cc600c",
+   "steps": [
+    2009,
+    2009
+   ],
+   "result": [
+    "rival:spin",
+    "rival:spin"
+   ],
+   "breakouts": [
+    0,
+    0
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "POWER 0.3#1",
+   "seed": 901,
+   "probeHash": "bba31639b75bf675c8d04f7d22b48e7b859e6776e5437d3ffcff3ff7d275a4e5",
+   "baselineHash": "bba31639b75bf675c8d04f7d22b48e7b859e6776e5437d3ffcff3ff7d275a4e5",
+   "steps": [
+    1939,
+    1939
+   ],
+   "result": [
+    "rival:spin",
+    "rival:spin"
+   ],
+   "breakouts": [
+    1,
+    1
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "POWER 0.5#0",
+   "seed": 902,
+   "probeHash": "fc9cd55ae283e7509ed7810a6c9cd3a556401ce8cb7bd5da74c4cfc2a0990418",
+   "baselineHash": "fc9cd55ae283e7509ed7810a6c9cd3a556401ce8cb7bd5da74c4cfc2a0990418",
+   "steps": [
+    2237,
+    2237
+   ],
+   "result": [
+    "rival:spin",
+    "rival:spin"
+   ],
+   "breakouts": [
+    2,
+    2
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "POWER 0.5#1",
+   "seed": 903,
+   "probeHash": "22ada30cfc5b27ac6bd18fa83d0077957acd3b1b9c90f3a9cdcbe8cd83393550",
+   "baselineHash": "22ada30cfc5b27ac6bd18fa83d0077957acd3b1b9c90f3a9cdcbe8cd83393550",
+   "steps": [
+    2680,
+    2680
+   ],
+   "result": [
+    "rival:spin",
+    "rival:spin"
+   ],
+   "breakouts": [
+    2,
+    2
+   ],
+   "wobbleBreaks": [
+    1,
+    1
+   ],
+   "same": true
+  },
+  {
+   "name": "POWER 0.7#0",
+   "seed": 904,
+   "probeHash": "c73c958d4d2dbce5949c82e63d56a087ad0f7cbf1f3a0a2a8a323d66efae4e46",
+   "baselineHash": "c73c958d4d2dbce5949c82e63d56a087ad0f7cbf1f3a0a2a8a323d66efae4e46",
+   "steps": [
+    2995,
+    2995
+   ],
+   "result": [
+    "rival:spin",
+    "rival:spin"
+   ],
+   "breakouts": [
+    2,
+    2
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "POWER 0.7#1",
+   "seed": 905,
+   "probeHash": "429a189880691eac731a64967772c7dee956bedb78a7a8732006b39fb8694b4b",
+   "baselineHash": "429a189880691eac731a64967772c7dee956bedb78a7a8732006b39fb8694b4b",
+   "steps": [
+    3046,
+    3046
+   ],
+   "result": [
+    "player:spin",
+    "player:spin"
+   ],
+   "breakouts": [
+    2,
+    2
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "POWER 0.85#0",
+   "seed": 906,
+   "probeHash": "deb7e0202196800260a652f98e04d911b3371b7e2153724227a2d9acd2bd424b",
+   "baselineHash": "deb7e0202196800260a652f98e04d911b3371b7e2153724227a2d9acd2bd424b",
+   "steps": [
+    2871,
+    2871
+   ],
+   "result": [
+    "player:spin",
+    "player:spin"
+   ],
+   "breakouts": [
+    1,
+    1
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "POWER 0.85#1",
+   "seed": 907,
+   "probeHash": "85c79523d71e0a842c4df5b4894557fd1bb70ab718dcb868fc19030082d2bc46",
+   "baselineHash": "85c79523d71e0a842c4df5b4894557fd1bb70ab718dcb868fc19030082d2bc46",
+   "steps": [
+    3407,
+    3407
+   ],
+   "result": [
+    "player:spin",
+    "player:spin"
+   ],
+   "breakouts": [
+    3,
+    3
+   ],
+   "wobbleBreaks": [
+    1,
+    1
+   ],
+   "same": true
+  },
+  {
+   "name": "POWER 1#0",
+   "seed": 908,
+   "probeHash": "9b2781e72f86492d1bbce952dc1980af1462fbf6e8b643056f1e5bbaf87d8477",
+   "baselineHash": "9b2781e72f86492d1bbce952dc1980af1462fbf6e8b643056f1e5bbaf87d8477",
+   "steps": [
+    2630,
+    2630
+   ],
+   "result": [
+    "player:spin",
+    "player:spin"
+   ],
+   "breakouts": [
+    2,
+    2
+   ],
+   "wobbleBreaks": [
+    1,
+    1
+   ],
+   "same": true
+  },
+  {
+   "name": "POWER 1#1",
+   "seed": 909,
+   "probeHash": "b1afa2e399f3d8fd036eb8b4c00d62b300e6824158b3bf949afa32c4439a217c",
+   "baselineHash": "b1afa2e399f3d8fd036eb8b4c00d62b300e6824158b3bf949afa32c4439a217c",
+   "steps": [
+    2683,
+    2683
+   ],
+   "result": [
+    "player:spin",
+    "player:spin"
+   ],
+   "breakouts": [
+    1,
+    1
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "EDGE A/D aim 1",
+   "seed": 1000,
+   "probeHash": "03b397c8d72472274ea7b4b93c017ffe0364a239c0f6eb5b7d31dcaf36804c68",
+   "baselineHash": "03b397c8d72472274ea7b4b93c017ffe0364a239c0f6eb5b7d31dcaf36804c68",
+   "steps": [
+    1550,
+    1550
+   ],
+   "result": [
+    "rival:spin",
+    "rival:spin"
+   ],
+   "breakouts": [
+    0,
+    0
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "EDGE A/D aim -1",
+   "seed": 1001,
+   "probeHash": "45d90e06f6a497759634bbfa088d561bbd824e6d47dc118bf059e09378c345c9",
+   "baselineHash": "45d90e06f6a497759634bbfa088d561bbd824e6d47dc118bf059e09378c345c9",
+   "steps": [
+    1446,
+    1446
+   ],
+   "result": [
+    "rival:spin",
+    "rival:spin"
+   ],
+   "breakouts": [
+    1,
+    1
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "LONG S/S#0",
+   "seed": 1010,
+   "probeHash": "a41a3c36a1fb109632d17df046b852901b82e13e46cfcd0aed587bee8c84d171",
+   "baselineHash": "a41a3c36a1fb109632d17df046b852901b82e13e46cfcd0aed587bee8c84d171",
+   "steps": [
+    5605,
+    5605
+   ],
+   "result": [
+    "player:spin",
+    "player:spin"
+   ],
+   "breakouts": [
+    10,
+    10
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "LONG S/S#1",
+   "seed": 1011,
+   "probeHash": "90215e41a74f87c753763ebc0075321449bb64a29e813b7abdd547cbf822fb4e",
+   "baselineHash": "90215e41a74f87c753763ebc0075321449bb64a29e813b7abdd547cbf822fb4e",
+   "steps": [
+    5800,
+    5800
+   ],
+   "result": [
+    "player:spin",
+    "player:spin"
+   ],
+   "breakouts": [
+    10,
+    10
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "LONG A/A#0",
+   "seed": 1020,
+   "probeHash": "25e09aebd11ad04795626f5be72d799932302f4759a1607c1be81b9d956eef67",
+   "baselineHash": "25e09aebd11ad04795626f5be72d799932302f4759a1607c1be81b9d956eef67",
+   "steps": [
+    1104,
+    1104
+   ],
+   "result": [
+    "player:spin",
+    "player:spin"
+   ],
+   "breakouts": [
+    0,
+    0
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "LONG A/A#1",
+   "seed": 1021,
+   "probeHash": "5ea59b48c8c7b9b58da2206d9b21000b83afb7d812126e2f423a2a6b3bffb3eb",
+   "baselineHash": "5ea59b48c8c7b9b58da2206d9b21000b83afb7d812126e2f423a2a6b3bffb3eb",
+   "steps": [
+    1204,
+    1204
+   ],
+   "result": [
+    "player:spin",
+    "player:spin"
+   ],
+   "breakouts": [
+    0,
+    0
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "FEELBAL#1000",
+   "seed": 1000,
+   "probeHash": "f88f85ba720c5a3199e9cf6a32858c3548de81b5a191e696b53679494dc9c22d",
+   "baselineHash": "f88f85ba720c5a3199e9cf6a32858c3548de81b5a191e696b53679494dc9c22d",
+   "steps": [
+    2533,
+    2533
+   ],
+   "result": [
+    "player:spin",
+    "player:spin"
+   ],
+   "breakouts": [
+    1,
+    1
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "FEELBAL#1001",
+   "seed": 1001,
+   "probeHash": "31b4ad20787b482e7acd51ebf96596cb1767d96d8e3aa2cf95566bf980cde8ae",
+   "baselineHash": "31b4ad20787b482e7acd51ebf96596cb1767d96d8e3aa2cf95566bf980cde8ae",
+   "steps": [
+    2978,
+    2978
+   ],
+   "result": [
+    "rival:spin",
+    "rival:spin"
+   ],
+   "breakouts": [
+    1,
+    1
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "FEELBAL#1002",
+   "seed": 1002,
+   "probeHash": "773832d2bba1df35024cb7dc544d0053ef9090806ab8968285fb1f6f2853bb13",
+   "baselineHash": "773832d2bba1df35024cb7dc544d0053ef9090806ab8968285fb1f6f2853bb13",
+   "steps": [
+    3086,
+    3086
+   ],
+   "result": [
+    "player:spin",
+    "player:spin"
+   ],
+   "breakouts": [
+    2,
+    2
+   ],
+   "wobbleBreaks": [
+    1,
+    1
+   ],
+   "same": true
+  },
+  {
+   "name": "FEELBAL#1003",
+   "seed": 1003,
+   "probeHash": "dc84e066b4d7ee72661f2583d1f122adbf0155fb2aff7aa5dcced5d67b165ff4",
+   "baselineHash": "dc84e066b4d7ee72661f2583d1f122adbf0155fb2aff7aa5dcced5d67b165ff4",
+   "steps": [
+    2849,
+    2849
+   ],
+   "result": [
+    "player:spin",
+    "player:spin"
+   ],
+   "breakouts": [
+    2,
+    2
+   ],
+   "wobbleBreaks": [
+    1,
+    1
+   ],
+   "same": true
+  },
+  {
+   "name": "FEELBAL#1004",
+   "seed": 1004,
+   "probeHash": "44e4b9f641d0c9c2fa9c9c4153c5cce413e0d3ac839830875d4bf8ebb06370a6",
+   "baselineHash": "44e4b9f641d0c9c2fa9c9c4153c5cce413e0d3ac839830875d4bf8ebb06370a6",
+   "steps": [
+    3129,
+    3129
+   ],
+   "result": [
+    "rival:spin",
+    "rival:spin"
+   ],
+   "breakouts": [
+    2,
+    2
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "FEELBAL#1005",
+   "seed": 1005,
+   "probeHash": "400e5f6105b1565ba1ece9f0c0f77423598b77e09c10f2416558c6de960ee3c4",
+   "baselineHash": "400e5f6105b1565ba1ece9f0c0f77423598b77e09c10f2416558c6de960ee3c4",
+   "steps": [
+    2986,
+    2986
+   ],
+   "result": [
+    "player:spin",
+    "player:spin"
+   ],
+   "breakouts": [
+    1,
+    1
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "FEELSTA#3000",
+   "seed": 3000,
+   "probeHash": "057644213147cfb583fca09bffa7717f54acf23e80eb81a3e8afcc9d54527e81",
+   "baselineHash": "057644213147cfb583fca09bffa7717f54acf23e80eb81a3e8afcc9d54527e81",
+   "steps": [
+    5431,
+    5431
+   ],
+   "result": [
+    "player:spin",
+    "player:spin"
+   ],
+   "breakouts": [
+    10,
+    10
+   ],
+   "wobbleBreaks": [
+    1,
+    1
+   ],
+   "same": true
+  },
+  {
+   "name": "FEELSTA#3001",
+   "seed": 3001,
+   "probeHash": "8f1aded1d43bb2d2d3ed50780d9c6309f3b48377f0bac28fa810796ac8494c5d",
+   "baselineHash": "8f1aded1d43bb2d2d3ed50780d9c6309f3b48377f0bac28fa810796ac8494c5d",
+   "steps": [
+    4980,
+    4980
+   ],
+   "result": [
+    "player:spin",
+    "player:spin"
+   ],
+   "breakouts": [
+    8,
+    8
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "FEELSTA#3002",
+   "seed": 3002,
+   "probeHash": "351784783d6e42421320e7fb6e0a73205fad63aaaf8904b3d78773ea0b410aeb",
+   "baselineHash": "351784783d6e42421320e7fb6e0a73205fad63aaaf8904b3d78773ea0b410aeb",
+   "steps": [
+    4954,
+    4954
+   ],
+   "result": [
+    "player:spin",
+    "player:spin"
+   ],
+   "breakouts": [
+    9,
+    9
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "FEELSTA#3003",
+   "seed": 3003,
+   "probeHash": "86c75531f5718738b8548e877a8e2adb50e7be7980820d06bca1790ad1a1292d",
+   "baselineHash": "86c75531f5718738b8548e877a8e2adb50e7be7980820d06bca1790ad1a1292d",
+   "steps": [
+    4869,
+    4869
+   ],
+   "result": [
+    "player:spin",
+    "player:spin"
+   ],
+   "breakouts": [
+    9,
+    9
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "NNPOW 0.3#0",
+   "seed": 4000,
+   "probeHash": "4b315f44318a50d7015ee9396d069d2ed8560482dfb8a4d99dcc6e108bf25832",
+   "baselineHash": "4b315f44318a50d7015ee9396d069d2ed8560482dfb8a4d99dcc6e108bf25832",
+   "steps": [
+    4103,
+    4103
+   ],
+   "result": [
+    "player:spin",
+    "player:spin"
+   ],
+   "breakouts": [
+    8,
+    8
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "NNPOW 0.3#1",
+   "seed": 4001,
+   "probeHash": "199a4e51e76f065086208ac7d6a2a5609aac472ce59d406475906ddc4b23cdbb",
+   "baselineHash": "199a4e51e76f065086208ac7d6a2a5609aac472ce59d406475906ddc4b23cdbb",
+   "steps": [
+    4001,
+    4001
+   ],
+   "result": [
+    "player:spin",
+    "player:spin"
+   ],
+   "breakouts": [
+    8,
+    8
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "NNPOW 0.3#2",
+   "seed": 4002,
+   "probeHash": "e87a38e8ed741ad289dce38d1d853c8ecc6c6fe798c87492992bd3c44de6296c",
+   "baselineHash": "e87a38e8ed741ad289dce38d1d853c8ecc6c6fe798c87492992bd3c44de6296c",
+   "steps": [
+    3918,
+    3918
+   ],
+   "result": [
+    "player:spin",
+    "player:spin"
+   ],
+   "breakouts": [
+    8,
+    8
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "NNPOW 0.3#3",
+   "seed": 4003,
+   "probeHash": "94995f1f527ea9e6cde175312ceaf6d3aa856d6e58c2f6eb8d796ac07a91f1d1",
+   "baselineHash": "94995f1f527ea9e6cde175312ceaf6d3aa856d6e58c2f6eb8d796ac07a91f1d1",
+   "steps": [
+    4183,
+    4183
+   ],
+   "result": [
+    "player:spin",
+    "player:spin"
+   ],
+   "breakouts": [
+    8,
+    8
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "NNPOW 0.45#0",
+   "seed": 4010,
+   "probeHash": "ab6f263c89a4316a08557e6c717f731c465ac71bf14b059ac6e7431cacc83473",
+   "baselineHash": "ab6f263c89a4316a08557e6c717f731c465ac71bf14b059ac6e7431cacc83473",
+   "steps": [
+    4417,
+    4417
+   ],
+   "result": [
+    "player:spin",
+    "player:spin"
+   ],
+   "breakouts": [
+    9,
+    9
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "NNPOW 0.45#1",
+   "seed": 4011,
+   "probeHash": "4ffcab649283d33f18e9c7e3c1b3881ff29213d88c267066899dea9deaf2a658",
+   "baselineHash": "4ffcab649283d33f18e9c7e3c1b3881ff29213d88c267066899dea9deaf2a658",
+   "steps": [
+    4285,
+    4285
+   ],
+   "result": [
+    "player:spin",
+    "player:spin"
+   ],
+   "breakouts": [
+    9,
+    9
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "NNPOW 0.45#2",
+   "seed": 4012,
+   "probeHash": "af65229f2c736585cc1b35bf0e8832a1ee5a522bd8592b28e3fe68bcee6c7813",
+   "baselineHash": "af65229f2c736585cc1b35bf0e8832a1ee5a522bd8592b28e3fe68bcee6c7813",
+   "steps": [
+    4629,
+    4629
+   ],
+   "result": [
+    "player:spin",
+    "player:spin"
+   ],
+   "breakouts": [
+    9,
+    9
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "NNPOW 0.45#3",
+   "seed": 4013,
+   "probeHash": "687bf50364e454d75b3d872b97dbbc95712c48828dfdf1a0577ddf29cc5b48ca",
+   "baselineHash": "687bf50364e454d75b3d872b97dbbc95712c48828dfdf1a0577ddf29cc5b48ca",
+   "steps": [
+    4494,
+    4494
+   ],
+   "result": [
+    "player:spin",
+    "player:spin"
+   ],
+   "breakouts": [
+    9,
+    9
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "NNPOW 0.9#0",
+   "seed": 4020,
+   "probeHash": "14852487c1d659b217365518e48c8a6d87d4e4ae754226a0be43c4e5f61e60b4",
+   "baselineHash": "14852487c1d659b217365518e48c8a6d87d4e4ae754226a0be43c4e5f61e60b4",
+   "steps": [
+    5583,
+    5583
+   ],
+   "result": [
+    "player:spin",
+    "player:spin"
+   ],
+   "breakouts": [
+    10,
+    10
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "NNPOW 0.9#1",
+   "seed": 4021,
+   "probeHash": "d456834288ae94462a70a0b27158ed9950d8a65c09da39a996ee1e0076e19f3a",
+   "baselineHash": "d456834288ae94462a70a0b27158ed9950d8a65c09da39a996ee1e0076e19f3a",
+   "steps": [
+    5917,
+    5917
+   ],
+   "result": [
+    "player:spin",
+    "player:spin"
+   ],
+   "breakouts": [
+    10,
+    10
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "NNPOW 0.9#2",
+   "seed": 4022,
+   "probeHash": "22924063e0fb91e035370906777a27a82e8378d0bd41318a5d5d981338d0196e",
+   "baselineHash": "22924063e0fb91e035370906777a27a82e8378d0bd41318a5d5d981338d0196e",
+   "steps": [
+    5607,
+    5607
+   ],
+   "result": [
+    "player:spin",
+    "player:spin"
+   ],
+   "breakouts": [
+    10,
+    10
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "NNPOW 0.9#3",
+   "seed": 4023,
+   "probeHash": "27c5cdb28a88fce38dea19cf4d624ed629370c521ffa012b96203d6b0bb2e20c",
+   "baselineHash": "27c5cdb28a88fce38dea19cf4d624ed629370c521ffa012b96203d6b0bb2e20c",
+   "steps": [
+    5716,
+    5716
+   ],
+   "result": [
+    "player:spin",
+    "player:spin"
+   ],
+   "breakouts": [
+    10,
+    10
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "CTRL center NN#0",
+   "seed": 5000,
+   "probeHash": "d4b9bb73ff30dd765d65962101aee266d5966539e48de7be717f4a7d06d43f31",
+   "baselineHash": "d4b9bb73ff30dd765d65962101aee266d5966539e48de7be717f4a7d06d43f31",
+   "steps": [
+    4624,
+    4624
+   ],
+   "result": [
+    "player:spin",
+    "player:spin"
+   ],
+   "breakouts": [
+    9,
+    9
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "CTRL center NN#1",
+   "seed": 5001,
+   "probeHash": "4a3f8eb425f510b515dbf010bb75352b7065faf9298f1ff5eb4ab7f2ab3b3cb6",
+   "baselineHash": "4a3f8eb425f510b515dbf010bb75352b7065faf9298f1ff5eb4ab7f2ab3b3cb6",
+   "steps": [
+    4644,
+    4644
+   ],
+   "result": [
+    "player:spin",
+    "player:spin"
+   ],
+   "breakouts": [
+    9,
+    9
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "CTRL center BB#0",
+   "seed": 5010,
+   "probeHash": "be48bc1c0aa6c46289276930a45bbfcd148f6101d6d0777ab2b9d59ea8dfa468",
+   "baselineHash": "be48bc1c0aa6c46289276930a45bbfcd148f6101d6d0777ab2b9d59ea8dfa468",
+   "steps": [
+    2949,
+    2949
+   ],
+   "result": [
+    "player:spin",
+    "player:spin"
+   ],
+   "breakouts": [
+    1,
+    1
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "CTRL center BB#1",
+   "seed": 5011,
+   "probeHash": "4e855e3e5caf465f6d56b14ae7690cb502f6e598909612374f351d1ae540dee8",
+   "baselineHash": "4e855e3e5caf465f6d56b14ae7690cb502f6e598909612374f351d1ae540dee8",
+   "steps": [
+    2747,
+    2747
+   ],
+   "result": [
+    "player:spin",
+    "player:spin"
+   ],
+   "breakouts": [
+    1,
+    1
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "CTRL center NR#0",
+   "seed": 5020,
+   "probeHash": "0b25399eae34ff4ad5c4546be4be97a71acccc1c451a0074eadca8559c7b7979",
+   "baselineHash": "0b25399eae34ff4ad5c4546be4be97a71acccc1c451a0074eadca8559c7b7979",
+   "steps": [
+    1810,
+    1810
+   ],
+   "result": [
+    "player:spin",
+    "player:spin"
+   ],
+   "breakouts": [
+    1,
+    1
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "CTRL center NR#1",
+   "seed": 5021,
+   "probeHash": "a336051bf1fc8a9bbacf85219f992f647de2e4f6b2cc6e2e6a76112ac2ea7fb7",
+   "baselineHash": "a336051bf1fc8a9bbacf85219f992f647de2e4f6b2cc6e2e6a76112ac2ea7fb7",
+   "steps": [
+    1499,
+    1499
+   ],
+   "result": [
+    "player:spin",
+    "player:spin"
+   ],
+   "breakouts": [
+    1,
+    1
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "CTRL wall NN#0",
+   "seed": 5100,
+   "probeHash": "0fbdb85ff73f33860485022150f3df51a838ae800e3679257a977be455eb3a68",
+   "baselineHash": "0fbdb85ff73f33860485022150f3df51a838ae800e3679257a977be455eb3a68",
+   "steps": [
+    4960,
+    4960
+   ],
+   "result": [
+    "player:spin",
+    "player:spin"
+   ],
+   "breakouts": [
+    10,
+    10
+   ],
+   "wobbleBreaks": [
+    1,
+    1
+   ],
+   "same": true
+  },
+  {
+   "name": "CTRL wall NN#1",
+   "seed": 5101,
+   "probeHash": "f404e062a03a47e8e2bb608b49f0392c1042debc2521c1db86b6116b6dd9680e",
+   "baselineHash": "f404e062a03a47e8e2bb608b49f0392c1042debc2521c1db86b6116b6dd9680e",
+   "steps": [
+    4360,
+    4360
+   ],
+   "result": [
+    "player:spin",
+    "player:spin"
+   ],
+   "breakouts": [
+    8,
+    8
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "CTRL wall BB#0",
+   "seed": 5110,
+   "probeHash": "a34cad349a5a0247f3065e9081a797997a1f8e3622b44d7c6f7b8b3cdaa18b9c",
+   "baselineHash": "a34cad349a5a0247f3065e9081a797997a1f8e3622b44d7c6f7b8b3cdaa18b9c",
+   "steps": [
+    2643,
+    2643
+   ],
+   "result": [
+    "player:spin",
+    "player:spin"
+   ],
+   "breakouts": [
+    2,
+    2
+   ],
+   "wobbleBreaks": [
+    1,
+    1
+   ],
+   "same": true
+  },
+  {
+   "name": "CTRL wall BB#1",
+   "seed": 5111,
+   "probeHash": "ad7197948f65506dbc35313cc880263f1d29f704a233c96f2bdc90c3613c3338",
+   "baselineHash": "ad7197948f65506dbc35313cc880263f1d29f704a233c96f2bdc90c3613c3338",
+   "steps": [
+    2640,
+    2640
+   ],
+   "result": [
+    "player:spin",
+    "player:spin"
+   ],
+   "breakouts": [
+    2,
+    2
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "CTRL wall NR#0",
+   "seed": 5120,
+   "probeHash": "380def116de7f8a96594b84a9464ead6e4f30a7301069759113ef75fa11a070e",
+   "baselineHash": "380def116de7f8a96594b84a9464ead6e4f30a7301069759113ef75fa11a070e",
+   "steps": [
+    1114,
+    1114
+   ],
+   "result": [
+    "player:spin",
+    "player:spin"
+   ],
+   "breakouts": [
+    1,
+    1
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "CTRL wall NR#1",
+   "seed": 5121,
+   "probeHash": "a8bd6744bd8ce07c7149f52552b78963140d42561faef6f06d4f2d936c205585",
+   "baselineHash": "a8bd6744bd8ce07c7149f52552b78963140d42561faef6f06d4f2d936c205585",
+   "steps": [
+    1335,
+    1335
+   ],
+   "result": [
+    "player:spin",
+    "player:spin"
+   ],
+   "breakouts": [
+    1,
+    1
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "CTRL graze NN#0",
+   "seed": 5200,
+   "probeHash": "27f3bc5ed5162e6a5110a2fff97f45f6b54d8ab4390b2cdd1d0c039736e88620",
+   "baselineHash": "27f3bc5ed5162e6a5110a2fff97f45f6b54d8ab4390b2cdd1d0c039736e88620",
+   "steps": [
+    4550,
+    4550
+   ],
+   "result": [
+    "player:spin",
+    "player:spin"
+   ],
+   "breakouts": [
+    8,
+    8
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "CTRL graze NN#1",
+   "seed": 5201,
+   "probeHash": "859cb65e0feb168506d5a5c54811741e2c41f6795d3bb35fc078aae20d6eedbf",
+   "baselineHash": "859cb65e0feb168506d5a5c54811741e2c41f6795d3bb35fc078aae20d6eedbf",
+   "steps": [
+    4581,
+    4581
+   ],
+   "result": [
+    "player:spin",
+    "player:spin"
+   ],
+   "breakouts": [
+    9,
+    9
+   ],
+   "wobbleBreaks": [
+    1,
+    1
+   ],
+   "same": true
+  },
+  {
+   "name": "CTRL graze BB#0",
+   "seed": 5210,
+   "probeHash": "f365dc66bae4816a2cbc3e1b33cf9c1c91bbd8b3140dfafeb57c735aa1e26c96",
+   "baselineHash": "f365dc66bae4816a2cbc3e1b33cf9c1c91bbd8b3140dfafeb57c735aa1e26c96",
+   "steps": [
+    2752,
+    2752
+   ],
+   "result": [
+    "player:spin",
+    "player:spin"
+   ],
+   "breakouts": [
+    2,
+    2
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "CTRL graze BB#1",
+   "seed": 5211,
+   "probeHash": "6b1f39ce966e75e0cd8f11a4cbc251cc21b5fbf40e749d98a75b5660b3f7764f",
+   "baselineHash": "6b1f39ce966e75e0cd8f11a4cbc251cc21b5fbf40e749d98a75b5660b3f7764f",
+   "steps": [
+    2958,
+    2958
+   ],
+   "result": [
+    "player:spin",
+    "player:spin"
+   ],
+   "breakouts": [
+    1,
+    1
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "CTRL graze NR#0",
+   "seed": 5220,
+   "probeHash": "ed7abc2485cab861576bfad060cd58d81626ea234329e13916c2c4701bafd234",
+   "baselineHash": "ed7abc2485cab861576bfad060cd58d81626ea234329e13916c2c4701bafd234",
+   "steps": [
+    1357,
+    1357
+   ],
+   "result": [
+    "player:spin",
+    "player:spin"
+   ],
+   "breakouts": [
+    1,
+    1
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  },
+  {
+   "name": "CTRL graze NR#1",
+   "seed": 5221,
+   "probeHash": "18ad142e9e627d6856d9d28844ba92dc778a28d3587f2ad60a70995bdf3dbb3f",
+   "baselineHash": "18ad142e9e627d6856d9d28844ba92dc778a28d3587f2ad60a70995bdf3dbb3f",
+   "steps": [
+    1651,
+    1651
+   ],
+   "result": [
+    "player:spin",
+    "player:spin"
+   ],
+   "breakouts": [
+    1,
+    1
+   ],
+   "wobbleBreaks": [
+    0,
+    0
+   ],
+   "same": true
+  }
+ ]
+}
