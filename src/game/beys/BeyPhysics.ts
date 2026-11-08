@@ -160,6 +160,8 @@ export class BeyPhysics {
   tilt = 0;
   /** 是否在极限轨道上冲刺 */
   dashing = false;
+  /** 本步轴心牵引是否实际施加（只写诊断 / 供 R1c 分类读取，不参与物理） */
+  tractionApplied = false;
   /** 是否接触地面 */
   grounded = false;
   private readonly pw: PhysicsWorld;
@@ -283,6 +285,16 @@ export class BeyPhysics {
     upOut.x /= l;
     upOut.y /= l;
     upOut.z /= l;
+  }
+
+  /** 自然进动给出的当前牵引方向（水平单位向量，只读） */
+  get naturalTractionDir(): { x: number; z: number } {
+    return { x: -Math.sin(this.precession) * this.spinSign, z: Math.cos(this.precession) * this.spinSign };
+  }
+
+  /** 转速消耗的惯量折算系数（只读，R1c 按原有牵引规则计算转速消耗用） */
+  get spinInertiaRatio(): number {
+    return this.inertiaRatio;
   }
 
   /** 转速比例 0..1 */
@@ -410,6 +422,7 @@ export class BeyPhysics {
         this.dashing = true;
       }
     }
+    this.tractionApplied = false;
     // 战术意图：决定“希望牵引指向哪里”和调制深度（不施力）
     const opp = this.opponent;
     if (opp) {
@@ -492,6 +505,7 @@ export class BeyPhysics {
         const r2 = this.breakout > 0 ? Math.max(ratio, T.breakoutRatio) : ratio;
         const a = T.driveAccel * driveGrip * r2 * body.mass() * dt;
         body.applyImpulse({ x: dx * a, y: 0, z: dz * a }, true);
+        this.tractionApplied = true;
         decay += T.driveSpinCost * driveGrip;
       }
       // 改变轴的倾斜方向需要力矩：按调制深度额外消耗转速

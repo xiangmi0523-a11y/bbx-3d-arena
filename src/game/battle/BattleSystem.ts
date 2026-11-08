@@ -6,6 +6,7 @@ import { computeLaunch, type Side } from '../launcher/launch';
 import type { LaunchCommand } from '../launcher/PullStringGesture';
 import type { PhysicsWorld } from '../physics/PhysicsWorld';
 import { ContactFeedback, type ContactSample, type ImpactDecision } from './contactFeedback';
+import { StallRecovery } from './stallRecovery';
 import { boundingRadius, canSkip, classifyContact, emptyEvidence, queryContact, type ContactClass, type ContactEvidence } from './contactSampling';
 import { impactTier, type ImpactTier } from './impactTiers';
 
@@ -105,6 +106,8 @@ export class BattleSystem {
   contactClass: ContactClass = classifyContact(this.contactEvidence);
   /** 诊断计数（步）：包围球门槛跳过、几何接触、预测间隙、冲量响应、几何接触但零冲量、有冲量但无几何接触 */
   readonly contactStats = { skipped: 0, geometric: 0, predictive: 0, impulse: 0, geometricZeroImpulse: 0, impulseNoGeometric: 0 };
+  /** R1c 受控恢复（Stage B 实验，R1C_TUNING.enabled 控制） */
+  readonly recovery = new StallRecovery();
   /** 两台刚体的包围球半径（首次采样时由碰撞体计算） */
   private bound: { a: BeyPhysics; b: BeyPhysics; ra: number; rb: number } | null = null;
   private readonly sample: ContactSample = { touching: false, force: 0, slide: 0, x: 0, y: 0, z: 0, nx: 1, nz: 0, tx: 0, tz: 1 };
@@ -149,6 +152,16 @@ export class BattleSystem {
       const other = this.beys[side === 'player' ? 'rival' : 'player'];
       b.opponent = other ?? null;
       b.preStep(dt);
+    }
+    // R1c：针尖对针尖低速僵持的受控恢复（独立通道，见 stallRecovery.ts）。读取上一步的接触观测（Stage A）
+    const a = this.beys.player;
+    const r = this.beys.rival;
+    if (a && r && !this.result)
+      this.recovery.step(dt, this.time, a, r, { contact: this.contactClass, contactValid: this.contactEvidence.valid, wobbleFor: this.wobbleFor, wobbleBreaks: this.wobbleBreaks });
+    // 碰撞前速度在所有施力之后记录（R1c 未施力时与原来逐步相同）
+    for (const side of ['player', 'rival'] as Side[]) {
+      const b = this.beys[side];
+      if (!b) continue;
       const v = b.body.linvel();
       this.preVel[side].x = v.x;
       this.preVel[side].z = v.z;
