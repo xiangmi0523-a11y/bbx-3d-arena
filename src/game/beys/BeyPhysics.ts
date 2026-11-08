@@ -311,6 +311,8 @@ export class BeyPhysics {
   opponent: BeyPhysics | null = null;
   /** 脱困计时（秒） */
   breakout = 0;
+  /** 滚动阻力倍率（由对战系统写入：针尖僵持确认时 < 1，见 battle/stallRoll.ts；其他时候恒为 1） */
+  rollScale = 1;
   /** 战术意图（有状态、确定性随机）。只调制进动相位转速，不施加力 */
   readonly intent: MotionIntent;
   /** 当前战术状态名（诊断 / 测试读取） */
@@ -503,7 +505,9 @@ export class BeyPhysics {
       const v = body.linvel();
       const sp = Math.hypot(v.x, v.z);
       if (sp > 1e-3) {
-        const dv = Math.min(sp, (T.rollBase + T.rollFriction * this.spec.tip.friction) * -GRAVITY * dt);
+        let k = T.rollBase + T.rollFriction * this.spec.tip.friction;
+        if (this.rollScale !== 1) k *= this.rollScale;
+        const dv = Math.min(sp, k * -GRAVITY * dt);
         const m = body.mass();
         body.applyImpulse({ x: (-v.x / sp) * dv * m, y: 0, z: (-v.z / sp) * dv * m }, true);
       }

@@ -1,0 +1,4829 @@
+{
+ "scale": 1,
+ "runs": [
+  {
+   "name": "AvD#0",
+   "group": "AvD",
+   "nn": false,
+   "hash": "7775c5b87607837449ab15a2f47c770a1a052d4406e681a7035a11c81af73b60",
+   "steps": 1361,
+   "duration": 11.341666666666667,
+   "result": "rival:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 2663,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 5
+  },
+  {
+   "name": "AvD#1",
+   "group": "AvD",
+   "nn": false,
+   "hash": "5f5a59b94283b051fa95b23e486993f95a970a44f8147033ec311c0fdc726ed5",
+   "steps": 1431,
+   "duration": 11.925,
+   "result": "rival:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 2799,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 7
+  },
+  {
+   "name": "AvD#2",
+   "group": "AvD",
+   "nn": false,
+   "hash": "9bd0d0ff923cb2e08afcff179e15357a2b9dd8955d9894468ba3ff3ec794bd3a",
+   "steps": 1727,
+   "duration": 14.391666666666667,
+   "result": "rival:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 3390,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 8
+  },
+  {
+   "name": "AvD#3",
+   "group": "AvD",
+   "nn": false,
+   "hash": "d9edb80640b838eb503a1558d003cc55d0af800aff4a2958ecab1f409d2285fb",
+   "steps": 1405,
+   "duration": 11.708333333333334,
+   "result": "rival:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 2705,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 4
+  },
+  {
+   "name": "AvD#4",
+   "group": "AvD",
+   "nn": false,
+   "hash": "e61c44a16aae5397dff7ad5c8b6bd27ed03a000864e68db8cf4f343db959d26f",
+   "steps": 1880,
+   "duration": 15.666666666666666,
+   "result": "rival:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 3700,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 1,
+   "wobbleBreaks": 1,
+   "hits": 7
+  },
+  {
+   "name": "AvD#5",
+   "group": "AvD",
+   "nn": false,
+   "hash": "c07db8d642a305599d70a4582da737ca612856261f169fbe94ffef62cba293e3",
+   "steps": 2113,
+   "duration": 17.608333333333334,
+   "result": "rival:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 4157,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 7
+  },
+  {
+   "name": "AvD#6",
+   "group": "AvD",
+   "nn": false,
+   "hash": "5d966671610bc90b39fa61e3d4c8d7d0ba1d770100eca3391d152a0d8e262b0b",
+   "steps": 1198,
+   "duration": 9.983333333333333,
+   "result": "rival:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 2337,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 6
+  },
+  {
+   "name": "AvD#7",
+   "group": "AvD",
+   "nn": false,
+   "hash": "e37f8d260ad4b0c1a2ae2ad19489ec69611217364ce55c86a3d9c34dab486fdd",
+   "steps": 1351,
+   "duration": 11.258333333333333,
+   "result": "rival:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 2591,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 3
+  },
+  {
+   "name": "AvD#8",
+   "group": "AvD",
+   "nn": false,
+   "hash": "901dfc858c340df78d8d54672b16ea0794b654081ee812d8f50f62677af7e5c0",
+   "steps": 1894,
+   "duration": 15.783333333333333,
+   "result": "rival:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 3729,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 7
+  },
+  {
+   "name": "AvD#9",
+   "group": "AvD",
+   "nn": false,
+   "hash": "c132b8c7872e01a0a5d9e917a17e2f689ce21ff0e48824492c30e6b31e05e09e",
+   "steps": 1365,
+   "duration": 11.375,
+   "result": "rival:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 2668,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 5
+  },
+  {
+   "name": "AvD#10",
+   "group": "AvD",
+   "nn": false,
+   "hash": "3010a10507837c5c4ef8235cd5dbd9057c68b26ca9684e698be1a6ad4cbbc317",
+   "steps": 1745,
+   "duration": 14.541666666666666,
+   "result": "rival:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 3430,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 5
+  },
+  {
+   "name": "AvD#11",
+   "group": "AvD",
+   "nn": false,
+   "hash": "467a4319051ae9505ea4ecb7d00d3fbac349fba4d150c70e3e6cb8f32c6bf7cb",
+   "steps": 1693,
+   "duration": 14.108333333333333,
+   "result": "rival:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 3272,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 6
+  },
+  {
+   "name": "AvD#12",
+   "group": "AvD",
+   "nn": false,
+   "hash": "248379e49d9d9044eaf0a5af051c9dd61583321ffbbc64f55a3a98ef6aee332e",
+   "steps": 1694,
+   "duration": 14.116666666666667,
+   "result": "rival:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 3329,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 5
+  },
+  {
+   "name": "AvD#13",
+   "group": "AvD",
+   "nn": false,
+   "hash": "c48b9cd3b6ecf638f57c69c42fb522f03ef27459ab47cbf8018e91c3815a5d34",
+   "steps": 1528,
+   "duration": 12.733333333333333,
+   "result": "rival:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 2993,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 6
+  },
+  {
+   "name": "AvD#14",
+   "group": "AvD",
+   "nn": false,
+   "hash": "90a8b91dc909c28c241175cd9fcb43b8d253c651f42f8bdc78a97e38a0e715ea",
+   "steps": 1807,
+   "duration": 15.058333333333334,
+   "result": "rival:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 3554,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 8
+  },
+  {
+   "name": "AvD#15",
+   "group": "AvD",
+   "nn": false,
+   "hash": "c0799ca74b93020c410f71969e01a1c13a316ce2590f82b30b9fb9e2bc9821ef",
+   "steps": 1196,
+   "duration": 9.966666666666667,
+   "result": "rival:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 2286,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 4
+  },
+  {
+   "name": "DvA#0",
+   "group": "DvA",
+   "nn": false,
+   "hash": "a4af8563f9f8281be038af13352cecef17d724b897ab5e79fdd8260a0b70e5a0",
+   "steps": 1398,
+   "duration": 11.65,
+   "result": "player:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 2684,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 5
+  },
+  {
+   "name": "DvA#1",
+   "group": "DvA",
+   "nn": false,
+   "hash": "7d528a303d3bc95a455740c077c106525898fae32fa56137e24980a2bf6ecc13",
+   "steps": 2039,
+   "duration": 16.991666666666667,
+   "result": "player:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 4015,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 9
+  },
+  {
+   "name": "DvA#2",
+   "group": "DvA",
+   "nn": false,
+   "hash": "c13d4b19b10a6778c48cbdb42d346bf7db290bb45ffd66b0001777fe9d542484",
+   "steps": 1206,
+   "duration": 10.05,
+   "result": "player:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 2353,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 5
+  },
+  {
+   "name": "DvA#3",
+   "group": "DvA",
+   "nn": false,
+   "hash": "a1364deba7bdccc23407f656d2505cb33d334034b74dbb3a8ad5407c3ffb472d",
+   "steps": 1741,
+   "duration": 14.508333333333333,
+   "result": "player:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 3389,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 8
+  },
+  {
+   "name": "DvA#4",
+   "group": "DvA",
+   "nn": false,
+   "hash": "9f9019ce2b707c96d0a6cc0dfee356a3340e85becc51933d567042586f854327",
+   "steps": 1764,
+   "duration": 14.7,
+   "result": "player:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 3405,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 4
+  },
+  {
+   "name": "DvA#5",
+   "group": "DvA",
+   "nn": false,
+   "hash": "0f9702dda315a4a962aa6d732ff514c101a50ea3bd3695e7a3c561d60941213d",
+   "steps": 1227,
+   "duration": 10.225,
+   "result": "player:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 2392,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 5
+  },
+  {
+   "name": "DvA#6",
+   "group": "DvA",
+   "nn": false,
+   "hash": "a4de48ad4ccc817e74d26d2ca4c6b2fb8f24884030d292033a8665c6bf0cfe64",
+   "steps": 1900,
+   "duration": 15.833333333333334,
+   "result": "player:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 3740,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 6
+  },
+  {
+   "name": "DvA#7",
+   "group": "DvA",
+   "nn": false,
+   "hash": "7038a00f13317135bf0f996ec882de183407ebc812a493e1f89522e8ec8b2db6",
+   "steps": 1729,
+   "duration": 14.408333333333333,
+   "result": "player:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 3364,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 6
+  },
+  {
+   "name": "DvA#8",
+   "group": "DvA",
+   "nn": false,
+   "hash": "442ce2a74b6700ef37a5a59587fb9a0ba6a4f5de1525c79d648f0ac5f88467a7",
+   "steps": 1334,
+   "duration": 11.116666666666667,
+   "result": "player:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 2561,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 5
+  },
+  {
+   "name": "DvA#9",
+   "group": "DvA",
+   "nn": false,
+   "hash": "3d86c7fc4640ff4137426c95d0853398c8dc2a7980d3ab5801ae088234d95a24",
+   "steps": 1840,
+   "duration": 15.333333333333334,
+   "result": "player:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 3617,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 6
+  },
+  {
+   "name": "DvA#10",
+   "group": "DvA",
+   "nn": false,
+   "hash": "cee223d5697d466971a5cd24d10fd32767be45b4e3bd3211c95e90c3c1a8821d",
+   "steps": 2067,
+   "duration": 17.225,
+   "result": "player:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 4074,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 7
+  },
+  {
+   "name": "DvA#11",
+   "group": "DvA",
+   "nn": false,
+   "hash": "9ae834573f0eb36e8b4a3ba452fd8e509f04aa52971cf5734e0bd530f9bf2851",
+   "steps": 1293,
+   "duration": 10.775,
+   "result": "player:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 2510,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 4
+  },
+  {
+   "name": "DvA#12",
+   "group": "DvA",
+   "nn": false,
+   "hash": "751b829987b463e6e7e4210aa625576ecf479a869f03f20e26fd96f4c699ce6e",
+   "steps": 1202,
+   "duration": 10.016666666666667,
+   "result": "player:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 2288,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 4
+  },
+  {
+   "name": "DvA#13",
+   "group": "DvA",
+   "nn": false,
+   "hash": "330a78e02793524f754c241a03a8ae9b518647fa0b1a2be36f522c40f29e5808",
+   "steps": 2193,
+   "duration": 18.275,
+   "result": "player:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 4324,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 1,
+   "wobbleBreaks": 1,
+   "hits": 9
+  },
+  {
+   "name": "DvA#14",
+   "group": "DvA",
+   "nn": false,
+   "hash": "c95d099fa159717e705abf75acc2abfaf0741b174f79b5a432c38f37d094db80",
+   "steps": 1218,
+   "duration": 10.15,
+   "result": "player:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 2353,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 5
+  },
+  {
+   "name": "DvA#15",
+   "group": "DvA",
+   "nn": false,
+   "hash": "790e9004b648c10cd72325714cc690c44606722f496235eaadd3bbcfecdc53fa",
+   "steps": 1353,
+   "duration": 11.275,
+   "result": "player:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 2601,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 5
+  },
+  {
+   "name": "SvA#0",
+   "group": "SvA",
+   "nn": false,
+   "hash": "0942c5e35b4d8e4d7ce64a113f6df40cdbdda01ff1f1ed0764f00fc77d53ec8b",
+   "steps": 1585,
+   "duration": 13.208333333333334,
+   "result": "player:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 3039,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 5
+  },
+  {
+   "name": "SvA#1",
+   "group": "SvA",
+   "nn": false,
+   "hash": "6a4a4c9b50a64bca7e08b9a54af21744382e2b5dc1e404a975f7797f669a5578",
+   "steps": 2137,
+   "duration": 17.808333333333334,
+   "result": "player:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 4209,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 7
+  },
+  {
+   "name": "SvA#2",
+   "group": "SvA",
+   "nn": false,
+   "hash": "c2b9783a6e873bfc1969439b2eaa3d6471275a28722debe5c5003039391ae247",
+   "steps": 1557,
+   "duration": 12.975,
+   "result": "player:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 3034,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 7
+  },
+  {
+   "name": "SvA#3",
+   "group": "SvA",
+   "nn": false,
+   "hash": "d0623cac3be74a14ed6c638cd55a600b5d76907439e24c225e6a652b918b9bc0",
+   "steps": 1905,
+   "duration": 15.875,
+   "result": "player:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 3710,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 8
+  },
+  {
+   "name": "SvA#4",
+   "group": "SvA",
+   "nn": false,
+   "hash": "bb86cc5704eefc52f877b5a4fafb156d8abe788ac24e2c34ce4ff3806dffc0ae",
+   "steps": 1948,
+   "duration": 16.233333333333334,
+   "result": "player:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 3774,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 6
+  },
+  {
+   "name": "SvA#5",
+   "group": "SvA",
+   "nn": false,
+   "hash": "7d7261e14c6a228788475e2e1f498def7415e73dd0152ee3b4ea2a28c7dea1fb",
+   "steps": 1668,
+   "duration": 13.9,
+   "result": "player:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 3254,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 8
+  },
+  {
+   "name": "SvA#6",
+   "group": "SvA",
+   "nn": false,
+   "hash": "ec09d61055158a0956754b5ca9fd604ffe944cb03f9e081fc7f55832a900207d",
+   "steps": 2245,
+   "duration": 18.708333333333332,
+   "result": "player:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 4415,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 7
+  },
+  {
+   "name": "SvA#7",
+   "group": "SvA",
+   "nn": false,
+   "hash": "10f9d1f21976b4e36fbd11050d811e3ff1ce35fe9acc2949f3a7518ee5dd3f1d",
+   "steps": 1875,
+   "duration": 15.625,
+   "result": "player:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 3638,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 7
+  },
+  {
+   "name": "SvA#8",
+   "group": "SvA",
+   "nn": false,
+   "hash": "9effac1180b6466d3e48dc4c0ea8674a6d79e59a89e577a5ba87603b56199677",
+   "steps": 1469,
+   "duration": 12.241666666666667,
+   "result": "player:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 2833,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 6
+  },
+  {
+   "name": "SvA#9",
+   "group": "SvA",
+   "nn": false,
+   "hash": "abe95549378b1fb84590fbb737f5ec176e161bef7198011f7d06c09f8a129904",
+   "steps": 1734,
+   "duration": 14.45,
+   "result": "player:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 3405,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 8
+  },
+  {
+   "name": "SvA#10",
+   "group": "SvA",
+   "nn": false,
+   "hash": "39016bd351c53e5b55a423721f55746631d9bb50e9cbc137fd27c9b3eca703e2",
+   "steps": 2454,
+   "duration": 20.45,
+   "result": "player:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 4824,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 7
+  },
+  {
+   "name": "SvA#11",
+   "group": "SvA",
+   "nn": false,
+   "hash": "f6949e41774c78c174f425483b436345d92fcd08ae2972edb75d5d69f73f643c",
+   "steps": 1472,
+   "duration": 12.266666666666667,
+   "result": "player:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 2840,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 5
+  },
+  {
+   "name": "SvA#12",
+   "group": "SvA",
+   "nn": false,
+   "hash": "2a7aa1e07fa712a4c6b3ae6fb971225eb175749224dd86761d1b769cff8ede31",
+   "steps": 1802,
+   "duration": 15.016666666666667,
+   "result": "player:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 3470,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 7
+  },
+  {
+   "name": "SvA#13",
+   "group": "SvA",
+   "nn": false,
+   "hash": "554e61cc21a28ea70961dc5297ff69bcebe975d5256eb13f0c872bafb8d7e5cf",
+   "steps": 2079,
+   "duration": 17.325,
+   "result": "player:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 4096,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 8
+  },
+  {
+   "name": "SvA#14",
+   "group": "SvA",
+   "nn": false,
+   "hash": "a22a35f211134009fc369424cff3f32a753808b755cbb55556e98c86ae1dcb56",
+   "steps": 1814,
+   "duration": 15.116666666666667,
+   "result": "player:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 3555,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 7
+  },
+  {
+   "name": "SvA#15",
+   "group": "SvA",
+   "nn": false,
+   "hash": "b2732cf1773ae9b80e9e842183bd95db26b9d71c0eeb85894d57c3f294b012a1",
+   "steps": 1933,
+   "duration": 16.108333333333334,
+   "result": "player:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 3754,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 7
+  },
+  {
+   "name": "BvB#0",
+   "group": "BvB",
+   "nn": false,
+   "hash": "5c971e975ad1a3b5064e3dbef4a1c5463fbab126c34410b5b3c182f1575494bc",
+   "steps": 3064,
+   "duration": 25.533333333333335,
+   "result": "rival:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 6069,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 9
+  },
+  {
+   "name": "BvB#1",
+   "group": "BvB",
+   "nn": false,
+   "hash": "140152ec48a054df76a341d0587f5073ef66a44b79b678a162754899e985ca5e",
+   "steps": 3001,
+   "duration": 25.008333333333333,
+   "result": "rival:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 5940,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 10
+  },
+  {
+   "name": "BvB#2",
+   "group": "BvB",
+   "nn": false,
+   "hash": "04e962fc6177e72abe896f721624c3034a1d8643f1c50f1396f34dd2621b2545",
+   "steps": 2551,
+   "duration": 21.258333333333333,
+   "result": "player:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 5043,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 9
+  },
+  {
+   "name": "BvB#3",
+   "group": "BvB",
+   "nn": false,
+   "hash": "422b36041d150745bb9e417645668b354983a938361c8a82ff5cc65909f20e5d",
+   "steps": 2646,
+   "duration": 22.05,
+   "result": "rival:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 5231,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 1,
+   "wobbleBreaks": 1,
+   "hits": 9
+  },
+  {
+   "name": "BvB#4",
+   "group": "BvB",
+   "nn": false,
+   "hash": "d0d29f30d93d808fc9a8b271792c72c3110c584e9f90ee2308c03b77336800fd",
+   "steps": 3684,
+   "duration": 30.7,
+   "result": "player:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 7308,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 11
+  },
+  {
+   "name": "BvB#5",
+   "group": "BvB",
+   "nn": false,
+   "hash": "8c7729e25679006679bf793740a55968134b89306da7239fd5a570ed64c1a809",
+   "steps": 2253,
+   "duration": 18.775,
+   "result": "player:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 4443,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 9
+  },
+  {
+   "name": "BvB#6",
+   "group": "BvB",
+   "nn": false,
+   "hash": "ea89dc2564e9a48a18bb324131486b5accc863c40e21af5e38041b0a4ce137b0",
+   "steps": 2734,
+   "duration": 22.783333333333335,
+   "result": "rival:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 5409,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 1,
+   "wobbleBreaks": 1,
+   "hits": 10
+  },
+  {
+   "name": "BvB#7",
+   "group": "BvB",
+   "nn": false,
+   "hash": "20a3203fcc0b9721a4e03bafda57bcdce738914bf04880a9fb1105f329ef0602",
+   "steps": 2684,
+   "duration": 22.366666666666667,
+   "result": "rival:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 5305,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 9
+  },
+  {
+   "name": "BvB#8",
+   "group": "BvB",
+   "nn": false,
+   "hash": "378759c2addf4642cc9a4d06ed1ca5813721e2dd039b28d9dc9e9deb22b93527",
+   "steps": 2107,
+   "duration": 17.558333333333334,
+   "result": "player:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 4155,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 8
+  },
+  {
+   "name": "BvB#9",
+   "group": "BvB",
+   "nn": false,
+   "hash": "9f3c2d31d7e3e33a986da4f36d11043648003f8ae076a2bb0f5d4450f63057a7",
+   "steps": 2488,
+   "duration": 20.733333333333334,
+   "result": "rival:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 4914,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 9
+  },
+  {
+   "name": "BvB#10",
+   "group": "BvB",
+   "nn": false,
+   "hash": "7f0b3cf2d76f63f19d8431a10309638fa54e876287449a8d3e0eaf8649b0482c",
+   "steps": 2517,
+   "duration": 20.975,
+   "result": "rival:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 4974,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 1,
+   "wobbleBreaks": 1,
+   "hits": 9
+  },
+  {
+   "name": "BvB#11",
+   "group": "BvB",
+   "nn": false,
+   "hash": "0fb7da512f15d5d9806ff3e6116e5ae61badf97e4dae9cfa4d348a508e3626a8",
+   "steps": 3118,
+   "duration": 25.983333333333334,
+   "result": "player:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 6169,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 9
+  },
+  {
+   "name": "BvB#12",
+   "group": "BvB",
+   "nn": false,
+   "hash": "b843de4482e18b4ce1926ee12fd858abc1b453b2a320b3c023ee7c9d93f0158f",
+   "steps": 3029,
+   "duration": 25.241666666666667,
+   "result": "rival:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 5998,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 1,
+   "wobbleBreaks": 1,
+   "hits": 7
+  },
+  {
+   "name": "BvB#13",
+   "group": "BvB",
+   "nn": false,
+   "hash": "aff029c35e2db7904608782c107a52dcfa8676cd4a48f1328350d1ca96eaa8f3",
+   "steps": 2955,
+   "duration": 24.625,
+   "result": "rival:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 5848,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 1,
+   "wobbleBreaks": 1,
+   "hits": 8
+  },
+  {
+   "name": "BvB#14",
+   "group": "BvB",
+   "nn": false,
+   "hash": "2c753a3d6a8db3bd97ac42e3a8df38465665a0e03cc3e2c56972b3013bbd2764",
+   "steps": 2265,
+   "duration": 18.875,
+   "result": "player:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 4471,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 9
+  },
+  {
+   "name": "BvB#15",
+   "group": "BvB",
+   "nn": false,
+   "hash": "94170e2831ecc81bcb8515f04fa595b317277d7671e1e672f82013e532dbe5a6",
+   "steps": 2799,
+   "duration": 23.325,
+   "result": "rival:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 5535,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 1,
+   "wobbleBreaks": 1,
+   "hits": 7
+  },
+  {
+   "name": "AvA#0",
+   "group": "AvA",
+   "nn": false,
+   "hash": "e350de97a70ef73acabafc6a5c8df4555e10edd968257005f46239d9f2dc2704",
+   "steps": 1475,
+   "duration": 12.291666666666666,
+   "result": "player:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 2835,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 4
+  },
+  {
+   "name": "AvA#1",
+   "group": "AvA",
+   "nn": false,
+   "hash": "cd6adaa8ade5622a152aa8833d7ad94d2cb3eaf9489090b67e5f31c536d4f4e8",
+   "steps": 1279,
+   "duration": 10.658333333333333,
+   "result": "rival:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 2495,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 6
+  },
+  {
+   "name": "AvA#2",
+   "group": "AvA",
+   "nn": false,
+   "hash": "626c5584d45d077c024db6b8ad519af790e46ec01f4dfbe83d2b76af9209bf9e",
+   "steps": 1109,
+   "duration": 9.241666666666667,
+   "result": "player:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 2139,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 4
+  },
+  {
+   "name": "AvA#3",
+   "group": "AvA",
+   "nn": false,
+   "hash": "bfae24efd1df7d256c43068184bb495efcc98bfe37120980f18db5eeb2d1c5fe",
+   "steps": 1172,
+   "duration": 9.766666666666667,
+   "result": "rival:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 2218,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 4
+  },
+  {
+   "name": "AvA#4",
+   "group": "AvA",
+   "nn": false,
+   "hash": "b12ec012b1f23ac0f74b92ce63b3ba3057013f1b37c3a412900e29cf45babffd",
+   "steps": 1171,
+   "duration": 9.758333333333333,
+   "result": "player:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 2181,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 4
+  },
+  {
+   "name": "AvA#5",
+   "group": "AvA",
+   "nn": false,
+   "hash": "8bbde3565cc08d1a303e73afa76479e284624914bee84072be67dd38704b6dd2",
+   "steps": 889,
+   "duration": 7.408333333333333,
+   "result": "player:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 1715,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 4
+  },
+  {
+   "name": "AvA#6",
+   "group": "AvA",
+   "nn": false,
+   "hash": "f5e1c340526a3bbff3b0a99dc9b4adf19c0b18e1c177841a7a91cf4b77a2b22a",
+   "steps": 1393,
+   "duration": 11.608333333333333,
+   "result": "player:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 2718,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 6
+  },
+  {
+   "name": "AvA#7",
+   "group": "AvA",
+   "nn": false,
+   "hash": "bbdf004fce8fc992cd961e21d5a6154922ccccc40f5f3c3ac30e2a191b3de540",
+   "steps": 1312,
+   "duration": 10.933333333333334,
+   "result": "rival:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 2485,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 4
+  },
+  {
+   "name": "AvA#8",
+   "group": "AvA",
+   "nn": false,
+   "hash": "49e2b27112bd2877cd821ac79accd96eb66ffea8b2c9606b2d8d080b0c4fce43",
+   "steps": 1222,
+   "duration": 10.183333333333334,
+   "result": "player:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 2328,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 3
+  },
+  {
+   "name": "AvA#9",
+   "group": "AvA",
+   "nn": false,
+   "hash": "d3285e18569811473453d46f3477d0edf633997692d2734173c2135b711a6909",
+   "steps": 926,
+   "duration": 7.716666666666667,
+   "result": "rival:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 1790,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 4
+  },
+  {
+   "name": "AvA#10",
+   "group": "AvA",
+   "nn": false,
+   "hash": "4983db79c7a2f7f0fc53979cee114f662bc547db7685065e7bc5d147bed84d1f",
+   "steps": 1432,
+   "duration": 11.933333333333334,
+   "result": "rival:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 2780,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 5
+  },
+  {
+   "name": "AvA#11",
+   "group": "AvA",
+   "nn": false,
+   "hash": "c1c23c9516c33fa06b0131808078d579b0059fba4adf0e5a1635514d81adcebe",
+   "steps": 1116,
+   "duration": 9.3,
+   "result": "player:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 2095,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 3
+  },
+  {
+   "name": "AvA#12",
+   "group": "AvA",
+   "nn": false,
+   "hash": "b9f25ba0a854eb4cf5c2e79cf4acf25993eb82951495fce39b35e84d10fbb66b",
+   "steps": 1118,
+   "duration": 9.316666666666666,
+   "result": "player:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 2113,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 5
+  },
+  {
+   "name": "AvA#13",
+   "group": "AvA",
+   "nn": false,
+   "hash": "2c52e0fdbda47941164b6e459c3ee386c0596f1d44bd7cadd018a23069408801",
+   "steps": 1420,
+   "duration": 11.833333333333334,
+   "result": "rival:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 2777,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 6
+  },
+  {
+   "name": "AvA#14",
+   "group": "AvA",
+   "nn": false,
+   "hash": "b8861240a2a497da96cac4b60f6d097128e65a9801e615c38796b4333f179943",
+   "steps": 1205,
+   "duration": 10.041666666666666,
+   "result": "player:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 2329,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 5
+  },
+  {
+   "name": "AvA#15",
+   "group": "AvA",
+   "nn": false,
+   "hash": "7a2cf7661d637b3221aaecb77751b1fdda13d6c6f50619f5cf506c593146f33d",
+   "steps": 1331,
+   "duration": 11.091666666666667,
+   "result": "rival:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 2539,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 4
+  },
+  {
+   "name": "DFLT#0",
+   "group": "DFLT",
+   "nn": false,
+   "hash": "2004ac164900e7157a10f09685fdf0eda963cb1abcae7b47559e575d78cec48c",
+   "steps": 1352,
+   "duration": 11.266666666666667,
+   "result": "rival:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 2645,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 6
+  },
+  {
+   "name": "DFLT#1",
+   "group": "DFLT",
+   "nn": false,
+   "hash": "f7134dc1ea3439b1af5928697892a137c6a091579a3c7cc737c5e5ef07bb9c00",
+   "steps": 1504,
+   "duration": 12.533333333333333,
+   "result": "rival:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 2932,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 7
+  },
+  {
+   "name": "DFLT#2",
+   "group": "DFLT",
+   "nn": false,
+   "hash": "6339afefaa537ca7791ed994bcde5df961bd1b7f51552b9d850a6fc1f7126b6c",
+   "steps": 2206,
+   "duration": 18.383333333333333,
+   "result": "rival:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 4305,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 4
+  },
+  {
+   "name": "DFLT#3",
+   "group": "DFLT",
+   "nn": false,
+   "hash": "798e63a8733f187de1f42352813220433315266f7024af18e1b4ebde14ea44d5",
+   "steps": 1334,
+   "duration": 11.116666666666667,
+   "result": "rival:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 2546,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 4
+  },
+  {
+   "name": "DFLT#4",
+   "group": "DFLT",
+   "nn": false,
+   "hash": "e673f3f37e1c90d3185f6684378ec9b4345d6003f15208c03bea45c34925c375",
+   "steps": 1666,
+   "duration": 13.883333333333333,
+   "result": "rival:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 3224,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 6
+  },
+  {
+   "name": "DFLT#5",
+   "group": "DFLT",
+   "nn": false,
+   "hash": "e9066ae3c7d65de27ce0bf6b1ae63ae27cc9a0e06fd3dd7454446e79daae6ab8",
+   "steps": 1566,
+   "duration": 13.05,
+   "result": "player:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 3070,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 7
+  },
+  {
+   "name": "DFLT#6",
+   "group": "DFLT",
+   "nn": false,
+   "hash": "b851b247a8f9aa1f07827f791384cb74e0d5cf236369d7f4f5bc73ec41803e1e",
+   "steps": 1382,
+   "duration": 11.516666666666667,
+   "result": "rival:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 2705,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 9
+  },
+  {
+   "name": "DFLT#7",
+   "group": "DFLT",
+   "nn": false,
+   "hash": "816f31bdd504f3783bc472fc1628fe50af821b682b72a5c4bcaf9aae3177c1dd",
+   "steps": 1441,
+   "duration": 12.008333333333333,
+   "result": "rival:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 2746,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 4
+  },
+  {
+   "name": "DFLT#8",
+   "group": "DFLT",
+   "nn": false,
+   "hash": "61281552cfe94cbe6856cb378d06a79a6339f5f7eaccbed324ff2919def90952",
+   "steps": 1591,
+   "duration": 13.258333333333333,
+   "result": "player:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 3123,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 8
+  },
+  {
+   "name": "DFLT#9",
+   "group": "DFLT",
+   "nn": false,
+   "hash": "70d59850781e037b8d7f621b5b5e3c974522f2e55f0163f5bebe8f9152d8e841",
+   "steps": 1520,
+   "duration": 12.666666666666666,
+   "result": "rival:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 2947,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 1,
+   "wobbleBreaks": 1,
+   "hits": 7
+  },
+  {
+   "name": "DFLT#10",
+   "group": "DFLT",
+   "nn": false,
+   "hash": "8520866bf2017041694840e70825ca8a44590be3b8ac855537886caa001e7b97",
+   "steps": 1288,
+   "duration": 10.733333333333333,
+   "result": "rival:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 2465,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 5
+  },
+  {
+   "name": "DFLT#11",
+   "group": "DFLT",
+   "nn": false,
+   "hash": "4bc2750debb7458eb9ab8d787c98d642f550dd660cb86ffc74f897cbbd585748",
+   "steps": 1365,
+   "duration": 11.375,
+   "result": "rival:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 2602,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 5
+  },
+  {
+   "name": "DFLT#12",
+   "group": "DFLT",
+   "nn": false,
+   "hash": "6aa7b329c160dea61a4ac37404c315887b462a374bfbf46f7db8458f08fe8db2",
+   "steps": 1336,
+   "duration": 11.133333333333333,
+   "result": "rival:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 2601,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 8
+  },
+  {
+   "name": "DFLT#13",
+   "group": "DFLT",
+   "nn": false,
+   "hash": "e208711cb7da35d09eed5cadfb20148437f4191ba83807ef35881edb96e0c8ec",
+   "steps": 1344,
+   "duration": 11.2,
+   "result": "rival:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 2590,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 7
+  },
+  {
+   "name": "DFLT#14",
+   "group": "DFLT",
+   "nn": false,
+   "hash": "2b74ec1d06e95a5d75e501370d4b5df7689c316b7fa33853d911ca4479d43110",
+   "steps": 1901,
+   "duration": 15.841666666666667,
+   "result": "rival:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 3702,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 5
+  },
+  {
+   "name": "DFLT#15",
+   "group": "DFLT",
+   "nn": false,
+   "hash": "b6df559138f0fd417fe0f759981f76c175ba043911e5495bccaaa9dddbeeab83",
+   "steps": 1414,
+   "duration": 11.783333333333333,
+   "result": "rival:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 2696,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 3
+  },
+  {
+   "name": "WALL#0",
+   "group": "WALL",
+   "nn": false,
+   "hash": "a76f1eeec4e457af8e511280a215778f92ce49cde9916dda4e4299c5f6ed5e6f",
+   "steps": 1471,
+   "duration": 12.258333333333333,
+   "result": "player:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 2817,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 4
+  },
+  {
+   "name": "WALL#1",
+   "group": "WALL",
+   "nn": false,
+   "hash": "e5824699380c144d73a0a6d32ef8ea7cc276072178adaa4897ba516bf306e46b",
+   "steps": 1157,
+   "duration": 9.641666666666667,
+   "result": "player:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 2195,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 5
+  },
+  {
+   "name": "WALL#2",
+   "group": "WALL",
+   "nn": false,
+   "hash": "234f7ee39d3c35d35d2c11ad627e33eef60f79244210cac7ba221bf64c213c65",
+   "steps": 1323,
+   "duration": 11.025,
+   "result": "player:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 2562,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 4
+  },
+  {
+   "name": "WALL#3",
+   "group": "WALL",
+   "nn": false,
+   "hash": "5cbdc87d23b0a5d16814d2ff5ebe1ba522cd16bb501f4db23e38f8ad4c799d03",
+   "steps": 1668,
+   "duration": 13.9,
+   "result": "player:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 3222,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 4
+  },
+  {
+   "name": "WALL#4",
+   "group": "WALL",
+   "nn": false,
+   "hash": "b66fcb89c614de2d529ec8a82cb73d1f399fd422b7e8220d52b04373d35aaa8e",
+   "steps": 1019,
+   "duration": 8.491666666666667,
+   "result": "player:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 1866,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 5
+  },
+  {
+   "name": "WALL#5",
+   "group": "WALL",
+   "nn": false,
+   "hash": "f45613b9402e3ec74f55faa6f240b4f28369df938250349777126de32c15709e",
+   "steps": 1252,
+   "duration": 10.433333333333334,
+   "result": "player:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 2428,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 6
+  },
+  {
+   "name": "WALL#6",
+   "group": "WALL",
+   "nn": false,
+   "hash": "f0a3faeb41aa893ea42607038a3c517542139ff92dc42ec7349d7019dba57f86",
+   "steps": 1339,
+   "duration": 11.158333333333333,
+   "result": "rival:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 2510,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 4
+  },
+  {
+   "name": "WALL#7",
+   "group": "WALL",
+   "nn": false,
+   "hash": "d4fdf36fa8a3ff807ed39077c144e65e9e40a3c94108ace8cb86809ea693aef3",
+   "steps": 1122,
+   "duration": 9.35,
+   "result": "player:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 2137,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 6
+  },
+  {
+   "name": "WALL#8",
+   "group": "WALL",
+   "nn": false,
+   "hash": "2177e16be094417d3f138ab16a40e4f3c10850d481d9a977934392cc788d0035",
+   "steps": 1388,
+   "duration": 11.566666666666666,
+   "result": "player:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 2713,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 5
+  },
+  {
+   "name": "WALL#9",
+   "group": "WALL",
+   "nn": false,
+   "hash": "3385ef4f9aa2ed1008105ff2162361029abfdfa023c60abffe87d7ed192b711b",
+   "steps": 1144,
+   "duration": 9.533333333333333,
+   "result": "player:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 2173,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 5
+  },
+  {
+   "name": "WALL#10",
+   "group": "WALL",
+   "nn": false,
+   "hash": "ab2ec073691198685d1ce4ab116b3195aa011172fd0d0eab1421b785085b4b8d",
+   "steps": 1170,
+   "duration": 9.75,
+   "result": "player:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 2236,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 5
+  },
+  {
+   "name": "WALL#11",
+   "group": "WALL",
+   "nn": false,
+   "hash": "bbeb92301482bca391e2bb12a919ecd9ae2073b49ff21910645cca4b9df677a0",
+   "steps": 1154,
+   "duration": 9.616666666666667,
+   "result": "player:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 2245,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 7
+  },
+  {
+   "name": "AIM -1#0",
+   "group": "AIM",
+   "nn": false,
+   "hash": "725b69e27ef3d21e1677287302c4653d2ece67bea853af0ef8ae5ab4e5168cee",
+   "steps": 1481,
+   "duration": 12.341666666666667,
+   "result": "rival:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 2908,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 8
+  },
+  {
+   "name": "AIM -1#1",
+   "group": "AIM",
+   "nn": false,
+   "hash": "b28bf5cf5310147c5fe5ede9c94442faa3c138a7b981c6c1b413a15ebc7d8add",
+   "steps": 1448,
+   "duration": 12.066666666666666,
+   "result": "rival:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 2845,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 7
+  },
+  {
+   "name": "AIM -0.5#0",
+   "group": "AIM",
+   "nn": false,
+   "hash": "54988061e3ee8c661a792ddabdb2e0a721d16c63aa561cdfaff5009ffaad2302",
+   "steps": 1555,
+   "duration": 12.958333333333334,
+   "result": "rival:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 3050,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 6
+  },
+  {
+   "name": "AIM -0.5#1",
+   "group": "AIM",
+   "nn": false,
+   "hash": "afc6d39af658ea84cdd4d9711aa01670de78ddb110ac3aa3c8d69a2abc9bde8f",
+   "steps": 1987,
+   "duration": 16.558333333333334,
+   "result": "rival:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 3907,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 7
+  },
+  {
+   "name": "AIM 0#0",
+   "group": "AIM",
+   "nn": false,
+   "hash": "ca3b9734ff84b527d0120863c9808b8ce22a4b8c102c7607eab59a94681b7947",
+   "steps": 1456,
+   "duration": 12.133333333333333,
+   "result": "rival:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 2850,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 6
+  },
+  {
+   "name": "AIM 0#1",
+   "group": "AIM",
+   "nn": false,
+   "hash": "b5cf7a00ec7d459f0b1d535732deb1fd7a1ef742bac5d87dbe06e7de52e9f2a6",
+   "steps": 1257,
+   "duration": 10.475,
+   "result": "rival:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 2452,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 6
+  },
+  {
+   "name": "AIM 0.5#0",
+   "group": "AIM",
+   "nn": false,
+   "hash": "bbea8c3af76c4c74b2d38c973592cb720c0ec5212803bdced7255bc3f48dcd55",
+   "steps": 1257,
+   "duration": 10.475,
+   "result": "rival:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 2379,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 4
+  },
+  {
+   "name": "AIM 0.5#1",
+   "group": "AIM",
+   "nn": false,
+   "hash": "59ebe6db9a1ba93dff270f31787bf72a673a0c10602ad07e635de815b6580298",
+   "steps": 1838,
+   "duration": 15.316666666666666,
+   "result": "rival:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 3598,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 6
+  },
+  {
+   "name": "AIM 1#0",
+   "group": "AIM",
+   "nn": false,
+   "hash": "0e0749a7a9ea570bf5dd4e2b30502cb0c338ebd23878691922a8d38e2237f330",
+   "steps": 1491,
+   "duration": 12.425,
+   "result": "rival:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 2836,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 5
+  },
+  {
+   "name": "AIM 1#1",
+   "group": "AIM",
+   "nn": false,
+   "hash": "7e856f1530a6291ebbbd3947f64d83266facf4be56131f68fdfe00bcf1ac322c",
+   "steps": 1223,
+   "duration": 10.191666666666666,
+   "result": "rival:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 2325,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 4
+  },
+  {
+   "name": "PHASE 0",
+   "group": "PHASE",
+   "nn": false,
+   "hash": "3c5fb911e9feee9d996677dddca25d8166726910f2335170b441392858576be9",
+   "steps": 1655,
+   "duration": 13.791666666666666,
+   "result": "rival:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 3248,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 8
+  },
+  {
+   "name": "PHASE 1",
+   "group": "PHASE",
+   "nn": false,
+   "hash": "e0e7b007677fb83306a9e481ac8a440eeac13a5527e7daaae6016eed845a88ac",
+   "steps": 1607,
+   "duration": 13.391666666666667,
+   "result": "rival:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 3129,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 9
+  },
+  {
+   "name": "PHASE 2",
+   "group": "PHASE",
+   "nn": false,
+   "hash": "098f22710e024d40c30be875e47ab3597577ddc35530d3d4d93a1c5d46668b39",
+   "steps": 1291,
+   "duration": 10.758333333333333,
+   "result": "rival:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 2481,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 5
+  },
+  {
+   "name": "PHASE 3",
+   "group": "PHASE",
+   "nn": false,
+   "hash": "a576b084f8f1c89f80d121b08d285f0a68029d214050f79cf267848ddd275b21",
+   "steps": 1099,
+   "duration": 9.158333333333333,
+   "result": "rival:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 2077,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 5
+  },
+  {
+   "name": "PHASE 4",
+   "group": "PHASE",
+   "nn": false,
+   "hash": "d43490c7947c8c5acad3ec0a869e1e369d0d46db4a8c8af42981f0da13c4aab6",
+   "steps": 1412,
+   "duration": 11.766666666666667,
+   "result": "rival:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 2762,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 6
+  },
+  {
+   "name": "PHASE 5",
+   "group": "PHASE",
+   "nn": false,
+   "hash": "c78b049d49dc78dacac768df0c97f11c7e09f4d12b7dd6ccebeed17c32f0bc5c",
+   "steps": 1622,
+   "duration": 13.516666666666667,
+   "result": "rival:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 3182,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 7
+  },
+  {
+   "name": "POWER 0.3#0",
+   "group": "POWER",
+   "nn": false,
+   "hash": "d138253657c56a6cae852b44237a4e60bdce5bb2a8b36de486d0dce320cc600c",
+   "steps": 2009,
+   "duration": 16.741666666666667,
+   "result": "rival:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 3960,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 8
+  },
+  {
+   "name": "POWER 0.3#1",
+   "group": "POWER",
+   "nn": false,
+   "hash": "79e021d301143aa36dedd9ae97eac13352d2c92810ea55c00aededb2ade59c50",
+   "steps": 1947,
+   "duration": 16.225,
+   "result": "rival:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 3833,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 8
+  },
+  {
+   "name": "POWER 0.5#0",
+   "group": "POWER",
+   "nn": false,
+   "hash": "369453d7caf51fca19648cdcb14b605da7dc866765319a7c194c398778e04682",
+   "steps": 2533,
+   "duration": 21.108333333333334,
+   "result": "rival:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 5007,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 1,
+   "wobbleBreaks": 1,
+   "hits": 8
+  },
+  {
+   "name": "POWER 0.5#1",
+   "group": "POWER",
+   "nn": false,
+   "hash": "660a9a36abc8f217db307e5a3c6f3f818990491de67e94852e172e60361e1426",
+   "steps": 2866,
+   "duration": 23.883333333333333,
+   "result": "rival:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 5671,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 10
+  },
+  {
+   "name": "POWER 0.7#0",
+   "group": "POWER",
+   "nn": false,
+   "hash": "e11bb903bb4767cdb01ccc34eb80233330b219bd25935b724f55f1a81d0ba2d7",
+   "steps": 3511,
+   "duration": 29.258333333333333,
+   "result": "rival:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 6961,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 8
+  },
+  {
+   "name": "POWER 0.7#1",
+   "group": "POWER",
+   "nn": false,
+   "hash": "ed980870cc57cfe51cfdb4ca390a9742f9526547fe37717f9cc1677cf5fb66c4",
+   "steps": 3528,
+   "duration": 29.4,
+   "result": "player:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 6994,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 9
+  },
+  {
+   "name": "POWER 0.85#0",
+   "group": "POWER",
+   "nn": false,
+   "hash": "9bdfbb9b01c9ebc79fdd2c62ec87472565d1103b92aa85aeb30dd85e1a1fb2b8",
+   "steps": 3096,
+   "duration": 25.8,
+   "result": "player:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 6131,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 1,
+   "wobbleBreaks": 1,
+   "hits": 10
+  },
+  {
+   "name": "POWER 0.85#1",
+   "group": "POWER",
+   "nn": false,
+   "hash": "b2d4356f55d7c86056c931841fb8a89d2bc37f40706e530a7c30633cbed20905",
+   "steps": 3687,
+   "duration": 30.725,
+   "result": "player:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 7312,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 1,
+   "wobbleBreaks": 1,
+   "hits": 12
+  },
+  {
+   "name": "POWER 1#0",
+   "group": "POWER",
+   "nn": false,
+   "hash": "3d500b9d4cb1883f0010b6441d34935cd48808fdb27586b4a5f128ee8bb1b460",
+   "steps": 2882,
+   "duration": 24.016666666666666,
+   "result": "player:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 5703,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 13
+  },
+  {
+   "name": "POWER 1#1",
+   "group": "POWER",
+   "nn": false,
+   "hash": "c1138433609cd7a3855347059e577cf9722f7c0063ea42c678c31fcbc0d4ffd9",
+   "steps": 3096,
+   "duration": 25.8,
+   "result": "player:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 6127,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 11
+  },
+  {
+   "name": "EDGE A/D aim 1",
+   "group": "LONG",
+   "nn": false,
+   "hash": "03b397c8d72472274ea7b4b93c017ffe0364a239c0f6eb5b7d31dcaf36804c68",
+   "steps": 1550,
+   "duration": 12.916666666666666,
+   "result": "rival:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 2990,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 6
+  },
+  {
+   "name": "EDGE A/D aim -1",
+   "group": "LONG",
+   "nn": false,
+   "hash": "30b5dcbc50495a9a093e51a92b84fc3faf30e27a2c5e8c2724a60bed6370d0dd",
+   "steps": 1691,
+   "duration": 14.091666666666667,
+   "result": "rival:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 3331,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 8
+  },
+  {
+   "name": "LONG S/S#0",
+   "group": "LONG",
+   "nn": true,
+   "hash": "3779179a7c0fd5e5f81605978ad06ac9ff59873ae85184e8451555a3a42d3d94",
+   "steps": 11592,
+   "duration": 96.6,
+   "result": "player:spin",
+   "gate": {
+    "entries": 1,
+    "confirmedSteps": 5477
+   },
+   "segments": [
+    {
+     "start": 958,
+     "end": 6435,
+     "exit": "spinRatio"
+    }
+   ],
+   "rollChecked": 22820,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 2,
+   "motion": {
+    "s0": 958,
+    "per": [
+     {
+      "net": 0.12305706286776684,
+      "path": 0.3191411618837018,
+      "straight": 0.38558818969459685,
+      "lowShare": 1,
+      "maxSpeed": 0.1327776004349234,
+      "spinSlope": -1.1284106064515411,
+      "spinLoss": 0.09274622443678973
+     },
+     {
+      "net": 0.1923557843858436,
+      "path": 0.30481876404644254,
+      "straight": 0.631049682874956,
+      "lowShare": 1,
+      "maxSpeed": 0.1513174272988348,
+      "spinSlope": -1.3980712719851838,
+      "spinLoss": 0.11437837167924847
+     }
+    ],
+    "lowShareAfter": 0.9677449689674629,
+    "recontact": 85.14166666666667,
+    "maxTiltAfter": 0.7002885504186941,
+    "wallAccelSteps": 0,
+    "maxWallSpeedAfter": 0,
+    "maxSpeedJumpNoContact": 0.11523382048832119,
+    "dist0": 1.026648910642411
+   }
+  },
+  {
+   "name": "LONG S/S#1",
+   "group": "LONG",
+   "nn": true,
+   "hash": "408a72a3ba2c0788ef9912144fc89db7b738b13aa1a91971bca746e4eec3e5c8",
+   "steps": 9374,
+   "duration": 78.11666666666666,
+   "result": "player:spin",
+   "gate": {
+    "entries": 1,
+    "confirmedSteps": 4566
+   },
+   "segments": [
+    {
+     "start": 1389,
+     "end": 5955,
+     "exit": "spinRatio"
+    }
+   ],
+   "rollChecked": 18517,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 1,
+   "wobbleBreaks": 1,
+   "hits": 0,
+   "motion": {
+    "s0": 1389,
+    "per": [
+     {
+      "net": 0.23983985700464064,
+      "path": 0.3514491041661945,
+      "straight": 0.6824312657551243,
+      "lowShare": 1,
+      "maxSpeed": 0.1444162670321034,
+      "spinSlope": -1.1402168785820144,
+      "spinLoss": 0.09280999882624445
+     },
+     {
+      "net": 0.18369353161979207,
+      "path": 0.3025006062314923,
+      "straight": 0.6072501272252604,
+      "lowShare": 1,
+      "maxSpeed": 0.131944083423162,
+      "spinSlope": -1.3733071862285509,
+      "spinLoss": 0.11938291922556683
+     }
+    ],
+    "lowShareAfter": 0.9737006887914841,
+    "recontact": 64.78333333333333,
+    "maxTiltAfter": 0.790668094130843,
+    "wallAccelSteps": 0,
+    "maxWallSpeedAfter": 0,
+    "maxSpeedJumpNoContact": 0.37683551856292735,
+    "dist0": 1.0214318792079793
+   }
+  },
+  {
+   "name": "LONG A/A#0",
+   "group": "LONG",
+   "nn": false,
+   "hash": "25e09aebd11ad04795626f5be72d799932302f4759a1607c1be81b9d956eef67",
+   "steps": 1104,
+   "duration": 9.2,
+   "result": "player:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 1999,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 4
+  },
+  {
+   "name": "LONG A/A#1",
+   "group": "LONG",
+   "nn": false,
+   "hash": "5ea59b48c8c7b9b58da2206d9b21000b83afb7d812126e2f423a2a6b3bffb3eb",
+   "steps": 1204,
+   "duration": 10.033333333333333,
+   "result": "player:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 2215,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 5
+  },
+  {
+   "name": "FEELBAL#1000",
+   "group": "FEELBAL",
+   "nn": false,
+   "hash": "41c9633c275b87a9f0438e9d33fa255bdf64e44f6fed2885b9352a5c515cf264",
+   "steps": 2630,
+   "duration": 21.916666666666668,
+   "result": "player:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 5198,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 11
+  },
+  {
+   "name": "FEELBAL#1001",
+   "group": "FEELBAL",
+   "nn": false,
+   "hash": "2792c16d4564b58f0efa5112cdfefb936213d3658e692a2d4d0d0b2aaf557df4",
+   "steps": 3354,
+   "duration": 27.95,
+   "result": "rival:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 6651,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 10
+  },
+  {
+   "name": "FEELBAL#1002",
+   "group": "FEELBAL",
+   "nn": false,
+   "hash": "4325c189f904a2128db4b989e3271f25859b67fb868ca36264176bc6377d383e",
+   "steps": 3393,
+   "duration": 28.275,
+   "result": "player:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 6725,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 13
+  },
+  {
+   "name": "FEELBAL#1003",
+   "group": "FEELBAL",
+   "nn": false,
+   "hash": "52e40a2d447725033b8fc9fef94511a96949dbe41bdca408c5cdb12ede59ea6b",
+   "steps": 3270,
+   "duration": 27.25,
+   "result": "player:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 6483,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 1,
+   "wobbleBreaks": 1,
+   "hits": 11
+  },
+  {
+   "name": "FEELBAL#1004",
+   "group": "FEELBAL",
+   "nn": false,
+   "hash": "8f18e8e69469e897f59a5e5b4ab31fd5f6c479c0f1ba6a8f42dedf49f0611c5d",
+   "steps": 3723,
+   "duration": 31.025,
+   "result": "rival:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 7386,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 1,
+   "wobbleBreaks": 1,
+   "hits": 9
+  },
+  {
+   "name": "FEELBAL#1005",
+   "group": "FEELBAL",
+   "nn": false,
+   "hash": "c4f1e7024b4e4b4f2f1fc22091a2d766b69e1758ec1d3639826c92c2819109d4",
+   "steps": 3384,
+   "duration": 28.2,
+   "result": "rival:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 6706,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 10
+  },
+  {
+   "name": "FEELSTA#3000",
+   "group": "FEELSTA",
+   "nn": true,
+   "hash": "b41cc977e78f155ac48504e199667f5d48e98258a43f6e99fc17efaa3f21c444",
+   "steps": 11022,
+   "duration": 91.85,
+   "result": "player:spin",
+   "gate": {
+    "entries": 1,
+    "confirmedSteps": 5077
+   },
+   "segments": [
+    {
+     "start": 893,
+     "end": 5970,
+     "exit": "spinRatio"
+    }
+   ],
+   "rollChecked": 21743,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 2,
+   "wobbleBreaks": 2,
+   "hits": 4,
+   "motion": {
+    "s0": 893,
+    "per": [
+     {
+      "net": 0.1331652583844297,
+      "path": 0.36804419542905453,
+      "straight": 0.3618186621016798,
+      "lowShare": 1,
+      "maxSpeed": 0.13338619389660925,
+      "spinSlope": -1.1239248129447628,
+      "spinLoss": 0.0920317388455199
+     },
+     {
+      "net": 0.14007598913545433,
+      "path": 0.31692352531665047,
+      "straight": 0.4419867190215653,
+      "lowShare": 1,
+      "maxSpeed": 0.10116492252415732,
+      "spinSlope": -1.347492393364531,
+      "spinLoss": 0.11819560631419379
+     }
+    ],
+    "lowShareAfter": 0.9534011254812913,
+    "recontact": 83.53333333333333,
+    "maxTiltAfter": 0.6775213161027899,
+    "wallAccelSteps": 0,
+    "maxWallSpeedAfter": 0,
+    "maxSpeedJumpNoContact": 0.13108119193700718,
+    "dist0": 1.0819943854897212
+   }
+  },
+  {
+   "name": "FEELSTA#3001",
+   "group": "FEELSTA",
+   "nn": true,
+   "hash": "2121e92d77f6e3636634fb1207efe2da338436957f560ea6f90d4745375914ea",
+   "steps": 8261,
+   "duration": 68.84166666666667,
+   "result": "player:spin",
+   "gate": {
+    "entries": 1,
+    "confirmedSteps": 4558
+   },
+   "segments": [
+    {
+     "start": 1074,
+     "end": 5632,
+     "exit": "spinRatio"
+    }
+   ],
+   "rollChecked": 16278,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 1,
+   "motion": {
+    "s0": 1074,
+    "per": [
+     {
+      "net": 0.23871140668388402,
+      "path": 0.37453622303906664,
+      "straight": 0.6373519889396247,
+      "lowShare": 1,
+      "maxSpeed": 0.13751289580201217,
+      "spinSlope": -1.1567043202216487,
+      "spinLoss": 0.09048917157035208
+     },
+     {
+      "net": 0.0286618282760532,
+      "path": 0.273664464464438,
+      "straight": 0.10473346743116417,
+      "lowShare": 1,
+      "maxSpeed": 0.05990125109396767,
+      "spinSlope": -1.2907085260280928,
+      "spinLoss": 0.1314372575083269
+     }
+    ],
+    "lowShareAfter": 0.9766244608320579,
+    "recontact": 58.483333333333334,
+    "maxTiltAfter": 0.7515913016869181,
+    "wallAccelSteps": 0,
+    "maxWallSpeedAfter": 0,
+    "maxSpeedJumpNoContact": 0.3860581805895797,
+    "dist0": 1.0565954983300876
+   }
+  },
+  {
+   "name": "FEELSTA#3002",
+   "group": "FEELSTA",
+   "nn": true,
+   "hash": "222e30f08b0ba259cc5ef0d06ef88b1f346b5fff4354f483ebb65c8643f93590",
+   "steps": 10706,
+   "duration": 89.21666666666667,
+   "result": "player:spin",
+   "gate": {
+    "entries": 1,
+    "confirmedSteps": 5350
+   },
+   "segments": [
+    {
+     "start": 797,
+     "end": 6147,
+     "exit": "spinRatio"
+    }
+   ],
+   "rollChecked": 21108,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 1,
+   "wobbleBreaks": 1,
+   "hits": 1,
+   "motion": {
+    "s0": 797,
+    "per": [
+     {
+      "net": 0.2396116047938005,
+      "path": 0.35458275275288864,
+      "straight": 0.6757565136305081,
+      "lowShare": 1,
+      "maxSpeed": 0.12738732160525748,
+      "spinSlope": -1.1278813451350191,
+      "spinLoss": 0.09415779584945023
+     },
+     {
+      "net": 0.12096039994264675,
+      "path": 0.29488512688236995,
+      "straight": 0.4101949841332554,
+      "lowShare": 1,
+      "maxSpeed": 0.09601442892493871,
+      "spinSlope": -1.3426362798206202,
+      "spinLoss": 0.1207480667669012
+     }
+    ],
+    "lowShareAfter": 0.9688162276718135,
+    "recontact": 79.2,
+    "maxTiltAfter": 0.6782811611186712,
+    "wallAccelSteps": 0,
+    "maxWallSpeedAfter": 0,
+    "maxSpeedJumpNoContact": 0.1363759942701751,
+    "dist0": 1.0143643708873364
+   }
+  },
+  {
+   "name": "FEELSTA#3003",
+   "group": "FEELSTA",
+   "nn": true,
+   "hash": "b74dfa2608be24e7dc724ded322a672747e89b2ed050b9b83d3f46d6fd035cbe",
+   "steps": 9580,
+   "duration": 79.83333333333333,
+   "result": "player:spin",
+   "gate": {
+    "entries": 1,
+    "confirmedSteps": 4248
+   },
+   "segments": [
+    {
+     "start": 1046,
+     "end": 5294,
+     "exit": "spinRatio"
+    }
+   ],
+   "rollChecked": 18858,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 1,
+   "motion": {
+    "s0": 1046,
+    "per": [
+     {
+      "net": 0.08088480469222728,
+      "path": 0.3202002051807552,
+      "straight": 0.2526069733358455,
+      "lowShare": 1,
+      "maxSpeed": 0.12061519630151876,
+      "spinSlope": -1.0824219201236913,
+      "spinLoss": 0.09967780284087532
+     },
+     {
+      "net": 0.14864477321320047,
+      "path": 0.33067334997877756,
+      "straight": 0.4495214785913059,
+      "lowShare": 1,
+      "maxSpeed": 0.10826708002101484,
+      "spinSlope": -1.2945639477711044,
+      "spinLoss": 0.13760187847292935
+     }
+    ],
+    "lowShareAfter": 0.97140848371221,
+    "recontact": 68.05833333333334,
+    "maxTiltAfter": 0.6988227966651457,
+    "wallAccelSteps": 0,
+    "maxWallSpeedAfter": 0,
+    "maxSpeedJumpNoContact": 0.10637154158890227,
+    "dist0": 1.0257648611622576
+   }
+  },
+  {
+   "name": "NNPOW 0.3#0",
+   "group": "NNPOW",
+   "nn": true,
+   "hash": "e66a4f09c3c0eb4bfcdb8f9445bbd99c5759de1a44d66fca83aba2859eb36051",
+   "steps": 7452,
+   "duration": 62.1,
+   "result": "player:spin",
+   "gate": {
+    "entries": 1,
+    "confirmedSteps": 3801
+   },
+   "segments": [
+    {
+     "start": 745,
+     "end": 4546,
+     "exit": "spinRatio"
+    }
+   ],
+   "rollChecked": 14699,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 1,
+   "wobbleBreaks": 1,
+   "hits": 1,
+   "motion": {
+    "s0": 745,
+    "per": [
+     {
+      "net": 0.08132568794999281,
+      "path": 0.33606232944928943,
+      "straight": 0.24199584667303378,
+      "lowShare": 1,
+      "maxSpeed": 0.07915691674880843,
+      "spinSlope": -0.9808291204786765,
+      "spinLoss": 0.12572778712120855
+     },
+     {
+      "net": 0.09051623234878162,
+      "path": 0.3245918365364435,
+      "straight": 0.2788617030996062,
+      "lowShare": 1,
+      "maxSpeed": 0.07420082525603282,
+      "spinSlope": -1.216138379486384,
+      "spinLoss": 0.16028166620696643
+     }
+    ],
+    "lowShareAfter": 0.9649619800208737,
+    "recontact": 53.35,
+    "maxTiltAfter": 0.6741619089921237,
+    "wallAccelSteps": 0,
+    "maxWallSpeedAfter": 0,
+    "maxSpeedJumpNoContact": 0.1905237652911802,
+    "dist0": 1.0551078871078288
+   }
+  },
+  {
+   "name": "NNPOW 0.3#1",
+   "group": "NNPOW",
+   "nn": true,
+   "hash": "aaad8cc214221c2d71327a189770139c18f14113ba4ad3b7e4b2b16574cee57c",
+   "steps": 7649,
+   "duration": 63.74166666666667,
+   "result": "player:spin",
+   "gate": {
+    "entries": 1,
+    "confirmedSteps": 3940
+   },
+   "segments": [
+    {
+     "start": 772,
+     "end": 4712,
+     "exit": "spinRatio"
+    }
+   ],
+   "rollChecked": 15108,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 2,
+   "motion": {
+    "s0": 772,
+    "per": [
+     {
+      "net": 0.09788505986280183,
+      "path": 0.35793528299804506,
+      "straight": 0.2734713913725472,
+      "lowShare": 1,
+      "maxSpeed": 0.09198299027925357,
+      "spinSlope": -0.9916226423349473,
+      "spinLoss": 0.12488076407785531
+     },
+     {
+      "net": 0.0964242551868228,
+      "path": 0.3405313380720112,
+      "straight": 0.2831582424476664,
+      "lowShare": 1,
+      "maxSpeed": 0.07282105071623989,
+      "spinSlope": -1.2306132085439632,
+      "spinLoss": 0.15863603960412503
+     }
+    ],
+    "lowShareAfter": 0.9665551839464883,
+    "recontact": 54.983333333333334,
+    "maxTiltAfter": 0.703510593691527,
+    "wallAccelSteps": 0,
+    "maxWallSpeedAfter": 0,
+    "maxSpeedJumpNoContact": 0.13501716711857864,
+    "dist0": 1.0141200846051215
+   }
+  },
+  {
+   "name": "NNPOW 0.3#2",
+   "group": "NNPOW",
+   "nn": true,
+   "hash": "c168ea3e886d7c7123ae07ce795ecf48f342c0cad7631f5bbf8ce3311135ae42",
+   "steps": 9121,
+   "duration": 76.00833333333334,
+   "result": "player:spin",
+   "gate": {
+    "entries": 1,
+    "confirmedSteps": 3941
+   },
+   "segments": [
+    {
+     "start": 780,
+     "end": 4721,
+     "exit": "spinRatio"
+    }
+   ],
+   "rollChecked": 17889,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 1,
+   "motion": {
+    "s0": 780,
+    "per": [
+     {
+      "net": 0.09757913784960667,
+      "path": 0.39258161634395333,
+      "straight": 0.2485575834099029,
+      "lowShare": 1,
+      "maxSpeed": 0.07658062842969263,
+      "spinSlope": -0.9784370439311998,
+      "spinLoss": 0.1260574411579979
+     },
+     {
+      "net": 0.08932299053602748,
+      "path": 0.32048524537416184,
+      "straight": 0.2787117092761765,
+      "lowShare": 1,
+      "maxSpeed": 0.07533988222150521,
+      "spinSlope": -1.2349999003377519,
+      "spinLoss": 0.15960961417249386
+     }
+    ],
+    "lowShareAfter": 0.8750749310634216,
+    "recontact": -1,
+    "maxTiltAfter": 0.037545232677700574,
+    "wallAccelSteps": 0,
+    "maxWallSpeedAfter": 0,
+    "maxSpeedJumpNoContact": 0.021772619425876424,
+    "dist0": 1.0517201070200457
+   }
+  },
+  {
+   "name": "NNPOW 0.3#3",
+   "group": "NNPOW",
+   "nn": true,
+   "hash": "a70a6bafdf6371a20cd06f0e196444832b04f6f2264bb51eec2779a78a7aaca8",
+   "steps": 7917,
+   "duration": 65.975,
+   "result": "player:spin",
+   "gate": {
+    "entries": 1,
+    "confirmedSteps": 4064
+   },
+   "segments": [
+    {
+     "start": 762,
+     "end": 4826,
+     "exit": "spinRatio"
+    }
+   ],
+   "rollChecked": 15570,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 1,
+   "motion": {
+    "s0": 762,
+    "per": [
+     {
+      "net": 0.10489447487899907,
+      "path": 0.3811471993203491,
+      "straight": 0.2752072560576175,
+      "lowShare": 1,
+      "maxSpeed": 0.07761284254371716,
+      "spinSlope": -0.9853945496314892,
+      "spinLoss": 0.12368278813635591
+     },
+     {
+      "net": 0.0816238270458154,
+      "path": 0.333559965192435,
+      "straight": 0.2447051072173052,
+      "lowShare": 1,
+      "maxSpeed": 0.07735650297634314,
+      "spinSlope": -1.2318892274072442,
+      "spinLoss": 0.15651318867520916
+     }
+    ],
+    "lowShareAfter": 0.9510831586303284,
+    "recontact": 56.71666666666667,
+    "maxTiltAfter": 0.7030315266934046,
+    "wallAccelSteps": 0,
+    "maxWallSpeedAfter": 0,
+    "maxSpeedJumpNoContact": 0.10677710035992788,
+    "dist0": 1.0586306137429748
+   }
+  },
+  {
+   "name": "NNPOW 0.45#0",
+   "group": "NNPOW",
+   "nn": true,
+   "hash": "754820a0f396756d98a180b7729aa1dd7bf8e35df079b72a6c6dec7deef73bf6",
+   "steps": 8362,
+   "duration": 69.68333333333334,
+   "result": "player:spin",
+   "gate": {
+    "entries": 1,
+    "confirmedSteps": 4413
+   },
+   "segments": [
+    {
+     "start": 812,
+     "end": 5225,
+     "exit": "spinRatio"
+    }
+   ],
+   "rollChecked": 16489,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 1,
+   "motion": {
+    "s0": 812,
+    "per": [
+     {
+      "net": 0.045604900627157434,
+      "path": 0.2826368774610531,
+      "straight": 0.16135509646451468,
+      "lowShare": 1,
+      "maxSpeed": 0.06540535484072431,
+      "spinSlope": -1.0185613596183813,
+      "spinLoss": 0.11117147455230113
+     },
+     {
+      "net": 0.17070154810722113,
+      "path": 0.2813934508330665,
+      "straight": 0.6066294279481576,
+      "lowShare": 1,
+      "maxSpeed": 0.10477666427532381,
+      "spinSlope": -1.2847924943696074,
+      "spinLoss": 0.14406090665609603
+     }
+    ],
+    "lowShareAfter": 0.9531125827814569,
+    "recontact": 59.56666666666667,
+    "maxTiltAfter": 0.6933776907375278,
+    "wallAccelSteps": 0,
+    "maxWallSpeedAfter": 0,
+    "maxSpeedJumpNoContact": 0.19418475511678537,
+    "dist0": 1.0618141496527502
+   }
+  },
+  {
+   "name": "NNPOW 0.45#1",
+   "group": "NNPOW",
+   "nn": true,
+   "hash": "f32273e757d06db74d7ec843430d6757666312dfaee669959e1fb5cc8a3aea93",
+   "steps": 8658,
+   "duration": 72.15,
+   "result": "player:spin",
+   "gate": {
+    "entries": 1,
+    "confirmedSteps": 4543
+   },
+   "segments": [
+    {
+     "start": 639,
+     "end": 5182,
+     "exit": "spinRatio"
+    }
+   ],
+   "rollChecked": 16978,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 1,
+   "wobbleBreaks": 1,
+   "hits": 1,
+   "motion": {
+    "s0": 639,
+    "per": [
+     {
+      "net": 0.1313101526308402,
+      "path": 0.4028336045943402,
+      "straight": 0.32596623303825806,
+      "lowShare": 1,
+      "maxSpeed": 0.10034099703139077,
+      "spinSlope": -1.0183345633544714,
+      "spinLoss": 0.11062821221290606
+     },
+     {
+      "net": 0.09904090012546941,
+      "path": 0.31995662088840154,
+      "straight": 0.3095447746962365,
+      "lowShare": 1,
+      "maxSpeed": 0.09404662591022174,
+      "spinSlope": -1.273243076270277,
+      "spinLoss": 0.14040775369078418
+     }
+    ],
+    "lowShareAfter": 0.9567277715425864,
+    "recontact": 63.34166666666667,
+    "maxTiltAfter": 0.713410703427565,
+    "wallAccelSteps": 0,
+    "maxWallSpeedAfter": 0,
+    "maxSpeedJumpNoContact": 0.18451009164121057,
+    "dist0": 1.04716283020569
+   }
+  },
+  {
+   "name": "NNPOW 0.45#2",
+   "group": "NNPOW",
+   "nn": true,
+   "hash": "2ae8c148926fbd216dc5b173341590fe1be3449496bec773976abcd8f44b98f0",
+   "steps": 8602,
+   "duration": 71.68333333333334,
+   "result": "player:spin",
+   "gate": {
+    "entries": 1,
+    "confirmedSteps": 4076
+   },
+   "segments": [
+    {
+     "start": 865,
+     "end": 4941,
+     "exit": "spinRatio"
+    }
+   ],
+   "rollChecked": 16865,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 3,
+   "motion": {
+    "s0": 865,
+    "per": [
+     {
+      "net": 0.12091324951537998,
+      "path": 0.3964437565964016,
+      "straight": 0.30499471237347636,
+      "lowShare": 1,
+      "maxSpeed": 0.3577106913943686,
+      "spinSlope": -1.03766027247307,
+      "spinLoss": 0.12971272507474338
+     },
+     {
+      "net": 0.10434042766527302,
+      "path": 0.3632449381904568,
+      "straight": 0.2872453727367983,
+      "lowShare": 1,
+      "maxSpeed": 0.3356660572187161,
+      "spinSlope": -1.2984660458964976,
+      "spinLoss": 0.16312777126025643
+     }
+    ],
+    "lowShareAfter": 0.9660074964456508,
+    "recontact": 61.59166666666667,
+    "maxTiltAfter": 0.7041944487793285,
+    "wallAccelSteps": 0,
+    "maxWallSpeedAfter": 0,
+    "maxSpeedJumpNoContact": 0.34614007079094156,
+    "dist0": 1.0117166808811262
+   }
+  },
+  {
+   "name": "NNPOW 0.45#3",
+   "group": "NNPOW",
+   "nn": true,
+   "hash": "aeb53202884ea5d068acd499be5011fb2a700e14be0881c0036eafa6c7d818a9",
+   "steps": 8830,
+   "duration": 73.58333333333333,
+   "result": "player:spin",
+   "gate": {
+    "entries": 1,
+    "confirmedSteps": 4489
+   },
+   "segments": [
+    {
+     "start": 781,
+     "end": 5270,
+     "exit": "spinRatio"
+    }
+   ],
+   "rollChecked": 17367,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 1,
+   "motion": {
+    "s0": 781,
+    "per": [
+     {
+      "net": 0.10875231359518372,
+      "path": 0.3759205660622875,
+      "straight": 0.289295993391232,
+      "lowShare": 1,
+      "maxSpeed": 0.10450668785126177,
+      "spinSlope": -1.022338498503703,
+      "spinLoss": 0.11144427655989232
+     },
+     {
+      "net": 0.14270456051060243,
+      "path": 0.27075130198980235,
+      "straight": 0.5270687877097533,
+      "lowShare": 1,
+      "maxSpeed": 0.10210317257466736,
+      "spinSlope": -1.2878600866254242,
+      "spinLoss": 0.14297637113291045
+     }
+    ],
+    "lowShareAfter": 0.9593738352590384,
+    "recontact": 63.975,
+    "maxTiltAfter": 0.702957870307632,
+    "wallAccelSteps": 0,
+    "maxWallSpeedAfter": 0,
+    "maxSpeedJumpNoContact": 0.10192468833451501,
+    "dist0": 1.1128306679245976
+   }
+  },
+  {
+   "name": "NNPOW 0.9#0",
+   "group": "NNPOW",
+   "nn": true,
+   "hash": "2a2b87191b7eaff3f2501d12d32ad855ba5284a1c9525851798428943b5cff63",
+   "steps": 11594,
+   "duration": 96.61666666666666,
+   "result": "player:spin",
+   "gate": {
+    "entries": 1,
+    "confirmedSteps": 5858
+   },
+   "segments": [
+    {
+     "start": 869,
+     "end": 6727,
+     "exit": "spinRatio"
+    }
+   ],
+   "rollChecked": 22832,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 1,
+   "motion": {
+    "s0": 869,
+    "per": [
+     {
+      "net": 0.08727215524221146,
+      "path": 0.26486244888408833,
+      "straight": 0.3294999182024642,
+      "lowShare": 1,
+      "maxSpeed": 0.09705007079589777,
+      "spinSlope": -1.1482238762503305,
+      "spinLoss": 0.09060872640483718
+     },
+     {
+      "net": 0.1866685071760974,
+      "path": 0.26583778315654805,
+      "straight": 0.7021895268595849,
+      "lowShare": 1,
+      "maxSpeed": 0.1508472830012547,
+      "spinSlope": -1.4163011827006082,
+      "spinLoss": 0.1119671916251831
+     }
+    ],
+    "lowShareAfter": 0.9751981351981353,
+    "recontact": 85.2,
+    "maxTiltAfter": 0.6970104839195235,
+    "wallAccelSteps": 0,
+    "maxWallSpeedAfter": 0,
+    "maxSpeedJumpNoContact": 0.13142660269791034,
+    "dist0": 1.0201747696522974
+   }
+  },
+  {
+   "name": "NNPOW 0.9#1",
+   "group": "NNPOW",
+   "nn": true,
+   "hash": "69767b795bf0176cfa8b65bc45817a8d33dbb2d3409843a63550c04a6bffc4ae",
+   "steps": 11495,
+   "duration": 95.79166666666667,
+   "result": "player:spin",
+   "gate": {
+    "entries": 1,
+    "confirmedSteps": 5206
+   },
+   "segments": [
+    {
+     "start": 1018,
+     "end": 6224,
+     "exit": "spinRatio"
+    }
+   ],
+   "rollChecked": 22709,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 1,
+   "wobbleBreaks": 1,
+   "hits": 2,
+   "motion": {
+    "s0": 1018,
+    "per": [
+     {
+      "net": 0.1469939274949134,
+      "path": 0.3558425924775548,
+      "straight": 0.4130869395691727,
+      "lowShare": 1,
+      "maxSpeed": 0.12826467558871057,
+      "spinSlope": -1.1264372568246388,
+      "spinLoss": 0.09212270686595793
+     },
+     {
+      "net": 0.18057805508361738,
+      "path": 0.26302289047164623,
+      "straight": 0.6865488199898085,
+      "lowShare": 1,
+      "maxSpeed": 0.12930399117694774,
+      "spinSlope": -1.3870547405395381,
+      "spinLoss": 0.1166576634613885
+     }
+    ],
+    "lowShareAfter": 0.9611530018134963,
+    "recontact": 83.56666666666666,
+    "maxTiltAfter": 0.6670027508116854,
+    "wallAccelSteps": 0,
+    "maxWallSpeedAfter": 0,
+    "maxSpeedJumpNoContact": 0.23128221476077115,
+    "dist0": 1.0184051782745938
+   }
+  },
+  {
+   "name": "NNPOW 0.9#2",
+   "group": "NNPOW",
+   "nn": true,
+   "hash": "25d13311099e817396a701dd5caba40e335a78d8582a3b5710aed7a9f0fe31c8",
+   "steps": 11575,
+   "duration": 96.45833333333333,
+   "result": "player:spin",
+   "gate": {
+    "entries": 1,
+    "confirmedSteps": 5174
+   },
+   "segments": [
+    {
+     "start": 1121,
+     "end": 6295,
+     "exit": "spinRatio"
+    }
+   ],
+   "rollChecked": 22758,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 1,
+   "wobbleBreaks": 1,
+   "hits": 4,
+   "motion": {
+    "s0": 1121,
+    "per": [
+     {
+      "net": 0.14146489761051914,
+      "path": 0.4077203947640447,
+      "straight": 0.3469654680688404,
+      "lowShare": 1,
+      "maxSpeed": 0.366054089799725,
+      "spinSlope": -1.108058226166127,
+      "spinLoss": 0.11248923789686924
+     },
+     {
+      "net": 0.15477155755812677,
+      "path": 0.3490576108524428,
+      "straight": 0.4433983180603198,
+      "lowShare": 1,
+      "maxSpeed": 0.3105842115314698,
+      "spinSlope": -1.3884756008126673,
+      "spinLoss": 0.12820344460286476
+     }
+    ],
+    "lowShareAfter": 0.9608762196288502,
+    "recontact": 83.38333333333334,
+    "maxTiltAfter": 0.6590009246427564,
+    "wallAccelSteps": 0,
+    "maxWallSpeedAfter": 0,
+    "maxSpeedJumpNoContact": 0.31332625872720743,
+    "dist0": 0.9951376813917002
+   }
+  },
+  {
+   "name": "NNPOW 0.9#3",
+   "group": "NNPOW",
+   "nn": true,
+   "hash": "4ab790d28031400c20dbaae61c0e48bb8425389def4531ff139ffb5499f6e64b",
+   "steps": 11868,
+   "duration": 98.9,
+   "result": "player:spin",
+   "gate": {
+    "entries": 1,
+    "confirmedSteps": 5690
+   },
+   "segments": [
+    {
+     "start": 1203,
+     "end": 6893,
+     "exit": "spinRatio"
+    }
+   ],
+   "rollChecked": 23445,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 2,
+   "wobbleBreaks": 2,
+   "hits": 2,
+   "motion": {
+    "s0": 1203,
+    "per": [
+     {
+      "net": 0.180599660155449,
+      "path": 0.365049099158124,
+      "straight": 0.4947270396556185,
+      "lowShare": 1,
+      "maxSpeed": 0.1374449792561857,
+      "spinSlope": -1.1443578182345449,
+      "spinLoss": 0.09043236546119139
+     },
+     {
+      "net": 0.07220309695291792,
+      "path": 0.2351069146295588,
+      "straight": 0.30710750071593257,
+      "lowShare": 1,
+      "maxSpeed": 0.09701031115409639,
+      "spinSlope": -1.3923978881467796,
+      "spinLoss": 0.11198228703771138
+     }
+    ],
+    "lowShareAfter": 0.9550867323019222,
+    "recontact": 87.93333333333334,
+    "maxTiltAfter": 0.7001268230340072,
+    "wallAccelSteps": 0,
+    "maxWallSpeedAfter": 0,
+    "maxSpeedJumpNoContact": 0.1726074504137991,
+    "dist0": 1.0242323774748712
+   }
+  },
+  {
+   "name": "CTRL center NN#0",
+   "group": "CTRL",
+   "nn": true,
+   "hash": "082951ef282a4373125de6b2770c7e72f33ceb13510d4097379f32062820185d",
+   "steps": 7200,
+   "duration": 60,
+   "result": "timeout",
+   "gate": {
+    "entries": 1,
+    "confirmedSteps": 6412
+   },
+   "segments": [
+    {
+     "start": 360,
+     "end": 6772,
+     "exit": "spinRatio"
+    }
+   ],
+   "rollChecked": 14202,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 0,
+   "motion": {
+    "s0": 360,
+    "per": [
+     {
+      "net": 0.15184890177782553,
+      "path": 0.3757885913988942,
+      "straight": 0.40408065932113435,
+      "lowShare": 1,
+      "maxSpeed": 0.11828759682059298,
+      "spinSlope": -1.100722260170721,
+      "spinLoss": 0.09366805946468602
+     },
+     {
+      "net": 0.15736714454415823,
+      "path": 0.2972000405085522,
+      "straight": 0.5294990682870713,
+      "lowShare": 1,
+      "maxSpeed": 0.10925827711014795,
+      "spinSlope": -1.3767875659345847,
+      "spinLoss": 0.11626140812395687
+     }
+    ],
+    "lowShareAfter": 1,
+    "recontact": -1,
+    "maxTiltAfter": 0.038575686414061915,
+    "wallAccelSteps": 0,
+    "maxWallSpeedAfter": 0,
+    "maxSpeedJumpNoContact": 0.024675451998978665,
+    "dist0": 1.0905264879689047
+   }
+  },
+  {
+   "name": "CTRL center NN#1",
+   "group": "CTRL",
+   "nn": true,
+   "hash": "0c27caf09129217ccef9f18b0bbc12c1a92542298b3da3791ac00384b62d1e41",
+   "steps": 7200,
+   "duration": 60,
+   "result": "timeout",
+   "gate": {
+    "entries": 1,
+    "confirmedSteps": 6411
+   },
+   "segments": [
+    {
+     "start": 360,
+     "end": 6771,
+     "exit": "spinRatio"
+    }
+   ],
+   "rollChecked": 14217,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 0,
+   "motion": {
+    "s0": 360,
+    "per": [
+     {
+      "net": 0.1566553176761489,
+      "path": 0.3707867935129685,
+      "straight": 0.42249432940137815,
+      "lowShare": 1,
+      "maxSpeed": 0.12389586008548027,
+      "spinSlope": -1.1169867579140014,
+      "spinLoss": 0.0944775178189321
+     },
+     {
+      "net": 0.12127272541811226,
+      "path": 0.2849674239256058,
+      "straight": 0.4255669779636706,
+      "lowShare": 1,
+      "maxSpeed": 0.10649953644447505,
+      "spinSlope": -1.3700992333887387,
+      "spinLoss": 0.11609119732056666
+     }
+    ],
+    "lowShareAfter": 1,
+    "recontact": -1,
+    "maxTiltAfter": 0.0402488655066375,
+    "wallAccelSteps": 0,
+    "maxWallSpeedAfter": 0,
+    "maxSpeedJumpNoContact": 0.02604656649362888,
+    "dist0": 1.1044334577088808
+   }
+  },
+  {
+   "name": "CTRL center BB#0",
+   "group": "CTRL",
+   "nn": false,
+   "hash": "2fed5b548e94dbce06c2f14bd9ea6350700cbe4420290c1a69f466b2b1b6827a",
+   "steps": 3379,
+   "duration": 28.158333333333335,
+   "result": "player:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 6757,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 10
+  },
+  {
+   "name": "CTRL center BB#1",
+   "group": "CTRL",
+   "nn": false,
+   "hash": "7ef1fc3e2b6e3837990ccb6beda7113e297c44cb120936320f29511be51bc815",
+   "steps": 3206,
+   "duration": 26.716666666666665,
+   "result": "player:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 6411,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 1,
+   "wobbleBreaks": 1,
+   "hits": 12
+  },
+  {
+   "name": "CTRL center NR#0",
+   "group": "CTRL",
+   "nn": false,
+   "hash": "7088ed839fcc1198792eb60e8024d55910538efc287826a79b4f5dac4a25ac40",
+   "steps": 1842,
+   "duration": 15.35,
+   "result": "player:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 3668,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 6
+  },
+  {
+   "name": "CTRL center NR#1",
+   "group": "CTRL",
+   "nn": false,
+   "hash": "837fc0cb10fe614736fb33a08b4916ec54281913a25b872eb10d5ce7ba58e7b4",
+   "steps": 1657,
+   "duration": 13.808333333333334,
+   "result": "player:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 3292,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 7
+  },
+  {
+   "name": "CTRL wall NN#0",
+   "group": "CTRL",
+   "nn": true,
+   "hash": "a2d86b5cd57c064838444b17936f14c6e24c8fc230404c58dba1a7fe37a60e52",
+   "steps": 7200,
+   "duration": 60,
+   "result": "timeout",
+   "gate": {
+    "entries": 1,
+    "confirmedSteps": 4619
+   },
+   "segments": [
+    {
+     "start": 1008,
+     "end": 5627,
+     "exit": "spinRatio"
+    }
+   ],
+   "rollChecked": 14181,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 5,
+   "motion": {
+    "s0": 1008,
+    "per": [
+     {
+      "net": 0.12299953069181585,
+      "path": 0.41447588541389097,
+      "straight": 0.2967591964222235,
+      "lowShare": 1,
+      "maxSpeed": 0.3786312442151984,
+      "spinSlope": -1.0564613943391472,
+      "spinLoss": 0.12139248180479116
+     },
+     {
+      "net": 0.13325435662575624,
+      "path": 0.34712382938409136,
+      "straight": 0.3838813280614934,
+      "lowShare": 1,
+      "maxSpeed": 0.3777657023391984,
+      "spinSlope": -1.326344544816421,
+      "spinLoss": 0.14760683661231191
+     }
+    ],
+    "lowShareAfter": 1,
+    "recontact": -1,
+    "maxTiltAfter": 0.04149305906179398,
+    "wallAccelSteps": 0,
+    "maxWallSpeedAfter": 0,
+    "maxSpeedJumpNoContact": 0.3719123354805799,
+    "dist0": 0.9877509495060124
+   }
+  },
+  {
+   "name": "CTRL wall NN#1",
+   "group": "CTRL",
+   "nn": true,
+   "hash": "4f69a535c1459fe8440d0942df731b9e80e767d0976f5e30157b8b03453c4494",
+   "steps": 7200,
+   "duration": 60,
+   "result": "timeout",
+   "gate": {
+    "entries": 1,
+    "confirmedSteps": 4008
+   },
+   "segments": [
+    {
+     "start": 1026,
+     "end": 5034,
+     "exit": "spinRatio"
+    }
+   ],
+   "rollChecked": 14208,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 3,
+   "motion": {
+    "s0": 1026,
+    "per": [
+     {
+      "net": 0.10530075686579035,
+      "path": 0.33070753765212285,
+      "straight": 0.3184105134505827,
+      "lowShare": 1,
+      "maxSpeed": 0.08937084898266558,
+      "spinSlope": -1.0298245112147681,
+      "spinLoss": 0.11209732544795853
+     },
+     {
+      "net": 0.13444354536801945,
+      "path": 0.3625677602338616,
+      "straight": 0.37080943237010744,
+      "lowShare": 1,
+      "maxSpeed": 0.08886914935168103,
+      "spinSlope": -1.2697509493264982,
+      "spinLoss": 0.13979082435096302
+     }
+    ],
+    "lowShareAfter": 1,
+    "recontact": -1,
+    "maxTiltAfter": 0.0499575265255868,
+    "wallAccelSteps": 0,
+    "maxWallSpeedAfter": 0,
+    "maxSpeedJumpNoContact": 0.02324317411780171,
+    "dist0": 1.021048564692066
+   }
+  },
+  {
+   "name": "CTRL wall BB#0",
+   "group": "CTRL",
+   "nn": false,
+   "hash": "3e3e4e86087cc5d1b66a0ae1e8393b2c92b12eff672f6c8391fdf90b838a0cc0",
+   "steps": 2815,
+   "duration": 23.458333333333332,
+   "result": "player:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 5628,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 11
+  },
+  {
+   "name": "CTRL wall BB#1",
+   "group": "CTRL",
+   "nn": false,
+   "hash": "e413d4c0bcf65f3ce47956fab04e531b07c1be083dadb72a8d9fadb7a0ce53d1",
+   "steps": 3282,
+   "duration": 27.35,
+   "result": "player:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 6562,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 16
+  },
+  {
+   "name": "CTRL wall NR#0",
+   "group": "CTRL",
+   "nn": false,
+   "hash": "5a2de94922a6ce32c44cf9c00901198158fc2b5e368b25b628876bcdb8bf75a1",
+   "steps": 1378,
+   "duration": 11.483333333333333,
+   "result": "player:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 2730,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 1,
+   "wobbleBreaks": 1,
+   "hits": 9
+  },
+  {
+   "name": "CTRL wall NR#1",
+   "group": "CTRL",
+   "nn": false,
+   "hash": "ad058b246116615e201b68d6065d4d38908e5e04e8e17ad93f472f09c3289134",
+   "steps": 1546,
+   "duration": 12.883333333333333,
+   "result": "player:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 3087,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 7
+  },
+  {
+   "name": "CTRL graze NN#0",
+   "group": "CTRL",
+   "nn": true,
+   "hash": "afa96c524ca364398fbeb6e13193a48d7e5704ddebbfc8885d26668cfbb7b945",
+   "steps": 7200,
+   "duration": 60,
+   "result": "timeout",
+   "gate": {
+    "entries": 1,
+    "confirmedSteps": 5204
+   },
+   "segments": [
+    {
+     "start": 680,
+     "end": 5884,
+     "exit": "spinRatio"
+    }
+   ],
+   "rollChecked": 14250,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 1,
+   "motion": {
+    "s0": 680,
+    "per": [
+     {
+      "net": 0.15783464588171445,
+      "path": 0.40547923615491405,
+      "straight": 0.38925457041507655,
+      "lowShare": 1,
+      "maxSpeed": 0.3740819629393419,
+      "spinSlope": -1.3111811748315216,
+      "spinLoss": 0.1262658278031552
+     },
+     {
+      "net": 0.1221128315745497,
+      "path": 0.31222317002090827,
+      "straight": 0.3911075259609091,
+      "lowShare": 1,
+      "maxSpeed": 0.3811609678472013,
+      "spinSlope": -1.6029575032100005,
+      "spinLoss": 0.15602886299347965
+     }
+    ],
+    "lowShareAfter": 1,
+    "recontact": -1,
+    "maxTiltAfter": 0.05183839243380569,
+    "wallAccelSteps": 0,
+    "maxWallSpeedAfter": 0,
+    "maxSpeedJumpNoContact": 0.3612475150862617,
+    "dist0": 0.9895292524198785
+   }
+  },
+  {
+   "name": "CTRL graze NN#1",
+   "group": "CTRL",
+   "nn": true,
+   "hash": "1bb3526d413bd2dc8494a2ebf9b5450ace4229e6ea3868aac0c3256ef448bb20",
+   "steps": 7200,
+   "duration": 60,
+   "result": "timeout",
+   "gate": {
+    "entries": 1,
+    "confirmedSteps": 4964
+   },
+   "segments": [
+    {
+     "start": 936,
+     "end": 5900,
+     "exit": "spinRatio"
+    }
+   ],
+   "rollChecked": 14253,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 0,
+   "motion": {
+    "s0": 936,
+    "per": [
+     {
+      "net": 0.13515104533278263,
+      "path": 0.3845551793220062,
+      "straight": 0.35144773130103724,
+      "lowShare": 1,
+      "maxSpeed": 0.36931919882111985,
+      "spinSlope": -1.0792324396037711,
+      "spinLoss": 0.11492406297201328
+     },
+     {
+      "net": 0.16330144877538091,
+      "path": 0.32584951120493466,
+      "straight": 0.5011560341813024,
+      "lowShare": 1,
+      "maxSpeed": 0.3907320895380993,
+      "spinSlope": -1.3522376597391546,
+      "spinLoss": 0.14468545859720433
+     }
+    ],
+    "lowShareAfter": 1,
+    "recontact": -1,
+    "maxTiltAfter": 0.04275818982839058,
+    "wallAccelSteps": 0,
+    "maxWallSpeedAfter": 0,
+    "maxSpeedJumpNoContact": 0.37106502100833477,
+    "dist0": 0.9865952403647791
+   }
+  },
+  {
+   "name": "CTRL graze BB#0",
+   "group": "CTRL",
+   "nn": false,
+   "hash": "3dc392b385a47025bd25d4a4467588a4c961ad5d7108cd515d8b4a3830515344",
+   "steps": 3100,
+   "duration": 25.833333333333332,
+   "result": "player:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 6199,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 11
+  },
+  {
+   "name": "CTRL graze BB#1",
+   "group": "CTRL",
+   "nn": false,
+   "hash": "a9dde0a21e52cbf85cab278efec93a4f687c7fa51d48f9f99278362124c1966d",
+   "steps": 3321,
+   "duration": 27.675,
+   "result": "player:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 6642,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 11
+  },
+  {
+   "name": "CTRL graze NR#0",
+   "group": "CTRL",
+   "nn": false,
+   "hash": "2b7db5067665dbffc880fc943b340f54714a61eb27fc95ae84b949283057c81f",
+   "steps": 1562,
+   "duration": 13.016666666666667,
+   "result": "player:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 3100,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 8
+  },
+  {
+   "name": "CTRL graze NR#1",
+   "group": "CTRL",
+   "nn": false,
+   "hash": "fec70720a24d8af99756381e609e51fb0e5b70ef592ac186fe6a9b177b848065",
+   "steps": 1869,
+   "duration": 15.575,
+   "result": "player:spin",
+   "gate": {
+    "entries": 0,
+    "confirmedSteps": 0
+   },
+   "segments": [],
+   "rollChecked": 3724,
+   "rollMismatch": 0,
+   "scaledWhileNotConfirmed": 0,
+   "scaledWhileLowSpin": 0,
+   "scaledSteps": 0,
+   "breakouts": 0,
+   "wobbleBreaks": 0,
+   "hits": 7
+  }
+ ]
+}

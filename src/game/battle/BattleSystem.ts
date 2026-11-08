@@ -8,6 +8,7 @@ import type { PhysicsWorld } from '../physics/PhysicsWorld';
 import { ContactFeedback, type ContactSample, type ImpactDecision } from './contactFeedback';
 import { boundingRadius, canSkip, classifyContact, emptyEvidence, queryContact, type ContactClass, type ContactEvidence } from './contactSampling';
 import { impactTier, type ImpactTier } from './impactTiers';
+import { StallRollGate } from './stallRoll';
 
 export type FinishType = 'spin' | 'over' | 'xtreme';
 
@@ -141,8 +142,12 @@ export class BattleSystem {
     return !!(this.beys.player && this.beys.rival);
   }
 
+  /** 针尖僵持自适应滚动阻力门控（只决定 rollScale，不施加力） */
+  readonly stallRoll = new StallRollGate();
+
   /** 物理步之前 */
   preStep(dt: number): void {
+    this.updateStallRoll(dt);
     for (const side of ['player', 'rival'] as Side[]) {
       const b = this.beys[side];
       if (!b) continue;
@@ -153,6 +158,38 @@ export class BattleSystem {
       this.preVel[side].x = v.x;
       this.preVel[side].z = v.z;
     }
+  }
+
+  /**
+   * 用上一步结束时的状态判定针尖僵持，并写入双方滚动阻力倍率。
+   * 不读取接触（contactFeedback = false）时没有接触信号，门控保持关闭。
+   */
+  private updateStallRoll(dt: number): void {
+    const a = this.beys.player;
+    const b = this.beys.rival;
+    if (!a || !b) return;
+    if (!this.sampling) {
+      a.rollScale = b.rollScale = 1;
+      return;
+    }
+    const va = a.body.linvel();
+    const vb = b.body.linvel();
+    const k = this.contactClass;
+    this.stallRoll.step(
+      {
+        bothNeedle: a.spec.tip.gearGrip < BEY_TUNING.driveMinGrip && b.spec.tip.gearGrip < BEY_TUNING.driveMinGrip,
+        contact: k.geometric || k.impulseResponse,
+        speedA: Math.hypot(va.x, va.z),
+        speedB: Math.hypot(vb.x, vb.z),
+        spinRatioA: a.spinRatio,
+        spinRatioB: b.spinRatio,
+        breakoutA: a.breakout,
+        breakoutB: b.breakout,
+        wobbleFor: this.wobbleFor,
+      },
+      dt,
+    );
+    a.rollScale = b.rollScale = this.stallRoll.scale;
   }
 
   /** 物理步之后：处理撞击、判定胜负 */
