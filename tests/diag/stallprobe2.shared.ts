@@ -123,8 +123,8 @@ function placeBeys(pw: PhysicsWorld, b: BattleSystem, sc: Scn): [BeyPhysics, Bey
   return [beys[0], beys[1]];
 }
 
-export function setup(R: R, sc: Scn) {
-  const pw = new PhysicsWorld(R);
+export function setup(R: R, sc: Scn, opts: { observeContacts?: boolean } = {}) {
+  const pw = new PhysicsWorld(R, opts);
   createArenaPhysics(pw);
   const b = new BattleSystem(pw, { player: assembleBey(sc.player), rival: assembleBey(sc.rival) });
   pw.beforeStep = (dt) => b.preStep(dt);

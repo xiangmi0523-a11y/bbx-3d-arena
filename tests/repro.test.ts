@@ -62,6 +62,18 @@ describe('阶段 1：可重复物理测试基线', () => {
     expect(rep.identical).toBe(list.length);
   }, 600000);
 
+  it(`开启只读 ContactService 时与 golden 逐场一致（${full ? '全部 180 场' : `每组第一场，共 ${sample.length} 场`}）：观测不改变物理、AI、接触与战斗`, () => {
+    const list = full ? all : sample;
+    const runs = list.map((sc) => recordRun(R, sc, { keyframes: false, observeContacts: true }));
+    for (const r of runs) expect(r.contactService, r.name).toBeDefined();
+    const want = G.runs.filter((g) => list.some((s) => s.name === g.name));
+    const rep = compareTraces(runs.map(summarize), want);
+    expect(rep.missing).toEqual([]);
+    expect(rep.diffs, JSON.stringify(rep.diffs.slice(0, 3), null, 1)).toEqual([]);
+    expect(rep.identical).toBe(list.length);
+    for (const r of runs) expect(r.random.run.bypass, `${r.name} 开启观测后推进中读取时间/系统随机`).toEqual({ performanceNow: 0, dateNow: 0, cryptoRandom: 0 });
+  }, 600000);
+
   it('测试辅助 simulateBattle 不再依赖全局随机：同一组参数两次运行结果相同', async () => {
     const opts = { player: { power: 0.8, aim: 0.2, tilt: 0 }, rival: { power: 0.8, aim: -0.1, tilt: 0 }, maxSeconds: 20 };
     const a = await simulateBattle(opts);

@@ -14,6 +14,7 @@
  * 另外记录：关键帧（每块开始时的完整状态）、事件表（撞击、意图切换、终局，带步号）、初始状态、参数指纹、随机源报告。
  */
 import { createHash } from 'node:crypto';
+import type { ContactService } from '../../src/game/physics/ContactService';
 import type { BattleSystem } from '../../src/game/battle/BattleSystem';
 import type { BeyPhysics } from '../../src/game/beys/BeyPhysics';
 import { loadRapier, PHYSICS_DT } from '../../src/game/physics/PhysicsWorld';
@@ -68,6 +69,8 @@ export interface Trace {
   random: { setup: DeterminismReport; run: DeterminismReport };
   /** detail 范围内逐步展开的完整状态（只在定位差异时使用） */
   detail?: { step: number; player: BeyState; rival: BeyState; contact: unknown; battle: unknown }[];
+  /** observeContacts 时：ContactService 输出的全程哈希与计数（独立于原有四个通道，不进入 golden 摘要） */
+  contactService?: { hash: string; events: number; begins: { body: number; collider: number }; physicalSteps: Record<string, number> };
 }
 
 export interface RecordOptions {
@@ -75,6 +78,11 @@ export interface RecordOptions {
   keyframes?: boolean;
   /** 逐步展开 [from, to) 步的完整状态 */
   detail?: [number, number];
+  /**
+   * 开启只读 ContactService（阶段 1 第二项 A）。只影响新增的 contactService 字段；四个原有通道与 golden 必须不变，
+   * 这正是“观测不改变物理”的回归证明。
+   */
+  observeContacts?: boolean;
 }
 
 const vec = (o: { x: number; y: number; z: number; w?: number }) => (o.w === undefined ? [o.x, o.y, o.z] : [o.x, o.y, o.z, o.w]);
@@ -107,6 +115,17 @@ function intentUpdate(h: Hash, beys: BeyPhysics[]) {
   h.update(Buffer.from(f.buffer));
 }
 
+/** ContactService 本步输出的规范化摘要（身份、状态、几何、冲量、生命周期、事件），用于独立哈希 */
+export function contactServiceDigest(cs: ContactService): string {
+  const pairs = cs.colliderPairs
+    .filter((p) => p.present || p.phase !== 'none')
+    .map((p) => [p.key, p.dataStatus, p.manifolds, p.points, p.solverPoints, p.minDist, p.minSolverDist, p.normalImpulse, p.staleImpulsePoints, p.degenerateNormalPoints, +p.penetration, +p.impulse, +p.physicalContact, +p.proximity, p.phase, p.startStep, p.durationSteps, p.episodes, p.contactPoints.map((q) => [q.x, q.y, q.z, q.nx, q.ny, q.nz, +q.normalValid, q.dist, q.impulse, q.manifold])])
+    .sort((x, y) => (x[0] < y[0] ? -1 : x[0] > y[0] ? 1 : 0));
+  const bodies = cs.bodyPairs.map((b) => [b.key, b.colliderPairs, b.physicalPairs, b.normalImpulse, +b.physicalContact, +b.proximity, b.phase, b.startStep, b.durationSteps, b.episodes]).sort((x, y) => (x[0] < y[0] ? -1 : x[0] > y[0] ? 1 : 0));
+  const events = cs.events.map((e) => [e.kind, e.level, e.key, e.step, e.startStep, e.durationSteps, e.reason]).sort((x, y) => (JSON.stringify(x) < JSON.stringify(y) ? -1 : 1));
+  return JSON.stringify([cs.step, cs.stats, pairs, bodies, events]);
+}
+
 function contactSnapshot(b: BattleSystem) {
   return { cls: b.contactClass, st: b.contact.state };
 }
@@ -123,7 +142,7 @@ export function recordRun(R: R, sc: Scn, opts: RecordOptions = {}): Trace {
   let trace!: Trace;
   let setupReport!: DeterminismReport;
   const runRes = withDeterminism(sc.seed, (live) => {
-    const { pw, b, A, B } = setup(R, sc);
+    const { pw, b, A, B } = setup(R, sc, { observeContacts: !!opts.observeContacts });
     setupReport = structuredClone(live);
     // 标记 Rapier 求解区间：区分引擎内部计时读取与游戏代码读取时间（只包一层调用，不改参数和顺序）
     const world = pw.world;
@@ -149,6 +168,9 @@ export function recordRun(R: R, sc: Scn, opts: RecordOptions = {}): Trace {
     let switches = 0;
     let seenImpacts = 0;
     let s = 0;
+    const csv = pw.contacts;
+    const csHash = createHash('sha256');
+    const csCount = { events: 0, begins: { body: 0, collider: 0 }, physicalSteps: {} as Record<string, number> };
     const closeChunk = () => {
       for (const c of CHANNELS) chunks[c].push(cs[c].digest('hex').slice(0, 16));
       for (const c of CHANNELS) cs[c] = createHash('sha256');
@@ -183,6 +205,12 @@ export function recordRun(R: R, sc: Scn, opts: RecordOptions = {}): Trace {
       const bj = JSON.stringify(battleSnapshot(b, fresh));
       hs.battle.update(bj);
       cs.battle.update(bj);
+      if (csv) {
+        csHash.update(contactServiceDigest(csv));
+        csCount.events += csv.events.length;
+        for (const e of csv.events) if (e.kind === 'begin') csCount.begins[e.level]++;
+        for (const bp of csv.bodyPairs) if (bp.physicalContact) csCount.physicalSteps[bp.key] = (csCount.physicalSteps[bp.key] ?? 0) + 1;
+      }
       if (opts.detail && s >= opts.detail[0] && s < opts.detail[1])
         detail.push({ step: s, player: beyState(A), rival: beyState(B), contact: contactSnapshot(b), battle: battleSnapshot(b, fresh) });
     }
@@ -206,6 +234,7 @@ export function recordRun(R: R, sc: Scn, opts: RecordOptions = {}): Trace {
       counters: { hits: b.hits, grinds: b.grinds, breakouts: b.breakouts, wobbleBreaks: b.wobbleBreaks, impacts: b.impacts.length, intentSwitches: switches },
       random: { setup: setupReport, run: { seededRandomCalls: 0, bypass: { performanceNow: 0, dateNow: 0, cryptoRandom: 0 }, engineTimerReads: 0 } },
       ...(opts.detail ? { detail } : {}),
+      ...(csv ? { contactService: { hash: csHash.digest('hex'), ...csCount } } : {}),
     };
     pw.dispose();
   });

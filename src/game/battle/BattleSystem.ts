@@ -4,6 +4,7 @@ import { BEY_TUNING, BeyPhysics } from '../beys/BeyPhysics';
 import type { AssembledBey } from '../beys/parts/assemble';
 import { computeLaunch, type Side } from '../launcher/launch';
 import type { LaunchCommand } from '../launcher/PullStringGesture';
+import { BEY_COLLIDER_PARTS, type ContactSubject } from '../physics/ContactService';
 import type { PhysicsWorld } from '../physics/PhysicsWorld';
 import { ContactFeedback, type ContactSample, type ImpactDecision } from './contactFeedback';
 import { boundingRadius, canSkip, classifyContact, emptyEvidence, queryContact, type ContactClass, type ContactEvidence } from './contactSampling';
@@ -120,6 +121,18 @@ export class BattleSystem {
     this.pw = pw;
     this.specs = specs;
     this.sampling = opts.contactFeedback !== false;
+    // 只读接触观测：告诉 ContactService 哪些碰撞体属于哪一台（只读 beys，不改变任何状态）
+    const cs = pw.contacts;
+    if (cs) {
+      const subjects: (ContactSubject | null)[] = [null, null];
+      cs.setSubjects(() => {
+        const p = this.beys.player;
+        const r = this.beys.rival;
+        if (subjects[0]?.colliders !== p?.colliders) subjects[0] = p ? { owner: 'player', colliders: p.colliders, parts: BEY_COLLIDER_PARTS } : null;
+        if (subjects[1]?.colliders !== r?.colliders) subjects[1] = r ? { owner: 'rival', colliders: r.colliders, parts: BEY_COLLIDER_PARTS } : null;
+        return subjects;
+      });
+    }
   }
 
   private readonly sampling: boolean;

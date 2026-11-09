@@ -9,6 +9,7 @@
  *   REPRO_NO_KEYFRAMES=1      不写关键帧（文件更小）
  *   REPRO_GOLDEN_WRITE=文件   同时写出每场摘要（tests/fixtures/repro-golden.json 由它生成）
  *   REPRO_TUNE='{"键":值}'   临时覆盖 BEY_TUNING（只在本进程内，用于验证对照工具能发现并定位变化）
+ *   REPRO_CONTACTS=1          开启只读 ContactService（四个原有通道必须与关闭时逐位一致）
  */
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname } from 'node:path';
@@ -40,7 +41,7 @@ test('repro: 180 场固定种子记录', async () => {
   };
   const t0 = performance.now();
   const runs: Trace[] = [];
-  for (const sc of list) runs.push(recordRun(R, sc, { keyframes: !env.REPRO_NO_KEYFRAMES, detail }));
+  for (const sc of list) runs.push(recordRun(R, sc, { keyframes: !env.REPRO_NO_KEYFRAMES, detail, observeContacts: !!env.REPRO_CONTACTS }));
   const ms = Math.round(performance.now() - t0);
   mkdirSync(dirname(out), { recursive: true });
   const meta = {
@@ -50,6 +51,7 @@ test('repro: 180 场固定种子记录', async () => {
     platform: `${process.platform}-${process.arch}`,
     order: env.REPRO_ORDER ?? 'forward',
     tune: env.REPRO_TUNE ?? null,
+    contacts: !!env.REPRO_CONTACTS,
     ms,
     config: configFingerprint(R),
     configSnapshot: configSnapshot(R),
