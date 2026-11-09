@@ -1,3 +1,4 @@
+/// <reference types="node" />
 /**
  * 测试侧的随机源控制与非确定来源探测（只在测试进程里替换全局函数，正式游戏不受影响）。
  *
@@ -13,6 +14,8 @@
  *     物理链路若读取了这些时间或系统随机源，结果就不再只由种子决定，测试会断言计数为 0。
  * 结束后全部恢复原函数。
  */
+import { appendFileSync } from 'node:fs';
+import { expect } from 'vitest';
 
 export interface DeterminismReport {
   /** 被种子控制的 Math.random 调用次数 */
@@ -66,7 +69,33 @@ export function seedSalt(): number {
  */
 export function defaultSeed(o: { player: unknown; rival: unknown; playerLoadout?: unknown; rivalLoadout?: unknown; maxSeconds?: number }): number {
   const key = JSON.stringify([o.player, o.rival, o.playerLoadout ?? null, o.rivalLoadout ?? null, o.maxSeconds ?? null]);
-  return (seedFromString(key) ^ seedSalt()) >>> 0;
+  return deriveSeed(key);
+}
+
+let saltAnnounced = false;
+/**
+ * 按标签派生种子：seed = FNV-1a(label) XOR REPRO_SEED_SALT（未设置时为 0，即默认固定种子）。
+ * 记录与复现：
+ *  - REPRO_SEED_LOG=文件 时，每次派生追加一行 JSON：{ test, label, salt, seed }；
+ *  - REPRO_SEED_SALT 非 0 时在控制台打印一次所用 salt 和复现命令；
+ *  - 同一 salt 重跑得到同一组种子（派生只依赖标签和 salt），单个种子也可通过 simulateBattle / diagnoseBattle 的 seed 选项直接指定。
+ */
+export function deriveSeed(label: string): number {
+  const salt = seedSalt();
+  const seed = (seedFromString(label) ^ salt) >>> 0;
+  const env = (globalThis as { process?: { env?: Record<string, string | undefined> } }).process?.env ?? {};
+  let test: string | null = null;
+  try {
+    test = expect.getState().currentTestName ?? null;
+  } catch {
+    test = null;
+  }
+  if (env.REPRO_SEED_LOG) appendFileSync(env.REPRO_SEED_LOG, JSON.stringify({ test, label, salt, seed }) + '\n');
+  if (salt && !saltAnnounced) {
+    saltAnnounced = true;
+    process.stderr.write(`[repro-seed] REPRO_SEED_SALT=${salt}：所有派生种子 = FNV-1a(标签) XOR ${salt}。复现：REPRO_SEED_SALT=${salt} npx vitest run <测试文件>；逐个种子写入 REPRO_SEED_LOG 指定的文件\n`);
+  }
+  return seed;
 }
 
 export function withDeterminism<T>(seed: number, fn: (live: DeterminismReport) => T): { value: T; report: DeterminismReport } {

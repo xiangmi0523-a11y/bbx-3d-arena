@@ -30,7 +30,7 @@ REPRO_ONLY="NNPOW 0.3#1" REPRO_DETAIL=0-120 REPRO_OUT=test-results/repro/drill.j
 REPRO_OUT=test-results/repro/new.json REPRO_GOLDEN_WRITE=tests/fixtures/repro-golden.json npx vitest run --config vitest.diag.config.ts tests/diag/repro.diag.ts
 ```
 
-其他环境变量：`REPRO_ORDER=reverse` 逆序运行；`REPRO_GROUPS=...` 只跑指定分组；`REPRO_TUNE='{"键":值}'` 在本进程内临时覆盖 BEY_TUNING，用来验证对照工具确实能发现变化；`REPRO_SEED_SALT=n` 整体换一组派生种子，用来抽查统计断言是否稳健。
+其他环境变量：`REPRO_ORDER=reverse` 逆序运行；`REPRO_GROUPS=...` 只跑指定分组；`REPRO_TUNE='{"键":值}'` 在本进程内临时覆盖 BEY_TUNING，用来验证对照工具确实能发现变化；`REPRO_SEED_SALT=n` 整体换一组派生种子，用来抽查统计断言是否稳健。派生规则为 seed = FNV-1a(标签) XOR salt，同一个 salt 重跑得到同一组种子；`REPRO_SEED_LOG=文件` 会逐个写出 `{test, label, salt, seed}`，salt 不为 0 时还会在 stderr 打印复现命令。默认 salt 为 0，即固定种子。
 
 ## 测试辅助的种子
 

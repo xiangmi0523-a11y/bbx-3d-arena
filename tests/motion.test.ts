@@ -27,13 +27,16 @@ async function battleWorld(seed: number, lo = { player: DEF_PLAYER, rival: DEF_R
   createArenaPhysics(pw);
   const orig = Math.random;
   Math.random = seeded(seed);
-  const b = new BattleSystem(pw, { player: assembleBey(lo.player), rival: assembleBey(lo.rival) });
-  pw.beforeStep = (dt) => b.preStep(dt);
-  pw.afterStep = (dt) => b.postStep(dt);
-  b.launch('player', { power: 0.8, aim: 0.2, tilt: 0 });
-  b.launch('rival', { power: 0.8, aim: -0.2, tilt: 0 });
-  Math.random = orig;
-  return { pw, b };
+  try {
+    const b = new BattleSystem(pw, { player: assembleBey(lo.player), rival: assembleBey(lo.rival) });
+    pw.beforeStep = (dt) => b.preStep(dt);
+    pw.afterStep = (dt) => b.postStep(dt);
+    b.launch('player', { power: 0.8, aim: 0.2, tilt: 0 });
+    b.launch('rival', { power: 0.8, aim: -0.2, tilt: 0 });
+    return { pw, b };
+  } finally {
+    Math.random = orig;
+  }
 }
 
 describe('战术意图层（纯逻辑）', () => {
@@ -245,11 +248,16 @@ describe('自主运动第二轮修正（固定种子）', () => {
       createArenaPhysics(pw);
       const orig = Math.random;
       Math.random = seeded(5);
-      const b = new BattleSystem(pw, { player: assembleBey(lo.player), rival: assembleBey(lo.rival) });
-      const beys = [b.launch('player', { power: 1, aim: 1, tilt: 0 })];
-      const p0 = (beys[0] as unknown as { precession: number }).precession;
-      beys.push(b.launch('rival', { power: 0.8, aim: -0.6, tilt: 0 }));
-      Math.random = orig;
+      let beys: ReturnType<BattleSystem['launch']>[];
+      let p0: number;
+      try {
+        const b = new BattleSystem(pw, { player: assembleBey(lo.player), rival: assembleBey(lo.rival) });
+        beys = [b.launch('player', { power: 1, aim: 1, tilt: 0 })];
+        p0 = (beys[0] as unknown as { precession: number }).precession;
+        beys.push(b.launch('rival', { power: 0.8, aim: -0.6, tilt: 0 }));
+      } finally {
+        Math.random = orig;
+      }
       beys.forEach((x, i) => {
         const prec = (x as unknown as { precession: number }).precession;
         const v = x.body.linvel();
