@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { simulateBattle } from './sim';
+import { seedFromString, seedSalt, withDeterminism } from './repro/determinism';
 import type { BeyLoadout } from '../src/game/beys/parts/types';
 
 // 真实 Rapier 无头模拟：验证刚体落地、碰撞、胜负判定都由物理驱动
@@ -86,14 +87,17 @@ describe('物理对战模拟', () => {
     const { BEY_TUNING } = await import('../src/game/beys/BeyPhysics');
     const saved = BEY_TUNING.driveMinGrip;
     BEY_TUNING.driveMinGrip = 2;
-    const collide = (speed: number) => {
+    const collide = (speed: number, k: number) => {
       const pw = new PhysicsWorld(R);
       createArenaPhysics(pw);
       const battle = new BattleSystem(pw, { player: assembleBey(RIVAL_LOADOUT), rival: assembleBey(RIVAL_LOADOUT) });
       pw.beforeStep = (dt) => battle.preStep(dt);
       pw.afterStep = (dt) => battle.postStep(dt);
-      battle.launch('player', { power: 0.5, aim: 0, tilt: 0 });
-      battle.launch('rival', { power: 0.5, aim: 0, tilt: 0 });
+      // 进动初相等随机数由固定种子决定（每个速度的第 k 次各用一个种子）
+      withDeterminism((seedFromString(`approach:${speed}:${k}`) ^ seedSalt()) >>> 0, () => {
+        battle.launch('player', { power: 0.5, aim: 0, tilt: 0 });
+        battle.launch('rival', { power: 0.5, aim: 0, tilt: 0 });
+      });
       const a = battle.beys.player!;
       const b = battle.beys.rival!;
       const y = 0.15;
@@ -120,7 +124,7 @@ describe('物理对战模拟', () => {
     // 倾斜进动的初相位随机，每个速度做 5 次，取中位数
     // P2.2.1：场地中央坡面变缓，从 ±0.9 处滑到中央时被加速得更少，中速档用 4.5 m/s 才对应原来 4 m/s 的实际接触速度
     const trial = (speed: number) => {
-      const rs = [0, 1, 2, 3, 4].map(() => collide(speed));
+      const rs = [0, 1, 2, 3, 4].map((k) => collide(speed, k));
       const tiers = rs.map((r) => r.ev?.tier ?? 'none');
       const dvs = rs.map((r) => r.dv).sort((x, y) => x - y);
       return { tiers, dv: dvs[2], ev: rs[0].ev };
@@ -184,8 +188,10 @@ describe('物理对战模拟', () => {
     });
     pw.beforeStep = (dt) => battle.preStep(dt);
     pw.afterStep = (dt) => battle.postStep(dt);
-    battle.launch('player', { power: 0.5, aim: 0, tilt: 0 });
-    battle.launch('rival', { power: 0.5, aim: 0, tilt: 0 });
+    withDeterminism((seedFromString(`headOn:${JSON.stringify([speed, la ?? null, lb ?? null])}`) ^ seedSalt()) >>> 0, () => {
+      battle.launch('player', { power: 0.5, aim: 0, tilt: 0 });
+      battle.launch('rival', { power: 0.5, aim: 0, tilt: 0 });
+    });
     const a = battle.beys.player!;
     const b = battle.beys.rival!;
     a.body.setTranslation({ x: -0.9, y: 0.15, z: 0 }, true);

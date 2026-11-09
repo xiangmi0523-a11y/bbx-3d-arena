@@ -25,7 +25,7 @@ test('type flaky', async () => {
       const out = [];
       for (let i = 0; i < 4; i++) {
         const aim = ((i % 2) * 2 - 1) * 0.2;
-        out.push(await diagnoseBattle({ player: { power: 0.85, aim, tilt: 0 }, rival: { power: 0.85, aim: -aim, tilt: 0 }, playerLoadout: a, rivalLoadout: b, maxSeconds: 40 }));
+        out.push(await diagnoseBattle({ player: { power: 0.85, aim, tilt: 0 }, rival: { power: 0.85, aim: -aim, tilt: 0 }, playerLoadout: a, rivalLoadout: b, maxSeconds: 40, seed: null }));
       }
       return out;
     };
