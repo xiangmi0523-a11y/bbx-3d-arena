@@ -1,0 +1,77 @@
+name: CI 测试与构建
+
+# 只运行类型检查、单元测试、固定种子物理回归、诊断实验与网页构建。
+# 不签名、不打包 IPA、不部署（IPA 仍由 ios-unsigned-ipa.yml 单独手动构建）。
+on:
+  push:
+    branches: ['v2/**']
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: 类型检查 + 测试 + 构建
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: 安装依赖
+        id: install
+        run: npm ci
+
+      - name: 类型检查
+        if: always() && steps.install.outcome == 'success'
+        run: npm run typecheck
+
+      - name: 单元测试 + 物理回归（180 场固定种子全量比对）
+        if: always() && steps.install.outcome == 'success'
+        env:
+          REPRO_FULL: '1'
+        run: npx vitest run --reporter=verbose
+
+      - name: 网页构建
+        if: always() && steps.install.outcome == 'success'
+        run: npm run build
+
+  diag:
+    name: 诊断与实验
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: 安装依赖
+        run: npm ci
+
+      # scripts/ci-diag.sh 列出当前分支需要复核的诊断 / 实验（固定种子，输出写入 test-results/）
+      - name: 运行诊断
+        run: |
+          if [ -f scripts/ci-diag.sh ]; then bash scripts/ci-diag.sh; else echo "没有 scripts/ci-diag.sh，跳过"; fi
+
+      - name: 上传诊断结果
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: diag-${{ github.sha }}
+          path: test-results/
+          retention-days: 14
+          if-no-files-found: ignore
