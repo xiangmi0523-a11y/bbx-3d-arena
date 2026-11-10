@@ -29,7 +29,7 @@ function partBars(p: PartSpec): [string, number][] {
     ];
   }
   return [
-    ['耐久', 1 - (p.spinDecay - 0.6) / 2.4],
+    ['持久', 1 - (p.spinDecay - 0.6) / 2.4],
     // P2.2.1：橡胶轴心摩擦系数调低后，机动性改按“漂移量”（轴心牵引跑动的强度）显示，更接近实战表现
     ['机动', p.drift / 0.2],
     ['牵引', p.gearGrip],
@@ -207,7 +207,7 @@ export function GarageScreen({ engine, s }: { engine: GameEngine; s: GameSnapsho
               [
                 ['攻击', stats.attack],
                 ['防御', stats.defense],
-                ['耐久', stats.stamina],
+                ['持久', stats.stamina],
                 ['机动', stats.mobility],
                 ['重量', stats.weight],
                 ['抗爆', stats.burst],

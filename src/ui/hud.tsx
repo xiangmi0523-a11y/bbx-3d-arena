@@ -36,7 +36,9 @@ const fmt = (t: number) => `${String(Math.floor(t / 60)).padStart(2, '0')}:${Str
 
 export function BattleHud({ engine, s }: { engine: GameEngine; s: GameSnapshot }) {
   const m = s.match;
-  const roundLabel = m ? (m.decider ? '决胜轮' : `第 ${m.round} 回合`) : '';
+  // 回合结束横幅期间显示刚结束的那一回合（比分已更新，回合序号还没进入下一回合）
+  const shown = s.phase === 'roundEnd' && s.lastRound ? s.lastRound.number : m?.round;
+  const roundLabel = m ? (m.decider && s.phase !== 'roundEnd' ? '决胜轮' : `第 ${shown} 回合`) : '';
   return (
     <>
       <div className="hud-top" data-testid="hud">
