@@ -13,7 +13,7 @@ import { test } from 'vitest';
 import { ARENA, floorHeight, pocketAtAngle } from '../../src/game/arena/arenaSpec';
 import { CLAW_EXPERIMENT } from '../../src/game/battle/clawStrike';
 import { loadRapier } from '../../src/game/physics/PhysicsWorld';
-import { matrixScenarios, out, quantile, r2, r3, runRound, summarize, type RoundRec } from './m5b.shared';
+import { matrixScenarios, newcombe, out, quantile, r2, r3, runRound, summarize, type RoundRec } from './m5b.shared';
 
 /** 临时打开重击模型（κ），结束后恢复默认 */
 export function withClaw<T>(kappa: number | null, fn: () => T): T {
@@ -201,4 +201,39 @@ test('E-A1b：重击 κ × R6 口袋 + 重击方向（探索性，m5b-experiment
     selected: pick ? { arm: pick.arm, kappa: pick.kappa, r6: pick.r6, outShare: pick.outShare } : null,
     note: pick ? '进入 E-A2 确认实验' : '没有一臂进入 13–28%：结论为击飞需要 AI 主动把对手撞向口袋（M4），不再加大 κ 或改竞技场几何',
   });
+}, 3_000_000);
+
+// ───────────────────────────── E-A2：确认实验（m5b-experiment-plan.md §3.3，只在 E-A1 / E-A1b 选出臂后运行） ─────────────────────────────
+/**
+ * 选定臂由环境变量给出（CI 脚本里写明）：M5B_KAPPA（κ）、M5B_R6（1 = R6 口袋）。新种子集 seed = 50000 + …，4 × 4 × 65 = 1040 回合 / 臂。
+ * 采用条件 C1–C5 全部通过才建议采用。
+ */
+test('E-A2：重击模型确认（预注册，m5b-experiment-plan.md §3.3）', async () => {
+  const kappa = Number(process.env.M5B_KAPPA ?? NaN);
+  if (!Number.isFinite(kappa)) {
+    out('M5B-A2 skipped', { reason: '没有选定的臂（M5B_KAPPA 未设置）' });
+    return;
+  }
+  const r6 = process.env.M5B_R6 === '1';
+  const R = await loadRapier();
+  const pockets: [number, number] | null = r6 ? [2.5, 3.85] : null;
+  const run = (k: number | null) => withPockets(pockets, () => runClawArm(R, k, 50000, 65));
+  const t0 = Date.now();
+  const base = run(null);
+  const arm = run(kappa);
+  const sb = summarize(base);
+  const sa = summarize(arm);
+  const audit = clawAudit(arm);
+  const lb = sb.perSignature.lieren;
+  const la = sa.perSignature.lieren;
+  const diff = newcombe(lb.k, lb.n, la.k, la.n);
+  const byImpact = (la.winsBy.over ?? 0) + (la.winsBy.xtreme ?? 0) + (la.winsBy.burst ?? 0);
+  const C1 = { rejected: audit.rejectedEnergy, bad: audit.badRounds, maxSpeed: sa.maxSpeed, maxRelDke: audit.maxRelDke, pass: audit.rejectedEnergy === 0 && audit.badRounds === 0 && sa.maxSpeed <= 25 && audit.maxRelDke <= 1e-9 };
+  const C2 = { outShare: sa.outShare, pass: sa.outShare >= 0.13 && sa.outShare <= 0.28 };
+  const C3 = { base: sb.ownShare, arm: sa.ownShare, pass: sa.ownShare <= sb.ownShare + 0.05 + 1e-9 };
+  const C4 = { base: lb.win, arm: la.win, diffCi95: [r3(diff[0]), r3(diff[1])], impactWinShare: la.k ? r3(byImpact / la.k) : 0, pass: diff[0] > 0 && la.k > 0 && byImpact / la.k >= 0.5 };
+  const C5 = { durationP50: sa.durationP50, pass: sa.durationP50 >= 10 && sa.durationP50 <= 18 };
+  out('M5B-A2 base', { ...sb });
+  out('M5B-A2 arm', { kappa, r6, ...sa, audit });
+  out('M5B-A2 verdict', { ms: Date.now() - t0, kappa, r6, C1, C2, C3, C4, C5, adopt: C1.pass && C2.pass && C3.pass && C4.pass && C5.pass });
 }, 3_000_000);
