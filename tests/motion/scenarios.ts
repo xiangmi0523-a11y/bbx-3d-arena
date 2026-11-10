@@ -5,13 +5,13 @@
 import type { BeyLoadout } from '../../src/game/beys/parts/types';
 import type { MotionScenario } from './motionSim';
 
-export const ATK: BeyLoadout = { blade: 'blaze-fang', disc: 'tri-lock', tip: 'rush-rubber' };
-export const DEF: BeyLoadout = { blade: 'tidal-bastion', disc: 'ring-guard', tip: 'dome-ball' };
-export const STA: BeyLoadout = { blade: 'titan-crown', disc: 'hex-lock', tip: 'needle-point' };
-export const BAL: BeyLoadout = { blade: 'gale-crescent', disc: 'hex-lock', tip: 'dome-ball' };
+export const ATK: BeyLoadout = { blade: 'blaze-fang', ratchet: 'tri-lock', bit: 'rush-rubber' };
+export const DEF: BeyLoadout = { blade: 'tidal-bastion', ratchet: 'ring-guard', bit: 'dome-ball' };
+export const STA: BeyLoadout = { blade: 'titan-crown', ratchet: 'hex-lock', bit: 'needle-point' };
+export const BAL: BeyLoadout = { blade: 'gale-crescent', ratchet: 'hex-lock', bit: 'dome-ball' };
 /** 游戏默认组合 */
-export const DEF_PLAYER: BeyLoadout = { blade: 'blaze-fang', disc: 'tri-lock', tip: 'gear-flat' };
-export const DEF_RIVAL: BeyLoadout = { blade: 'tidal-bastion', disc: 'hex-lock', tip: 'dome-ball' };
+export const DEF_PLAYER: BeyLoadout = { blade: 'blaze-fang', ratchet: 'tri-lock', bit: 'gear-flat' };
+export const DEF_RIVAL: BeyLoadout = { blade: 'tidal-bastion', ratchet: 'hex-lock', bit: 'dome-ball' };
 
 export interface Group {
   key: string;
@@ -57,7 +57,7 @@ export function groups(): Group[] {
       return {
         name: `WALL#${i}`,
         player: DEF_PLAYER,
-        rival: { blade: 'gale-crescent', disc: 'tri-lock', tip: 'rush-rubber' },
+        rival: { blade: 'gale-crescent', ratchet: 'tri-lock', bit: 'rush-rubber' },
         pCmd: { power: 0.7 + (i % 3) * 0.15, aim, tilt: 0 },
         rCmd: { power: 0.8, aim: -aim, tilt: 0 },
         seed: 1100 + i,

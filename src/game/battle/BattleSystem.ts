@@ -236,7 +236,7 @@ export class BattleSystem {
       const wobbling = isDeathWobble({
         touching: d < a.spec.blade.radius + b.spec.blade.radius + 0.05,
         lowSpin: low.spinRatio,
-        lowTiltExcess: low.tilt - low.spec.tip.drift,
+        lowTiltExcess: low.tilt - low.spec.bit.drift,
         highSpin: high.spinRatio,
         highCanDrive: high.spin > T.minStableSpin * 2,
         highInBreakout: high.breakout > 0,

@@ -22,6 +22,11 @@ const G = golden as unknown as { generatedFrom: string; config: string; runs: Tr
 const all = scenariosV2();
 const sample = all.filter((s, i) => all.findIndex((x) => x.group === s.group) === i);
 const full = !!process.env.REPRO_FULL;
+/**
+ * 行为比对不含参数指纹：参数指纹由下面单独的用例检查。这样“只改名 / 只加字段、行为不变”的提交
+ * 能单独证明四通道逐位一致，参数指纹的变化另行说明后更新。
+ */
+const behavior = (s: TraceSummary): TraceSummary => ({ ...s, config: '' });
 
 beforeAll(async () => {
   R = await rapier();
@@ -37,6 +42,7 @@ describe('阶段 1：可重复物理测试基线', () => {
 
   it('关键物理参数指纹与 golden 一致（参数、求解器设置、Rapier 版本未变）', () => {
     expect(configFingerprint(R)).toBe(G.config);
+    for (const r of G.runs) expect(r.config, r.name).toBe(G.config);
   });
 
   it('同一进程内重复运行逐位一致；推进过程不消耗随机数、不读取时间或系统随机源', () => {
@@ -56,7 +62,7 @@ describe('阶段 1：可重复物理测试基线', () => {
     const list = full ? all : sample;
     const runs = list.map((sc) => summarize(recordRun(R, sc, { keyframes: false })));
     const want = G.runs.filter((g) => list.some((s) => s.name === g.name));
-    const rep = compareTraces(runs, want);
+    const rep = compareTraces(runs.map(behavior), want.map(behavior));
     expect(rep.missing).toEqual([]);
     expect(rep.diffs, JSON.stringify(rep.diffs.slice(0, 3), null, 1)).toEqual([]);
     expect(rep.identical).toBe(list.length);
@@ -67,7 +73,7 @@ describe('阶段 1：可重复物理测试基线', () => {
     const runs = list.map((sc) => recordRun(R, sc, { keyframes: false, observeContacts: true }));
     for (const r of runs) expect(r.contactService, r.name).toBeDefined();
     const want = G.runs.filter((g) => list.some((s) => s.name === g.name));
-    const rep = compareTraces(runs.map(summarize), want);
+    const rep = compareTraces(runs.map(summarize).map(behavior), want.map(behavior));
     expect(rep.missing).toEqual([]);
     expect(rep.diffs, JSON.stringify(rep.diffs.slice(0, 3), null, 1)).toEqual([]);
     expect(rep.identical).toBe(list.length);

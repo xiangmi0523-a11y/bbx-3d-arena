@@ -53,7 +53,7 @@ export function scenariosV2(): Scn[] {
   const out: Scn[] = [];
   for (const g of groups())
     for (const sc of g.scenarios) out.push({ ...sc, group: g.key, init: `发射 p=${sc.pCmd.power}/${sc.rCmd.power} aim=${sc.pCmd.aim}/${sc.rCmd.aim}${sc.phase ? ' 指定进动相位' : ''}` });
-  const RIVAL: BeyLoadout = { blade: 'tidal-bastion', disc: 'hex-lock', tip: 'dome-ball' };
+  const RIVAL: BeyLoadout = { blade: 'tidal-bastion', ratchet: 'hex-lock', bit: 'dome-ball' };
   const z = { power: 0, aim: 0, tilt: 0 };
   for (let i = 0; i < 6; i++) out.push({ name: `FEELBAL#${1000 + i}`, group: 'FEELBAL', player: BAL, rival: RIVAL, pCmd: z, rCmd: z, seed: 1000 + i, maxSeconds: 120, feel: true, init: 'feelRun 随机发射（种子决定）' });
   for (let i = 0; i < 4; i++) out.push({ name: `FEELSTA#${3000 + i}`, group: 'FEELSTA', player: STA, rival: STA2, pCmd: z, rCmd: z, seed: 3000 + i, maxSeconds: 120, feel: true, init: 'feelRun 随机发射（种子决定）' });

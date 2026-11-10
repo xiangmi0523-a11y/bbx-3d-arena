@@ -10,9 +10,9 @@ import { assembleBey } from '../../src/game/beys/parts/assemble';
  */
 it('装配截面', () => {
   const [blade, disc, tip] = (process.env.DIAG_LOADOUT ?? 'gale-crescent,hex-lock,dome-ball').split(',');
-  const spec = assembleBey({ blade, disc, tip });
+  const spec = assembleBey({ blade, ratchet: disc, bit: tip });
   const hit = new THREE.MeshBasicMaterial({ side: THREE.DoubleSide });
-  const parts = (['tip', 'disc', 'blade'] as const).map((k) => {
+  const parts = (['bit', 'ratchet', 'blade'] as const).map((k) => {
     const g = buildPartModel(spec[k]);
     g.position.y = spec.layers[k].bottom;
     g.traverse((o) => {
@@ -24,7 +24,7 @@ it('装配截面', () => {
   });
   const ray = new THREE.Raycaster();
   const angles = (process.env.DIAG_ANGLES ?? '0,30').split(',').map(Number);
-  const out: Record<string, unknown> = { layers: spec.layers, disc: { radius: spec.disc.radius, height: spec.disc.height }, blade: { radius: spec.blade.radius }, slices: {} };
+  const out: Record<string, unknown> = { layers: spec.layers, ratchet: { radius: spec.ratchet.radius, height: spec.ratchet.height }, blade: { radius: spec.blade.radius }, slices: {} };
   for (const deg of angles) {
     const a = (deg * Math.PI) / 180;
     const cols: { r: number; part: string; ys: number[] }[] = [];

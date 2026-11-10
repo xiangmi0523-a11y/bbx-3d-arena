@@ -3,8 +3,8 @@
  *
  *   npx vite  →  打开 /tools/bey-sheet.html
  *   参数：?set=balance|attack|defense|stamina（默认 balance）
- *         或 ?blade=<id>&disc=<id>&tip=<id> 指定任意组合
- *         ?only=blade|disc|tip 只显示单个零件（爆炸图格换成该零件的独立 3D 展示）
+ *         或 ?blade=<id>&ratchet=<id>&bit=<id> 指定任意组合
+ *         ?only=blade|ratchet|bit 只显示单个零件（爆炸图格换成该零件的独立 3D 展示）
  *
  * 一屏 6 个视图：顶视 / 侧视 / 底视（正交）、爆炸图、侧视 + 碰撞体、透视 + 碰撞体。
  * 碰撞体直接读自真实的 Rapier 刚体（tools/inspect/colliders.ts），不是按参数另画一份，
@@ -21,28 +21,28 @@ import { readColliders, type ColliderInfo } from './inspect/colliders';
 import { measureVisual } from './inspect/visualBounds';
 
 const SETS: Record<string, BeyLoadout> = {
-  balance: { blade: 'gale-crescent', disc: 'hex-lock', tip: 'dome-ball' },
-  attack: { blade: 'blaze-fang', disc: 'tri-lock', tip: 'gear-flat' },
-  defense: { blade: 'tidal-bastion', disc: 'hex-lock', tip: 'dome-ball' },
-  stamina: { blade: 'titan-crown', disc: 'ring-guard', tip: 'needle-point' },
+  balance: { blade: 'gale-crescent', ratchet: 'hex-lock', bit: 'dome-ball' },
+  attack: { blade: 'blaze-fang', ratchet: 'tri-lock', bit: 'gear-flat' },
+  defense: { blade: 'tidal-bastion', ratchet: 'hex-lock', bit: 'dome-ball' },
+  stamina: { blade: 'titan-crown', ratchet: 'ring-guard', bit: 'needle-point' },
 };
 const q = new URLSearchParams(location.search);
 const base = SETS[q.get('set') ?? 'balance'] ?? SETS.balance;
-const loadout: BeyLoadout = { blade: q.get('blade') ?? base.blade, disc: q.get('disc') ?? base.disc, tip: q.get('tip') ?? base.tip };
+const loadout: BeyLoadout = { blade: q.get('blade') ?? base.blade, ratchet: q.get('ratchet') ?? base.ratchet, bit: q.get('bit') ?? base.bit };
 const spec = assembleBey(loadout);
-const only = (['blade', 'disc', 'tip'] as const).find((k) => k === q.get('only')) ?? null;
+const only = (['blade', 'ratchet', 'bit'] as const).find((k) => k === q.get('only')) ?? null;
 
 const COLORS: Record<ColliderInfo['label'], number> = {
   blade: 0xff8a1f,
-  disc: 0xffd84a,
-  'tip-shaft': 0x3fe0ff,
-  'tip-ball': 0xff4fd8,
+  ratchet: 0xffd84a,
+  'bit-shaft': 0x3fe0ff,
+  'bit-ball': 0xff4fd8,
 };
 const LABEL_CN: Record<ColliderInfo['label'], string> = {
   blade: 'Blade 圆柱',
-  disc: 'Disc 圆柱',
-  'tip-shaft': 'Tip 轴杆圆柱',
-  'tip-ball': 'Tip 接地球',
+  ratchet: 'Disc 圆柱',
+  'bit-shaft': 'Bit 轴杆圆柱',
+  'bit-ball': 'Bit 接地球',
 };
 
 const INFO_W = 360;
@@ -75,7 +75,7 @@ function makeScene(): THREE.Scene {
 const sceneA = makeScene();
 const visual = createBeyVisual(spec);
 visual.blur.visible = false;
-if (only) for (const k of ['blade', 'disc', 'tip'] as const) visual.slots[k].visible = k === only;
+if (only) for (const k of ['blade', 'ratchet', 'bit'] as const) visual.slots[k].visible = k === only;
 sceneA.add(visual.root);
 // 地面基准线（y = 0）与转轴
 const axis = new THREE.Line(
@@ -131,11 +131,11 @@ const sceneB = makeScene();
 const exploded = createBeyVisual(spec);
 exploded.blur.visible = false;
 if (only) {
-  for (const k of ['blade', 'disc', 'tip'] as const) exploded.slots[k].visible = k === only;
+  for (const k of ['blade', 'ratchet', 'bit'] as const) exploded.slots[k].visible = k === only;
   exploded.root.rotation.y = 0.5;
 } else {
-  exploded.slots.tip.position.y = spec.layers.tip.bottom - 0.12;
-  exploded.slots.disc.position.y = spec.layers.disc.bottom + 0.2;
+  exploded.slots.bit.position.y = spec.layers.bit.bottom - 0.12;
+  exploded.slots.ratchet.position.y = spec.layers.ratchet.bottom + 0.2;
   exploded.slots.blade.position.y = spec.layers.blade.bottom + 0.55;
 }
 sceneB.add(exploded.root);
@@ -144,9 +144,9 @@ sceneB.add(exploded.root);
 // 正交视图半宽：单看某个零件时按它的外径取景（Disc / Tip 比 Blade 小很多）
 // ?focus=joint：放大 Blade 与 Disc 的接合处（装配关系特写）
 const joint = q.get('focus') === 'joint';
-const S = joint ? 0.17 : only === 'blade' ? 0.6 : only === 'disc' ? spec.disc.radius * 1.2 : only === 'tip' ? 0.3 : 0.68;
+const S = joint ? 0.17 : only === 'blade' ? 0.6 : only === 'ratchet' ? spec.ratchet.radius * 1.2 : only === 'bit' ? 0.3 : 0.68;
 /** 透视机位按零件大小缩放（以 Blade 为 1） */
-const Z = joint ? 0.42 : only === 'disc' ? (spec.disc.radius * 1.2) / 0.6 : only === 'tip' ? 0.5 : 1;
+const Z = joint ? 0.42 : only === 'ratchet' ? (spec.ratchet.radius * 1.2) / 0.6 : only === 'bit' ? 0.5 : 1;
 // ?section=1：两个侧视格沿过转轴的竖直面剖开（只保留 z ≤ 0 的一半），直接看到零件截面的配合
 const section = q.get('section') === '1';
 const sectionPlane = [new THREE.Plane(new THREE.Vector3(0, 0, -1), 0)];
@@ -157,9 +157,9 @@ const ortho = (pos: THREE.Vector3, up: THREE.Vector3, target: THREE.Vector3) => 
   c.lookAt(target);
   return c;
 };
-const midY = joint ? spec.layers.disc.top : only ? spec.layers[only].center : spec.totalHeight / 2;
+const midY = joint ? spec.layers.ratchet.top : only ? spec.layers[only].center : spec.totalHeight / 2;
 const camTop = ortho(new THREE.Vector3(0, 5, 0), new THREE.Vector3(0, 0, -1), new THREE.Vector3(0, 0, 0));
-const sideX = joint ? spec.disc.radius * 0.62 : 0;
+const sideX = joint ? spec.ratchet.radius * 0.62 : 0;
 const camSide = ortho(new THREE.Vector3(sideX, midY, 5), new THREE.Vector3(0, 1, 0), new THREE.Vector3(sideX, midY, 0));
 const camBottom = ortho(new THREE.Vector3(0, -5, 0), new THREE.Vector3(0, 0, 1), new THREE.Vector3(0, 0, 0));
 const persp = (pos: THREE.Vector3, target: THREE.Vector3) => {
@@ -247,18 +247,18 @@ function ratioCell(ratio: number, limit: number): string {
 async function main(): Promise<void> {
   const R = await loadRapier();
   const cols = readColliders(R, spec);
-  const showCol = (c: ColliderInfo) => !only || (only === 'tip' ? c.label.startsWith('tip') : c.label === only);
+  const showCol = (c: ColliderInfo) => !only || (only === 'bit' ? c.label.startsWith('bit') : c.label === only);
   for (const c of cols) if (showCol(c)) colliderGroup.add(colliderMesh(c));
 
   const info = document.createElement('div');
   info.id = 'info';
   info.style.width = `${INFO_W}px`;
-  const kinds: PartKind[] = ['blade', 'disc', 'tip'];
+  const kinds: PartKind[] = ['blade', 'ratchet', 'bit'];
   const rows = kinds
     .map((k) => {
       const part = getPart(k, loadout[k]);
       const b = measureVisual(buildPartModel(part));
-      if (k === 'tip') {
+      if (k === 'bit') {
         return `<tr><td>Tip ${part.id}</td><td>${fmt(b.radial)}</td><td>${fmt(cols[1].radius)}（轴杆）</td><td>—</td><td>${fmt(b.yMax)}</td><td>${fmt(part.height)}</td>${ratioCell(b.yMax / part.height, 1.02)}</tr>`;
       }
       const p = part as { radius: number; height: number; id: string };
@@ -274,7 +274,7 @@ async function main(): Promise<void> {
   const whole = measureVisual(visual.root);
   info.innerHTML = `
     <h1>陀螺模型检视页</h1>
-    <div>${loadout.blade} · ${loadout.disc} · ${loadout.tip}</div>
+    <div>${loadout.blade} · ${loadout.ratchet} · ${loadout.bit}</div>
     <div style="color:#8fa3c4">总高 ${fmt(spec.totalHeight)} · 碰撞外径 ${fmt(spec.outerRadius)} · 质量 ${spec.totalMass.toFixed(2)}</div>
     <h2>视觉 vs 碰撞体（游戏单位）</h2>
     <table><tr><th>零件</th><th>视觉外径</th><th>碰撞半径</th><th>比值</th><th>视觉顶</th><th>层厚</th><th>比值</th></tr>${rows}</table>

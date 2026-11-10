@@ -11,9 +11,9 @@ if (process.env.DIAG_INTENT) Object.assign(INTENT_TUNING, JSON.parse(process.env
 if (process.env.DIAG_TUNE) Object.assign(BEY_TUNING, JSON.parse(process.env.DIAG_TUNE));
 test('type flaky', async () => {
   const { diagnoseBattle } = await import('./harness');
-  const ATK = { blade: 'blaze-fang', disc: 'tri-lock', tip: 'rush-rubber' };
-  const DEF = { blade: 'tidal-bastion', disc: 'ring-guard', tip: 'dome-ball' };
-  const STA = { blade: 'titan-crown', disc: 'hex-lock', tip: 'needle-point' };
+  const ATK = { blade: 'blaze-fang', ratchet: 'tri-lock', bit: 'rush-rubber' };
+  const DEF = { blade: 'tidal-bastion', ratchet: 'ring-guard', bit: 'dome-ball' };
+  const STA = { blade: 'titan-crown', ratchet: 'hex-lock', bit: 'needle-point' };
   const avg = (a: number[]) => a.reduce((s, v) => s + v, 0) / a.length;
   const lines: string[] = [];
   let pass = 0;

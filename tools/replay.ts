@@ -332,7 +332,7 @@ let single: Ver = (q.get('ver') as Ver) === 'base' ? 'base' : 'new';
 let duration = 0;
 let pairKey = '';
 
-const loadoutName = (l: Replay['scenario']['player']) => `${getPart('blade', l.blade).name}·${getPart('disc', l.disc).name}·${getPart('tip', l.tip).name}`;
+const loadoutName = (l: Replay['scenario']['player']) => `${getPart('blade', l.blade).name}·${getPart('ratchet', l.ratchet).name}·${getPart('bit', l.bit).name}`;
 
 function chip(x: number, y: number, text: string, bg: string, fg = '#081018') {
   ctx.font = '600 13px -apple-system, "PingFang SC", "Noto Sans SC", sans-serif';

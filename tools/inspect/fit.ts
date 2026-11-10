@@ -24,7 +24,7 @@ export interface SeatReport {
 }
 
 /** 把零件模型放到装配位置，并换成双面材质（只用于射线求交，不影响共用材质） */
-function placed(spec: AssembledBey, kind: 'blade' | 'disc' | 'tip'): THREE.Group {
+function placed(spec: AssembledBey, kind: 'blade' | 'ratchet' | 'bit'): THREE.Group {
   const g = buildPartModel(spec[kind]);
   g.position.y = spec.layers[kind].bottom;
   const hitMat = new THREE.MeshBasicMaterial({ side: THREE.DoubleSide });
@@ -38,10 +38,10 @@ function placed(spec: AssembledBey, kind: 'blade' | 'disc' | 'tip'): THREE.Group
 
 export function measureSeat(spec: AssembledBey, dr = 0.004, da = 2): SeatReport {
   const blade = placed(spec, 'blade');
-  const disc = placed(spec, 'disc');
+  const disc = placed(spec, 'ratchet');
   const ray = new THREE.Raycaster();
   const top = spec.totalHeight + 1;
-  const R = spec.disc.radius * 1.03;
+  const R = spec.ratchet.radius * 1.03;
   let samples = 0;
   let overlapping = 0;
   let discHits = 0;

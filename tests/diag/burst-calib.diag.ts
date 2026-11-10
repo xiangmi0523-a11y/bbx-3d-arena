@@ -25,17 +25,9 @@ import { scenariosV2, setup, type R as RT, type Scn } from './stallprobe2.shared
 
 const log = (...a: unknown[]) => process.stderr.write(a.map((x) => (typeof x === 'object' ? JSON.stringify(x) : String(x))).join(' ') + '\n');
 
-/** v2.0 设计初值（params-v2.json）：Bit 抗爆护轴。目录里有 burstGuard 字段后以目录为准 */
-const GUARD_V2: Record<string, number> = { 'rush-rubber': 0.9, 'gear-flat': 0.85, 'dome-ball': 0.5, 'needle-point': 0.35 };
-
-/** 抗爆参数：优先读目录里的 v2 字段（ratchet.lock / bit.burstGuard），没有时回退到 disc.burstResistance + 设计初值 */
+/** 抗爆参数：Ratchet.lock × Bit.burstGuard（v2.0 §6.3） */
 export function resistanceOf(spec: AssembledBey): BurstResistance {
-  const s = spec as unknown as Record<string, Record<string, unknown>>;
-  const rat = (s.ratchet ?? s.disc) as Record<string, unknown>;
-  const bit = (s.bit ?? s.tip) as Record<string, unknown>;
-  const lock = (rat.lock ?? rat.burstResistance) as number;
-  const guard = (bit.burstGuard as number | undefined) ?? GUARD_V2[bit.id as string] ?? 1;
-  return { lock, burstGuard: guard };
+  return { lock: spec.ratchet.lock, burstGuard: spec.bit.burstGuard };
 }
 
 /** k 扫描网格（对数间隔） */

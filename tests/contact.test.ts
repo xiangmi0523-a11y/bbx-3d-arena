@@ -445,7 +445,7 @@ describe('接触反馈：数量上限与生命周期', () => {
     try {
       for (let k = 0; k < 10; k++) {
         const b = p.startBattle(
-          k % 2 ? LO : { player: { blade: 'blaze-fang', disc: 'tri-lock', tip: 'rush-rubber' }, rival: RIVAL_LOADOUT },
+          k % 2 ? LO : { player: { blade: 'blaze-fang', ratchet: 'tri-lock', bit: 'rush-rubber' }, rival: RIVAL_LOADOUT },
           { player: { power: 0.6 + 0.05 * k, aim: ((k % 3) - 1) * 0.3, tilt: 0 }, rival: { power: 0.75, aim: 0, tilt: 0 } },
         );
         p.ctx.maxLiveSources = 0;

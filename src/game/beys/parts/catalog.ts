@@ -1,4 +1,4 @@
-import type { BeyLoadout, BladeSpec, DiscSpec, PartKind, PartSpec, TipSpec } from './types';
+import type { BeyLoadout, BeyRole, BitSpec, BladeSpec, PartKind, PartSpec, RatchetSpec } from './types';
 
 /**
  * 部件目录（全部为原创设计）。
@@ -80,68 +80,73 @@ export const BLADES: Record<string, BladeSpec> = {
   },
 };
 
-export const DISCS: Record<string, DiscSpec> = {
+export const RATCHETS: Record<string, RatchetSpec> = {
   'tri-lock': {
-    kind: 'disc',
+    kind: 'ratchet',
     id: 'tri-lock',
-    name: '三棱锁盘',
+    name: '三齿棘轮',
     code: 'TRI-LOCK',
     desc: '三个锁齿，轻量，适合攻击型。',
     mass: 0.9,
     rimWeight: 0.45,
     radius: 0.3,
     height: 0.13,
-    burstResistance: 0.5,
-    visual: { points: 3, sharpness: 0.6, color: 0x2a2e36, accent: 0xe8302a },
+    lock: 0.5,
+    teeth: 3,
+    visual: { sharpness: 0.6, color: 0x2a2e36, accent: 0xe8302a },
   },
   'hex-lock': {
-    kind: 'disc',
+    kind: 'ratchet',
     id: 'hex-lock',
-    name: '六角锁盘',
+    name: '六齿棘轮',
     code: 'HEX-LOCK',
     desc: '六个锁齿，咬合牢固，不易松脱。',
     mass: 1.1,
     rimWeight: 0.5,
     radius: 0.32,
     height: 0.12,
-    burstResistance: 0.75,
-    visual: { style: 'ratchet', points: 6, sharpness: 0.35, color: 0x0b1c4a, accent: 0x1f5cff },
+    lock: 0.75,
+    teeth: 6,
+    visual: { style: 'ratchet', sharpness: 0.35, color: 0x0b1c4a, accent: 0x1f5cff },
   },
   'quad-edge': {
-    kind: 'disc',
+    kind: 'ratchet',
     id: 'quad-edge',
-    name: '四刃锁盘',
+    name: '四齿棘轮',
     code: 'QUAD-EDGE',
     desc: '四个尖锐锁齿，较高，让刀刃打得更高。',
     mass: 1.0,
     rimWeight: 0.55,
     radius: 0.31,
     height: 0.16,
-    burstResistance: 0.55,
-    visual: { points: 4, sharpness: 0.9, color: 0x30343d, accent: 0xffb323 },
+    lock: 0.55,
+    teeth: 4,
+    visual: { sharpness: 0.9, color: 0x30343d, accent: 0xffb323 },
   },
   'ring-guard': {
-    kind: 'disc',
+    kind: 'ratchet',
     id: 'ring-guard',
-    name: '圆环护盘',
+    name: '圆环护轮',
     code: 'RING GUARD',
     desc: '圆形整体护盘，重心低，最稳。',
     mass: 1.4,
     rimWeight: 0.8,
     radius: 0.34,
     height: 0.11,
-    burstResistance: 0.85,
-    visual: { points: 0, sharpness: 0, color: 0x3a3f4a, accent: 0x39f0d8 },
+    lock: 0.85,
+    teeth: 0,
+    visual: { sharpness: 0, color: 0x3a3f4a, accent: 0x39f0d8 },
   },
 };
 
-export const TIPS: Record<string, TipSpec> = {
+export const BITS: Record<string, BitSpec> = {
   'gear-flat': {
-    kind: 'tip',
+    kind: 'bit',
+    role: 'balance',
     id: 'gear-flat',
-    name: '齿轮平轴',
+    name: '平齿轴',
     code: 'GEAR FLAT',
-    desc: '平底加一圈齿轮，抓地并能咬住极限轨道冲刺。',
+    desc: '平底加一圈齿轮，抓地，齿轮能咬住轨道冲刺。',
     mass: 0.35,
     contactRadius: 0.13,
     height: 0.24,
@@ -149,12 +154,15 @@ export const TIPS: Record<string, TipSpec> = {
     spinDecay: 2.0,
     gearGrip: 1.0,
     drift: 0.16,
+    gear: true,
+    burstGuard: 0.85,
     visual: { shape: 'gear-flat', color: 0xe8302a, accent: 0xffb323 },
   },
   'dome-ball': {
-    kind: 'tip',
+    kind: 'bit',
+    role: 'stamina',
     id: 'dome-ball',
-    name: '圆顶球轴',
+    name: '圆球轴',
     code: 'DOME BALL',
     desc: '圆球接地，打滑回中，耐久与防守兼顾。',
     mass: 0.35,
@@ -164,10 +172,13 @@ export const TIPS: Record<string, TipSpec> = {
     spinDecay: 1.2,
     gearGrip: 0.35,
     drift: 0.05,
+    gear: false,
+    burstGuard: 0.5,
     visual: { shape: 'ball', color: 0x1f7cf0, accent: 0x39f0d8 },
   },
   'needle-point': {
-    kind: 'tip',
+    kind: 'bit',
+    role: 'defense',
     id: 'needle-point',
     name: '针尖轴',
     code: 'NEEDLE',
@@ -179,12 +190,15 @@ export const TIPS: Record<string, TipSpec> = {
     spinDecay: 0.85,
     gearGrip: 0.1,
     drift: 0.03,
+    gear: false,
+    burstGuard: 0.35,
     visual: { shape: 'point', color: 0xc9ced8, accent: 0xff5ad1 },
   },
   'rush-rubber': {
-    kind: 'tip',
+    kind: 'bit',
+    role: 'attack',
     id: 'rush-rubber',
-    name: '橡胶突进轴',
+    name: '橡胶轴',
     code: 'RUSH RUBBER',
     desc: '宽橡胶平底，抓地极强，移动最激烈但耗转快。',
     mass: 0.4,
@@ -194,14 +208,16 @@ export const TIPS: Record<string, TipSpec> = {
     spinDecay: 2.0,
     gearGrip: 0.8,
     drift: 0.2,
+    gear: false,
+    burstGuard: 0.9,
     visual: { shape: 'rubber', color: 0x2fd27a, accent: 0x14161b },
   },
 };
 
 const TABLES: Record<PartKind, Record<string, PartSpec>> = {
   blade: BLADES,
-  disc: DISCS,
-  tip: TIPS,
+  ratchet: RATCHETS,
+  bit: BITS,
 };
 
 export function getPart<K extends PartKind>(kind: K, id: string): Extract<PartSpec, { kind: K }> {
@@ -222,11 +238,33 @@ export function listParts<K extends PartKind>(kind: K): Extract<PartSpec, { kind
 export function sanitizeLoadout(l: Partial<BeyLoadout> | null | undefined, fallback: BeyLoadout): BeyLoadout {
   return {
     blade: l?.blade && hasPart('blade', l.blade) ? l.blade : fallback.blade,
-    disc: l?.disc && hasPart('disc', l.disc) ? l.disc : fallback.disc,
-    tip: l?.tip && hasPart('tip', l.tip) ? l.tip : fallback.tip,
+    ratchet: l?.ratchet && hasPart('ratchet', l.ratchet) ? l.ratchet : fallback.ratchet,
+    bit: l?.bit && hasPart('bit', l.bit) ? l.bit : fallback.bit,
   };
 }
 
-/** 默认的两台对战陀螺 */
-export const PLAYER_LOADOUT: BeyLoadout = { blade: 'blaze-fang', disc: 'tri-lock', tip: 'gear-flat' };
-export const RIVAL_LOADOUT: BeyLoadout = { blade: 'tidal-bastion', disc: 'hex-lock', tip: 'dome-ball' };
+export type SignatureKey = 'lieren' | 'pandun' | 'senheng' | 'ziyao';
+
+/** 签名构筑：四类陀螺的推荐组合（不是固定陀螺，零件可自由混搭）。v2.0 §3.2：类型由 Bit 决定 */
+export interface SignatureBuild {
+  key: SignatureKey;
+  name: string;
+  role: BeyRole;
+  /** 主色（界面卡片 / 结算） */
+  color: number;
+  loadout: BeyLoadout;
+}
+
+/** v2.0 签名构筑（R2：紫曜改圆球轴、磐盾改针尖轴，与官方分类对齐） */
+export const SIGNATURES: Record<SignatureKey, SignatureBuild> = {
+  lieren: { key: 'lieren', name: '烈刃', role: 'attack', color: 0xe8302a, loadout: { blade: 'blaze-fang', ratchet: 'quad-edge', bit: 'rush-rubber' } },
+  pandun: { key: 'pandun', name: '磐盾', role: 'defense', color: 0x1f7cf0, loadout: { blade: 'tidal-bastion', ratchet: 'ring-guard', bit: 'needle-point' } },
+  senheng: { key: 'senheng', name: '森衡', role: 'balance', color: 0x2fae5f, loadout: { blade: 'gale-crescent', ratchet: 'hex-lock', bit: 'gear-flat' } },
+  ziyao: { key: 'ziyao', name: '紫曜', role: 'stamina', color: 0x8b5cf6, loadout: { blade: 'titan-crown', ratchet: 'tri-lock', bit: 'dome-ball' } },
+};
+
+export const SIGNATURE_LIST: SignatureBuild[] = [SIGNATURES.lieren, SIGNATURES.pandun, SIGNATURES.senheng, SIGNATURES.ziyao];
+
+/** 默认的两台对战陀螺（v1 默认对局，签名构筑换位见 SIGNATURES） */
+export const PLAYER_LOADOUT: BeyLoadout = { blade: 'blaze-fang', ratchet: 'tri-lock', bit: 'gear-flat' };
+export const RIVAL_LOADOUT: BeyLoadout = { blade: 'tidal-bastion', ratchet: 'hex-lock', bit: 'dome-ball' };

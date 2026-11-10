@@ -59,7 +59,7 @@ export interface GameSnapshot {
 
 const hudOf = (spec: AssembledBey): BeyHud => ({
   name: spec.blade.name,
-  code: `${spec.blade.code} · ${spec.disc.code} · ${spec.tip.code}`,
+  code: `${spec.blade.code} · ${spec.ratchet.code} · ${spec.bit.code}`,
   spin: 0,
   rpm: 0,
   dashing: false,
@@ -403,8 +403,8 @@ export class GameEngine {
       playerVisual: this.visuals.player
         ? {
             blade: this.visuals.player.blade.name,
-            disc: this.visuals.player.disc.name,
-            tip: this.visuals.player.tip.name,
+            ratchet: this.visuals.player.ratchet.name,
+            bit: this.visuals.player.bit.name,
           }
         : null,
     };
@@ -487,7 +487,7 @@ export class GameEngine {
 
   private buildThumbnails(): void {
     try {
-      const parts: PartSpec[] = [...listParts('blade'), ...listParts('disc'), ...listParts('tip')];
+      const parts: PartSpec[] = [...listParts('blade'), ...listParts('ratchet'), ...listParts('bit')];
       const thumbs = renderThumbnails(parts, (r) => this.makeEnv(r));
       this.store.set({ garage: { ...this.store.get().garage, thumbs } });
     } catch (err) {

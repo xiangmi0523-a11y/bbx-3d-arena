@@ -6,8 +6,8 @@ import type { GameEngine, GameSnapshot } from '../game/core/GameEngine';
 
 const TABS: { kind: PartKind; label: string; en: string }[] = [
   { kind: 'blade', label: '刀刃', en: 'BLADE' },
-  { kind: 'disc', label: '齿轮盘', en: 'DISC' },
-  { kind: 'tip', label: '陀尖', en: 'TIP' },
+  { kind: 'ratchet', label: '棘轮', en: 'RATCHET' },
+  { kind: 'bit', label: '轴尖', en: 'BIT' },
 ];
 
 const ROLE_LABEL: Record<string, string> = { attack: '攻击型', defense: '防御型', stamina: '耐久型', balance: '平衡型' };
@@ -21,9 +21,9 @@ function partBars(p: PartSpec): [string, number][] {
       ['重量', (p.mass - 2.6) / 1.4],
     ];
   }
-  if (p.kind === 'disc') {
+  if (p.kind === 'ratchet') {
     return [
-      ['抗爆', p.burstResistance],
+      ['锁扣', p.lock],
       ['重量', (p.mass - 0.7) / 0.8],
       ['高度', (p.height - 0.09) / 0.08],
     ];
@@ -32,7 +32,7 @@ function partBars(p: PartSpec): [string, number][] {
     ['耐久', 1 - (p.spinDecay - 0.6) / 2.4],
     // P2.2.1：橡胶轴心摩擦系数调低后，机动性改按“漂移量”（轴心牵引跑动的强度）显示，更接近实战表现
     ['机动', p.drift / 0.2],
-    ['冲刺', p.gearGrip],
+    ['牵引', p.gearGrip],
   ];
 }
 
@@ -170,7 +170,7 @@ export function GarageScreen({ engine, s }: { engine: GameEngine; s: GameSnapsho
                   <div className="part-name">{p.name}</div>
                   <div className="part-meta">
                     {p.code} · {(p.mass * 8.5).toFixed(1)} g
-                    {p.kind === 'blade' ? ` · ${ROLE_LABEL[p.role]}` : ''}
+                    {p.kind === 'bit' ? ` · ${ROLE_LABEL[p.role]}` : ''}
                   </div>
                   <div className="mini-bars">
                     {partBars(p).map(([label, v]) => (
@@ -196,8 +196,8 @@ export function GarageScreen({ engine, s }: { engine: GameEngine; s: GameSnapsho
           <div className="assembly-name">{spec.blade.name}</div>
           <div className="assembly-codes">
             <span className="chip red">{spec.blade.code}</span>
-            <span className="chip">{spec.disc.code}</span>
-            <span className="chip blue">{spec.tip.code}</span>
+            <span className="chip">{spec.ratchet.code}</span>
+            <span className="chip blue">{spec.bit.code}</span>
           </div>
           <div className="assembly-mass">总重 {partMass(spec)}</div>
         </div>

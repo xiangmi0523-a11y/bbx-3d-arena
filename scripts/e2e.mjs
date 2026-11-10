@@ -61,23 +61,23 @@ try {
   await page.screenshot({ path: `${OUT}/10-garage.png` });
 
   const before = await page.evaluate(() => window.__game.store.get().garage.draft);
-  await page.tap('[data-testid=tab-disc]');
+  await page.tap('[data-testid=tab-ratchet]');
   await page.tap('[data-testid=part-quad-edge]');
   await page.waitForTimeout(180);
   await page.screenshot({ path: `${OUT}/11-garage-swap-anim.png` });
   const afterDisc = await page.evaluate(() => window.__game.store.get().garage.draft);
   check(
     '换齿轮盘：只改 Disc，Blade/Tip 不变',
-    afterDisc.disc === 'quad-edge' && afterDisc.blade === before.blade && afterDisc.tip === before.tip,
+    afterDisc.ratchet === 'quad-edge' && afterDisc.blade === before.blade && afterDisc.bit === before.bit,
     JSON.stringify(afterDisc),
   );
   await page.tap('[data-testid=tab-blade]');
   await page.tap('[data-testid=part-titan-crown]');
-  await page.tap('[data-testid=tab-tip]');
+  await page.tap('[data-testid=tab-bit]');
   await page.tap('[data-testid=part-needle-point]');
   await page.waitForTimeout(700);
   const draft = await page.evaluate(() => window.__game.store.get().garage.draft);
-  check('换刀刃和陀尖：三个部件各自独立', draft.blade === 'titan-crown' && draft.disc === 'quad-edge' && draft.tip === 'needle-point', JSON.stringify(draft));
+  check('换刀刃和陀尖：三个部件各自独立', draft.blade === 'titan-crown' && draft.ratchet === 'quad-edge' && draft.bit === 'needle-point', JSON.stringify(draft));
 
   // 拖动旋转（触摸）
   const stage = await page.locator('[data-testid=garage-stage]').boundingBox();
@@ -110,7 +110,7 @@ try {
   await page.tap('[data-testid=garage-confirm]');
   await page.waitForFunction(() => window.__game.store.get().phase === 'title');
   const lo = await page.evaluate(() => window.__game.store.get().loadout);
-  check('确认出战：组装结果传回游戏', lo.blade === 'titan-crown' && lo.disc === 'quad-edge' && lo.tip === 'needle-point', JSON.stringify(lo));
+  check('确认出战：组装结果传回游戏', lo.blade === 'titan-crown' && lo.ratchet === 'quad-edge' && lo.bit === 'needle-point', JSON.stringify(lo));
 
   await page.tap('[data-testid=start]');
   await page.waitForFunction(() => window.__game.store.get().phase === 'aim');
@@ -145,7 +145,7 @@ try {
   const bl = await page.evaluate(() => window.__game.debugState());
   check(
     '战斗使用组装结果（物理 + 模型一致）',
-    bl.player.loadout.blade === 'titan-crown' && bl.playerVisual.blade === 'blade:titan-crown' && bl.playerVisual.disc === 'disc:quad-edge' && bl.playerVisual.tip === 'tip:needle-point',
+    bl.player.loadout.blade === 'titan-crown' && bl.playerVisual.blade === 'blade:titan-crown' && bl.playerVisual.ratchet === 'ratchet:quad-edge' && bl.playerVisual.bit === 'bit:needle-point',
     JSON.stringify(bl.playerVisual),
   );
   check('画质：iPhone 起始为“均衡”档（流畅优先）', bl.initialQuality === 'medium', `起始=${bl.initialQuality}，当前=${bl.quality}（软件渲染帧率低，会自动降档）`);

@@ -35,7 +35,7 @@ export function configSnapshot(R: Rapier) {
     maxCcdSubsteps: ip.maxCcdSubsteps,
   };
   pw.dispose();
-  const parts = [...listParts('blade'), ...listParts('disc'), ...listParts('tip')].map((p) => [`${p.kind}:${p.id}`, physicsOf(p)]);
+  const parts = [...listParts('blade'), ...listParts('ratchet'), ...listParts('bit')].map((p) => [`${p.kind}:${p.id}`, physicsOf(p)]);
   return {
     rapier: R.version(),
     physicsHz: PHYSICS_HZ,

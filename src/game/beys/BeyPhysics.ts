@@ -141,8 +141,8 @@ export const BEY_TUNING = {
  * 本地原点在轴心最底部，Y 轴为旋转轴。
  *
  * 真实参与碰撞的部分：
- *  - Tip 球形接触点与场地之间的摩擦，会把转动转化成在碗面上的移动；
- *  - Blade / Disc 圆柱与对手、墙壁之间的碰撞与摩擦（转速差会产生切向冲量）。
+ *  - Bit 球形接触点与场地之间的摩擦，会把转动转化成在碗面上的移动；
+ *  - Blade / Ratchet 圆柱与对手、墙壁之间的碰撞与摩擦（转速差会产生切向冲量）。
  * 额外施加的力只有两类，用于模拟刚体引擎没有直接表达的现象：
  *  - 陀螺仪自稳：转速越高越不容易倾倒，转速低时自然倒下；
  *  - 齿轮咬合轨道的冲刺。
@@ -188,7 +188,7 @@ export class BeyPhysics {
     // 针尖几乎没有扶正力矩，被猛撞容易大幅倾斜、边缘刮地掉速
     const tipK = BEY_TUNING.tipStability;
     this.gyroFactor =
-      Math.sqrt(spec.spinInertia / REF_INERTIA) * (1 - tipK + tipK * Math.min(1.3, spec.tip.contactRadius / 0.12));
+      Math.sqrt(spec.spinInertia / REF_INERTIA) * (1 - tipK + tipK * Math.min(1.3, spec.bit.contactRadius / 0.12));
 
     const tilt = launch.tilt ?? 0;
     const axis = launch.tiltAxis ?? { x: 1, y: 0, z: 0 };
@@ -209,26 +209,26 @@ export class BeyPhysics {
         .setAngularDamping(0),
     );
 
-    const { tip, disc, blade, layers } = spec;
+    const { bit, ratchet, blade, layers } = spec;
     const events = R.ActiveEvents.COLLISION_EVENTS;
 
-    // Tip：接地球 + 轴杆
-    const ball = R.ColliderDesc.ball(tip.contactRadius)
-      .setTranslation(0, tip.contactRadius, 0)
-      .setMass(tip.mass * 0.6)
-      .setFriction(tip.friction)
+    // Bit：接地球 + 轴杆
+    const ball = R.ColliderDesc.ball(bit.contactRadius)
+      .setTranslation(0, bit.contactRadius, 0)
+      .setMass(bit.mass * 0.6)
+      .setFriction(bit.friction)
       // 摩擦相乘：低摩擦轴心在斜面上打滑、被重力拉回中心；高摩擦轴心抓地、绕场移动
       .setFrictionCombineRule(R.CoefficientCombineRule.Multiply)
       .setRestitution(0.1);
-    const shaftH = Math.max(0.02, layers.tip.top - tip.contactRadius);
+    const shaftH = Math.max(0.02, layers.bit.top - bit.contactRadius);
     const shaft = R.ColliderDesc.cylinder(shaftH / 2, 0.11)
-      .setTranslation(0, tip.contactRadius + shaftH / 2, 0)
-      .setMass(tip.mass * 0.4)
+      .setTranslation(0, bit.contactRadius + shaftH / 2, 0)
+      .setMass(bit.mass * 0.4)
       .setFriction(0.2);
-    // Disc
-    const discDesc = R.ColliderDesc.cylinder(disc.height / 2, disc.radius)
-      .setTranslation(0, layers.disc.center, 0)
-      .setMass(disc.mass)
+    // Ratchet
+    const ratchetDesc = R.ColliderDesc.cylinder(ratchet.height / 2, ratchet.radius)
+      .setTranslation(0, layers.ratchet.center, 0)
+      .setMass(ratchet.mass)
       .setFriction(0.3)
       // 金属对撞几乎不反弹：恢复系数低，弹开主要来自刀刃咬合冲量
       .setRestitution(0.1)
@@ -241,7 +241,7 @@ export class BeyPhysics {
       .setRestitution(blade.restitution * 0.4)
       .setActiveEvents(events);
 
-    for (const d of [ball, shaft, discDesc]) this.colliders.push(world.createCollider(d, this.body));
+    for (const d of [ball, shaft, ratchetDesc]) this.colliders.push(world.createCollider(d, this.body));
     this.bladeCollider = world.createCollider(bladeDesc, this.body);
     this.colliders.push(this.bladeCollider);
 
@@ -383,12 +383,12 @@ export class BeyPhysics {
     let mag = Math.abs(spinSigned);
     // 轴心摩擦、牵引、刮地都是“力矩”，转速下降 = 力矩 / 转动惯量：
     // 同样的轴心，惯量大（重量集中在外缘）的陀螺掉速更慢 → 耐力型的优势来自零件本身
-    let decay = this.spec.tip.spinDecay;
+    let decay = this.spec.bit.spinDecay;
     if (this.tilt > 0.5) decay += T.scrapeDecay * Math.min(1, (this.tilt - 0.5) * 2);
 
     // 2) 极限轨道：齿轮轴心咬合轨道冲刺
     this.dashing = false;
-    const grip = this.spec.tip.gearGrip;
+    const grip = this.spec.bit.gearGrip;
     if (grip > 0 && this.grounded && r > ARENA.railInner && r < ARENA.railOuter + 0.05 && mag > T.minStableSpin) {
       const ex = pos.x / r;
       const ez = pos.z / r;
@@ -503,7 +503,7 @@ export class BeyPhysics {
       const v = body.linvel();
       const sp = Math.hypot(v.x, v.z);
       if (sp > 1e-3) {
-        const dv = Math.min(sp, (T.rollBase + T.rollFriction * this.spec.tip.friction) * -GRAVITY * dt);
+        const dv = Math.min(sp, (T.rollBase + T.rollFriction * this.spec.bit.friction) * -GRAVITY * dt);
         const m = body.mass();
         body.applyImpulse({ x: (-v.x / sp) * dv * m, y: 0, z: (-v.z / sp) * dv * m }, true);
       }
@@ -519,7 +519,7 @@ export class BeyPhysics {
       // 目标姿态：轴心类型决定的“自然倾角”，倾斜方向以进动角速度绕竖直轴旋转。
       // 倾斜的轴心与地面的接触点偏离转轴，摩擦力方向随进动旋转，
       // 由 Rapier 的摩擦自然产生花瓣形移动轨迹（攻击型轴心倾角大、移动激烈）。
-      const lean = this.spec.tip.drift * Math.min(1, mag / (this.launchSpin * 0.5));
+      const lean = this.spec.bit.drift * Math.min(1, mag / (this.launchSpin * 0.5));
       // 自然进动角速度（只由转速决定）
       let rate = this.spinSign * -(T.precessBase + T.precessSpin / Math.max(20, mag));
       // 战术意图：牵引方向（= 倾斜方向 + 90°·旋向）接近期望方向时进动放慢、背离时加快。

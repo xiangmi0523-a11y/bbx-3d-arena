@@ -33,16 +33,16 @@ const LEGACY: Record<string, { radial?: number; bladeTop?: number }> = {
   'blade:blaze-fang': { bladeTop: 1.395 },
   'blade:tidal-bastion': { radial: 1.045, bladeTop: 1.38 },
   'blade:titan-crown': { radial: 1.045, bladeTop: 1.355 },
-  'disc:tri-lock': { radial: 1.045 },
-  'disc:quad-edge': { radial: 1.04 },
-  'disc:ring-guard': { radial: 1.04 },
+  'ratchet:tri-lock': { radial: 1.045 },
+  'ratchet:quad-edge': { radial: 1.04 },
+  'ratchet:ring-guard': { radial: 1.04 },
 };
 
-const parts: PartSpec[] = [...listParts('blade'), ...listParts('disc'), ...listParts('tip')];
+const parts: PartSpec[] = [...listParts('blade'), ...listParts('ratchet'), ...listParts('bit')];
 const bounds = new Map<string, VisualBounds>();
 const key = (p: PartSpec) => `${p.kind}:${p.id}`;
 const limit = (p: PartSpec, k: 'radial' | 'bladeTop') => LEGACY[key(p)]?.[k] ?? TARGET[k];
-const minDiscRadius = Math.min(...listParts('disc').map((d) => d.radius));
+const minDiscRadius = Math.min(...listParts('ratchet').map((d) => d.radius));
 
 beforeAll(() => {
   for (const p of parts) bounds.set(key(p), measureVisual(buildPartModel(p)));
@@ -66,16 +66,16 @@ describe('视觉模型包围盒（相对碰撞体）', () => {
     });
   }
 
-  for (const p of listParts('disc')) {
-    it(`disc:${p.id} 外径在碰撞体范围内，锁齿只略伸进 Blade 层`, () => {
+  for (const p of listParts('ratchet')) {
+    it(`ratchet:${p.id} 外径在碰撞体范围内，锁齿只略伸进 Blade 层`, () => {
       const b = bounds.get(key(p))!;
       expect(b.radial / p.radius).toBeLessThanOrEqual(limit(p, 'radial'));
       expect(b.yMax - p.height).toBeLessThanOrEqual(TARGET.discLockRise + 1e-6);
     });
   }
 
-  for (const p of listParts('tip')) {
-    it(`tip:${p.id} 藏在 Disc 下方、不高出自身层`, () => {
+  for (const p of listParts('bit')) {
+    it(`bit:${p.id} 藏在 Disc 下方、不高出自身层`, () => {
       const b = bounds.get(key(p))!;
       expect(b.radial).toBeLessThanOrEqual(minDiscRadius);
       expect(b.yMax).toBeLessThanOrEqual(p.height + 0.005);
@@ -90,7 +90,7 @@ describe('视觉模型包围盒（相对碰撞体）', () => {
 
 describe('Blade + Disc 装配（P2.3 阶段 2，射线实测）', () => {
   it('疾风新月 + 六角锁盘：不穿插，Disc 顶面有支承面贴住 Blade 底面', () => {
-    const spec = assembleBey({ blade: 'gale-crescent', disc: 'hex-lock', tip: 'dome-ball' });
+    const spec = assembleBey({ blade: 'gale-crescent', ratchet: 'hex-lock', bit: 'dome-ball' });
     const seat = measureSeat(spec, 0.008, 6);
     expect(seat.penetrating).toBe(0);
     expect(seat.minGap).toBeGreaterThan(-0.0005);
@@ -98,9 +98,9 @@ describe('Blade + Disc 装配（P2.3 阶段 2，射线实测）', () => {
   }, 60000);
 
   it('六角锁盘自身、以及与疾风新月装配后没有共面重叠的面（不会 z-fighting 闪烁）', () => {
-    const spec = assembleBey({ blade: 'gale-crescent', disc: 'hex-lock', tip: 'dome-ball' });
+    const spec = assembleBey({ blade: 'gale-crescent', ratchet: 'hex-lock', bit: 'dome-ball' });
     const root = new THREE.Group();
-    for (const k of ['disc', 'blade'] as const) {
+    for (const k of ['ratchet', 'blade'] as const) {
       const m = buildPartModel(spec[k]);
       m.position.y = spec.layers[k].bottom;
       root.add(m);
@@ -117,18 +117,18 @@ describe('碰撞体与装配层（读自真实 Rapier 刚体）', () => {
 
   it('全部 64 种组合：碰撞体尺寸 = 部件参数，位置 = 装配层', () => {
     for (const blade of listParts('blade'))
-      for (const disc of listParts('disc'))
-        for (const tip of listParts('tip')) {
-          const spec = assembleBey({ blade: blade.id, disc: disc.id, tip: tip.id });
+      for (const disc of listParts('ratchet'))
+        for (const tip of listParts('bit')) {
+          const spec = assembleBey({ blade: blade.id, ratchet: disc.id, bit: tip.id });
           const [ball, shaft, d, bl] = readColliders(R, spec);
           const L = spec.layers;
           expect(ball.shape).toBe('ball');
           expect(ball.radius).toBeCloseTo(tip.contactRadius, 5);
           expect(ball.centerY - ball.radius).toBeCloseTo(0, 5); // 接地点 = 本地原点
-          expect(shaft.centerY + shaft.halfHeight).toBeCloseTo(L.tip.top, 5);
+          expect(shaft.centerY + shaft.halfHeight).toBeCloseTo(L.bit.top, 5);
           expect(d.radius).toBeCloseTo(disc.radius, 5);
-          expect(d.centerY - d.halfHeight).toBeCloseTo(L.disc.bottom, 5);
-          expect(d.centerY + d.halfHeight).toBeCloseTo(L.disc.top, 5);
+          expect(d.centerY - d.halfHeight).toBeCloseTo(L.ratchet.bottom, 5);
+          expect(d.centerY + d.halfHeight).toBeCloseTo(L.ratchet.top, 5);
           expect(bl.radius).toBeCloseTo(blade.radius, 5);
           expect(bl.centerY - bl.halfHeight).toBeCloseTo(L.blade.bottom, 5);
           expect(bl.centerY + bl.halfHeight).toBeCloseTo(L.blade.top, 5);

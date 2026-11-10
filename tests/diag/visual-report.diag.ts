@@ -11,16 +11,16 @@ import { measureVisual } from '../../tools/inspect/visualBounds';
  *   npx vitest run --config vitest.diag.config.ts tests/diag/visual-report.diag.ts
  */
 it('visual report', () => {
-  const parts: PartSpec[] = [...listParts('blade'), ...listParts('disc'), ...listParts('tip')];
+  const parts: PartSpec[] = [...listParts('blade'), ...listParts('ratchet'), ...listParts('bit')];
   const rows = parts.map((p) => {
     const b = measureVisual(buildPartModel(p));
-    const physR = p.kind === 'tip' ? p.contactRadius : p.radius;
+    const physR = p.kind === 'bit' ? p.contactRadius : p.radius;
     return {
       part: `${p.kind}:${p.id}`,
       physRadius: physR,
       physHeight: p.height,
       visualRadial: +b.radial.toFixed(4),
-      radialRatio: p.kind === 'tip' ? null : +(b.radial / physR).toFixed(4),
+      radialRatio: p.kind === 'bit' ? null : +(b.radial / physR).toFixed(4),
       visualTop: +b.yMax.toFixed(4),
       topRatio: +(b.yMax / p.height).toFixed(4),
       visualBottom: +b.yMin.toFixed(5),

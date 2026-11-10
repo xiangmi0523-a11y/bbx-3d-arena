@@ -3,15 +3,15 @@ import { createSpinBlurTexture } from '../render/textures';
 import { buildGaleBlade } from './models/galeBlade';
 import { buildRatchetDisc } from './models/ratchetDisc';
 import type { AssembledBey } from './parts/assemble';
-import type { BladeSpec, DiscSpec, PartKind, PartSpec, TipSpec } from './parts/types';
+import type { BitSpec, BladeSpec, PartKind, PartSpec, RatchetSpec } from './parts/types';
 
 /**
  * 陀螺视觉模型工厂：根据部件的 visual 参数程序化生成真 3D 网格（全部原创造型）。
  *
  * 每个部件都是独立的 Group（底面在本地 y=0），有自己的几何与材质：
  *  - Blade：金属刃 + 彩色涂层 + 透明塑料护盖 + 装甲片 / 铆钉 / 刻线等细节；
- *  - Disc：齿轮锁盘，按锁齿数 / 尖锐度生成；
- *  - Tip：外壳 + 接地部分（齿轮平底 / 球 / 针尖 / 橡胶）。
+ *  - Ratchet：锁齿棘轮，按锁齿数 / 尖锐度生成；
+ *  - Bit：外壳 + 接地部分（齿轮平底 / 球 / 针尖 / 橡胶）。
  * 组装界面和战斗共用这里的构建函数，保证两处模型完全一致。
  */
 
@@ -20,8 +20,8 @@ export interface BeyVisual {
   /** 三个部件槽，位置为该部件在组装体中的底部高度 */
   slots: Record<PartKind, THREE.Group>;
   blade: THREE.Group;
-  disc: THREE.Group;
-  tip: THREE.Group;
+  ratchet: THREE.Group;
+  bit: THREE.Group;
   /** 高速旋转时显示的残影盘 */
   blur: THREE.Mesh;
   dispose(): void;
@@ -299,15 +299,15 @@ export function buildBladeModel(spec: BladeSpec): THREE.Group {
   return g;
 }
 
-// ───────────────────────── Disc ─────────────────────────
+// ───────────────────────── Ratchet ─────────────────────────
 
-export function buildDiscModel(spec: DiscSpec): THREE.Group {
+export function buildRatchetModel(spec: RatchetSpec): THREE.Group {
   if (spec.visual.style === 'ratchet') return buildRatchetDisc(spec);
   const g = new THREE.Group();
-  g.name = `disc:${spec.id}`;
+  g.name = `ratchet:${spec.id}`;
   const v = spec.visual;
   const R = spec.radius;
-  const N = v.points;
+  const N = spec.teeth;
   const sharp = v.sharpness;
   const profile =
     N === 0
@@ -335,11 +335,11 @@ export function buildDiscModel(spec: DiscSpec): THREE.Group {
   return g;
 }
 
-// ───────────────────────── Tip ─────────────────────────
+// ───────────────────────── Bit ─────────────────────────
 
-export function buildTipModel(spec: TipSpec): THREE.Group {
+export function buildBitModel(spec: BitSpec): THREE.Group {
   const g = new THREE.Group();
-  g.name = `tip:${spec.id}`;
+  g.name = `bit:${spec.id}`;
   const v = spec.visual;
   const r = spec.contactRadius;
   const H = spec.height;
@@ -389,7 +389,7 @@ export function buildTipModel(spec: TipSpec): THREE.Group {
 }
 
 export function buildPartModel(part: PartSpec): THREE.Group {
-  const g = part.kind === 'blade' ? buildBladeModel(part) : part.kind === 'disc' ? buildDiscModel(part) : buildTipModel(part);
+  const g = part.kind === 'blade' ? buildBladeModel(part) : part.kind === 'ratchet' ? buildRatchetModel(part) : buildBitModel(part);
   g.traverse((o) => {
     if ((o as THREE.Mesh).isMesh) {
       o.castShadow = true;
@@ -419,20 +419,20 @@ export function createBeyVisual(spec: AssembledBey): BeyVisual {
   const root = new THREE.Group();
   root.name = `bey:${spec.blade.id}`;
   const slots = {
-    tip: new THREE.Group(),
-    disc: new THREE.Group(),
+    bit: new THREE.Group(),
+    ratchet: new THREE.Group(),
     blade: new THREE.Group(),
   } as Record<PartKind, THREE.Group>;
-  const tip = buildPartModel(spec.tip);
-  const disc = buildPartModel(spec.disc);
+  const bit = buildPartModel(spec.bit);
+  const ratchet = buildPartModel(spec.ratchet);
   const blade = buildPartModel(spec.blade);
-  slots.tip.add(tip);
-  slots.disc.add(disc);
+  slots.bit.add(bit);
+  slots.ratchet.add(ratchet);
   slots.blade.add(blade);
-  slots.tip.position.y = spec.layers.tip.bottom;
-  slots.disc.position.y = spec.layers.disc.bottom;
+  slots.bit.position.y = spec.layers.bit.bottom;
+  slots.ratchet.position.y = spec.layers.ratchet.bottom;
   slots.blade.position.y = spec.layers.blade.bottom;
-  root.add(slots.tip, slots.disc, slots.blade);
+  root.add(slots.bit, slots.ratchet, slots.blade);
 
   const blurMat = new THREE.MeshBasicMaterial({
     map: createSpinBlurTexture(spec.blade.visual.primary),
@@ -456,8 +456,8 @@ export function createBeyVisual(spec: AssembledBey): BeyVisual {
     root,
     slots,
     blade,
-    disc,
-    tip,
+    ratchet,
+    bit,
     blur,
     dispose() {
       disposeObject(root);

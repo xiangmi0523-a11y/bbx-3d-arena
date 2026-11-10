@@ -124,8 +124,8 @@ export function profileOf(spec: AssembledBey): MotionProfile {
   return {
     aggression: c(spec.blade.attack - 0.5 * spec.blade.defense),
     steadiness: c(spec.blade.defense),
-    economy: c(1 - (spec.tip.spinDecay - 0.85) / 1.15) * c((spec.blade.rimWeight - 0.45) / 0.3),
-    tipAuthority: 0.3 + 0.7 * c(spec.tip.drift / 0.16),
+    economy: c(1 - (spec.bit.spinDecay - 0.85) / 1.15) * c((spec.blade.rimWeight - 0.45) / 0.3),
+    tipAuthority: 0.3 + 0.7 * c(spec.bit.drift / 0.16),
     attack: c(spec.blade.attack),
   };
 }
