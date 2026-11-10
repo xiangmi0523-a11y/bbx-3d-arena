@@ -129,8 +129,17 @@ export const BEY_TUNING = {
    * （与脱困 breakoutGrip 同一假设），方向仍由进动相位 + 墙边修正决定。0 = 关闭。
    */
   edgeGrip: 0.3,
-  /** 低于这个咬合度的轴心（针尖）没有牵引。P2.2.1 为 0.5，球头（0.35）完全没有牵引，会停在碗底 */
+  /**
+   * 低于这个咬合度的轴心没有牵引。P2.2.1 为 0.5，球头（0.35）完全没有牵引，会停在碗底；
+   * 0.2 时针尖（0.1）被二值门整个关掉，针尖对针尖可无接触僵持 35–87 s（v2.0 R3 的结构根因）。
+   * v2.0 R3 实验值 0.1：针尖获得弱但非零的牵引（30 × 0.1 = 3 m/s²，平齿轴的十分之一），牵引仍按 grip 连续缩放。
+   */
   driveMinGrip: 0.2,
+  /**
+   * v2.0 R8 轨道冲刺齿轮门控：1 = 只有带齿轮的 Bit（gear = true）能在轨道上冲刺，加速度与转速代价固定（不再乘 grip）；
+   * 0 = 旧行为（任何 grip > 0 的轴心都冲刺，按 grip 缩放）。真实机制是齿轮与轨道齿条啮合，与抓地力无关。
+   */
+  railGearOnly: 0,
   /**
    * 轴心滚动 / 滑动阻力：水平减速度 = (rollBase + rollFriction × 轴心摩擦) × g。
    * 没有这一项时，陀螺在碗边的离心轨道几乎不损失能量，会长时间绕外圈（P2.1 诊断：最长 24 秒没有交锋）。
@@ -394,7 +403,11 @@ export class BeyPhysics {
     // 2) 极限轨道：齿轮轴心咬合轨道冲刺
     this.dashing = false;
     const grip = this.spec.bit.gearGrip;
-    if (!this.bursted && grip > 0 && this.grounded && r > ARENA.railInner && r < ARENA.railOuter + 0.05 && mag > T.minStableSpin) {
+    // 齿轮门控（R8）：冲刺资格来自齿轮，强度不随抓地力缩放
+    const gearOnly = T.railGearOnly > 0;
+    const canDash = gearOnly ? this.spec.bit.gear : grip > 0;
+    const dashK = gearOnly ? 1 : grip;
+    if (!this.bursted && canDash && this.grounded && r > ARENA.railInner && r < ARENA.railOuter + 0.05 && mag > T.minStableSpin) {
       const ex = pos.x / r;
       const ez = pos.z / r;
       // ω × e_r 的水平分量（ω 竖直），冲刺方向为其反方向（齿轮在外圈齿条上滚动）
@@ -408,10 +421,10 @@ export class BeyPhysics {
       const v = body.linvel();
       const along = v.x * dx + v.z * dz;
       if (along < T.railMaxSpeed) {
-        const accel = T.railDash * grip * Math.min(1, mag / (this.launchSpin * 0.4));
+        const accel = T.railDash * dashK * Math.min(1, mag / (this.launchSpin * 0.4));
         const m = body.mass();
         body.applyImpulse({ x: dx * accel * m * dt, y: 0, z: dz * accel * m * dt }, true);
-        decay += T.railSpinCost * grip;
+        decay += T.railSpinCost * dashK;
         this.dashing = true;
       }
     }
