@@ -14,7 +14,8 @@ import { SMASH_EXPERIMENT } from '../../src/game/battle/BattleSystem';
 import { BEY_TUNING } from '../../src/game/beys/BeyPhysics';
 import { ARENA } from '../../src/game/arena/arenaSpec';
 import type { SpinLedger } from '../../src/game/beys/BeyPhysics';
-import { SIGNATURE_LIST } from '../../src/game/beys/parts/catalog';
+import { BITS, BLADES, SIGNATURE_LIST } from '../../src/game/beys/parts/catalog';
+import { assembleBey, REF_INERTIA } from '../../src/game/beys/parts/assemble';
 import { rivalCommand } from '../../src/game/launcher/launch';
 import { loadRapier, PHYSICS_DT } from '../../src/game/physics/PhysicsWorld';
 import { seeded } from '../motion/motionSim';
@@ -333,6 +334,165 @@ test('G：平衡杠杆筛选（签名矩阵 + 针尖对针尖探针）', async (
       durationP50: [...recs.map((x) => x.steps / 120)].sort((x, y) => x - y)[Math.floor(n / 2)],
       contactsP50: [...recs.map((x) => x.contacts)].sort((x, y) => x - y)[Math.floor(n / 2)],
       needleMirror: probe,
+    });
+  }
+}, 3_000_000);
+
+// ───────────────────────────── H. 零件参数筛选（探索性，不作采用依据） ─────────────────────────────
+/**
+ * G 的结论：咬合接近速度项、中心平台、外圈坡度、滚动阻力下限都没有动摇磐盾（胜率 94–98%）——
+ * 防守优势不在竞技场或咬合模型，而在“谁掉速慢”（自转终结约 77%）。本部分筛选零件参数：
+ *  - v2.0 §3.4 列出的调参候选：针尖 spinDecay 0.85 ↑（2.0 / 3.0）、圆球 spinDecay 1.2 ↓（0.6）、泰坦王冠 rimWeight 0.78 ↑（0.95）；
+ *  - E7 账本指向的主因：Bit 接地摩擦（Rapier 接触积分掉速与 Bit 摩擦同序）——针尖 0.12 → 0.2、平齿 / 橡胶 0.45 → 0.32；
+ *  - 组合臂：针尖 2.0 + 圆球 0.6 + 平齿 / 橡胶 0.32。
+ * 每臂 320 回合（每个无序对阵 40 回合，95% CI 半宽约 ±15 个点：只看方向与量级）。
+ * 输出（行首 M5-H）：对阵胜率（v2.0 §3.4 的三条克制链 + 默认对局）、各构筑的平均账本（基础衰减 / Rapier 接触损失 / 终局转速）、
+ * v2.0 定义的“生效衰减率”（spinDecay × REF_INERTIA / spinInertia）及其最大差。
+ */
+type PartTweak = { kind: 'bit' | 'blade'; id: string; field: string; value: number };
+interface PartArm {
+  arm: string;
+  parts: PartTweak[];
+}
+function withParts<T>(tw: PartTweak[], fn: () => T): T {
+  const old: { o: Record<string, number>; f: string; v: number }[] = [];
+  for (const t of tw) {
+    const o = (t.kind === 'bit' ? BITS[t.id] : BLADES[t.id]) as unknown as Record<string, number>;
+    old.push({ o, f: t.field, v: o[t.field] });
+    o[t.field] = t.value;
+  }
+  try {
+    return fn();
+  } finally {
+    for (const x of old.reverse()) x.o[x.f] = x.v;
+  }
+}
+
+test('H：零件参数筛选（v2.0 §3.4 候选 + Bit 摩擦）', async () => {
+  const R: RT = await loadRapier();
+  const POW = [0.65, 0.8, 0.95];
+  const needle = (v: number): PartTweak => ({ kind: 'bit', id: 'needle-point', field: 'spinDecay', value: v });
+  const ball = (v: number): PartTweak => ({ kind: 'bit', id: 'dome-ball', field: 'spinDecay', value: v });
+  const fric = (v: number): PartTweak[] => [
+    { kind: 'bit', id: 'gear-flat', field: 'friction', value: v },
+    { kind: 'bit', id: 'rush-rubber', field: 'friction', value: v },
+  ];
+  const arms: PartArm[] = [
+    { arm: 'base', parts: [] },
+    { arm: 'needleDecay2.0', parts: [needle(2.0)] },
+    { arm: 'needleDecay3.0', parts: [needle(3.0)] },
+    { arm: 'ballDecay0.6', parts: [ball(0.6)] },
+    { arm: 'crownRim0.95', parts: [{ kind: 'blade', id: 'titan-crown', field: 'rimWeight', value: 0.95 }] },
+    { arm: 'needleFric0.2', parts: [{ kind: 'bit', id: 'needle-point', field: 'friction', value: 0.2 }] },
+    { arm: 'flatRubberFric0.32', parts: fric(0.32) },
+    { arm: 'combo', parts: [needle(2.0), ball(0.6), ...fric(0.32)] },
+  ];
+  const PAIRS: [string, string, string][] = [
+    ['A>S', 'lieren', 'ziyao'],
+    ['S>D', 'ziyao', 'pandun'],
+    ['D>A', 'pandun', 'lieren'],
+    ['default', 'senheng', 'pandun'],
+    ['B-A', 'senheng', 'lieren'],
+    ['B-S', 'senheng', 'ziyao'],
+  ];
+  for (const a of arms) {
+    const t0 = Date.now();
+    const rep = withParts(a.parts, () => {
+      const recs: { p: string; r: string; kind: string; finish: string | null; winner: string | null; steps: number; sides: Side[] }[] = [];
+      const eff: Record<string, number> = {};
+      for (const sg of SIGNATURE_LIST) {
+        const sp = assembleBey(sg.loadout);
+        eff[sg.key] = r2((sp.bit.spinDecay * REF_INERTIA) / sp.spinInertia);
+      }
+      SIGNATURE_LIST.forEach((p, pi) =>
+        SIGNATURE_LIST.forEach((r, ri) => {
+          for (let i = 0; i < SEEDS; i++) {
+            const seed = 20000 + pi * 1000 + ri * 100 + i;
+            const rnd = seeded(seed * 7 + 13);
+            const sc: Scn = { name: `${p.key}-${r.key}#${i}`, group: 'SIG', player: p.loadout, rival: r.loadout, pCmd: { power: POW[i % 3], aim: (rnd() - 0.5) * 1.2, tilt: 0 }, rCmd: rivalCommand(rnd), seed, maxSeconds: 61, init: '签名矩阵' };
+            const orig = Math.random;
+            Math.random = seeded(sc.seed);
+            try {
+              const { pw, b, A, B } = setup(R, sc, { observeContacts: true });
+              const max = Math.round(61 / PHYSICS_DT);
+              let s = 0;
+              for (; s < max && !b.result; s++) pw.step();
+              const o = b.judgeRound.outcome;
+              const won = (side: 'player' | 'rival') => (o && o.kind === 'win' ? o.winner === side : null);
+              recs.push({
+                p: p.key,
+                r: r.key,
+                kind: o?.kind ?? 'none',
+                finish: o?.finish ?? null,
+                winner: o?.winner ?? null,
+                steps: s,
+                sides: [
+                  { key: p.key, launch: A.launchSpin, end: A.spin, ledger: { ...A.ledger }, won: won('player') },
+                  { key: r.key, launch: B.launchSpin, end: B.spin, ledger: { ...B.ledger }, won: won('rival') },
+                ],
+              });
+              pw.dispose();
+            } finally {
+              Math.random = orig;
+            }
+          }
+        }),
+      );
+      return { recs, eff };
+    });
+    const { recs, eff } = rep;
+    const n = recs.length;
+    const c: Record<string, number> = {};
+    for (const x of recs) {
+      const k = x.kind === 'win' ? (x.finish as string) : x.kind;
+      c[k] = (c[k] ?? 0) + 1;
+    }
+    const pairs: Record<string, string> = {};
+    for (const [tag, x, y] of PAIRS) {
+      let wx = 0;
+      let wy = 0;
+      let d = 0;
+      for (const q of recs) {
+        if (!((q.p === x && q.r === y) || (q.p === y && q.r === x))) continue;
+        const xs = q.p === x ? 'player' : 'rival';
+        if (q.kind !== 'win') {
+          d++;
+          continue;
+        }
+        if (q.winner === xs) wx++;
+        else wy++;
+      }
+      pairs[tag] = `${x} ${wx}:${wy} ${y}（平 ${d}）`;
+    }
+    const perSig: Record<string, unknown> = {};
+    for (const sg of SIGNATURE_LIST) {
+      let dec = 0;
+      let w = 0;
+      for (const x of recs) {
+        const side = x.p === sg.key ? 'player' : x.r === sg.key ? 'rival' : null;
+        if (!side || x.p === x.r || x.kind !== 'win') continue;
+        dec++;
+        if (x.winner === side) w++;
+      }
+      const sides = recs.filter((x) => x.p !== x.r).flatMap((x) => x.sides).filter((s) => s.key === sg.key);
+      const m = sides.length || 1;
+      perSig[sg.key] = {
+        win: dec ? Math.round((w / dec) * 1000) / 1000 : NaN,
+        base: r2(sides.reduce((s, v) => s + v.ledger.base, 0) / m),
+        contactLoss: r2(sides.reduce((s, v) => s + v.ledger.contactLoss, 0) / m),
+        end: r2(sides.reduce((s, v) => s + v.end, 0) / m),
+        effDecay: eff[sg.key],
+      };
+    }
+    const ev = Object.values(eff);
+    out(`M5-H ${a.arm}`, {
+      ms: Date.now() - t0,
+      rounds: n,
+      shares: Object.fromEntries(Object.entries(c).map(([k, v]) => [k, Math.round((v / n) * 1000) / 1000])),
+      pairs,
+      perSignature: perSig,
+      effDecaySpreadPct: Math.round((Math.max(...ev) / Math.min(...ev) - 1) * 100),
+      durationP50: [...recs.map((x) => x.steps / 120)].sort((x, y) => x - y)[Math.floor(n / 2)],
     });
   }
 }, 3_000_000);
