@@ -18,6 +18,7 @@ test('trajectory fingerprint', async () => {
     Math.random = () => ((s = (s * 16807) % 2147483647) - 1) / 2147483646;
     const h = new Fingerprint();
     const r = await simulateBattle({
+      seed: null,
       player: { power: 0.6 + seed * 0.06, aim: (seed % 3 - 1) * 0.3, tilt: 0 },
       rival: { power: 0.8, aim: 0, tilt: 0 },
       maxSeconds: 60,

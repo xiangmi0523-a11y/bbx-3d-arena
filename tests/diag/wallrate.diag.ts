@@ -25,6 +25,7 @@ test('wall / tiers rate', async () => {
     for (let i = 0; i < 6; i++) {
       const aim = ((i % 3) - 1) * 0.3;
       const r = await diagnoseBattle({
+        seed: null,
         player: { power: 0.7 + (i % 3) * 0.15, aim, tilt: 0 },
         rival: { power: 0.8, aim: -aim, tilt: 0 },
         rivalLoadout: { blade: 'gale-crescent', disc: 'tri-lock', tip: 'rush-rubber' },
@@ -42,7 +43,7 @@ test('wall / tiers rate', async () => {
     let t2 = 0;
     for (let i = 0; i < 6; i++) {
       const aim = ((i % 3) - 1) * 0.3;
-      const r = await simulateBattle({ player: { power: 0.7 + (i % 3) * 0.15, aim, tilt: 0 }, rival: { power: 0.8, aim: -aim, tilt: 0 }, maxSeconds: 40 });
+      const r = await simulateBattle({ player: { power: 0.7 + (i % 3) * 0.15, aim, tilt: 0 }, rival: { power: 0.8, aim: -aim, tilt: 0 }, maxSeconds: 40, seed: null });
       for (const e of r.battle.impacts) tiers[e.tier as keyof typeof tiers]++;
       hits += r.battle.hits;
       t2 += r.battle.time;

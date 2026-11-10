@@ -167,30 +167,33 @@ describe('接触反馈：真实物理场景', () => {
     const run = async (on: boolean) => {
       const orig = Math.random;
       Math.random = seeded(7);
-      const { createArenaPhysics } = await import('../src/game/arena/ArenaPhysics');
-      const { BattleSystem } = await import('../src/game/battle/BattleSystem');
-      const { assembleBey } = await import('../src/game/beys/parts/assemble');
-      const { loadRapier, PhysicsWorld } = await import('../src/game/physics/PhysicsWorld');
-      const R = await loadRapier();
-      const pw = new PhysicsWorld(R);
-      createArenaPhysics(pw);
-      const b = new BattleSystem(pw, { player: assembleBey(LO.player), rival: assembleBey(LO.rival) }, { contactFeedback: on });
-      pw.beforeStep = (dt) => b.preStep(dt);
-      pw.afterStep = (dt) => b.postStep(dt);
-      b.launch('player', CMD.player);
-      b.launch('rival', CMD.rival);
-      const h = new Fingerprint();
-      for (let i = 0; i < 120 * 20 && !b.result; i++) {
-        pw.step();
-        for (const x of [b.beys.player!, b.beys.rival!]) {
-          const t = x.body.translation();
-          h.update(`${t.x},${t.y},${t.z},${x.spin};`);
+      try {
+        const { createArenaPhysics } = await import('../src/game/arena/ArenaPhysics');
+        const { BattleSystem } = await import('../src/game/battle/BattleSystem');
+        const { assembleBey } = await import('../src/game/beys/parts/assemble');
+        const { loadRapier, PhysicsWorld } = await import('../src/game/physics/PhysicsWorld');
+        const R = await loadRapier();
+        const pw = new PhysicsWorld(R);
+        createArenaPhysics(pw);
+        const b = new BattleSystem(pw, { player: assembleBey(LO.player), rival: assembleBey(LO.rival) }, { contactFeedback: on });
+        pw.beforeStep = (dt) => b.preStep(dt);
+        pw.afterStep = (dt) => b.postStep(dt);
+        b.launch('player', CMD.player);
+        b.launch('rival', CMD.rival);
+        const h = new Fingerprint();
+        for (let i = 0; i < 120 * 20 && !b.result; i++) {
+          pw.step();
+          for (const x of [b.beys.player!, b.beys.rival!]) {
+            const t = x.body.translation();
+            h.update(`${t.x},${t.y},${t.z},${x.spin};`);
+          }
         }
+        const out = { hash: h.digest(), strengths: b.impacts.map((e) => e.strength), hits: b.hits, breakouts: b.breakouts };
+        pw.dispose();
+        return out;
+      } finally {
+        Math.random = orig;
       }
-      const out = { hash: h.digest(), strengths: b.impacts.map((e) => e.strength), hits: b.hits, breakouts: b.breakouts };
-      pw.dispose();
-      Math.random = orig;
-      return out;
     };
     const on = await run(true);
     const off = await run(false);
@@ -344,33 +347,36 @@ describe('接触反馈：真实物理场景', () => {
     const run = async (on: boolean, seed: number) => {
       const orig = Math.random;
       Math.random = seeded(seed);
-      const { createArenaPhysics } = await import('../src/game/arena/ArenaPhysics');
-      const { BattleSystem } = await import('../src/game/battle/BattleSystem');
-      const { assembleBey } = await import('../src/game/beys/parts/assemble');
-      const { rivalCommand } = await import('../src/game/launcher/launch');
-      const { loadRapier, PhysicsWorld } = await import('../src/game/physics/PhysicsWorld');
-      const R = await loadRapier();
-      const pw = new PhysicsWorld(R);
-      createArenaPhysics(pw);
-      const b = new BattleSystem(pw, { player: assembleBey(LO.player), rival: assembleBey(LO.rival) }, { contactFeedback: on });
-      pw.beforeStep = (dt) => b.preStep(dt);
-      pw.afterStep = (dt) => b.postStep(dt);
-      const rnd = Math.random;
-      b.launch('player', { power: 0.6 + rnd() * 0.35, aim: (rnd() - 0.5) * 0.8, tilt: 0 });
-      b.launch('rival', rivalCommand(rnd));
-      let stalledSteps = 0;
-      let stalledInContact = 0;
-      for (let i = 0; i < 120 * 30 && !b.result; i++) {
-        pw.step();
-        if (b.stallFor > 0) {
-          stalledSteps++;
-          if (b.contact.state.phase !== 'idle') stalledInContact++;
+      try {
+        const { createArenaPhysics } = await import('../src/game/arena/ArenaPhysics');
+        const { BattleSystem } = await import('../src/game/battle/BattleSystem');
+        const { assembleBey } = await import('../src/game/beys/parts/assemble');
+        const { rivalCommand } = await import('../src/game/launcher/launch');
+        const { loadRapier, PhysicsWorld } = await import('../src/game/physics/PhysicsWorld');
+        const R = await loadRapier();
+        const pw = new PhysicsWorld(R);
+        createArenaPhysics(pw);
+        const b = new BattleSystem(pw, { player: assembleBey(LO.player), rival: assembleBey(LO.rival) }, { contactFeedback: on });
+        pw.beforeStep = (dt) => b.preStep(dt);
+        pw.afterStep = (dt) => b.postStep(dt);
+        const rnd = Math.random;
+        b.launch('player', { power: 0.6 + rnd() * 0.35, aim: (rnd() - 0.5) * 0.8, tilt: 0 });
+        b.launch('rival', rivalCommand(rnd));
+        let stalledSteps = 0;
+        let stalledInContact = 0;
+        for (let i = 0; i < 120 * 30 && !b.result; i++) {
+          pw.step();
+          if (b.stallFor > 0) {
+            stalledSteps++;
+            if (b.contact.state.phase !== 'idle') stalledInContact++;
+          }
         }
+        const out = { breakouts: b.breakouts, stalledSteps, stalledInContact, phase: b.contact.state.phase, time: b.time };
+        pw.dispose();
+        return out;
+      } finally {
+        Math.random = orig;
       }
-      const out = { breakouts: b.breakouts, stalledSteps, stalledInContact, phase: b.contact.state.phase, time: b.time };
-      pw.dispose();
-      Math.random = orig;
-      return out;
     };
     let seed = 1018;
     let on = await run(true, seed);

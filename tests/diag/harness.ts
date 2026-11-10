@@ -17,6 +17,7 @@ import { assembleBey } from '../../src/game/beys/parts/assemble';
 import type { BeyLoadout } from '../../src/game/beys/parts/types';
 import type { LaunchCommand } from '../../src/game/launcher/PullStringGesture';
 import { loadRapier, PhysicsWorld, PHYSICS_DT } from '../../src/game/physics/PhysicsWorld';
+import { defaultSeed, withDeterminism } from '../repro/determinism';
 
 export interface Episode {
   t: number;
@@ -95,6 +96,8 @@ export async function diagnoseBattle(opts: {
   playerLoadout?: BeyLoadout;
   rivalLoadout?: BeyLoadout;
   maxSeconds?: number;
+  /** 随机种子；省略时由参数派生（见 tests/repro/determinism.ts defaultSeed） */
+  seed?: number | null;
 }): Promise<DiagResult> {
   const R = await loadRapier();
   const { PLAYER_LOADOUT, RIVAL_LOADOUT } = await import('../../src/game/beys/parts/catalog');
@@ -105,8 +108,13 @@ export async function diagnoseBattle(opts: {
     player: assembleBey(opts.playerLoadout ?? PLAYER_LOADOUT),
     rival: assembleBey(opts.rivalLoadout ?? RIVAL_LOADOUT),
   });
-  battle.launch('player', opts.player);
-  battle.launch('rival', opts.rival);
+  const launch = () => {
+    battle.launch('player', opts.player);
+    battle.launch('rival', opts.rival);
+  };
+  // seed: null = 沿用调用方当前的全局 Math.random（旧诊断脚本自行替换 Math.random 时使用）
+  if (opts.seed === null) launch();
+  else withDeterminism(opts.seed ?? defaultSeed(opts), launch);
   const A = battle.beys.player!;
   const B = battle.beys.rival!;
 

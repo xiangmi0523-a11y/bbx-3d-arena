@@ -131,6 +131,15 @@ export function createArenaPhysics(pw: PhysicsWorld, spec: ArenaSpec = ARENA): A
   );
   handles.add(table.handle);
 
+  // 只读接触观测的身份表（未开启观测时为空操作）
+  const cs = pw.contacts;
+  if (cs) {
+    cs.registerStatic(floor, 'arena', 'floor');
+    walls.forEach((c, i) => cs.registerStatic(c, 'arena', `wall#${i}`));
+    pockets.forEach((c, i) => cs.registerStatic(c, 'arena', `pocket#${Math.floor(i / 4)}.${['base', 'back', 'side0', 'side1'][i % 4]}`));
+    cs.registerStatic(table, 'arena', 'table');
+  }
+
   return { floor, walls, pockets, table, handles };
 }
 

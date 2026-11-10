@@ -1,4 +1,5 @@
 import RAPIER from '@dimforge/rapier3d-compat';
+import { ContactService } from './ContactService';
 
 export type Rapier = typeof RAPIER;
 
@@ -36,13 +37,19 @@ export class PhysicsWorld {
   beforeStep: ((dt: number) => void) | null = null;
   /** 每个固定步之后调用（读取碰撞） */
   afterStep: ((dt: number) => void) | null = null;
+  /**
+   * 只读接触观测（阶段 1 第二项 A）：构造时 observeContacts = true 才创建，默认关闭。
+   * 在 world.step 之后、afterStep 之前观测一次；只读取窄相位数据，不改变物理（见 ContactService.ts）。
+   */
+  readonly contacts: ContactService | null;
 
-  constructor(R: Rapier) {
+  constructor(R: Rapier, opts: { observeContacts?: boolean } = {}) {
     this.R = R;
     this.world = new R.World({ x: 0, y: GRAVITY, z: 0 });
     this.world.timestep = PHYSICS_DT;
     this.world.integrationParameters.numSolverIterations = 8;
     this.events = new R.EventQueue(true);
+    this.contacts = opts.observeContacts ? new ContactService(this.world) : null;
   }
 
   /**
@@ -67,6 +74,7 @@ export class PhysicsWorld {
     this.events.drainCollisionEvents((h1, h2, started) => {
       if (started) this.startedContacts.push({ a: h1, b: h2 });
     });
+    this.contacts?.observe();
     this.afterStep?.(PHYSICS_DT);
   }
 

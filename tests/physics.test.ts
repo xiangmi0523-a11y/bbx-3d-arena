@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { simulateBattle } from './sim';
+import { deriveSeed, withDeterminism } from './repro/determinism';
 import type { BeyLoadout } from '../src/game/beys/parts/types';
 
 // 真实 Rapier 无头模拟：验证刚体落地、碰撞、胜负判定都由物理驱动
@@ -86,58 +87,64 @@ describe('物理对战模拟', () => {
     const { BEY_TUNING } = await import('../src/game/beys/BeyPhysics');
     const saved = BEY_TUNING.driveMinGrip;
     BEY_TUNING.driveMinGrip = 2;
-    const collide = (speed: number) => {
-      const pw = new PhysicsWorld(R);
-      createArenaPhysics(pw);
-      const battle = new BattleSystem(pw, { player: assembleBey(RIVAL_LOADOUT), rival: assembleBey(RIVAL_LOADOUT) });
-      pw.beforeStep = (dt) => battle.preStep(dt);
-      pw.afterStep = (dt) => battle.postStep(dt);
-      battle.launch('player', { power: 0.5, aim: 0, tilt: 0 });
-      battle.launch('rival', { power: 0.5, aim: 0, tilt: 0 });
-      const a = battle.beys.player!;
-      const b = battle.beys.rival!;
-      const y = 0.15;
-      a.body.setTranslation({ x: -0.9, y, z: 0 }, true);
-      b.body.setTranslation({ x: 0.9, y, z: 0 }, true);
-      a.body.setLinvel({ x: speed / 2, y: 0, z: 0 }, true);
-      b.body.setLinvel({ x: -speed / 2, y: 0, z: 0 }, true);
-      const v0 = { a: speed / 2, b: -speed / 2 };
-      let ev: { strength: number; tier: string } | null = null;
-      let dv = 0;
-      for (let i = 0; i < 240 && !ev; i++) {
-        pw.step();
-        if (battle.impacts.length) {
-          ev = battle.impacts[0];
-          const va = a.body.linvel();
-          const vb = b.body.linvel();
-          dv = (Math.abs(va.x - v0.a) + Math.abs(vb.x - v0.b)) / 2;
+    try {
+      const collide = (speed: number, k: number) => {
+        const pw = new PhysicsWorld(R);
+        createArenaPhysics(pw);
+        const battle = new BattleSystem(pw, { player: assembleBey(RIVAL_LOADOUT), rival: assembleBey(RIVAL_LOADOUT) });
+        pw.beforeStep = (dt) => battle.preStep(dt);
+        pw.afterStep = (dt) => battle.postStep(dt);
+        // 进动初相等随机数由固定种子决定（每个速度的第 k 次各用一个种子）
+        withDeterminism(deriveSeed(`approach:${speed}:${k}`), () => {
+          battle.launch('player', { power: 0.5, aim: 0, tilt: 0 });
+          battle.launch('rival', { power: 0.5, aim: 0, tilt: 0 });
+        });
+        const a = battle.beys.player!;
+        const b = battle.beys.rival!;
+        const y = 0.15;
+        a.body.setTranslation({ x: -0.9, y, z: 0 }, true);
+        b.body.setTranslation({ x: 0.9, y, z: 0 }, true);
+        a.body.setLinvel({ x: speed / 2, y: 0, z: 0 }, true);
+        b.body.setLinvel({ x: -speed / 2, y: 0, z: 0 }, true);
+        const v0 = { a: speed / 2, b: -speed / 2 };
+        let ev: { strength: number; tier: string } | null = null;
+        let dv = 0;
+        for (let i = 0; i < 240 && !ev; i++) {
+          pw.step();
+          if (battle.impacts.length) {
+            ev = battle.impacts[0];
+            const va = a.body.linvel();
+            const vb = b.body.linvel();
+            dv = (Math.abs(va.x - v0.a) + Math.abs(vb.x - v0.b)) / 2;
+          }
         }
-      }
-      pw.dispose();
-      return { ev, dv };
-    };
-    // P2.2：0.6 m/s 的贴身慢碰多数被判为摩擦（不产生事件），即使产生也只是轻擦；轻擦用 2.2 m/s
-    // 倾斜进动的初相位随机，每个速度做 5 次，取中位数
-    // P2.2.1：场地中央坡面变缓，从 ±0.9 处滑到中央时被加速得更少，中速档用 4.5 m/s 才对应原来 4 m/s 的实际接触速度
-    const trial = (speed: number) => {
-      const rs = [0, 1, 2, 3, 4].map(() => collide(speed));
-      const tiers = rs.map((r) => r.ev?.tier ?? 'none');
-      const dvs = rs.map((r) => r.dv).sort((x, y) => x - y);
-      return { tiers, dv: dvs[2], ev: rs[0].ev };
-    };
-    const graze = trial(0.6);
-    expect(graze.tiers.every((t) => t === 'none' || t === 'light')).toBe(true);
-    const slow = trial(2.2);
-    const mid = trial(4.5);
-    const fast = trial(11);
-    expect(slow.tiers.filter((t) => t === 'light').length, slow.tiers.join()).toBeGreaterThanOrEqual(3);
-    expect(slow.tiers.filter((t) => t === 'medium' || t === 'heavy').length, slow.tiers.join()).toBe(0);
-    expect(mid.tiers.filter((t) => t === 'medium').length, mid.tiers.join()).toBeGreaterThanOrEqual(4);
-    expect(fast.tiers.every((t) => t === 'heavy')).toBe(true);
-    // 弹开程度随力度明显增大：猛撞后的速度变化远大于轻擦
-    expect(fast.dv).toBeGreaterThan(mid.dv * 1.5);
-    expect(mid.dv).toBeGreaterThan(slow.dv * 1.5);
-    BEY_TUNING.driveMinGrip = saved;
+        pw.dispose();
+        return { ev, dv };
+      };
+      // P2.2：0.6 m/s 的贴身慢碰多数被判为摩擦（不产生事件），即使产生也只是轻擦；轻擦用 2.2 m/s
+      // 倾斜进动的初相位随机，每个速度做 5 次，取中位数
+      // P2.2.1：场地中央坡面变缓，从 ±0.9 处滑到中央时被加速得更少，中速档用 4.5 m/s 才对应原来 4 m/s 的实际接触速度
+      const trial = (speed: number) => {
+        const rs = [0, 1, 2, 3, 4].map((k) => collide(speed, k));
+        const tiers = rs.map((r) => r.ev?.tier ?? 'none');
+        const dvs = rs.map((r) => r.dv).sort((x, y) => x - y);
+        return { tiers, dv: dvs[2], ev: rs[0].ev };
+      };
+      const graze = trial(0.6);
+      expect(graze.tiers.every((t) => t === 'none' || t === 'light')).toBe(true);
+      const slow = trial(2.2);
+      const mid = trial(4.5);
+      const fast = trial(11);
+      expect(slow.tiers.filter((t) => t === 'light').length, slow.tiers.join()).toBeGreaterThanOrEqual(3);
+      expect(slow.tiers.filter((t) => t === 'medium' || t === 'heavy').length, slow.tiers.join()).toBe(0);
+      expect(mid.tiers.filter((t) => t === 'medium').length, mid.tiers.join()).toBeGreaterThanOrEqual(4);
+      expect(fast.tiers.every((t) => t === 'heavy')).toBe(true);
+      // 弹开程度随力度明显增大：猛撞后的速度变化远大于轻擦
+      expect(fast.dv).toBeGreaterThan(mid.dv * 1.5);
+      expect(mid.dv).toBeGreaterThan(slow.dv * 1.5);
+    } finally {
+      BEY_TUNING.driveMinGrip = saved;
+    }
   }, 60000);
 
   it('P2.1：交锋更频繁，且轻 / 中 / 猛三档都会出现', async () => {
@@ -178,38 +185,43 @@ describe('物理对战模拟', () => {
     // 只测碰撞本身：关掉轴心牵引 / 追击（P2.3.1 起球头轴心也有牵引）
     const savedGrip = BEY_TUNING.driveMinGrip;
     BEY_TUNING.driveMinGrip = 2;
-    const battle = new BattleSystem(pw, {
-      player: assembleBey({ ...RIVAL_LOADOUT, ...la }),
-      rival: assembleBey({ ...RIVAL_LOADOUT, ...lb }),
-    });
-    pw.beforeStep = (dt) => battle.preStep(dt);
-    pw.afterStep = (dt) => battle.postStep(dt);
-    battle.launch('player', { power: 0.5, aim: 0, tilt: 0 });
-    battle.launch('rival', { power: 0.5, aim: 0, tilt: 0 });
-    const a = battle.beys.player!;
-    const b = battle.beys.rival!;
-    a.body.setTranslation({ x: -0.9, y: 0.15, z: 0 }, true);
-    b.body.setTranslation({ x: 0.9, y: 0.15, z: 0 }, true);
-    a.body.setLinvel({ x: speed / 2, y: 0, z: 0 }, true);
-    b.body.setLinvel({ x: -speed / 2, y: 0, z: 0 }, true);
-    const events: { strength: number; tier: string; t: number }[] = [];
-    let after: { dvA: number; dvB: number; sep: number } | null = null;
-    for (let i = 0; i < 120; i++) {
-      pw.step();
-      for (const e of battle.impacts) events.push({ strength: e.strength, tier: e.tier, t: i / 120 });
-      battle.impacts.length = 0;
-      if (events.length && !after) {
-        // 撞击之后再走 3 步，让 Rapier 接触解算与额外冲量都完成
-        for (let k = 0; k < 3; k++) pw.step();
-        const va = a.body.linvel();
-        const vb = b.body.linvel();
-        after = { dvA: Math.hypot(va.x - speed / 2, va.z), dvB: Math.hypot(vb.x + speed / 2, vb.z), sep: vb.x - va.x };
+    try {
+      const battle = new BattleSystem(pw, {
+        player: assembleBey({ ...RIVAL_LOADOUT, ...la }),
+        rival: assembleBey({ ...RIVAL_LOADOUT, ...lb }),
+      });
+      pw.beforeStep = (dt) => battle.preStep(dt);
+      pw.afterStep = (dt) => battle.postStep(dt);
+      withDeterminism(deriveSeed(`headOn:${JSON.stringify([speed, la ?? null, lb ?? null])}`), () => {
+        battle.launch('player', { power: 0.5, aim: 0, tilt: 0 });
+        battle.launch('rival', { power: 0.5, aim: 0, tilt: 0 });
+      });
+      const a = battle.beys.player!;
+      const b = battle.beys.rival!;
+      a.body.setTranslation({ x: -0.9, y: 0.15, z: 0 }, true);
+      b.body.setTranslation({ x: 0.9, y: 0.15, z: 0 }, true);
+      a.body.setLinvel({ x: speed / 2, y: 0, z: 0 }, true);
+      b.body.setLinvel({ x: -speed / 2, y: 0, z: 0 }, true);
+      const events: { strength: number; tier: string; t: number }[] = [];
+      let after: { dvA: number; dvB: number; sep: number } | null = null;
+      for (let i = 0; i < 120; i++) {
+        pw.step();
+        for (const e of battle.impacts) events.push({ strength: e.strength, tier: e.tier, t: i / 120 });
+        battle.impacts.length = 0;
+        if (events.length && !after) {
+          // 撞击之后再走 3 步，让 Rapier 接触解算与额外冲量都完成
+          for (let k = 0; k < 3; k++) pw.step();
+          const va = a.body.linvel();
+          const vb = b.body.linvel();
+          after = { dvA: Math.hypot(va.x - speed / 2, va.z), dvB: Math.hypot(vb.x + speed / 2, vb.z), sep: vb.x - va.x };
+        }
       }
+      const res = { events, after, grinds: battle.grinds, massA: a.body.mass(), massB: b.body.mass() };
+      return res;
+    } finally {
+      BEY_TUNING.driveMinGrip = savedGrip;
+      pw.dispose();
     }
-    const res = { events, after, grinds: battle.grinds, massA: a.body.mass(), massB: b.body.mass() };
-    BEY_TUNING.driveMinGrip = savedGrip;
-    pw.dispose();
-    return res;
   }
 
   it('P2.2：碰撞不再“越撞越有劲”——有效恢复系数 < 1（P2.1 为 1.3–2.7）', async () => {
