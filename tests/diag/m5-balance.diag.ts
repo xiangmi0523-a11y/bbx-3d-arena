@@ -496,3 +496,104 @@ test('H：零件参数筛选（v2.0 §3.4 候选 + Bit 摩擦）', async () => {
     });
   }
 }, 3_000_000);
+
+// ───────────────────────────── I. 接触掉速的来源分解（只读诊断） ─────────────────────────────
+/**
+ * H 的意外结果：把针尖摩擦 0.12 → 0.2、平齿 / 橡胶 0.45 → 0.32，各构筑的“Rapier 接触积分损失”几乎不变（±4%）——
+ * 账本 §2 里“接触损失随 Bit 摩擦同序”是相关、不是因果。本部分把每一步的接触损失按
+ * （上一步是否有陀螺对陀螺的法向冲量）×（倾角区间）分桶，给出每桶的时间占比与掉速率（rad/s 每秒）；
+ * 并做两个只读对照臂：刀刃摩擦全部置 0（隔离陀螺对陀螺的摩擦）、Bit 摩擦全部减半（复核地面摩擦）。
+ * 另给出 base 下每个无序对阵按终结方式的胜负明细（谁、怎么赢的）。
+ */
+test('I：接触掉速来源分解（对撞 / 倾角分桶 + 刀刃摩擦 0 / Bit 摩擦减半 对照）', async () => {
+  const R: RT = await loadRapier();
+  const POW = [0.65, 0.8, 0.95];
+  const halfBits: PartTweak[] = Object.keys(BITS).map((id) => ({ kind: 'bit', id, field: 'friction', value: BITS[id].friction / 2 }));
+  const zeroBlades: PartTweak[] = Object.keys(BLADES).map((id) => ({ kind: 'blade', id, field: 'friction', value: 0 }));
+  const arms: PartArm[] = [
+    { arm: 'base', parts: [] },
+    { arm: 'bladeFric0', parts: zeroBlades },
+    { arm: 'bitFricHalf', parts: halfBits },
+  ];
+  const BINS = ['hit', 't<0.05', 't0.05-0.15', 't0.15-0.3', 't>0.3', 'air'] as const;
+  type Bin = (typeof BINS)[number];
+  for (const a of arms) {
+    const t0 = Date.now();
+    const res = withParts(a.parts, () => {
+      const acc: Record<string, Record<Bin, { t: number; loss: number; gain: number }>> = {};
+      const fin: Record<string, Record<string, number>> = {};
+      const wins: Record<string, number> = {};
+      const dec: Record<string, number> = {};
+      for (const sg of SIGNATURE_LIST) acc[sg.key] = Object.fromEntries(BINS.map((b) => [b, { t: 0, loss: 0, gain: 0 }])) as Record<Bin, { t: number; loss: number; gain: number }>;
+      SIGNATURE_LIST.forEach((p, pi) =>
+        SIGNATURE_LIST.forEach((r, ri) => {
+          for (let i = 0; i < SEEDS; i++) {
+            const seed = 20000 + pi * 1000 + ri * 100 + i;
+            const rnd = seeded(seed * 7 + 13);
+            const sc: Scn = { name: `${p.key}-${r.key}#${i}`, group: 'SIG', player: p.loadout, rival: r.loadout, pCmd: { power: POW[i % 3], aim: (rnd() - 0.5) * 1.2, tilt: 0 }, rCmd: rivalCommand(rnd), seed, maxSeconds: 61, init: '签名矩阵' };
+            const orig = Math.random;
+            Math.random = seeded(sc.seed);
+            try {
+              const { pw, b, A, B } = setup(R, sc, { observeContacts: true });
+              const cs = pw.contacts!;
+              const max = Math.round(61 / PHYSICS_DT);
+              const sides = [
+                { bey: A, key: p.key, prevL: 0, prevG: 0, bin: 'air' as Bin },
+                { bey: B, key: r.key, prevL: 0, prevG: 0, bin: 'air' as Bin },
+              ];
+              for (let s = 0; s < max && !b.result; s++) {
+                pw.step();
+                // 本步测到的账本增量对应上一步的 Rapier 积分 → 用上一步记下的桶
+                for (const sd of sides) {
+                  const L = sd.bey.ledger;
+                  if (p.key !== r.key) {
+                    const cell = acc[sd.key][sd.bin];
+                    cell.t += PHYSICS_DT;
+                    cell.loss += L.contactLoss - sd.prevL;
+                    cell.gain += L.contactGain - sd.prevG;
+                  }
+                  sd.prevL = L.contactLoss;
+                  sd.prevG = L.contactGain;
+                }
+                const hit = (cs.bodyPair('player', 'rival')?.normalImpulse ?? 0) > 0;
+                for (const sd of sides) {
+                  const tl = sd.bey.tilt;
+                  sd.bin = hit ? 'hit' : !sd.bey.grounded ? 'air' : tl < 0.05 ? 't<0.05' : tl < 0.15 ? 't0.05-0.15' : tl < 0.3 ? 't0.15-0.3' : 't>0.3';
+                }
+              }
+              const o = b.judgeRound.outcome;
+              if (p.key !== r.key && o && o.kind === 'win') {
+                const wk = o.winner === 'player' ? p.key : r.key;
+                const lk = o.winner === 'player' ? r.key : p.key;
+                const pair = [p.key, r.key].sort().join('-');
+                fin[pair] ??= {};
+                fin[pair][`${wk}:${o.finish}`] = (fin[pair][`${wk}:${o.finish}`] ?? 0) + 1;
+                wins[wk] = (wins[wk] ?? 0) + 1;
+                dec[wk] = (dec[wk] ?? 0) + 1;
+                dec[lk] = (dec[lk] ?? 0) + 1;
+              }
+              pw.dispose();
+            } finally {
+              Math.random = orig;
+            }
+          }
+        }),
+      );
+      return { acc, fin, wins, dec };
+    });
+    const per: Record<string, unknown> = {};
+    for (const sg of SIGNATURE_LIST) {
+      const cells = res.acc[sg.key];
+      const T = BINS.reduce((s, b) => s + cells[b].t, 0) || 1;
+      const L = BINS.reduce((s, b) => s + cells[b].loss, 0) || 1;
+      per[sg.key] = {
+        win: r2((res.wins[sg.key] ?? 0) / Math.max(1, res.dec[sg.key] ?? 0)),
+        bins: Object.fromEntries(
+          BINS.map((b) => [b, { timePct: r2((cells[b].t / T) * 100), lossPct: r2((cells[b].loss / L) * 100), lossRate: r2(cells[b].loss / Math.max(1e-6, cells[b].t)), gainRate: r2(cells[b].gain / Math.max(1e-6, cells[b].t)) }]),
+        ),
+        lossPerSec: r2(L / T),
+      };
+    }
+    out(`M5-I ${a.arm}`, { ms: Date.now() - t0, perSignature: per, finishes: res.fin });
+  }
+}, 3_000_000);

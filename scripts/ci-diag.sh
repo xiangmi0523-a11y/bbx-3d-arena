@@ -14,4 +14,4 @@ run() {
 
 # 阶段 M2：回合裁判的 golden 变化归因 + 针尖探针（R3）+ 签名矩阵与爆裂 k 标定（R8 / §6.3）
 # （M2 最终参数实测与 M5a 账本、竞技场 A/B 已有结论，见 docs/engineering/m5-ledger-report.md）
-run "M5 零件参数筛选（探索性：v2.0 §3.4 候选 spinDecay / rimWeight + Bit 摩擦）" npx vitest run --config vitest.diag.config.ts tests/diag/m5-balance.diag.ts -t "H："
+run "M5 接触掉速来源分解（只读：对撞 / 倾角分桶 + 刀刃摩擦 0 / Bit 摩擦减半）" npx vitest run --config vitest.diag.config.ts tests/diag/m5-balance.diag.ts -t "I："
