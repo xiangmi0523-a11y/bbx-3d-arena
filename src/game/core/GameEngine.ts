@@ -218,6 +218,8 @@ export class GameEngine {
   private flying: FlyingBlade[] = [];
   /** 组装界面关闭后回到哪个菜单页 */
   private garageReturn: MenuScreen = 'home';
+  /** 本回合玩家实际使用的发射力度（三档之一，测试读取） */
+  private lastLaunchPower: number | null = null;
 
   /** 默认对局 = v2.0 §3.5 的新手向默认组合：森衡（平衡）对 磐盾（防守）；存档里有上次的构筑时用存档 */
   constructor(container: HTMLElement, loadouts: Record<Side, BeyLoadout> = { player: SIGNATURES.senheng.loadout, rival: SIGNATURES.pandun.loadout }) {
@@ -363,6 +365,7 @@ export class GameEngine {
     if (this.phase !== 'aim' || !this.battle) return;
     const tier = powerTier(cmd.power);
     const playerCmd = { ...cmd, power: tier.power };
+    this.lastLaunchPower = tier.power;
     this.battle.launch('player', playerCmd);
     this.battle.launch('rival', aiLaunchCommand(Math.random, this.store.get().setup.difficulty));
     for (const side of SIDES) {
@@ -554,6 +557,7 @@ export class GameEngine {
     };
     return {
       phase: this.phase,
+      launchPower: this.lastLaunchPower,
       time: b?.time ?? 0,
       hits: b?.hits ?? 0,
       player: read('player'),

@@ -13,4 +13,4 @@ run() {
 }
 
 # 阶段 M2：回合裁判的 golden 变化归因 + 针尖探针（R3）+ 签名矩阵与爆裂 k 标定（R8 / §6.3）
-run "M2 确认（A golden 归因与新 golden 导出 / D 最终参数实测）" env M2_PARTS=A,D M2_GOLDEN_DUMP=1 npx vitest run --config vitest.diag.config.ts tests/diag/m2-experiment.diag.ts
+run "M2 最终参数实测（签名矩阵 4×4×20，爆裂实时判定）" env M2_PARTS=D npx vitest run --config vitest.diag.config.ts tests/diag/m2-experiment.diag.ts
