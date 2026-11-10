@@ -57,3 +57,32 @@ export function computeLaunch(spec: AssembledBey, side: Side, cmd: LaunchCommand
 export function rivalCommand(rand: () => number = Math.random): LaunchCommand {
   return { power: 0.55 + rand() * 0.4, aim: (rand() - 0.5) * 1.2, tilt: 0 };
 }
+
+/**
+ * 发射力度三档（v2.0 §6.1 / §10.3：轻 / 中 / 重 = 0.65 / 0.8 / 0.95，与平衡验证用的诊断矩阵 POW 档一致）。
+ * 拉绳手势照常给出连续力度（仪式感：拉得越长、松手越快越强），松手时归到三档之一，
+ * 保证游戏里出现的发射状态都是验证过的那三种。
+ */
+export const POWER_TIERS = [
+  { key: 'light', label: '轻', power: 0.65 },
+  { key: 'medium', label: '中', power: 0.8 },
+  { key: 'heavy', label: '重', power: 0.95 },
+] as const;
+export type PowerTier = (typeof POWER_TIERS)[number];
+
+/** 手势力度 → 档位：< 0.55 轻，< 0.8 中，其余重（满拉不甩 = 0.65 → 中；满拉快甩 → 重） */
+export function powerTier(raw: number): PowerTier {
+  return raw < 0.55 ? POWER_TIERS[0] : raw < 0.8 ? POWER_TIERS[1] : POWER_TIERS[2];
+}
+
+/**
+ * 电脑对手的发射（游戏内用；回归测试仍用 rivalCommand 保持固定种子场景不变）。
+ * 难度只改“发射决策”的分布，不改物理：新手多用轻 / 中档、方向随意；高手多用重档、方向更准。
+ */
+export function aiLaunchCommand(rand: () => number, level: 'rookie' | 'pro' | 'master'): LaunchCommand {
+  const w = level === 'rookie' ? [0.5, 0.4, 0.1] : level === 'master' ? [0.05, 0.35, 0.6] : [1 / 3, 1 / 3, 1 / 3];
+  const r = rand();
+  const tier = r < w[0] ? POWER_TIERS[0] : r < w[0] + w[1] ? POWER_TIERS[1] : POWER_TIERS[2];
+  const spread = level === 'rookie' ? 1.4 : level === 'master' ? 0.6 : 1.2;
+  return { power: tier.power, aim: (rand() - 0.5) * spread, tilt: 0 };
+}

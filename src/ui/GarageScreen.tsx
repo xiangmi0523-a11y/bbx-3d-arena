@@ -10,7 +10,7 @@ const TABS: { kind: PartKind; label: string; en: string }[] = [
   { kind: 'bit', label: '轴尖', en: 'BIT' },
 ];
 
-const ROLE_LABEL: Record<string, string> = { attack: '攻击型', defense: '防御型', stamina: '耐久型', balance: '平衡型' };
+const ROLE_LABEL: Record<string, string> = { attack: '攻击型', defense: '防守型', stamina: '耐力型', balance: '平衡型' };
 
 /** 每类部件在卡片上显示的 3 个关键属性（0..1） */
 function partBars(p: PartSpec): [string, number][] {

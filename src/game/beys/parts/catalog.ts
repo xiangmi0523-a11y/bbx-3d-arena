@@ -268,3 +268,32 @@ export const SIGNATURE_LIST: SignatureBuild[] = [SIGNATURES.lieren, SIGNATURES.p
 /** 默认的两台对战陀螺（v1 默认对局，签名构筑换位见 SIGNATURES） */
 export const PLAYER_LOADOUT: BeyLoadout = { blade: 'blaze-fang', ratchet: 'tri-lock', bit: 'gear-flat' };
 export const RIVAL_LOADOUT: BeyLoadout = { blade: 'tidal-bastion', ratchet: 'hex-lock', bit: 'dome-ball' };
+
+/** 组装方案对应的签名构筑（三件都相同才算）；自定义组合返回 null */
+export function signatureOf(l: BeyLoadout): SignatureBuild | null {
+  return SIGNATURE_LIST.find((s) => s.loadout.blade === l.blade && s.loadout.ratchet === l.ratchet && s.loadout.bit === l.bit) ?? null;
+}
+
+/** 界面上的陀螺名：签名构筑用签名名，自定义组合用刀刃名 */
+export function buildName(l: BeyLoadout): string {
+  return signatureOf(l)?.name ?? getPart('blade', l.blade).name;
+}
+
+/** 类型的显示名与主色（类型由 Bit 决定） */
+export const ROLE_INFO: Record<BeyRole, { label: string; short: string; color: number }> = {
+  attack: { label: '攻击型', short: '攻', color: 0xe8302a },
+  defense: { label: '防守型', short: '防', color: 0x1f7cf0 },
+  balance: { label: '平衡型', short: '衡', color: 0x2fae5f },
+  stamina: { label: '耐力型', short: '耐', color: 0x8b5cf6 },
+};
+
+/**
+ * 官方相克三角（v2.0 §3.4）：攻击 > 耐力 > 防守 > 攻击；平衡在三角之外。
+ * 返回 1 = a 克制 b，-1 = a 被 b 克制，0 = 无硬克制。紫曜 → 磐盾一链的机制尚未建立（[待验证]），界面上只作“打法提示”。
+ */
+export function counterOf(a: BeyRole, b: BeyRole): -1 | 0 | 1 {
+  const beats: Partial<Record<BeyRole, BeyRole>> = { attack: 'stamina', stamina: 'defense', defense: 'attack' };
+  if (beats[a] === b) return 1;
+  if (beats[b] === a) return -1;
+  return 0;
+}

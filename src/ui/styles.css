@@ -292,3 +292,194 @@ body {
   .stat { font-size: 10px; }
   .stage-hint { display: none; }
 }
+
+/* ───────── M3 最小可玩闭环：菜单页 / HUD / 结算（横屏 844×390 优先） ───────── */
+:root { --green: #2fae5f; --purple: #8b5cf6; --line: rgba(90, 160, 255, 0.28); --panel2: rgba(8, 13, 24, 0.86); }
+.btn.wide { min-width: 220px; }
+.btn.icon.settings-btn { position: absolute; top: calc(10px + var(--safe-t)); right: calc(12px + var(--safe-r)); }
+.muted { color: var(--muted); font-size: 12px; }
+
+.type-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 700; border: 1px solid; border-radius: 999px; padding: 1px 8px 1px 2px; background: rgba(0,0,0,0.35); }
+.type-badge i { font-style: normal; width: 18px; height: 18px; border-radius: 50%; color: #fff; display: inline-flex; align-items: center; justify-content: center; font-size: 11px; }
+.type-badge.small { font-size: 11px; }
+.type-badge.small i { width: 16px; height: 16px; font-size: 10px; }
+
+.statbars { display: flex; flex-direction: column; gap: 3px; width: 100%; }
+.statbar { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #b8c6de; }
+.statbar-label { width: 28px; flex: none; }
+.statbar-track { flex: 1; height: 6px; border-radius: 3px; background: rgba(255,255,255,0.1); overflow: hidden; }
+.statbar-fill { height: 100%; border-radius: 3px; transition: width 0.3s; }
+.statbar-val { width: 26px; text-align: right; font-variant-numeric: tabular-nums; font-weight: 700; color: var(--fg); }
+.statbar-val.up { color: #5ef09a; }
+.statbar-val.down { color: #ff8a7a; }
+
+.blade-glyph { flex: none; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.6)); }
+.blade-glyph.spin { animation: glyphspin 2.4s linear infinite; }
+@keyframes glyphspin { to { transform: rotate(-360deg); } }
+
+/* 主界面 */
+.home { position: absolute; inset: 0; display: flex; align-items: stretch; justify-content: space-between; gap: 16px;
+  padding: calc(14px + var(--safe-t)) calc(16px + var(--safe-r)) calc(12px + var(--safe-b)) calc(20px + var(--safe-l));
+  background: linear-gradient(90deg, rgba(4,7,14,0.86) 0%, rgba(4,7,14,0.35) 45%, rgba(4,7,14,0.1) 60%, rgba(4,7,14,0.7) 100%); }
+.home-left { display: flex; flex-direction: column; justify-content: center; gap: 14px; }
+.home .logo { align-items: flex-start; }
+.home-menu { display: flex; flex-direction: column; gap: 10px; align-items: flex-start; }
+.home-menu .btn.big { min-width: 220px; }
+.home-right { display: flex; align-items: flex-end; padding-bottom: 18px; }
+.build-card { width: min(300px, 36vw); background: var(--panel2); border: 1px solid; border-left-width: 4px; border-radius: 14px; padding: 10px 12px; display: flex; flex-direction: column; gap: 6px; }
+.build-card-head { display: flex; gap: 10px; align-items: center; }
+.build-label { font-size: 11px; color: var(--muted); }
+.build-name { font-size: 22px; font-weight: 900; font-style: italic; letter-spacing: 1px; }
+.build-parts { font-size: 11px; color: #b8c6de; }
+
+/* 菜单页通用框架 */
+.screen { position: absolute; inset: 0; display: flex; flex-direction: column;
+  padding: calc(8px + var(--safe-t)) calc(14px + var(--safe-r)) calc(8px + var(--safe-b)) calc(14px + var(--safe-l));
+  background: linear-gradient(180deg, rgba(5,9,18,0.92), rgba(5,9,18,0.82)); }
+.screen-head { display: flex; align-items: center; gap: 10px; }
+.screen-title { font-size: 20px; font-weight: 900; letter-spacing: 2px; }
+.screen-sub { font-size: 11px; color: var(--muted); }
+.screen-body { flex: 1; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; touch-action: pan-y; padding: 8px 0; }
+.screen-actions { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding-top: 6px; border-top: 1px solid rgba(255,255,255,0.06); }
+.pick-summary { font-size: 13px; color: #b8c6de; }
+.filters { display: flex; gap: 6px; flex-wrap: wrap; }
+.chip-btn { appearance: none; border: 1px solid rgba(255,255,255,0.18); background: rgba(255,255,255,0.05); color: var(--fg); border-radius: 999px; padding: 6px 12px; font-size: 13px; min-height: 36px; }
+.chip-btn.on { border-color: var(--cyan); background: rgba(57,240,216,0.18); }
+
+/* 陀螺库 */
+.sig-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+.sig-card { background: linear-gradient(180deg, rgba(20,34,62,0.7), rgba(9,14,26,0.85)); border: 2px solid var(--line); border-radius: 14px; padding: 8px; display: flex; flex-direction: column; gap: 5px; overflow: hidden; }
+.sig-card.on { box-shadow: 0 0 18px rgba(57,240,216,0.2); }
+.sig-top { display: flex; gap: 8px; align-items: center; margin: -8px -8px 0; padding: 8px; }
+.sig-name { font-size: 18px; font-weight: 900; font-style: italic; }
+.sig-parts { font-size: 10.5px; color: #b8c6de; }
+.sig-note { font-size: 10.5px; color: #cfd8e8; line-height: 1.35; }
+.sig-note.weak { color: #9fb0c8; }
+.sig-card .btn.small { margin-top: auto; }
+
+/* 模式与对手 */
+.mode-row { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.mode-card { appearance: none; text-align: left; color: var(--fg); border: 2px solid var(--line); border-radius: 12px; padding: 8px 10px; background: rgba(15,26,48,0.75); min-height: 74px; display: flex; flex-direction: column; gap: 3px; }
+.mode-card.on { border-color: var(--cyan); background: rgba(57,240,216,0.14); }
+.mode-card.locked { opacity: 0.5; }
+.mode-name { font-size: 15px; font-weight: 800; }
+.mode-desc { font-size: 10.5px; color: #b8c6de; }
+.mode-state { font-size: 11px; color: var(--cyan); margin-top: auto; }
+.mode-card.locked .mode-state { color: var(--muted); }
+.pick-label { font-size: 12px; color: var(--muted); margin: 8px 0 4px; letter-spacing: 1px; }
+.rival-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.rival-chip { appearance: none; color: var(--fg); border: 2px solid var(--line); background: rgba(15,26,48,0.75); border-radius: 12px; padding: 4px 10px 4px 4px; display: flex; align-items: center; gap: 6px; min-height: 44px; font-weight: 800; font-size: 14px; }
+.rival-chip small { font-size: 10px; color: var(--muted); font-weight: 600; }
+.rival-chip.on { border-color: var(--cyan); background: rgba(57,240,216,0.14); }
+.dice { width: 34px; height: 34px; border-radius: 8px; background: #26314a; display: inline-flex; align-items: center; justify-content: center; font-weight: 900; }
+.dice.big { width: 56px; height: 56px; font-size: 26px; }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+.seg-btn { appearance: none; border: 0; background: rgba(15,26,48,0.75); color: var(--fg); padding: 8px 22px; font-size: 14px; font-weight: 800; min-height: 40px; }
+.seg-btn + .seg-btn { border-left: 1px solid var(--line); }
+.seg-btn.on { background: linear-gradient(180deg, #ff4b3a, #c01d16); }
+
+/* 竞技场选择 */
+.arena-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.arena-card { appearance: none; text-align: left; color: var(--fg); border: 2px solid var(--line); border-radius: 14px; padding: 8px 12px; background: rgba(15,26,48,0.75); display: flex; flex-direction: column; align-items: flex-start; gap: 2px; }
+.arena-card.on { border-color: var(--cyan); background: rgba(57,240,216,0.12); }
+.arena-card.locked { opacity: 0.5; }
+.arena-glyph { align-self: center; }
+.arena-name { font-size: 16px; font-weight: 900; }
+.arena-theme { font-size: 11px; color: var(--muted); }
+.arena-card ul { margin: 2px 0; padding-left: 16px; font-size: 11px; color: #cfd8e8; }
+.arena-fit { font-size: 11px; color: var(--cyan); }
+.arena-card.locked .arena-fit { color: var(--muted); }
+
+/* 战斗准备 */
+.versus { display: grid; grid-template-columns: 1fr auto 1fr; gap: 12px; align-items: stretch; }
+.vs-card { background: linear-gradient(180deg, rgba(20,34,62,0.7), rgba(9,14,26,0.85)); border: 2px solid; border-radius: 14px; padding: 8px 12px; display: flex; flex-direction: column; gap: 6px; }
+.vs-side { font-size: 11px; color: var(--muted); }
+.vs-head { display: flex; align-items: center; gap: 10px; }
+.vs-name { font-size: 22px; font-weight: 900; font-style: italic; }
+.vs-parts { font-size: 11px; color: #b8c6de; }
+.vs-mid { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; max-width: 200px; text-align: center; }
+.vs-hint { font-size: 12px; color: #ffd98a; }
+.vs-rules { font-size: 10.5px; color: var(--muted); line-height: 1.5; }
+
+/* 战斗 HUD */
+.hud-top { left: calc(12px + var(--safe-l)); right: calc(12px + var(--safe-r)); top: calc(6px + var(--safe-t)); align-items: flex-start; gap: 10px; }
+.hud-side { flex: 1; max-width: 300px; display: flex; flex-direction: column; gap: 3px; }
+.hud-side.rival { align-items: flex-end; text-align: right; }
+.hud-name { font-size: 12px; font-weight: 800; display: flex; gap: 6px; align-items: center; text-shadow: 0 1px 3px #000; }
+.burst-tag { font-size: 10px; color: #fff; background: #e8302a; padding: 0 5px; border-radius: 4px; }
+.hud-bar { width: 100%; height: 8px; border-radius: 4px; background: rgba(255,255,255,0.12); overflow: hidden; }
+.hud-bar.stress { height: 4px; }
+.hud-side.rival .hud-bar { transform: scaleX(-1); }
+.hud-fill { height: 100%; border-radius: 4px; transition: width 0.1s linear; }
+.hud-bar.stress .hud-fill { background: linear-gradient(90deg, #ffb323, #ff7a1a); }
+.hud-bar.stress.hot .hud-fill { background: #ff2d2d; animation: flash 0.25s infinite alternate; }
+.hud-meta { font-size: 10px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.hud-center { min-width: 110px; text-align: center; }
+.score { font-size: 24px; font-weight: 900; font-variant-numeric: tabular-nums; display: flex; justify-content: center; gap: 6px; text-shadow: 0 2px 8px #000; }
+.score i { font-style: normal; color: var(--muted); }
+.hud-round { font-size: 11px; color: #cfd8e8; font-variant-numeric: tabular-nums; }
+.hud-left { position: absolute; left: calc(10px + var(--safe-l)); bottom: calc(22px + var(--safe-b)); display: flex; gap: 8px; }
+.decider-banner, .watch-tip { position: absolute; left: 50%; top: calc(62px + var(--safe-t)); transform: translateX(-50%); background: var(--panel); border: 1px solid rgba(255,179,35,0.5); color: #ffd98a; padding: 4px 12px; border-radius: 10px; font-size: 13px; pointer-events: none; white-space: nowrap; }
+.watch-tip { border-color: var(--line); color: #cfd8e8; }
+.aim-tip { bottom: calc(10px + var(--safe-b)); font-size: 12px; }
+
+/* 力度三档 */
+.tier-meter { position: absolute; left: calc(14px + var(--safe-l)); bottom: calc(76px + var(--safe-b)); height: 40%; display: flex; gap: 6px; pointer-events: none; }
+.tier-track { position: relative; width: 16px; height: 100%; border-radius: 8px; background: rgba(255,255,255,0.1); overflow: hidden; }
+.tier-fill { position: absolute; left: 0; right: 0; bottom: 0; background: linear-gradient(0deg, #39f0d8, #ffb323 60%, #ff3b2f); }
+.tier-mark { position: absolute; left: 0; right: 0; height: 2px; background: rgba(255,255,255,0.8); }
+.tier-labels { display: flex; flex-direction: column; justify-content: space-between; font-size: 12px; font-weight: 800; color: var(--muted); padding: 4px 0; }
+.tier-labels span.on { color: #fff; text-shadow: 0 0 6px var(--gold); }
+
+/* 回合横幅（顶部，不遮挡场地中央） */
+.round-banner { appearance: none; position: absolute; left: 50%; top: calc(58px + var(--safe-t)); transform: translateX(-50%); min-width: 320px; max-width: min(560px, 80vw);
+  background: var(--panel2); color: var(--fg); border: 1px solid var(--line); border-radius: 14px; padding: 8px 18px; text-align: center; }
+.round-banner.win { border-color: rgba(255,179,35,0.7); }
+.round-banner.lose { border-color: rgba(120,160,220,0.6); }
+.rb-title { font-size: 20px; font-weight: 900; font-style: italic; }
+.round-banner.win .rb-title { color: var(--gold); }
+.round-banner.lose .rb-title { color: #9fc0ef; }
+.rb-text { font-size: 13px; margin-top: 2px; }
+.rb-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+/* 比赛结算 */
+.match-end { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: min(620px, calc(100% - 32px));
+  background: linear-gradient(180deg, rgba(14,22,40,0.94), rgba(6,10,20,0.95)); border: 1px solid var(--line); border-radius: 18px;
+  padding: 12px 20px; text-align: center; display: flex; flex-direction: column; gap: 6px; box-shadow: 0 10px 40px rgba(0,0,0,0.6); }
+.me-title { font-size: 36px; font-weight: 900; font-style: italic; letter-spacing: 4px; }
+.me-title.win { color: var(--gold); text-shadow: 0 0 18px rgba(255,179,35,0.5); }
+.me-title.lose { color: #9fb4d8; }
+.me-score { display: flex; justify-content: center; align-items: center; gap: 14px; font-weight: 800; font-size: 15px; }
+.me-score b { font-size: 26px; font-variant-numeric: tabular-nums; }
+.me-reason { font-size: 13px; color: #cfd8e8; }
+.me-rounds { display: flex; justify-content: center; gap: 5px; flex-wrap: wrap; }
+.me-round { font-size: 12px; font-weight: 800; padding: 2px 8px; border-radius: 6px; background: rgba(255,255,255,0.08); }
+.me-round.win { background: rgba(255,179,35,0.25); color: #ffd98a; }
+.me-round.lose { background: rgba(31,124,240,0.25); color: #b8d4ff; }
+.me-stats { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin: 4px 0; }
+.stat-cell { background: rgba(255,255,255,0.05); border-radius: 10px; padding: 4px; }
+.stat-v { font-size: 15px; font-weight: 800; font-variant-numeric: tabular-nums; }
+.stat-k { font-size: 10px; color: var(--muted); }
+.me-types { display: flex; justify-content: center; align-items: center; gap: 6px; flex-wrap: wrap; }
+.me-actions { display: flex; justify-content: center; gap: 10px; margin-top: 4px; }
+.settings-body { display: flex; flex-direction: column; gap: 8px; }
+.toggle-row { display: flex; gap: 8px; justify-content: center; }
+
+@media (orientation: landscape) and (max-height: 500px) {
+  .home-menu .btn.big { padding: 10px 30px; }
+  .btn.wide { min-height: 40px; padding: 8px 18px; }
+  .sig-note { display: none; }
+  .sig-card { gap: 4px; }
+  .me-title { font-size: 28px; }
+  .vs-name { font-size: 18px; }
+  .screen-title { font-size: 18px; }
+}
+@media (orientation: portrait) {
+  .home { flex-direction: column; }
+  .home-right { align-items: stretch; }
+  .build-card { width: 100%; }
+  .sig-grid, .mode-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .arena-row { grid-template-columns: 1fr; }
+  .versus { grid-template-columns: 1fr; }
+  .me-stats { grid-template-columns: repeat(3, 1fr); }
+}
