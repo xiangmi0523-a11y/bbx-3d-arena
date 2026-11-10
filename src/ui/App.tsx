@@ -4,7 +4,7 @@ import type { QualityLevel } from '../game/render/Quality';
 import { GarageScreen } from './GarageScreen';
 import { BattleHud, MatchEndScreen, RoundBanner } from './hud';
 import { LauncherPad } from './LauncherPad';
-import { ArenaScreen, HomeScreen, LibraryScreen, ModeScreen, PrepScreen } from './screens';
+import { ArenaScreen, ChallengeScreen, HomeScreen, LibraryScreen, ModeScreen, PrepScreen } from './screens';
 
 declare global {
   interface Window {
@@ -87,6 +87,7 @@ function Overlay({ engine }: { engine: GameEngine }) {
           {s.screen === 'mode' && <ModeScreen engine={engine} s={s} />}
           {s.screen === 'arena' && <ArenaScreen engine={engine} s={s} />}
           {s.screen === 'prep' && <PrepScreen engine={engine} s={s} />}
+          {s.screen === 'challenge' && <ChallengeScreen engine={engine} s={s} />}
           {s.screen === 'home' && (
             <button className="btn icon settings-btn" onClick={() => setSettings(true)} aria-label="设置" data-testid="open-settings">
               设置
@@ -130,13 +131,13 @@ function Overlay({ engine }: { engine: GameEngine }) {
           <div className="modal-card" onClick={(e: React.MouseEvent) => e.stopPropagation()} data-testid="settings">
             <h2>设置</h2>
             <SettingsBody engine={engine} s={s} />
-            <button className="btn primary" onClick={() => setSettings(false)}>
+            <button className="btn primary" onClick={() => setSettings(false)} data-testid="settings-done">
               完成
             </button>
           </div>
         </div>
       )}
-      {s.fps > 0 && s.phase !== 'garage' && <PerfBadge engine={engine} fps={s.fps} quality={s.quality} />}
+      {s.fps > 0 && s.phase !== 'garage' && s.settings.showFps && <PerfBadge engine={engine} fps={s.fps} quality={s.quality} />}
     </div>
   );
 }
@@ -179,31 +180,57 @@ function PerfBadge({ engine, fps, quality }: { engine: GameEngine; fps: number; 
 
 const QUALITY_LABEL: Record<QualityLevel, string> = { low: '流畅', medium: '均衡', high: '高清', ultra: '极致' };
 
-/** 设置（S4 最小面板：画质 / 音效 / 减特效；完整设置页在 S6） */
+/**
+ * 设置（v2.0 §10.2 设置面板，S6 完整版）：画质（自动 / 四档）+ 帧率显示、音效、战斗镜头（跟随 / 全场）、语言、辅助（减特效）。
+ * 全部随存档保存。没有的内容不做假选项：游戏目前没有背景音乐，界面只有简体中文。
+ */
 function SettingsBody({ engine, s }: { engine: GameEngine; s: GameSnapshot }) {
   const st = s.settings;
   return (
-    <div className="settings-body">
-      <div className="quality">
-        <div className="quality-label">画质（自动调整中：{QUALITY_LABEL[s.quality]}）</div>
+    <div className="settings-body" data-testid="settings-body">
+      <div className="set-row">
+        <span className="set-label">画质</span>
         <div className="quality-row">
-          {(['low', 'medium', 'high', 'ultra'] as QualityLevel[]).map((q) => (
-            <button key={q} className={`btn tiny ${q === s.quality ? 'on' : ''}`} onClick={() => engine.setQuality(q)}>
-              {QUALITY_LABEL[q]}
+          {(['auto', 'low', 'medium', 'high', 'ultra'] as const).map((q) => (
+            <button key={q} className={`btn tiny ${st.quality === q ? 'on' : ''}`} onClick={() => engine.setQuality(q)} data-testid={`quality-${q}`}>
+              {q === 'auto' ? `自动（当前 ${QUALITY_LABEL[s.quality]}）` : QUALITY_LABEL[q]}
             </button>
           ))}
-          <button className="btn tiny ghost" onClick={() => engine.setQuality('auto')}>
-            自动
-          </button>
         </div>
       </div>
-      <div className="toggle-row">
+      <div className="set-row">
+        <span className="set-label">帧率显示</span>
+        <button className={`btn tiny ${st.showFps ? 'on' : ''}`} onClick={() => engine.setSettings({ showFps: !st.showFps })} data-testid="toggle-fps">
+          {st.showFps ? '显示' : '隐藏'}
+        </button>
+      </div>
+      <div className="set-row">
+        <span className="set-label">音效</span>
         <button className={`btn tiny ${st.sound ? 'on' : ''}`} onClick={() => engine.setSettings({ sound: !st.sound })} data-testid="toggle-sound">
           音效：{st.sound ? '开' : '关'}
         </button>
+      </div>
+      <div className="set-row">
+        <span className="set-label">战斗镜头</span>
+        <button className={`btn tiny ${st.camera === 'follow' ? 'on' : ''}`} onClick={() => engine.setSettings({ camera: 'follow' })} data-testid="camera-follow">
+          跟随
+        </button>
+        <button className={`btn tiny ${st.camera === 'overview' ? 'on' : ''}`} onClick={() => engine.setSettings({ camera: 'overview' })} data-testid="camera-overview">
+          全场
+        </button>
+        <small>战斗中仍可随时切换</small>
+      </div>
+      <div className="set-row">
+        <span className="set-label">语言</span>
+        <span className="set-value">简体中文</span>
+        <small>其他语言暂未提供</small>
+      </div>
+      <div className="set-row">
+        <span className="set-label">辅助</span>
         <button className={`btn tiny ${st.reduceEffects ? 'on' : ''}`} onClick={() => engine.setSettings({ reduceEffects: !st.reduceEffects })} data-testid="toggle-fx">
           减特效：{st.reduceEffects ? '开' : '关'}
         </button>
+        <small>关闭爆裂慢动作与镜头震动</small>
       </div>
     </div>
   );

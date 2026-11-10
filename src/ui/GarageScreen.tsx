@@ -1,6 +1,7 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { assembleBey, computeStats, partMass } from '../game/beys/parts/assemble';
 import { listParts } from '../game/beys/parts/catalog';
+import { ownsPart, partUnlockLevel } from '../game/modes/challenge';
 import type { PartKind, PartSpec } from '../game/beys/parts/types';
 import type { GameEngine, GameSnapshot } from '../game/core/GameEngine';
 
@@ -155,22 +156,26 @@ export function GarageScreen({ engine, s }: { engine: GameEngine; s: GameSnapsho
           {parts.map((p) => {
             const selected = draft[p.kind] === p.id;
             const thumb = s.garage.thumbs[`${p.kind}:${p.id}`];
+            const has = ownsPart(s.save, p.kind, p.id);
             return (
               <button
                 key={p.id}
-                className={`part-card ${selected ? 'selected' : ''}`}
+                className={`part-card ${selected ? 'selected' : ''} ${has ? '' : 'locked'}`}
+                disabled={!has}
                 onClick={() => engine.garageSelect(p.kind, p.id)}
                 data-testid={`part-${p.id}`}
               >
                 <div className="part-thumb">
                   {thumb ? <img src={thumb} alt={p.name} draggable={false} /> : <div className="thumb-loading" />}
                   {selected && <div className="part-check">✓</div>}
+                  {!has && <div className="part-lock">🔒</div>}
                 </div>
                 <div className="part-info">
                   <div className="part-name">{p.name}</div>
                   <div className="part-meta">
                     {p.code} · {(p.mass * 8.5).toFixed(1)} g
                     {p.kind === 'bit' ? ` · ${ROLE_LABEL[p.role]}` : ''}
+                    {has ? '' : ` · 挑战第 ${partUnlockLevel(p.kind, p.id)} 关解锁`}
                   </div>
                   <div className="mini-bars">
                     {partBars(p).map(([label, v]) => (

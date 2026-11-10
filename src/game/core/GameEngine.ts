@@ -22,7 +22,22 @@ import { loadRapier, PhysicsWorld, PHYSICS_DT, type Rapier } from '../physics/Ph
 import { ImpactFX } from '../render/ImpactFX';
 import { BattleFeedback } from './BattleFeedback';
 import { initialQuality, QualityController, type QualityLevel, type QualityPreset } from '../render/Quality';
-import { SaveStore, type SaveData } from '../storage/SaveStore';
+import { DEFAULT_SETTINGS, SaveStore, type SaveData, type SaveSettings } from '../storage/SaveStore';
+import {
+  ALL_ARENAS,
+  ALL_PART_KEYS,
+  applyClear,
+  CHALLENGES,
+  conditionText,
+  evaluateChallenge,
+  levelAvailable,
+  nextLevel,
+  ownedLoadout,
+  ownsLoadout,
+  ownsPart,
+  type ArenaId,
+  type Progress,
+} from '../modes/challenge';
 import { Store } from './Store';
 
 /**
@@ -31,9 +46,9 @@ import { Store } from './Store';
  */
 export type GamePhase = 'loading' | 'title' | 'garage' | 'aim' | 'battle' | 'roundEnd' | 'matchEnd' | 'paused' | 'error';
 
-/** 菜单页（v2.0 §10.2 最小 6 屏：主界面 / 陀螺库 / 组装 / 模式与对手 / 竞技场选择 / 战斗准备） */
-export type MenuScreen = 'home' | 'library' | 'mode' | 'arena' | 'prep';
-export type ArenaId = 'standard' | 'velocity' | 'sky';
+/** 菜单页（v2.0 §10.2：主界面 / 陀螺库 / 组装 / 模式与对手 / 竞技场选择 / 战斗准备；S6 增加挑战关卡选择） */
+export type MenuScreen = 'home' | 'library' | 'mode' | 'arena' | 'prep' | 'challenge';
+export type { ArenaId } from '../modes/challenge';
 export type ModeId = 'free' | 'challenge' | 'tournament' | 'survival';
 
 export interface MatchSetup {
@@ -42,12 +57,27 @@ export interface MatchSetup {
   difficulty: AiLevel;
   /** 对手：签名构筑，或每场随机 */
   rival: SignatureKey | 'random';
+  /** 挑战模式的关卡序号（自由对战为 null） */
+  level: number | null;
 }
 
-export interface Settings {
-  /** 减特效：关闭爆裂慢动作与镜头震动（v2.0 §10.3 无障碍） */
-  reduceEffects: boolean;
-  sound: boolean;
+/** 设置（v2.0 §10.2 设置面板），随存档保存 */
+export type Settings = SaveSettings;
+
+/** 挑战关卡的结算（比赛结束时给出） */
+export interface ChallengeResultView {
+  level: number;
+  condition: string;
+  won: boolean;
+  conditionMet: boolean;
+  cleared: boolean;
+  detail: string;
+  firstClear: boolean;
+  /** 首次通关的奖励说明 */
+  reward: string | null;
+  points: number;
+  /** 可以直接进入的下一关 */
+  next: number | null;
 }
 
 export interface BeyHud {
@@ -118,6 +148,8 @@ export interface GameSnapshot {
   lastRound: RoundView | null;
   settings: Settings;
   save: SaveData;
+  /** 最近一场挑战的结算（自由对战为 null） */
+  challengeResult: ChallengeResultView | null;
   fps: number;
   quality: QualityLevel;
   /** 慢动作中（UI 可做提示） */
@@ -218,6 +250,8 @@ export class GameEngine {
   private flying: FlyingBlade[] = [];
   /** 组装界面关闭后回到哪个菜单页 */
   private garageReturn: MenuScreen = 'home';
+  /** 进入挑战前的自由对战设置（回到模式选择时恢复） */
+  private freeSetup: MatchSetup = { mode: 'free', arena: 'standard', difficulty: 'pro', rival: 'pandun', level: null };
   /** 本回合玩家实际使用的发射力度（三档之一，测试读取） */
   private lastLaunchPower: number | null = null;
 
@@ -238,12 +272,13 @@ export class GameEngine {
       hits: 0,
       result: null,
       screen: 'home',
-      setup: { mode: 'free', arena: 'standard', difficulty: 'pro', rival: 'pandun' },
+      setup: { mode: 'free', arena: 'standard', difficulty: 'pro', rival: 'pandun', level: null },
       rivalLoadout: { ...loadouts.rival },
       match: null,
       lastRound: null,
-      settings: { reduceEffects: false, sound: true },
+      settings: { ...DEFAULT_SETTINGS },
       save: this.save.data,
+      challengeResult: null,
       fps: 0,
       quality: this.quality.level,
       garage: { draft: { ...loadouts.player }, exploded: false, thumbs: {} },
@@ -257,9 +292,14 @@ export class GameEngine {
       const [R, save] = await Promise.all([loadRapier(), withTimeout(this.save.load(), 1500, this.save.data)]);
       if (this.disposed) return;
       this.R = R;
-      this.store.set({ save });
-      // 读取上次的组装方案（校验每个部件，不认识的单独回退）
-      if (save.lastLoadout) this.applyPlayerLoadout(sanitizeLoadout(save.lastLoadout, PLAYER_LOADOUT));
+      this.store.set({ save, settings: { ...save.settings } });
+      this.audio.setMuted(!save.settings.sound);
+      if (save.settings.quality !== 'auto') this.quality.set(save.settings.quality, true);
+      // 读取上次的组装方案（校验每个部件，不认识的单独回退；没有拥有的零件逐个换回森衡的对应零件）
+      if (save.lastLoadout) {
+        const known = sanitizeLoadout(save.lastLoadout, PLAYER_LOADOUT);
+        this.applyPlayerLoadout(ownedLoadout(save, known, SIGNATURES.senheng.loadout));
+      }
       this.resetRound();
       this.setPhase('title');
       this.cam.setMode('overview', true);
@@ -287,20 +327,45 @@ export class GameEngine {
 
   navigate(screen: MenuScreen): void {
     if (this.phase !== 'title') return;
+    // 从挑战回到自由对战的流程（模式 / 竞技场选择）时，恢复进入挑战前的自由对战设置
+    if ((screen === 'mode' || screen === 'arena') && this.store.get().setup.mode === 'challenge') this.setSetup({ ...this.freeSetup });
     this.store.set({ screen });
   }
 
-  /** 修改比赛设置；对手换成某个签名构筑时立即换上它的模型 */
+  /** 修改比赛设置；对手换成某个签名构筑时立即换上它的模型。切回自由对战时清除关卡 */
   setSetup(patch: Partial<MatchSetup>): void {
     const setup = { ...this.store.get().setup, ...patch };
+    if (patch.mode && patch.mode !== 'challenge') setup.level = null;
     this.store.set({ setup });
     if (patch.rival && patch.rival !== 'random') this.applyRivalLoadout(SIGNATURES[patch.rival].loadout);
   }
 
-  /** 陀螺库：装备一个签名构筑（零件可再到组装界面自由替换） */
+  /**
+   * 挑战模式：选择第 n 关 → 战斗准备。对手、AI 难度、竞技场由关卡固定（v2.0 §8.2）；只有已开放的关卡可以进入。
+   */
+  startChallenge(n: number): void {
+    if (this.phase !== 'title') return;
+    const L = CHALLENGES[n - 1];
+    if (!L || !levelAvailable(this.save.data, n)) return;
+    const cur = this.store.get().setup;
+    if (cur.mode !== 'challenge') this.freeSetup = { ...cur };
+    this.store.set({ setup: { mode: 'challenge', level: n, rival: L.rival, difficulty: L.ai, arena: L.arena }, screen: 'prep', challengeResult: null });
+    this.applyRivalLoadout(SIGNATURES[L.rival].loadout);
+  }
+
+  /** 挑战结算页：进入下一关的战斗准备 */
+  nextChallenge(): void {
+    const next = this.store.get().challengeResult?.next;
+    if (this.phase !== 'matchEnd' || !next) return;
+    this.toTitle('challenge');
+    this.startChallenge(next);
+  }
+
+  /** 陀螺库：装备一个签名构筑（零件可再到组装界面自由替换）；需要拥有它的三个零件 */
   equipSignature(key: SignatureKey): void {
     if (this.phase !== 'title') return;
     const loadout = SIGNATURES[key].loadout;
+    if (!ownsLoadout(this.save.data, loadout)) return;
     this.applyPlayerLoadout(loadout);
     this.resetRound();
     void this.save.update({ lastLoadout: loadout }).then((save) => this.store.set({ save }));
@@ -310,6 +375,7 @@ export class GameEngine {
     const settings = { ...this.store.get().settings, ...patch };
     this.store.set({ settings });
     this.audio.setMuted(!settings.sound);
+    void this.save.update({ settings }).then((save) => this.store.set({ save }));
   }
 
   /** 战斗准备 → 开始一场比赛（先到 4 分），进入第 1 回合的发射准备 */
@@ -324,7 +390,7 @@ export class GameEngine {
     this.match = new Match();
     this.roundViews = [];
     this.publishMatch();
-    this.store.set({ lastRound: null });
+    this.store.set({ lastRound: null, challengeResult: null });
     this.resetRound();
     this.setPhase('aim');
     this.cam.setMode('aim');
@@ -368,6 +434,7 @@ export class GameEngine {
     this.lastLaunchPower = tier.power;
     this.battle.launch('player', playerCmd);
     this.battle.launch('rival', aiLaunchCommand(Math.random, this.store.get().setup.difficulty));
+    const camPref = this.store.get().settings.camera;
     for (const side of SIDES) {
       const v = this.visuals[side]!;
       this.scene.attach(v.root);
@@ -376,7 +443,7 @@ export class GameEngine {
     this.aimArrow.visible = false;
     this.pw!.resetAccumulator();
     this.setPhase('battle');
-    this.cam.setMode('battle');
+    this.cam.setMode(camPref === 'overview' ? 'overview' : 'battle');
     this.cam.impact(0.35, 0.2);
     this.audio.launch(playerCmd.power);
     navigator.vibrate?.(20);
@@ -436,11 +503,9 @@ export class GameEngine {
   }
 
   setQuality(level: QualityLevel | 'auto'): void {
-    if (level === 'auto') {
-      this.quality.locked = false;
-      return;
-    }
-    this.quality.set(level, true);
+    if (level === 'auto') this.quality.locked = false;
+    else this.quality.set(level, true);
+    this.setSettings({ quality: level });
   }
 
   // ── 组装界面 ──
@@ -478,6 +543,7 @@ export class GameEngine {
   /** 只替换一个部件，另外两个部件保持不变 */
   garageSelect(kind: PartKind, id: string): void {
     if (this.phase !== 'garage' || !this.garage) return;
+    if (!ownsPart(this.save.data, kind, id)) return;
     const g = this.store.get().garage;
     if (g.draft[kind] === id) return;
     const draft = swapPart(g.draft, kind, id);
@@ -739,14 +805,50 @@ export class GameEngine {
     this.resultRecorded = true;
     const won = m.winner === 'player';
     const d = this.save.data;
-    void this.save
-      .update({
-        wins: d.wins + (won ? 1 : 0),
-        losses: d.losses + (won ? 0 : 1),
-        points: d.points + (won ? m.score.player : 0),
-        lastLoadout: this.specs.player.loadout,
-      })
-      .then((save) => this.store.set({ save }));
+    const patch: Partial<SaveData> = {
+      wins: d.wins + (won ? 1 : 0),
+      losses: d.losses + (won ? 0 : 1),
+      points: d.points + (won ? m.score.player : 0),
+      lastLoadout: this.specs.player.loadout,
+    };
+    // 挑战模式：按决胜回合判定通关条件；首次通关发放奖励（零件 / 竞技场 / 称号）与积分
+    const setup = this.store.get().setup;
+    const L = setup.mode === 'challenge' && setup.level ? CHALLENGES[setup.level - 1] : null;
+    if (L) {
+      const verdict = evaluateChallenge(L, { winner: m.winner, rounds: this.roundViews.map((r) => ({ outcome: r.outcome })) });
+      const before: Progress = { parts: d.parts, arenas: d.arenas, cleared: d.cleared, titles: d.titles, points: patch.points! };
+      const clear = verdict.cleared ? applyClear(before, L) : { progress: before, firstClear: false, reward: null, points: 0 };
+      Object.assign(patch, clear.progress);
+      this.store.set({
+        challengeResult: {
+          level: L.n,
+          condition: conditionText(L.condition),
+          won: verdict.won,
+          conditionMet: verdict.conditionMet,
+          cleared: verdict.cleared,
+          detail: verdict.detail,
+          firstClear: clear.firstClear,
+          reward: clear.reward,
+          points: clear.points,
+          next: verdict.cleared ? nextLevel(clear.progress, L.n) : null,
+        },
+      });
+    }
+    void this.save.update(patch).then((save) => this.store.set({ save }));
+  }
+
+  /** 调试 / 自动化测试用：按真实通关路径记录第 n 关通关（发放同样的奖励），不经过比赛 */
+  debugClearChallenge(n: number): void {
+    const L = CHALLENGES[n - 1];
+    if (!L) return;
+    const d = this.save.data;
+    const clear = applyClear({ parts: d.parts, arenas: d.arenas, cleared: d.cleared, titles: d.titles, points: d.points }, L);
+    void this.save.update(clear.progress).then((save) => this.store.set({ save }));
+  }
+
+  /** 调试 / 自动化测试用：解锁全部零件与竞技场（不改挑战进度） */
+  debugUnlockAll(): void {
+    void this.save.update({ parts: [...ALL_PART_KEYS], arenas: [...ALL_ARENAS] }).then((save) => this.store.set({ save }));
   }
 
   /** 爆裂表现：Blade 从陀螺上脱离，沿撞击方向带着自转飞出、落地（物理上 Blade 碰撞体已在 BattleSystem 移除） */
