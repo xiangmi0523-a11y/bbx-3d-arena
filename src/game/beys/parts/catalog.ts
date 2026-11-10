@@ -22,7 +22,7 @@ export const BLADES: Record<string, BladeSpec> = {
     restitution: 0.55,
     attack: 0.9,
     defense: 0.25,
-    visual: { style: 'fang', lobes: 3, primary: 0xe8302a, secondary: 0x1a1d24, metal: 0xd4d9e2, accent: 0xffb323 },
+    visual: { style: 'fang', tint: 'attack', lobes: 3, primary: 0xe8302a, secondary: 0x1a1d24, metal: 0xd4d9e2, accent: 0xffb323 },
   },
   'tidal-bastion': {
     kind: 'blade',
@@ -40,14 +40,14 @@ export const BLADES: Record<string, BladeSpec> = {
     restitution: 0.4,
     attack: 0.35,
     defense: 0.7,
-    visual: { style: 'bastion', lobes: 6, primary: 0x1f7cf0, secondary: 0xeef3fb, metal: 0xb7c2cf, accent: 0x39f0d8 },
+    visual: { style: 'bastion', tint: 'defense', lobes: 6, primary: 0x1f7cf0, secondary: 0xeef3fb, metal: 0xb7c2cf, accent: 0x39f0d8 },
   },
   'gale-crescent': {
     kind: 'blade',
     id: 'gale-crescent',
     name: '疾风新月',
     code: 'GALE CRESCENT',
-    desc: '银色双层前掠爪刃配蓝色透明骨架，攻守平衡。',
+    desc: '银色双层前掠爪刃配绿色透明骨架，攻守平衡。',
     role: 'balance',
     spin: 'right',
     mass: 3.1,
@@ -58,14 +58,14 @@ export const BLADES: Record<string, BladeSpec> = {
     restitution: 0.5,
     attack: 0.65,
     defense: 0.45,
-    visual: { style: 'gale', lobes: 10, primary: 0x1f5cff, secondary: 0x0c111d, metal: 0xdfe4ec, accent: 0x7fb4ff },
+    visual: { style: 'gale', tint: 'balance', lobes: 10, primary: 0x2fae5f, secondary: 0x0c111d, metal: 0xdfe4ec, accent: 0x9ff0b8 },
   },
   'titan-crown': {
     kind: 'blade',
     id: 'titan-crown',
     name: '泰坦王冠',
     code: 'TITAN CROWN',
-    desc: '四瓣厚重王冠，外缘金属配重，转得最久。',
+    desc: '四瓣流线王冠，外缘厚重金属配重环，转得最久。',
     role: 'stamina',
     spin: 'right',
     mass: 3.7,
@@ -76,7 +76,7 @@ export const BLADES: Record<string, BladeSpec> = {
     restitution: 0.35,
     attack: 0.3,
     defense: 0.6,
-    visual: { style: 'crown', lobes: 4, primary: 0x1c1a22, secondary: 0xe6b84a, metal: 0xe9c66b, accent: 0xff5ad1 },
+    visual: { style: 'crown', tint: 'stamina', lobes: 4, primary: 0x8b5cf6, secondary: 0x1c1a22, metal: 0xdfe4ec, accent: 0xd6c2ff },
   },
 };
 
@@ -93,7 +93,7 @@ export const RATCHETS: Record<string, RatchetSpec> = {
     height: 0.13,
     lock: 0.5,
     teeth: 3,
-    visual: { sharpness: 0.6, color: 0x2a2e36, accent: 0xe8302a },
+    visual: { style: 'ratchet', tint: 'stamina', sharpness: 0.6, color: 0x3b1a7c, accent: 0x8b5cf6 },
   },
   'hex-lock': {
     kind: 'ratchet',
@@ -107,7 +107,7 @@ export const RATCHETS: Record<string, RatchetSpec> = {
     height: 0.12,
     lock: 0.75,
     teeth: 6,
-    visual: { style: 'ratchet', sharpness: 0.35, color: 0x0b1c4a, accent: 0x1f5cff },
+    visual: { style: 'ratchet', tint: 'balance', sharpness: 0.35, color: 0x0f5c2c, accent: 0x2fae5f },
   },
   'quad-edge': {
     kind: 'ratchet',
@@ -121,7 +121,7 @@ export const RATCHETS: Record<string, RatchetSpec> = {
     height: 0.16,
     lock: 0.55,
     teeth: 4,
-    visual: { sharpness: 0.9, color: 0x30343d, accent: 0xffb323 },
+    visual: { style: 'ratchet', tint: 'attack', sharpness: 0.9, color: 0x7a1410, accent: 0xe8302a },
   },
   'ring-guard': {
     kind: 'ratchet',
@@ -135,7 +135,7 @@ export const RATCHETS: Record<string, RatchetSpec> = {
     height: 0.11,
     lock: 0.85,
     teeth: 0,
-    visual: { sharpness: 0, color: 0x3a3f4a, accent: 0x39f0d8 },
+    visual: { style: 'ratchet', tint: 'defense', sharpness: 0, color: 0x12307e, accent: 0x1f7cf0 },
   },
 };
 
@@ -156,7 +156,7 @@ export const BITS: Record<string, BitSpec> = {
     drift: 0.16,
     gear: true,
     burstGuard: 0.85,
-    visual: { shape: 'gear-flat', color: 0xe8302a, accent: 0xffb323 },
+    visual: { shape: 'gear-flat', tint: 'balance', color: 0x2fae5f, accent: 0xdfe4ec },
   },
   'dome-ball': {
     kind: 'bit',
@@ -174,7 +174,7 @@ export const BITS: Record<string, BitSpec> = {
     drift: 0.05,
     gear: false,
     burstGuard: 0.5,
-    visual: { shape: 'ball', color: 0x1f7cf0, accent: 0x39f0d8 },
+    visual: { shape: 'ball', tint: 'stamina', color: 0x8b5cf6, accent: 0xd6c2ff },
   },
   'needle-point': {
     kind: 'bit',
@@ -192,7 +192,7 @@ export const BITS: Record<string, BitSpec> = {
     drift: 0.03,
     gear: false,
     burstGuard: 0.35,
-    visual: { shape: 'point', color: 0xc9ced8, accent: 0xff5ad1 },
+    visual: { shape: 'point', tint: 'defense', color: 0x1f7cf0, accent: 0xe6eaf0 },
   },
   'rush-rubber': {
     kind: 'bit',
@@ -210,7 +210,7 @@ export const BITS: Record<string, BitSpec> = {
     drift: 0.2,
     gear: false,
     burstGuard: 0.9,
-    visual: { shape: 'rubber', color: 0x2fd27a, accent: 0x14161b },
+    visual: { shape: 'rubber', tint: 'attack', color: 0xe8302a, accent: 0x14161b },
   },
 };
 

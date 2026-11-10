@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { P, chamfer, lathe, merge, mesh, slab } from './geom';
-import { bluePlastic, navyPlastic, satinMetal } from './materials';
+import { satinMetal, typePlastic, typeSolid } from './materials';
 import type { RatchetSpec } from '../parts/types';
 
 /**
@@ -31,6 +31,22 @@ const EMBED = 0.002;
 
 /** Bit 外壳上卡扣所在的角度（BeyVisualFactory 的 ring(g, 3, …) 从 0 开始均分） */
 const CLIP_ANGLES = [0, TAU / 3, (2 * TAU) / 3];
+
+/** 连续圆环外轮廓（teeth = 0 的圆环护轮：没有凸起，只有一圈防滑竖筋），M6 */
+function ringOutline(R: number, ribs: boolean, scale: number): THREE.Vector2[] {
+  const n = 36;
+  const base = 0.97 * R;
+  const rib = 0.014 * R;
+  const pts: [number, number][] = [];
+  for (let k = 0; k < n; k++) {
+    const a0 = (k / n) * TAU;
+    const at = (u: number) => a0 + (u * TAU) / n;
+    pts.push([at(0), base]);
+    if (ribs) pts.push([at(0.35), base], [at(0.42), base + rib], [at(0.58), base + rib], [at(0.65), base]);
+    else pts.push([at(0.5), base]);
+  }
+  return pts.map(([a, r]) => P(r * scale, a));
+}
 
 /** 外轮廓关键点（角度、半径），一个凸起 + 一段竖筋间隙为一个扇区 */
 function outline(R: number, n: number, ribs: boolean, scale: number): THREE.Vector2[] {
@@ -152,18 +168,21 @@ export function buildRatchetDisc(spec: RatchetSpec): THREE.Group {
   g.name = `ratchet:${spec.id}`;
   const R = spec.radius;
   const H = spec.height;
-  const n = Math.max(3, spec.teeth);
+  const ring = spec.teeth === 0;
+  const n = ring ? 6 : Math.max(3, spec.teeth);
   // 现有 Blade 全部右旋；锁齿方向按右旋排列
   const dir = 1;
 
-  const mNavy = navyPlastic();
-  const mBlue = bluePlastic();
+  // M6：裙边与罩层用类型色（任务书概念板）；防守型仍是原来的深蓝 + 透明蓝（同一材质实例）
+  const tint = spec.visual.tint ?? 'defense';
+  const mNavy = typeSolid(tint);
+  const mBlue = typePlastic(tint);
   const mSatin = satinMetal();
 
   const navy: THREE.BufferGeometry[] = [];
 
   // 1) 下部裙边：外轮廓（带竖筋）− Bit 插口 − 凸起空腔
-  const skirt = shapeOf(outline(R, n, true, 1));
+  const skirt = shapeOf(ring ? ringOutline(R, true, 1) : outline(R, n, true, 1));
   skirt.holes.push(socketPath(R), ...pocketPaths(R, n));
   navy.push(slab(skirt, H * 0.5, R * 0.012, 1, 12));
 
@@ -197,11 +216,14 @@ export function buildRatchetDisc(spec: RatchetSpec): THREE.Group {
   const seat = H + 0.004;
   navy.push(lathe(chamfer([[0.37 * R, H - EMBED], [0.66 * R, H - EMBED], [0.66 * R, seat], [0.37 * R, seat]], R * 0.004, [2, 3]), 48));
   const pitch = TAU / n;
-  for (let k = 0; k < n; k++) navy.push(toothGeometry(0.42 * R, 0.63 * R, k * pitch + pitch * 0.2, pitch * 0.55, seat, H + TOOTH_TOP, dir));
+  if (ring) {
+    // 圆环护轮：锁齿换成一圈连续的锁环（lock 最高的视觉表达），高度同样留出 Blade 中心凹槽的余隙
+    navy.push(lathe(chamfer([[0.42 * R, seat - 0.001], [0.63 * R, seat - 0.001], [0.63 * R, H + TOOTH_TOP * 0.85], [0.42 * R, H + TOOTH_TOP * 0.85]], R * 0.006, [2, 3]), 64));
+  } else for (let k = 0; k < n; k++) navy.push(toothGeometry(0.42 * R, 0.63 * R, k * pitch + pitch * 0.2, pitch * 0.55, seat, H + TOOTH_TOP, dir));
   g.add(mesh(merge(navy), mNavy));
 
   // 4) 上部透明蓝罩层：比裙边内缩 1.5%，形成合模线台阶；中间留轴孔
-  const cap = shapeOf(outline(R, n, false, 0.985));
+  const cap = shapeOf(ring ? ringOutline(R, false, 0.985) : outline(R, n, false, 0.985));
   cap.holes.push(circlePath(0.37 * R, 32));
   // 顶面比层顶低 0.0005：旧款 Blade 的平底正好落在层顶，避免与透明罩顶面共面闪烁
   const capGeo = slab(cap, H * 0.5 - 0.0015, R * 0.01, 1, 12);

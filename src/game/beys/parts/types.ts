@@ -32,6 +32,8 @@ export type BladeStyle = 'fang' | 'bastion' | 'crescent' | 'crown' | 'gale';
 
 export interface BladeVisual {
   style: BladeStyle;
+  /** 类型色（骨架 / 底盘 / 徽标配色，M6 按任务书概念板：攻击红 / 防守蓝 / 平衡绿 / 耐力紫）；省略按 role */
+  tint?: BeyRole;
   /** 刃的数量（旋转对称数） */
   lobes: number;
   primary: number;
@@ -66,6 +68,8 @@ export interface BladeSpec extends PartBase {
 export interface RatchetVisual {
   /** 外观样式：'ratchet' = P2.3 阶段 2 的锁齿式写实模型；省略 = 旧的简化模型 */
   style?: 'ratchet';
+  /** 类型色（裙边 / 罩层），M6 */
+  tint?: BeyRole;
   /** 凸起的尖锐程度 0..1 */
   sharpness: number;
   color: number;
@@ -92,6 +96,8 @@ export type BitShape = 'gear-flat' | 'ball' | 'point' | 'rubber';
 
 export interface BitVisual {
   shape: BitShape;
+  /** 类型色（外壳），M6 */
+  tint?: BeyRole;
   color: number;
   accent: number;
 }

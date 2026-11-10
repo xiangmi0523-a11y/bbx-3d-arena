@@ -29,14 +29,8 @@ import snapshot from './fixtures/physics-snapshot.json';
 const TARGET = { radial: 1.03, bladeTop: 1.25, discLockRise: 0.02, centroid: 0.01, floor: 0.002 };
 
 /** 现有模型的当前上限（测量值向上取整，单位与 TARGET 相同） */
-const LEGACY: Record<string, { radial?: number; bladeTop?: number }> = {
-  'blade:blaze-fang': { bladeTop: 1.395 },
-  'blade:tidal-bastion': { radial: 1.045, bladeTop: 1.38 },
-  'blade:titan-crown': { radial: 1.045, bladeTop: 1.355 },
-  'ratchet:tri-lock': { radial: 1.045 },
-  'ratchet:quad-edge': { radial: 1.04 },
-  'ratchet:ring-guard': { radial: 1.04 },
-};
+// M6：四把 Blade 与四个 Ratchet 全部按任务书概念板重制，全部按目标值检查（LEGACY 清空）
+const LEGACY: Record<string, { radial?: number; bladeTop?: number }> = {};
 
 const parts: PartSpec[] = [...listParts('blade'), ...listParts('ratchet'), ...listParts('bit')];
 const bounds = new Map<string, VisualBounds>();

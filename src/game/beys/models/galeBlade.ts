@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { P, chamfer, creased, lathe, merge, mesh, slab } from './geom';
-import { bluePlastic, clearDome, darkPlastic, galeEmblem, polishedMetal, satinMetal } from './materials';
+import { clearDome, darkPlastic, polishedMetal, satinMetal, typeEmblem, typePlastic } from './materials';
 import type { BladeSpec } from '../parts/types';
 
 /**
@@ -31,7 +31,7 @@ const TAU = Math.PI * 2;
 
 // ───────────────────────── 爪刃几何 ─────────────────────────
 
-interface ClawSpec {
+export interface ClawSpec {
   /** 刃根所在角度（后端内尖在它后方） */
   a0: number;
   /** 刃身沿圆周扫过的角度（正 = 旋转前进方向） */
@@ -53,7 +53,7 @@ interface ClawSpec {
  * 截面（从内到外）：内侧壁 → 内倒角 → 内侧大切面（中间一道浅折线，分成两个切面）→ 脊线倒角 → 外侧陡切面 → 外倒角 → 外侧壁 → 底面。
  * 两端截面收成一点，形成尖端。t ∈ [-0.12, 0] 为后端内尖，t ∈ [0, 1] 为刃身（1 = 前端刃尖）。
  */
-function clawGeometry(R: number, H: number, c: ClawSpec, dir: number, pos: number[], uv: number[]): void {
+export function clawGeometry(R: number, H: number, c: ClawSpec, dir: number, pos: number[], uv: number[]): void {
   const ts: number[] = [];
   for (let i = 0; i <= 4; i++) ts.push(-0.12 + (0.12 * i) / 4);
   // 刃身前段（收尖处）采样更密，曲面过渡更顺
@@ -165,7 +165,7 @@ function clawGeometry(R: number, H: number, c: ClawSpec, dir: number, pos: numbe
 }
 
 /** 刃根安装座：每枚爪的后端下方一块倒角的银色连接块，把爪刃“固定”在骨架外圈上 */
-function mountGeometry(R: number, H: number, a: number, pos: number[], uv: number[]): void {
+export function mountGeometry(R: number, H: number, a: number, pos: number[], uv: number[]): void {
   const r0 = R * 0.6;
   const r1 = R * 0.74;
   const half = 0.07;
@@ -200,7 +200,8 @@ export function buildGaleBlade(spec: BladeSpec): THREE.Group {
 
   const mMetal = polishedMetal();
   const mSatin = satinMetal();
-  const mBlue = bluePlastic();
+  // M6：骨架与底盘用类型色（任务书概念板：平衡型 = 绿），造型与已验收版本相同
+  const mBlue = typePlastic(spec.visual.tint ?? 'balance');
   const mDark = darkPlastic();
 
   // 1) 蓝色透明底盘：底面三级同心台阶，外缘略向上收；内部 10 条加强筋透过底盘可见
@@ -332,7 +333,7 @@ export function buildGaleBlade(spec: BladeSpec): THREE.Group {
   g.add(mesh(merge(darkParts), mDark));
 
   // 7) 原创徽标（带清漆的印刷贴片）+ 透明护罩
-  const emblemMat = galeEmblem();
+  const emblemMat = typeEmblem(spec.visual.tint ?? 'balance');
   const emblem = new THREE.Mesh(new THREE.CircleGeometry(R * 0.355, 64), emblemMat);
   emblem.rotation.x = -Math.PI / 2;
   // 徽标随旋转方向镜像，前掠方向与刀刃一致
