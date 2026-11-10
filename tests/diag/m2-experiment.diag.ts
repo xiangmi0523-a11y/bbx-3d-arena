@@ -99,6 +99,8 @@ function withOldPhysics<T>(fn: () => T): T {
 test('A：golden 变化归因（A1 旧物理 + 120 s 应逐位一致；A2 旧物理 + 60 s 只影响原时长 > 60 s；A3 最终参数，可导出新 golden）', async () => {
   if (!parts.has('A')) return;
   await rapier();
+  // 指纹按 R 缓存：先在默认参数下算一次，避免第一次调用发生在旧物理臂里（会把旧参数的指纹写进新 golden）
+  const fp = configFingerprint(R);
   const all = scenariosV2();
   const gold = new Map(G.runs.map((g) => [g.name, g]));
   const classify = (label: string, rep: ReturnType<typeof compareTraces>, expected: (g: TraceSummary) => boolean) => {
@@ -125,7 +127,7 @@ test('A：golden 变化归因（A1 旧物理 + 120 s 应逐位一致；A2 旧物
   out('M2-A A3(final) vs A2', { identical: vsA2.identical, diffs: vsA2.diffs.length, finishes: finish, bursts: a3.filter((r) => r.result?.finish === 'burst').map((r) => r.name) });
   if (process.env.M2_GOLDEN_DUMP) {
     const byName = [...a3].sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0));
-    const json = JSON.stringify({ generatedFrom: process.env.GITHUB_SHA ?? 'local', config: configFingerprint(R), runs: byName }, null, 1) + '\n';
+    const json = JSON.stringify({ generatedFrom: process.env.GITHUB_SHA ?? 'local', config: fp, runs: byName.map((r) => ({ ...r, config: fp })) }, null, 1) + '\n';
     const b64 = gzipSync(Buffer.from(json)).toString('base64');
     const W = 3000;
     out('GOLDEN-META', { bytes: json.length, b64: b64.length, chunks: Math.ceil(b64.length / W) });

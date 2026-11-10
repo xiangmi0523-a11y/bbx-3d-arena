@@ -25,6 +25,28 @@ export interface LaunchParams {
   ai?: AiLevel;
 }
 
+/**
+ * 自转账本（v2.0 S1 任务 1.3 / E7）：一台陀螺本回合按来源分解的转速变化（rad/s，累计量）。
+ * 只做记账：与物理计算并行累加，不参与任何物理量的计算（golden 逐位不变）。
+ *  - base / scrape / rail / drive / steer / burst / air：preStep 里游戏层衰减的各个分项（已按惯量比换算，按实际扣除量分摊）；
+ *  - smash：刀刃咬合结算的掉速（BattleSystem.resolveSmash → loseSpin）；
+ *  - contactLoss / contactGain：两次 preStep 之间 Rapier 积分对转速的改变（接触摩擦、陀螺耦合等），扣除 smash 后按正负分开。
+ */
+export interface SpinLedger {
+  base: number;
+  scrape: number;
+  rail: number;
+  drive: number;
+  steer: number;
+  burst: number;
+  air: number;
+  smash: number;
+  contactLoss: number;
+  contactGain: number;
+}
+
+export const emptyLedger = (): SpinLedger => ({ base: 0, scrape: 0, rail: 0, drive: 0, steer: 0, burst: 0, air: 0, smash: 0, contactLoss: 0, contactGain: 0 });
+
 /** 爆裂后剩余部分的额外转速衰减（rad/s²，按参考惯量；只影响回合结束后的表现） */
 const BURST_SPINDOWN = 60;
 
@@ -192,6 +214,11 @@ export class BeyPhysics {
   knockResyncs = 0;
   /** 本步进动相位是否在跟随被撞歪的实际倾斜 */
   knocked = false;
+  /** 自转账本（只记账，见 SpinLedger） */
+  readonly ledger: SpinLedger = emptyLedger();
+  /** 上一次 preStep 写回的转速、之后 loseSpin 扣掉的量（账本用） */
+  private ledgerWritten = -1;
+  private ledgerSmash = 0;
 
   constructor(pw: PhysicsWorld, spec: AssembledBey, launch: LaunchParams) {
     this.pw = pw;
@@ -264,6 +291,7 @@ export class BeyPhysics {
 
     this.launchHeading = Math.atan2(launch.velocity.z, launch.velocity.x);
     this.spin = launch.spin;
+    this.ledgerWritten = launch.spin;
     this.launchSpin = Math.max(1, launch.spin);
     this.body.setLinvel(launch.velocity, true);
     const up = this.up();
@@ -398,10 +426,24 @@ export class BeyPhysics {
 
     // 1) 转速衰减：轴心恒定摩擦 + 空气阻力 + 倾倒刮地
     let mag = Math.abs(spinSigned);
+    // 账本：上一步写回之后的变化 = Rapier 积分 + 咬合掉速（只记账）
+    if (this.ledgerWritten >= 0) {
+      const d = mag - this.ledgerWritten + this.ledgerSmash;
+      if (d < 0) this.ledger.contactLoss -= d;
+      else this.ledger.contactGain += d;
+    }
+    this.ledgerSmash = 0;
+    let lScrape = 0;
+    let lRail = 0;
+    let lDrive = 0;
+    let lSteer = 0;
     // 轴心摩擦、牵引、刮地都是“力矩”，转速下降 = 力矩 / 转动惯量：
     // 同样的轴心，惯量大（重量集中在外缘）的陀螺掉速更慢 → 耐力型的优势来自零件本身
     let decay = this.spec.bit.spinDecay;
-    if (this.tilt > 0.5) decay += T.scrapeDecay * Math.min(1, (this.tilt - 0.5) * 2);
+    if (this.tilt > 0.5) {
+      lScrape = T.scrapeDecay * Math.min(1, (this.tilt - 0.5) * 2);
+      decay += T.scrapeDecay * Math.min(1, (this.tilt - 0.5) * 2);
+    }
     // 爆裂后只剩 Ratchet + Bit：失去刀刃的惯量与驱动，很快停转倾倒（回合已由规则结束，只是表现）
     if (this.bursted) decay += BURST_SPINDOWN;
 
@@ -430,6 +472,7 @@ export class BeyPhysics {
         const m = body.mass();
         body.applyImpulse({ x: dx * accel * m * dt, y: 0, z: dz * accel * m * dt }, true);
         decay += T.railSpinCost * dashK;
+        lRail = T.railSpinCost * dashK;
         this.dashing = true;
       }
     }
@@ -516,9 +559,11 @@ export class BeyPhysics {
         const a = T.driveAccel * driveGrip * r2 * body.mass() * dt;
         body.applyImpulse({ x: dx * a, y: 0, z: dz * a }, true);
         decay += T.driveSpinCost * driveGrip;
+        lDrive = T.driveSpinCost * driveGrip;
       }
       // 改变轴的倾斜方向需要力矩：按调制深度额外消耗转速
       decay += T.steerSpinCost * steering * driveGrip;
+      lSteer = T.steerSpinCost * steering * driveGrip;
     }
 
     // 轴心滚动 / 滑动阻力：在碗面上持续损失水平速度，绕圈的陀螺会慢慢滑回中央与对手相遇
@@ -532,8 +577,22 @@ export class BeyPhysics {
       }
     }
 
+    const mag0 = mag;
     decay = decay * this.inertiaRatio + T.airDrag * mag;
     mag = Math.max(0, mag - decay * dt);
+    // 账本：本步实际扣除量按各分项比例分摊（转速见底时扣除量 < decay·dt）
+    if (decay > 0) {
+      const L = this.ledger;
+      const f = ((mag0 - mag) / (decay * dt)) * dt;
+      const k = this.inertiaRatio * f;
+      L.base += this.spec.bit.spinDecay * k;
+      L.scrape += lScrape * k;
+      L.rail += lRail * k;
+      L.drive += lDrive * k;
+      L.steer += lSteer * k;
+      if (this.bursted) L.burst += BURST_SPINDOWN * k;
+      L.air += T.airDrag * mag0 * f;
+    }
 
     // 3) 陀螺仪自稳：转得越快越能保持直立；角动量 L = Iω 越大越难被撞歪（防御 / 耐力型更稳）
     const s =
@@ -585,6 +644,7 @@ export class BeyPhysics {
       true,
     );
     this.spin = mag;
+    this.ledgerWritten = mag;
   }
 
   /** 已爆裂（Blade 已脱离） */
@@ -624,6 +684,8 @@ export class BeyPhysics {
     const spinSigned = w.x * up.x + w.y * up.y + w.z * up.z;
     const sign = Math.sign(spinSigned) || this.spinSign;
     const delta = Math.min(Math.abs(spinSigned), amount) * sign;
+    this.ledger.smash += Math.abs(delta);
+    this.ledgerSmash += Math.abs(delta);
     this.body.setAngvel({ x: w.x - up.x * delta, y: w.y - up.y * delta, z: w.z - up.z * delta }, true);
   }
 
