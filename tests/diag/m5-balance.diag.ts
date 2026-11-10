@@ -9,6 +9,8 @@
  * 用法：npx vitest run --config vitest.diag.config.ts tests/diag/m5-balance.diag.ts（M5_SEEDS 每个对阵的种子数，默认 20）
  */
 import { test } from 'vitest';
+import { ARENA_PHYSICS } from '../../src/game/arena/ArenaPhysics';
+import { ARENA } from '../../src/game/arena/arenaSpec';
 import type { SpinLedger } from '../../src/game/beys/BeyPhysics';
 import { SIGNATURE_LIST } from '../../src/game/beys/parts/catalog';
 import { rivalCommand } from '../../src/game/launcher/launch';
@@ -94,4 +96,107 @@ test('E：签名矩阵上的掉速账本', async () => {
     perSignature: perSig,
     defaultSenhengVsPandun: { senheng: summarize(dflt.map((x) => x.p)), pandun: summarize(dflt.map((x) => x.r)), finishes: dflt.map((x) => `${x.p.won ? 'P' : x.r.won ? 'R' : '='}:${x.finish}:${r2(x.dur)}`) },
   });
+}, 1_800_000);
+
+// ───────────────────────────── F. 竞技场 A/B：口袋宽度（R6）与墙恢复系数（R7） ─────────────────────────────
+/**
+ * v2.0 §6.7 预注册规则：
+ *  R6 口袋加宽（出界 1.85 → 2.50、极限 2.6 → 3.85）：出界 + 极限终结合计进入 §5.4 目标区间（13–28%），
+ *     且误入率（自灭：出界 / 极限前 1.5 s 内无接触）不高于基线 5 个百分点 → 采用；否则回退。
+ *  R7 墙恢复 0.5 → 0.2：贴墙率（r > 5.1 的时间占比）不劣于基线，且分构筑胜率无单构筑恶化 > 5 个百分点 → 采用。
+ * （墙反弹速度一项需要逐次撞墙测量，本轮先报告贴墙率与撞墙接触段数。）
+ */
+function withArena<T>(o: { pockets?: [number, number]; wall?: number }, fn: () => T): T {
+  const oldW = ARENA.pockets.map((p) => p.width);
+  const oldR = ARENA_PHYSICS.wallRestitution;
+  if (o.pockets) for (const p of ARENA.pockets) p.width = p.kind === 'xtreme' ? o.pockets[1] : o.pockets[0];
+  if (o.wall !== undefined) ARENA_PHYSICS.wallRestitution = o.wall;
+  try {
+    return fn();
+  } finally {
+    ARENA.pockets.forEach((p, i) => (p.width = oldW[i]));
+    ARENA_PHYSICS.wallRestitution = oldR;
+  }
+}
+
+test('F：竞技场 A/B（R6 口袋宽度 × R7 墙恢复系数），签名矩阵', async () => {
+  const R: RT = await loadRapier();
+  const POW = [0.65, 0.8, 0.95];
+  const arms: { arm: string; o: { pockets?: [number, number]; wall?: number } }[] = [
+    { arm: 'base', o: {} },
+    { arm: 'R6', o: { pockets: [2.5, 3.85] } },
+    { arm: 'R7', o: { wall: 0.2 } },
+    { arm: 'R6+R7', o: { pockets: [2.5, 3.85], wall: 0.2 } },
+  ];
+  for (const { arm, o } of arms) {
+    const recs = withArena(o, () => {
+      const rs: { p: string; r: string; kind: string; finish: string | null; own: boolean; winner: string | null; wallP: number; wallR: number; steps: number }[] = [];
+      SIGNATURE_LIST.forEach((p, pi) =>
+        SIGNATURE_LIST.forEach((r, ri) => {
+          for (let i = 0; i < SEEDS; i++) {
+            const seed = 20000 + pi * 1000 + ri * 100 + i;
+            const rnd = seeded(seed * 7 + 13);
+            const sc: Scn = { name: `${p.key}-${r.key}#${i}`, group: 'SIG', player: p.loadout, rival: r.loadout, pCmd: { power: POW[i % 3], aim: (rnd() - 0.5) * 1.2, tilt: 0 }, rCmd: rivalCommand(rnd), seed, maxSeconds: 61, init: '签名矩阵' };
+            const orig = Math.random;
+            Math.random = seeded(sc.seed);
+            try {
+              const { pw, b, A, B } = setup(R, sc, { observeContacts: true });
+              const max = Math.round(61 / PHYSICS_DT);
+              let s = 0;
+              let wa = 0;
+              let wb = 0;
+              for (; s < max && !b.result; s++) {
+                pw.step();
+                const pa = A.body.translation();
+                const pb = B.body.translation();
+                if (Math.hypot(pa.x, pa.z) > ARENA.radius - 0.3) wa++;
+                if (Math.hypot(pb.x, pb.z) > ARENA.radius - 0.3) wb++;
+              }
+              const out = b.judgeRound.outcome;
+              rs.push({ p: p.key, r: r.key, kind: out?.kind ?? 'none', finish: out?.finish ?? null, own: !!out?.own, winner: out?.winner ?? null, wallP: wa / Math.max(1, s), wallR: wb / Math.max(1, s), steps: s });
+              pw.dispose();
+            } finally {
+              Math.random = orig;
+            }
+          }
+        }),
+      );
+      return rs;
+    });
+    const n = recs.length;
+    const c: Record<string, number> = {};
+    for (const x of recs) {
+      const k = x.kind === 'win' ? (x.finish as string) : x.kind;
+      c[k] = (c[k] ?? 0) + 1;
+    }
+    const pocket = (c.over ?? 0) + (c.xtreme ?? 0);
+    const own = recs.filter((x) => x.own).length;
+    const per: Record<string, unknown> = {};
+    for (const sg of SIGNATURE_LIST) {
+      let dec = 0;
+      let w = 0;
+      let wall = 0;
+      let m = 0;
+      for (const x of recs) {
+        const side = x.p === sg.key ? 'player' : x.r === sg.key ? 'rival' : null;
+        if (!side || x.p === x.r) continue;
+        m++;
+        wall += side === 'player' ? x.wallP : x.wallR;
+        if (x.kind !== 'win') continue;
+        dec++;
+        if (x.winner === side) w++;
+      }
+      per[sg.key] = { winRate: dec ? Math.round((w / dec) * 1000) / 1000 : NaN, decided: dec, wallFrac: Math.round((wall / Math.max(1, m)) * 10000) / 10000 };
+    }
+    const dflt = recs.filter((x) => x.p === 'senheng' && x.r === 'pandun');
+    out(`M5-F ${arm}`, {
+      rounds: n,
+      shares: Object.fromEntries(Object.entries(c).map(([k, v]) => [k, Math.round((v / n) * 1000) / 1000])),
+      pocketShare: Math.round((pocket / n) * 1000) / 1000,
+      ownShare: Math.round((own / n) * 1000) / 1000,
+      perSignature: per,
+      defaultSenhengVsPandun: { n: dflt.length, playerWins: dflt.filter((x) => x.winner === 'player').length },
+      durationP50: [...recs.map((x) => x.steps / 120)].sort((a, b) => a - b)[Math.floor(n / 2)],
+    });
+  }
 }, 1_800_000);
