@@ -23,6 +23,9 @@ export interface LaunchParams {
   seed?: number;
 }
 
+/** 爆裂后剩余部分的额外转速衰减（rad/s²，按参考惯量；只影响回合结束后的表现） */
+const BURST_SPINDOWN = 60;
+
 /** 陀螺物理调参（集中在这里，方便后续平衡性调整） */
 export const BEY_TUNING = {
   /** 低于这个转速时陀螺失去自稳 */
@@ -385,11 +388,13 @@ export class BeyPhysics {
     // 同样的轴心，惯量大（重量集中在外缘）的陀螺掉速更慢 → 耐力型的优势来自零件本身
     let decay = this.spec.bit.spinDecay;
     if (this.tilt > 0.5) decay += T.scrapeDecay * Math.min(1, (this.tilt - 0.5) * 2);
+    // 爆裂后只剩 Ratchet + Bit：失去刀刃的惯量与驱动，很快停转倾倒（回合已由规则结束，只是表现）
+    if (this.bursted) decay += BURST_SPINDOWN;
 
     // 2) 极限轨道：齿轮轴心咬合轨道冲刺
     this.dashing = false;
     const grip = this.spec.bit.gearGrip;
-    if (grip > 0 && this.grounded && r > ARENA.railInner && r < ARENA.railOuter + 0.05 && mag > T.minStableSpin) {
+    if (!this.bursted && grip > 0 && this.grounded && r > ARENA.railInner && r < ARENA.railOuter + 0.05 && mag > T.minStableSpin) {
       const ex = pos.x / r;
       const ez = pos.z / r;
       // ω × e_r 的水平分量（ω 竖直），冲刺方向为其反方向（齿轮在外圈齿条上滚动）
@@ -446,7 +451,7 @@ export class BeyPhysics {
     // 墙边：没有牵引的轴心（针尖）贴近外圈时，与脱困同理按 edgeGrip 计算牵引（倾斜着压在陡坡上，接触点外移）
     if (T.edgeGrip > 0 && this.intent.edgeW > 0) driveGrip = Math.max(driveGrip, T.edgeGrip * Math.min(1, this.intent.edgeW * 2));
     let steering = 0;
-    if (driveGrip >= T.driveMinGrip && this.grounded && !this.dashing && mag > T.minStableSpin * 2) {
+    if (!this.bursted && driveGrip >= T.driveMinGrip && this.grounded && !this.dashing && mag > T.minStableSpin * 2) {
       const ratio = Math.min(1, mag / this.launchSpin);
       const v = body.linvel();
       let dx = -Math.sin(this.precession) * this.spinSign;
@@ -562,6 +567,21 @@ export class BeyPhysics {
       true,
     );
     this.spin = mag;
+  }
+
+  /** 已爆裂（Blade 已脱离） */
+  bursted = false;
+
+  /**
+   * 爆裂：Blade 从刚体上脱离（移除刀刃碰撞体，Rapier 按剩余碰撞体重算质量），剩下的 Ratchet + Bit 失去驱动并很快停转。
+   * 只在规则判定爆裂之后调用；表现层另外播放 Blade 飞出的动画。
+   */
+  burstApart(): void {
+    if (this.bursted) return;
+    this.bursted = true;
+    const i = this.colliders.indexOf(this.bladeCollider);
+    if (i >= 0) this.colliders.splice(i, 1);
+    this.pw.world.removeCollider(this.bladeCollider, true);
   }
 
   /** 施加水平撞击冲量 */

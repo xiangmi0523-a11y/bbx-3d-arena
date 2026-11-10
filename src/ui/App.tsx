@@ -146,10 +146,10 @@ function Overlay({ engine }: { engine: GameEngine }) {
       {s.phase === 'result' && s.result && (
         <div className="result-banner" data-testid="result">
           <div className={`result-title ${s.result.winner === 'player' ? 'win' : 'lose'}`}>
-            {s.result.winner === 'player' ? '胜利！' : '败北'}
+            {s.result.kind === 'draw' ? '平局' : s.result.winner === 'player' ? '胜利！' : '败北'}
           </div>
           <div className="result-finish">
-            {FINISH_LABEL[s.result.finish]} · {s.result.points} 分 · {s.result.duration.toFixed(1)} 秒
+            {s.result.finish ? `${FINISH_LABEL[s.result.finish]} · ${s.result.points} 分` : '同时终结，重赛'} · {s.result.duration.toFixed(1)} 秒
           </div>
           <div className="result-actions">
             <button className="btn primary" onClick={() => engine.restart()} data-testid="again">
@@ -240,7 +240,7 @@ function SpinBar({ hud, side }: { hud: BeyHud; side: 'player' | 'rival' }) {
     <div className={`spinbar ${side}`}>
       <div className="spinbar-label">
         <span>{hud.name}</span>
-        {hud.dashing && <span className="dash">XTREME DASH</span>}
+        {hud.dashing && <span className="dash">轨道冲刺</span>}
       </div>
       <div className="spinbar-track">
         <div className="spinbar-fill" style={{ width: `${Math.round(hud.spin * 100)}%` }} />

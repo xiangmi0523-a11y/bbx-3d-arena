@@ -296,7 +296,7 @@ export async function diagnoseBattle(opts: {
     meanR: { player: rSum.player / steps, rival: rSum.rival / steps },
     spinHalf: { player: spinHalf.player < 0 ? duration : spinHalf.player, rival: spinHalf.rival < 0 ? duration : spinHalf.rival },
     dvTaken,
-    winner: battle.result ? battle.result.winner : 'none',
+    winner: battle.result?.winner ?? 'none',
   };
   pw.dispose();
   return out;

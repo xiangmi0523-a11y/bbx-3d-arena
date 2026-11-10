@@ -831,7 +831,7 @@ export class GameEngine {
       targets.length = 0;
       for (const s of SIDES) {
         const b = battle.beys[s];
-        if (!b || (phase === 'result' && b !== battle.beys[battle.result!.winner])) continue;
+        if (!b || (phase === 'result' && battle.result?.winner && b !== battle.beys[battle.result.winner])) continue;
         const t = this.camTargetPool[targets.length];
         t.position.copy(this.visuals[s]?.root.position ?? (b.body.translation() as THREE.Vector3Like));
         const v = b.body.linvel();

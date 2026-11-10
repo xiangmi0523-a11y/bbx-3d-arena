@@ -352,8 +352,8 @@ describe('ContactService 在真实对局上的不变量与读写边界', () => {
     }
   }, 600000);
 
-  it('关闭观测时不创建服务、不注册身份（默认行为与旧系统相同）', () => {
-    const pw = new PhysicsWorld(R);
+  it('显式关闭观测时不创建服务、不注册身份（M2 起默认开启，供爆裂与自灭判定使用）', () => {
+    const pw = new PhysicsWorld(R, { observeContacts: false });
     createArenaPhysics(pw);
     expect(pw.contacts).toBeNull();
     pw.dispose();
