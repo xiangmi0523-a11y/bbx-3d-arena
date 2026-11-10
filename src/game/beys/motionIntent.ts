@@ -124,8 +124,8 @@ export function profileOf(spec: AssembledBey): MotionProfile {
   return {
     aggression: c(spec.blade.attack - 0.5 * spec.blade.defense),
     steadiness: c(spec.blade.defense),
-    economy: c(1 - (spec.tip.spinDecay - 0.85) / 1.15) * c((spec.blade.rimWeight - 0.45) / 0.3),
-    tipAuthority: 0.3 + 0.7 * c(spec.tip.drift / 0.16),
+    economy: c(1 - (spec.bit.spinDecay - 0.85) / 1.15) * c((spec.blade.rimWeight - 0.45) / 0.3),
+    tipAuthority: 0.3 + 0.7 * c(spec.bit.drift / 0.16),
     attack: c(spec.blade.attack),
   };
 }
@@ -148,6 +148,19 @@ export interface IntentInput {
   /** 对手的进攻性（决定是否需要闪避） */
   oppAggression: number;
 }
+
+/**
+ * AI 难度（v2.0 §7.2）：只改决策参数，不改任何物理参数——同一构筑在任何难度下物理完全相同。
+ *  - aggression：进攻性倍率（进入切入 / 环绕的概率、切入后再切入的倾向）；
+ *  - delay：反应延迟（秒），加在每次战术决策的计划持续时间上（越慢越晚重新判断局势）。
+ * 'pro'（进阶）= 标准参数，与未分难度时逐位相同；玩家一侧的陀螺始终用 'pro'。
+ */
+export type AiLevel = 'rookie' | 'pro' | 'master';
+export const AI_LEVELS: Record<AiLevel, { label: string; aggression: number; delay: number }> = {
+  rookie: { label: '新手', aggression: 0.7, delay: 0.3 },
+  pro: { label: '进阶', aggression: 1, delay: 0 },
+  master: { label: '高手', aggression: 1.15, delay: -0.15 },
+};
 
 export function mulberry32(seed: number): () => number {
   let s = seed >>> 0;
@@ -182,14 +195,28 @@ export class MotionIntent {
   readonly profile: MotionProfile;
   private readonly rng: () => number;
 
-  constructor(spec: AssembledBey, seed: number) {
-    this.profile = profileOf(spec);
+  /** 难度的反应延迟（秒）；0 = 标准 */
+  private readonly delay: number;
+  readonly level: AiLevel;
+
+  constructor(spec: AssembledBey, seed: number, level: AiLevel = 'pro') {
+    const base = profileOf(spec);
+    const L = AI_LEVELS[level];
+    this.level = level;
+    // 标准难度不做任何运算，保证与未分难度时逐位相同
+    this.profile = L.aggression === 1 ? base : { ...base, aggression: Math.max(0, Math.min(1, base.aggression * L.aggression)) };
+    this.delay = L.delay;
     this.rng = mulberry32(seed);
     this.side = this.rng() < 0.5 ? 1 : -1;
   }
 
   private range(a: number, b: number): number {
     return a + (b - a) * this.rng();
+  }
+
+  /** 战术决策的计划持续时间加上难度的反应延迟（标准难度原样返回） */
+  private react(hold: number): number {
+    return this.delay === 0 ? hold : Math.max(0.2, hold + this.delay);
   }
 
   /** 诊断：进入各状态的次数；切入以接触结束的次数 */
@@ -222,15 +249,15 @@ export class MotionIntent {
     if (r < pCut && gap < 4) {
       this.side = this.rng() < 0.5 ? 1 : -1;
       this.cutAngle = this.range(T.cutAngleMin, T.cutAngleMax) * DEG;
-      this.enter('cut', this.range(T.cutMin, T.cutMax));
+      this.enter('cut', this.react(this.range(T.cutMin, T.cutMax)));
     } else if (P.aggression > 0.2 && r < pCut + 0.5) {
       if (this.rng() < 0.35) this.side = -this.side;
       this.orbitGap = this.range(T.orbitGapMin, T.orbitGapMax);
-      this.enter('orbit', this.range(T.orbitMin, T.orbitMax) * (1.2 - 0.5 * P.aggression));
+      this.enter('orbit', this.react(this.range(T.orbitMin, T.orbitMax) * (1.2 - 0.5 * P.aggression)));
     } else if (P.steadiness >= P.economy * 0.8) {
-      this.enter('guard', this.range(T.idleMin, T.idleMax));
+      this.enter('guard', this.react(this.range(T.idleMin, T.idleMax)));
     } else {
-      this.enter('roam', this.range(T.idleMin, T.idleMax));
+      this.enter('roam', this.react(this.range(T.idleMin, T.idleMax)));
     }
   }
 
@@ -281,10 +308,10 @@ export class MotionIntent {
           this.side = -this.side;
           if (this.rng() < P.aggression) {
             this.cutAngle = this.range(T.cutAngleMin, T.cutAngleMax) * DEG;
-            this.enter('cut', this.range(T.cutMin, T.cutMax));
+            this.enter('cut', this.react(this.range(T.cutMin, T.cutMax)));
           } else {
             this.orbitGap = this.range(T.orbitGapMin, T.orbitGapMax);
-            this.enter('orbit', this.range(T.orbitMin, T.orbitMax));
+            this.enter('orbit', this.react(this.range(T.orbitMin, T.orbitMax)));
           }
         } else this.decide(inp, gap);
       }

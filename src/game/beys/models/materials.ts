@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { getMetalRoughnessMap, getStudioEnv } from '../../render/studioEnv';
-import { createGaleEmblemTexture } from '../../render/textures';
+import { createGaleEmblemTexture, createTypeEmblemTexture } from '../../render/textures';
+import type { BeyRole } from '../parts/types';
 
 /**
  * 陀螺零件共用的材质库（P2.3）。
@@ -152,3 +153,63 @@ export const navyPlastic = shared('navy-plastic', () =>
     envMapIntensity: 0.4,
   }),
 );
+
+// ───────────────────────── M6：四种类型色（任务书概念板的视觉语言：银色金属刃 + 类型色骨架 + 中心徽章） ─────────────────────────
+
+/**
+ * 各类型的透明塑料与不透明注塑色。ACES 色调映射会把高亮纯色推偏，所以底色压暗、主要颜色来自自发光
+ * （与已验收的疾风新月蓝色透明件同一做法）：攻击 红 / 防守 蓝 / 平衡 绿 / 耐力 紫。
+ */
+const TYPE_PLASTIC: Record<BeyRole, { color: number; emissive: number; k: number; solid: number }> = {
+  attack: { color: 0x5a0707, emissive: 0xc8170e, k: 0.5, solid: 0x7a1410 },
+  defense: { color: 0x062590, emissive: 0x0a3ccc, k: 0.5, solid: 0x12307e },
+  balance: { color: 0x04401b, emissive: 0x13a34a, k: 0.45, solid: 0x0f5c2c },
+  stamina: { color: 0x26085e, emissive: 0x6b2be2, k: 0.5, solid: 0x3b1a7c },
+};
+
+const typeClear: Partial<Record<BeyRole, () => THREE.MeshPhysicalMaterial>> = {};
+const typeSolidM: Partial<Record<BeyRole, () => THREE.MeshPhysicalMaterial>> = {};
+const typeEmblemM: Partial<Record<BeyRole, () => THREE.MeshPhysicalMaterial>> = {};
+
+/** 类型色透明塑料（骨架、底盘、Ratchet 罩层）。防守型与疾风新月原来的蓝色透明件是同一个实例 */
+export function typePlastic(role: BeyRole): THREE.MeshPhysicalMaterial {
+  if (role === 'defense') return bluePlastic();
+  const make = (typeClear[role] ??= shared(`clear-plastic-${role}`, () => {
+    const t = TYPE_PLASTIC[role];
+    return clearPlastic(
+      { color: t.color, emissive: t.emissive, emissiveIntensity: t.k, metalness: 0, roughness: 0.1, ior: 1.49, specularIntensity: 1, envMapIntensity: 0.32, opacity: 0.62 },
+      0.45,
+      0.9,
+    );
+  }));
+  return make();
+}
+
+/** 类型色不透明注塑件（Ratchet 裙边、Bit 外壳）。防守型与原来的深蓝注塑件是同一个实例 */
+export function typeSolid(role: BeyRole): THREE.MeshPhysicalMaterial {
+  if (role === 'defense') return navyPlastic();
+  const make = (typeSolidM[role] ??= shared(`solid-plastic-${role}`, () =>
+    new THREE.MeshPhysicalMaterial({
+      color: TYPE_PLASTIC[role].solid,
+      metalness: 0,
+      roughness: 0.5,
+      clearcoat: 0.15,
+      clearcoatRoughness: 0.35,
+      specularIntensity: 0.6,
+      envMap: getStudioEnv(),
+      envMapIntensity: 0.4,
+    }),
+  ));
+  return make();
+}
+
+/** 类型徽标（原创图形，带清漆的印刷贴片）；平衡型沿用疾风新月的风刃徽标结构，只换颜色 */
+export function typeEmblem(role: BeyRole): THREE.MeshPhysicalMaterial {
+  const make = (typeEmblemM[role] ??= shared(`emblem-${role}`, () => {
+    const m = new THREE.MeshPhysicalMaterial({ color: 0xffffff, roughness: 0.45, metalness: 0, clearcoat: 0.35, clearcoatRoughness: 0.2, envMap: getStudioEnv(), envMapIntensity: 0.3 });
+    if (typeof document !== 'undefined') m.map = createTypeEmblemTexture(role);
+    else m.color.set(TYPE_PLASTIC[role].solid);
+    return m;
+  }));
+  return make();
+}

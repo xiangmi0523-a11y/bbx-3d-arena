@@ -24,9 +24,9 @@ test('惯量契约：游戏层标量 vs Rapier 主惯量（64 组合）', async 
   const R = await loadRapier();
   const rows: { loadout: string; mass: number; comY: number; gameSpin: number; rapierIy: number; rapierIxz: number[]; diffPct: number }[] = [];
   for (const bl of listParts('blade'))
-    for (const d of listParts('disc'))
-      for (const t of listParts('tip')) {
-        const spec = assembleBey({ blade: bl.id, disc: d.id, tip: t.id });
+    for (const d of listParts('ratchet'))
+      for (const t of listParts('bit')) {
+        const spec = assembleBey({ blade: bl.id, ratchet: d.id, bit: t.id });
         const pw = new PhysicsWorld(R);
         const bey = new BeyPhysics(pw, spec, { position: { x: 0, y: 2, z: 0 }, velocity: { x: 0, y: 0, z: 0 }, spin: 0, seed: 1 });
         const I = bey.body.principalInertia();

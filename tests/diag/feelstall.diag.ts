@@ -13,9 +13,9 @@ import { feelRun } from '../feelSim';
 if (process.env.DIAG_TUNE) Object.assign(BEY_TUNING, JSON.parse(process.env.DIAG_TUNE));
 
 test('feel stall', async () => {
-  const RIVAL = { blade: 'tidal-bastion', disc: 'hex-lock', tip: 'dome-ball' };
-  const BAL = { blade: 'gale-crescent', disc: 'hex-lock', tip: 'dome-ball' };
-  const STA = { blade: 'titan-crown', disc: 'hex-lock', tip: 'needle-point' };
+  const RIVAL = { blade: 'tidal-bastion', ratchet: 'hex-lock', bit: 'dome-ball' };
+  const BAL = { blade: 'gale-crescent', ratchet: 'hex-lock', bit: 'dome-ball' };
+  const STA = { blade: 'titan-crown', ratchet: 'hex-lock', bit: 'needle-point' };
   const rows: Record<string, unknown>[] = [];
   for (let i = 0; i < 6; i++) rows.push({ case: 'BAL vs RIVAL', seed: 1000 + i, ...(await feelRun({ player: BAL, rival: RIVAL }, 1000 + i, 40)) });
   for (let i = 0; i < 4; i++) rows.push({ case: 'STA vs STA(tidal)', seed: 3000 + i, ...(await feelRun({ player: STA, rival: { ...STA, blade: 'tidal-bastion' } }, 3000 + i, 40)) });

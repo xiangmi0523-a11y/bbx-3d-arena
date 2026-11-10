@@ -43,6 +43,12 @@ export class AudioFX {
   grindChainsCreated = 0;
   muted = false;
 
+  /** 设置里的音效开关：只调主音量，音频链照常运行（重新打开时不需要再解锁） */
+  setMuted(m: boolean): void {
+    this.muted = m;
+    if (this.master) this.master.gain.value = m ? 0 : 0.8;
+  }
+
   /** 在触摸 / 点击事件里调用 */
   unlock(): void {
     if (!this.ctx) {
@@ -50,7 +56,7 @@ export class AudioFX {
       if (!Ctor) return;
       this.ctx = new Ctor();
       this.master = this.ctx.createGain();
-      this.master.gain.value = 0.8;
+      this.master.gain.value = this.muted ? 0 : 0.8;
       const comp = this.ctx.createDynamicsCompressor();
       comp.threshold.value = -10;
       comp.ratio.value = 6;

@@ -18,12 +18,12 @@ import { seeded } from '../feelSim';
  */
 const MATCHUPS: Record<string, { player: BeyLoadout; rival: BeyLoadout }> = {
   默认: { player: PLAYER_LOADOUT, rival: RIVAL_LOADOUT },
-  平衡套装: { player: { blade: 'gale-crescent', disc: 'hex-lock', tip: 'dome-ball' }, rival: RIVAL_LOADOUT },
+  平衡套装: { player: { blade: 'gale-crescent', ratchet: 'hex-lock', bit: 'dome-ball' }, rival: RIVAL_LOADOUT },
   攻击对防御: {
-    player: { blade: 'blaze-fang', disc: 'tri-lock', tip: 'rush-rubber' },
-    rival: { blade: 'tidal-bastion', disc: 'ring-guard', tip: 'dome-ball' },
+    player: { blade: 'blaze-fang', ratchet: 'tri-lock', bit: 'rush-rubber' },
+    rival: { blade: 'tidal-bastion', ratchet: 'ring-guard', bit: 'dome-ball' },
   },
-  同攻击: { player: PLAYER_LOADOUT, rival: { blade: 'blaze-fang', disc: 'tri-lock', tip: 'rush-rubber' } },
+  同攻击: { player: PLAYER_LOADOUT, rival: { blade: 'blaze-fang', ratchet: 'tri-lock', bit: 'rush-rubber' } },
 };
 
 interface Seg {

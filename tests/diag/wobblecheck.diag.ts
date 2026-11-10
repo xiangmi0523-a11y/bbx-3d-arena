@@ -48,7 +48,7 @@ test('wobble check', async () => {
           const low = A.spinRatio <= B.spinRatio ? A : B;
           const high = low === A ? B : A;
           if (inHi) hiGrindTrig++;
-          trig.push({ name: sc.name, t: +(i * PHYSICS_DT).toFixed(2), lowSpin: +low.spinRatio.toFixed(3), lowTiltDeg: +((low.tilt * 180) / Math.PI).toFixed(1), lowDriftDeg: +((low.spec.tip.drift * 180) / Math.PI).toFixed(1), highSpin: +high.spinRatio.toFixed(3) });
+          trig.push({ name: sc.name, t: +(i * PHYSICS_DT).toFixed(2), lowSpin: +low.spinRatio.toFixed(3), lowTiltDeg: +((low.tilt * 180) / Math.PI).toFixed(1), lowDriftDeg: +((low.spec.bit.drift * 180) / Math.PI).toFixed(1), highSpin: +high.spinRatio.toFixed(3) });
         }
       }
       Math.random = orig;

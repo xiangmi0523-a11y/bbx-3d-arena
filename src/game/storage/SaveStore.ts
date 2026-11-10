@@ -1,20 +1,51 @@
 import type { BeyLoadout } from '../beys/parts/types';
 
 /**
- * 本地存档（IndexedDB）。P1 只存战绩和上次使用的组装方案，
+ * 本地存档（IndexedDB）。存战绩和上次使用的组装方案，
  * 结构按 key-value 设计，后续可以加入部件收藏、设置等。
  * IndexedDB 不可用时（隐私模式等）自动退回内存存储，不影响游戏运行。
+ *
+ * 版本：v1 → v2（v2.0 §4.3）：组装方案的槽位名 disc → ratchet、tip → bit，部件 id 不变。
+ * 读到 v1 存档时一次性迁移；迁移不了的字段回退默认（不丢战绩）。
  */
 
 export interface SaveData {
-  version: 1;
+  version: 2;
   wins: number;
   losses: number;
   points: number;
   lastLoadout: BeyLoadout | null;
 }
 
-export const DEFAULT_SAVE: SaveData = { version: 1, wins: 0, losses: 0, points: 0, lastLoadout: null };
+export const SAVE_VERSION = 2;
+export const DEFAULT_SAVE: SaveData = { version: 2, wins: 0, losses: 0, points: 0, lastLoadout: null };
+
+const num = (v: unknown, d = 0) => (typeof v === 'number' && Number.isFinite(v) ? v : d);
+const str = (v: unknown) => (typeof v === 'string' ? v : undefined);
+
+/**
+ * 把任意版本的存档迁移到当前版本（纯函数，可单独测试）。
+ * 认不出的存档返回 null（调用方使用默认存档）；部件 id 是否存在由 sanitizeLoadout 另行校验。
+ */
+export function migrateSave(raw: unknown): SaveData | null {
+  if (!raw || typeof raw !== 'object') return null;
+  const r = raw as Record<string, unknown>;
+  const base = { wins: num(r.wins), losses: num(r.losses), points: num(r.points) };
+  const lo = r.lastLoadout && typeof r.lastLoadout === 'object' ? (r.lastLoadout as Record<string, unknown>) : null;
+  if (r.version === 1) {
+    const blade = str(lo?.blade);
+    const ratchet = str(lo?.disc);
+    const bit = str(lo?.tip);
+    return { version: 2, ...base, lastLoadout: blade && ratchet && bit ? { blade, ratchet, bit } : null };
+  }
+  if (r.version === 2) {
+    const blade = str(lo?.blade);
+    const ratchet = str(lo?.ratchet);
+    const bit = str(lo?.bit);
+    return { version: 2, ...base, lastLoadout: blade && ratchet && bit ? { blade, ratchet, bit } : null };
+  }
+  return null;
+}
 
 const DB_NAME = 'bbx-arena';
 const STORE = 'kv';
@@ -75,8 +106,8 @@ export class SaveStore {
 
   async load(): Promise<SaveData> {
     try {
-      const saved = await this.backend.get<SaveData>(KEY);
-      if (saved && saved.version === 1) this.data = { ...DEFAULT_SAVE, ...saved };
+      const saved = migrateSave(await this.backend.get<unknown>(KEY));
+      if (saved) this.data = saved;
     } catch (err) {
       console.warn('读取存档失败，使用内存存储', err);
       this.backend = new MemoryBackend();

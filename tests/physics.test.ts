@@ -4,7 +4,7 @@ import { deriveSeed, withDeterminism } from './repro/determinism';
 import type { BeyLoadout } from '../src/game/beys/parts/types';
 
 // 真实 Rapier 无头模拟：验证刚体落地、碰撞、胜负判定都由物理驱动
-const RIVAL = { blade: 'tidal-bastion', disc: 'hex-lock', tip: 'dome-ball' };
+const RIVAL = { blade: 'tidal-bastion', ratchet: 'hex-lock', bit: 'dome-ball' };
 
 describe('物理对战模拟', () => {
   it('两台陀螺发射后能完成一整场对战', async () => {
@@ -46,7 +46,7 @@ describe('物理对战模拟', () => {
     const tips = ['gear-flat', 'dome-ball', 'needle-point', 'rush-rubber'];
     const discs = ['tri-lock', 'hex-lock', 'quad-edge', 'ring-guard'];
     for (let i = 0; i < blades.length; i++) {
-      const lo: BeyLoadout = { blade: blades[i], disc: discs[i], tip: tips[(i + 1) % 4] };
+      const lo: BeyLoadout = { blade: blades[i], ratchet: discs[i], bit: tips[(i + 1) % 4] };
       let minY = Infinity;
       const r = await simulateBattle({
         player: { power: 0.9, aim: 0, tilt: 0 },
@@ -241,8 +241,8 @@ describe('物理对战模拟', () => {
   }, 60000);
 
   it('P2.2：重量真实影响结果——轻的一方被撞开的速度变化更大', async () => {
-    const heavy = { blade: 'titan-crown', disc: 'ring-guard', tip: 'dome-ball' };
-    const light = { blade: 'blaze-fang', disc: 'tri-lock', tip: 'dome-ball' };
+    const heavy = { blade: 'titan-crown', ratchet: 'ring-guard', bit: 'dome-ball' };
+    const light = { blade: 'blaze-fang', ratchet: 'tri-lock', bit: 'dome-ball' };
     const r = await headOn(9, heavy, light);
     expect(r.massA).toBeGreaterThan(r.massB * 1.15);
     expect(r.after).not.toBeNull();
@@ -301,7 +301,7 @@ describe('物理对战模拟', () => {
         const r = await simulateBattle({
           player: { power: 0.5, aim: 0, tilt: 0 },
           rival: { power: 0.5, aim: 0, tilt: 0 },
-          playerLoadout: { blade: 'blaze-fang', disc: 'tri-lock', tip: 'needle-point' },
+          playerLoadout: { blade: 'blaze-fang', ratchet: 'tri-lock', bit: 'needle-point' },
           maxSeconds: 0.01,
         });
         const a = r.battle.beys.player!;
@@ -328,7 +328,7 @@ describe('物理对战模拟', () => {
       const r = await diagnoseBattle({
         player: { power: 0.7 + (i % 3) * 0.15, aim, tilt: 0 },
         rival: { power: 0.8, aim: -aim, tilt: 0 },
-        rivalLoadout: { blade: 'gale-crescent', disc: 'tri-lock', tip: 'rush-rubber' },
+        rivalLoadout: { blade: 'gale-crescent', ratchet: 'tri-lock', bit: 'rush-rubber' },
         maxSeconds: 40,
       });
       walls += r.wallHits.player + r.wallHits.rival;
@@ -343,9 +343,9 @@ describe('物理对战模拟', () => {
   it('P2.2.1：三种类型的差异来自真实参数——耐力型转得最久，防御型稳在中央，攻击型主动撞击', async () => {
     const { assembleBey } = await import('../src/game/beys/parts/assemble');
     const { diagnoseBattle } = await import('./diag/harness');
-    const ATK = { blade: 'blaze-fang', disc: 'tri-lock', tip: 'rush-rubber' };
-    const DEF = { blade: 'tidal-bastion', disc: 'ring-guard', tip: 'dome-ball' };
-    const STA = { blade: 'titan-crown', disc: 'hex-lock', tip: 'needle-point' };
+    const ATK = { blade: 'blaze-fang', ratchet: 'tri-lock', bit: 'rush-rubber' };
+    const DEF = { blade: 'tidal-bastion', ratchet: 'ring-guard', bit: 'dome-ball' };
+    const STA = { blade: 'titan-crown', ratchet: 'hex-lock', bit: 'needle-point' };
     // 转动惯量（质量 × 半径² × 外缘配重）：耐力 > 防御 > 攻击
     const I = [ATK, DEF, STA].map((lo) => assembleBey(lo).spinInertia);
     expect(I[2]).toBeGreaterThan(I[1]);
@@ -404,7 +404,7 @@ describe('物理对战模拟', () => {
 
   it('P2.3.1：不会长时间原地互转——平衡套装对默认对手（都是球头轴心）最长僵持 < 1.6 秒', async () => {
     const { feelRun } = await import('./feelSim');
-    const lo = { player: { blade: 'gale-crescent', disc: 'hex-lock', tip: 'dome-ball' }, rival: RIVAL };
+    const lo = { player: { blade: 'gale-crescent', ratchet: 'hex-lock', bit: 'dome-ball' }, rival: RIVAL };
     let stall = 0;
     let time = 0;
     let longest = 0;
@@ -421,7 +421,7 @@ describe('物理对战模拟', () => {
     expect(stall / time).toBeLessThan(0.15);
     expect(speed).toBeGreaterThan(0.9);
     // 针尖轴心几乎没有牵引，两台会停在碗底平台上隔几厘米各转各的：脱困后同样不会长时间僵持
-    const STA = { blade: 'titan-crown', disc: 'hex-lock', tip: 'needle-point' };
+    const STA = { blade: 'titan-crown', ratchet: 'hex-lock', bit: 'needle-point' };
     let staLongest = 0;
     for (let i = 0; i < 4; i++) {
       const r = await feelRun({ player: STA, rival: { ...STA, blade: 'tidal-bastion' } }, 3000 + i, 40);

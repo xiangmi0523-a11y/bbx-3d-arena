@@ -1,14 +1,14 @@
 import * as THREE from 'three';
 import { P, chamfer, lathe, merge, mesh, slab } from './geom';
-import { bluePlastic, navyPlastic, satinMetal } from './materials';
-import type { DiscSpec } from '../parts/types';
+import { satinMetal, typePlastic, typeSolid } from './materials';
+import type { RatchetSpec } from '../parts/types';
 
 /**
- * 锁齿式 Disc（P2.3 阶段 2，首个是「六角锁盘」hex-lock），与疾风新月 Blade 同一套设计语言。
+ * 锁齿式 Ratchet（P2.3 阶段 2，首个是「六齿棘轮」hex-lock），与疾风新月 Blade 同一套设计语言。
  *
- * 结构（从下到上；本地 y = 0 为 Disc 底面，H 为 Disc 层厚）：
+ * 结构（从下到上；本地 y = 0 为 Ratchet 底面，H 为 Ratchet 层厚）：
  *  1. 下部裙边（深蓝不透明注塑件，y 0 → 0.5H）：外轮廓是 N 个凸起 + 凸起之间的防滑竖筋；
- *     中央是 Tip 的插口，插口边缘有 3 个卡口缺口，正对 Tip 外壳上的 3 个卡扣；
+ *     中央是 Bit 的插口，插口边缘有 3 个卡口缺口，正对 Bit 外壳上的 3 个卡扣；
  *     每个凸起底下挖空（注塑件常见的减料空腔），空腔中间留一道加强筋。
  *  2. 上部透明蓝罩层（与 Blade 同一种透明蓝，y 0.5H → H）：比裙边内缩一圈，形成合模线台阶；
  *     透过它能看到里面的深蓝轮毂管和 12 道放射加强筋。
@@ -29,8 +29,24 @@ const TOOTH_TOP = 0.0195;
 /** 顶面凸台的底面埋进透明罩 0.002：不与透明罩顶面共面（共面会在透明件后面闪烁） */
 const EMBED = 0.002;
 
-/** Tip 外壳上卡扣所在的角度（BeyVisualFactory 的 ring(g, 3, …) 从 0 开始均分） */
+/** Bit 外壳上卡扣所在的角度（BeyVisualFactory 的 ring(g, 3, …) 从 0 开始均分） */
 const CLIP_ANGLES = [0, TAU / 3, (2 * TAU) / 3];
+
+/** 连续圆环外轮廓（teeth = 0 的圆环护轮：没有凸起，只有一圈防滑竖筋），M6 */
+function ringOutline(R: number, ribs: boolean, scale: number): THREE.Vector2[] {
+  const n = 36;
+  const base = 0.97 * R;
+  const rib = 0.014 * R;
+  const pts: [number, number][] = [];
+  for (let k = 0; k < n; k++) {
+    const a0 = (k / n) * TAU;
+    const at = (u: number) => a0 + (u * TAU) / n;
+    pts.push([at(0), base]);
+    if (ribs) pts.push([at(0.35), base], [at(0.42), base + rib], [at(0.58), base + rib], [at(0.65), base]);
+    else pts.push([at(0.5), base]);
+  }
+  return pts.map(([a, r]) => P(r * scale, a));
+}
 
 /** 外轮廓关键点（角度、半径），一个凸起 + 一段竖筋间隙为一个扇区 */
 function outline(R: number, n: number, ribs: boolean, scale: number): THREE.Vector2[] {
@@ -67,7 +83,7 @@ function circlePath(r: number, segs: number): THREE.Path {
   return new THREE.Path(pts);
 }
 
-/** Tip 插口：圆孔 + 3 个卡口缺口（按角度顺序依次走：圆弧 → 缺口一侧直边 → 缺口外沿 → 另一侧直边） */
+/** Bit 插口：圆孔 + 3 个卡口缺口（按角度顺序依次走：圆弧 → 缺口一侧直边 → 缺口外沿 → 另一侧直边） */
 function socketPath(R: number): THREE.Path {
   const r0 = 0.7 * R;
   const r1 = 0.79 * R;
@@ -147,23 +163,26 @@ function toothGeometry(r0: number, r1: number, a0: number, span: number, y0: num
   return geo;
 }
 
-export function buildRatchetDisc(spec: DiscSpec): THREE.Group {
+export function buildRatchetDisc(spec: RatchetSpec): THREE.Group {
   const g = new THREE.Group();
-  g.name = `disc:${spec.id}`;
+  g.name = `ratchet:${spec.id}`;
   const R = spec.radius;
   const H = spec.height;
-  const n = Math.max(3, spec.visual.points);
+  const ring = spec.teeth === 0;
+  const n = ring ? 6 : Math.max(3, spec.teeth);
   // 现有 Blade 全部右旋；锁齿方向按右旋排列
   const dir = 1;
 
-  const mNavy = navyPlastic();
-  const mBlue = bluePlastic();
+  // M6：裙边与罩层用类型色（任务书概念板）；防守型仍是原来的深蓝 + 透明蓝（同一材质实例）
+  const tint = spec.visual.tint ?? 'defense';
+  const mNavy = typeSolid(tint);
+  const mBlue = typePlastic(tint);
   const mSatin = satinMetal();
 
   const navy: THREE.BufferGeometry[] = [];
 
-  // 1) 下部裙边：外轮廓（带竖筋）− Tip 插口 − 凸起空腔
-  const skirt = shapeOf(outline(R, n, true, 1));
+  // 1) 下部裙边：外轮廓（带竖筋）− Bit 插口 − 凸起空腔
+  const skirt = shapeOf(ring ? ringOutline(R, true, 1) : outline(R, n, true, 1));
   skirt.holes.push(socketPath(R), ...pocketPaths(R, n));
   navy.push(slab(skirt, H * 0.5, R * 0.012, 1, 12));
 
@@ -197,19 +216,22 @@ export function buildRatchetDisc(spec: DiscSpec): THREE.Group {
   const seat = H + 0.004;
   navy.push(lathe(chamfer([[0.37 * R, H - EMBED], [0.66 * R, H - EMBED], [0.66 * R, seat], [0.37 * R, seat]], R * 0.004, [2, 3]), 48));
   const pitch = TAU / n;
-  for (let k = 0; k < n; k++) navy.push(toothGeometry(0.42 * R, 0.63 * R, k * pitch + pitch * 0.2, pitch * 0.55, seat, H + TOOTH_TOP, dir));
+  if (ring) {
+    // 圆环护轮：锁齿换成一圈连续的锁环（lock 最高的视觉表达），高度同样留出 Blade 中心凹槽的余隙
+    navy.push(lathe(chamfer([[0.42 * R, seat - 0.001], [0.63 * R, seat - 0.001], [0.63 * R, H + TOOTH_TOP * 0.85], [0.42 * R, H + TOOTH_TOP * 0.85]], R * 0.006, [2, 3]), 64));
+  } else for (let k = 0; k < n; k++) navy.push(toothGeometry(0.42 * R, 0.63 * R, k * pitch + pitch * 0.2, pitch * 0.55, seat, H + TOOTH_TOP, dir));
   g.add(mesh(merge(navy), mNavy));
 
   // 4) 上部透明蓝罩层：比裙边内缩 1.5%，形成合模线台阶；中间留轴孔
-  const cap = shapeOf(outline(R, n, false, 0.985));
+  const cap = shapeOf(ring ? ringOutline(R, false, 0.985) : outline(R, n, false, 0.985));
   cap.holes.push(circlePath(0.37 * R, 32));
   // 顶面比层顶低 0.0005：旧款 Blade 的平底正好落在层顶，避免与透明罩顶面共面闪烁
   const capGeo = slab(cap, H * 0.5 - 0.0015, R * 0.01, 1, 12);
   capGeo.translate(0, H * 0.5 + 0.001, 0);
-  // 透明件绘制顺序：Disc 罩层（0）在 Blade 底盘（1）之前
+  // 透明件绘制顺序：Ratchet 罩层（0）在 Blade 底盘（1）之前
   g.add(mesh(capGeo, mBlue, 0, 0));
 
-  // 5) 缎面金属衬套：连接 Tip 轴与 Blade 的唯一金属件，顶端伸进 Blade 中心孔
+  // 5) 缎面金属衬套：连接 Bit 轴与 Blade 的唯一金属件，顶端伸进 Blade 中心孔
   g.add(
     mesh(
       lathe(

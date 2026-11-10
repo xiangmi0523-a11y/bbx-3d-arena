@@ -8,21 +8,21 @@ import { computePower, PullStringGesture } from '../src/game/launcher/PullString
 describe('部件组装', () => {
   it('Blade/Disc/Tip 从下到上堆叠', () => {
     const b = assembleBey(PLAYER_LOADOUT);
-    expect(b.layers.tip.bottom).toBe(0);
-    expect(b.layers.disc.bottom).toBeCloseTo(b.layers.tip.top);
-    expect(b.layers.blade.bottom).toBeCloseTo(b.layers.disc.top);
-    expect(b.totalMass).toBeCloseTo(b.blade.mass + b.disc.mass + b.tip.mass);
+    expect(b.layers.bit.bottom).toBe(0);
+    expect(b.layers.ratchet.bottom).toBeCloseTo(b.layers.bit.top);
+    expect(b.layers.blade.bottom).toBeCloseTo(b.layers.ratchet.top);
+    expect(b.totalMass).toBeCloseTo(b.blade.mass + b.ratchet.mass + b.bit.mass);
   });
   it('可以单独替换任意部件', () => {
-    const swapped = assembleBey(swapPart(PLAYER_LOADOUT, 'tip', RIVAL_LOADOUT.tip));
+    const swapped = assembleBey(swapPart(PLAYER_LOADOUT, 'bit', RIVAL_LOADOUT.bit));
     expect(swapped.blade.id).toBe(PLAYER_LOADOUT.blade);
-    expect(swapped.tip.id).toBe(RIVAL_LOADOUT.tip);
+    expect(swapped.bit.id).toBe(RIVAL_LOADOUT.bit);
   });
   it('未知部件抛错', () => {
     expect(() => assembleBey({ ...PLAYER_LOADOUT, blade: 'nope' })).toThrow();
   });
   it('目录里每类至少两个部件', () => {
-    for (const k of ['blade', 'disc', 'tip'] as const) expect(listParts(k).length).toBeGreaterThanOrEqual(2);
+    for (const k of ['blade', 'ratchet', 'bit'] as const) expect(listParts(k).length).toBeGreaterThanOrEqual(2);
   });
 });
 
@@ -86,42 +86,42 @@ describe('P2：部件系统', () => {
   it('每类 4 个部件，id 唯一，全部可组装', async () => {
     const { listParts } = await import('../src/game/beys/parts/catalog');
     const blades = listParts('blade');
-    const discs = listParts('disc');
-    const tips = listParts('tip');
+    const discs = listParts('ratchet');
+    const tips = listParts('bit');
     expect(blades.length).toBe(4);
     expect(discs.length).toBe(4);
     expect(tips.length).toBe(4);
     for (const b of blades) for (const d of discs) for (const t of tips) {
-      const a = assembleBey({ blade: b.id, disc: d.id, tip: t.id });
+      const a = assembleBey({ blade: b.id, ratchet: d.id, bit: t.id });
       expect(a.totalHeight).toBeGreaterThan(0.4);
       expect(a.maxSpin).toBeGreaterThan(100);
     }
   });
   it('连续换部件互不影响', () => {
     let l = { ...PLAYER_LOADOUT };
-    l = swapPart(l, 'disc', 'quad-edge');
-    l = swapPart(l, 'tip', 'needle-point');
+    l = swapPart(l, 'ratchet', 'quad-edge');
+    l = swapPart(l, 'bit', 'needle-point');
     expect(l.blade).toBe(PLAYER_LOADOUT.blade);
     l = swapPart(l, 'blade', 'titan-crown');
-    expect(l).toEqual({ blade: 'titan-crown', disc: 'quad-edge', tip: 'needle-point' });
+    expect(l).toEqual({ blade: 'titan-crown', ratchet: 'quad-edge', bit: 'needle-point' });
   });
   it('换齿轮盘会改变刀刃高度（物理堆叠跟着变）', () => {
     const a = assembleBey(PLAYER_LOADOUT);
-    const b = assembleBey(swapPart(PLAYER_LOADOUT, 'disc', 'quad-edge'));
+    const b = assembleBey(swapPart(PLAYER_LOADOUT, 'ratchet', 'quad-edge'));
     expect(b.layers.blade.bottom).toBeGreaterThan(a.layers.blade.bottom);
-    expect(b.layers.tip).toEqual(a.layers.tip);
+    expect(b.layers.bit).toEqual(a.layers.bit);
   });
   it('存档里的坏部件只回退那一个', async () => {
     const { sanitizeLoadout } = await import('../src/game/beys/parts/catalog');
-    expect(sanitizeLoadout({ blade: 'titan-crown', disc: 'deleted', tip: 'needle-point' }, PLAYER_LOADOUT)).toEqual({
+    expect(sanitizeLoadout({ blade: 'titan-crown', ratchet: 'deleted', bit: 'needle-point' }, PLAYER_LOADOUT)).toEqual({
       blade: 'titan-crown',
-      disc: PLAYER_LOADOUT.disc,
-      tip: 'needle-point',
+      ratchet: PLAYER_LOADOUT.ratchet,
+      bit: 'needle-point',
     });
   });
   it('属性值都在 0..1', async () => {
     const { computeStats } = await import('../src/game/beys/parts/assemble');
-    const s = computeStats(assembleBey({ blade: 'titan-crown', disc: 'ring-guard', tip: 'needle-point' }));
+    const s = computeStats(assembleBey({ blade: 'titan-crown', ratchet: 'ring-guard', bit: 'needle-point' }));
     for (const v of Object.values(s)) {
       expect(v).toBeGreaterThan(0);
       expect(v).toBeLessThanOrEqual(1);

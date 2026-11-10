@@ -28,7 +28,7 @@ test('wall / tiers rate', async () => {
         seed: null,
         player: { power: 0.7 + (i % 3) * 0.15, aim, tilt: 0 },
         rival: { power: 0.8, aim: -aim, tilt: 0 },
-        rivalLoadout: { blade: 'gale-crescent', disc: 'tri-lock', tip: 'rush-rubber' },
+        rivalLoadout: { blade: 'gale-crescent', ratchet: 'tri-lock', bit: 'rush-rubber' },
         maxSeconds: 40,
       });
       walls += r.wallHits.player + r.wallHits.rival;

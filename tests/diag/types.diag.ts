@@ -18,9 +18,9 @@ import { simulateBattle } from '../sim';
 
 /** 三种战术定位的代表组合（只用现有零件） */
 export const ARCHETYPES = {
-  攻击: { blade: 'blaze-fang', disc: 'tri-lock', tip: 'rush-rubber' },
-  防御: { blade: 'tidal-bastion', disc: 'ring-guard', tip: 'dome-ball' },
-  耐力: { blade: 'titan-crown', disc: 'hex-lock', tip: 'needle-point' },
+  攻击: { blade: 'blaze-fang', ratchet: 'tri-lock', bit: 'rush-rubber' },
+  防御: { blade: 'tidal-bastion', ratchet: 'ring-guard', bit: 'dome-ball' },
+  耐力: { blade: 'titan-crown', ratchet: 'hex-lock', bit: 'needle-point' },
 } as const;
 type Arch = keyof typeof ARCHETYPES;
 

@@ -56,44 +56,49 @@
       "attack": 0.3,
       "defense": 0.6
     },
-    "disc:tri-lock": {
-      "kind": "disc",
+    "ratchet:tri-lock": {
+      "kind": "ratchet",
       "id": "tri-lock",
       "mass": 0.9,
       "rimWeight": 0.45,
       "radius": 0.3,
       "height": 0.13,
-      "burstResistance": 0.5
+      "lock": 0.5,
+      "teeth": 3
     },
-    "disc:hex-lock": {
-      "kind": "disc",
+    "ratchet:hex-lock": {
+      "kind": "ratchet",
       "id": "hex-lock",
       "mass": 1.1,
       "rimWeight": 0.5,
       "radius": 0.32,
       "height": 0.12,
-      "burstResistance": 0.75
+      "lock": 0.75,
+      "teeth": 6
     },
-    "disc:quad-edge": {
-      "kind": "disc",
+    "ratchet:quad-edge": {
+      "kind": "ratchet",
       "id": "quad-edge",
       "mass": 1,
       "rimWeight": 0.55,
       "radius": 0.31,
       "height": 0.16,
-      "burstResistance": 0.55
+      "lock": 0.55,
+      "teeth": 4
     },
-    "disc:ring-guard": {
-      "kind": "disc",
+    "ratchet:ring-guard": {
+      "kind": "ratchet",
       "id": "ring-guard",
       "mass": 1.4,
       "rimWeight": 0.8,
       "radius": 0.34,
       "height": 0.11,
-      "burstResistance": 0.85
+      "lock": 0.85,
+      "teeth": 0
     },
-    "tip:gear-flat": {
-      "kind": "tip",
+    "bit:gear-flat": {
+      "kind": "bit",
+      "role": "balance",
       "id": "gear-flat",
       "mass": 0.35,
       "contactRadius": 0.13,
@@ -101,10 +106,13 @@
       "friction": 0.45,
       "spinDecay": 2,
       "gearGrip": 1,
-      "drift": 0.16
+      "drift": 0.16,
+      "gear": true,
+      "burstGuard": 0.85
     },
-    "tip:dome-ball": {
-      "kind": "tip",
+    "bit:dome-ball": {
+      "kind": "bit",
+      "role": "stamina",
       "id": "dome-ball",
       "mass": 0.35,
       "contactRadius": 0.09,
@@ -112,10 +120,13 @@
       "friction": 0.18,
       "spinDecay": 1.2,
       "gearGrip": 0.35,
-      "drift": 0.05
+      "drift": 0.05,
+      "gear": false,
+      "burstGuard": 0.5
     },
-    "tip:needle-point": {
-      "kind": "tip",
+    "bit:needle-point": {
+      "kind": "bit",
+      "role": "defense",
       "id": "needle-point",
       "mass": 0.3,
       "contactRadius": 0.045,
@@ -123,10 +134,13 @@
       "friction": 0.12,
       "spinDecay": 0.85,
       "gearGrip": 0.1,
-      "drift": 0.03
+      "drift": 0.03,
+      "gear": false,
+      "burstGuard": 0.35
     },
-    "tip:rush-rubber": {
-      "kind": "tip",
+    "bit:rush-rubber": {
+      "kind": "bit",
+      "role": "attack",
       "id": "rush-rubber",
       "mass": 0.4,
       "contactRadius": 0.15,
@@ -134,7 +148,9 @@
       "friction": 0.45,
       "spinDecay": 2,
       "gearGrip": 0.8,
-      "drift": 0.2
+      "drift": 0.2,
+      "gear": false,
+      "burstGuard": 0.9
     }
   },
   "tuning": {
@@ -176,6 +192,7 @@
     "breakoutGrip": 0.35,
     "edgeGrip": 0.3,
     "driveMinGrip": 0.2,
+    "railGearOnly": 1,
     "rollBase": 0.02,
     "rollFriction": 0.02
   },

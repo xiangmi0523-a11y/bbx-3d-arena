@@ -1,12 +1,12 @@
 {
- "generatedFrom": "2d6131f63f97f87da3c225ad1b9bb7407a530501",
- "config": "1d488918d95647a1",
+ "generatedFrom": "3f8932349c4e7e24f6a8db3d94ab72d28bc36062",
+ "config": "062f2ceaf78fdc1b",
  "runs": [
   {
    "name": "AIM -0.5#0",
    "seed": 702,
    "steps": 1555,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "54988061e3ee8c661a792ddabdb2e0a721d16c63aa561cdfaff5009ffaad2302",
     "intent": "01a16ca6b8751575c8e988180bcf92cdc03968f48863a70a9471744db7c46c6b",
@@ -31,7 +31,7 @@
    "name": "AIM -0.5#1",
    "seed": 703,
    "steps": 1987,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "afc6d39af658ea84cdd4d9711aa01670de78ddb110ac3aa3c8d69a2abc9bde8f",
     "intent": "285146811b0600300daf66ef9aa1754cfc2a78f5c879cc4a00d90d5ab580c48e",
@@ -56,7 +56,7 @@
    "name": "AIM -1#0",
    "seed": 700,
    "steps": 1481,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "725b69e27ef3d21e1677287302c4653d2ece67bea853af0ef8ae5ab4e5168cee",
     "intent": "d3441751e7c89f7e822775cfde68d749d032108421bc08fc744593d47bf9cfb9",
@@ -81,7 +81,7 @@
    "name": "AIM -1#1",
    "seed": 701,
    "steps": 1448,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "b28bf5cf5310147c5fe5ede9c94442faa3c138a7b981c6c1b413a15ebc7d8add",
     "intent": "25ce84de0de70d8ce799a84fcdc093a332ab558174495b57c5539e8ee975f413",
@@ -106,7 +106,7 @@
    "name": "AIM 0#0",
    "seed": 704,
    "steps": 1456,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "ca3b9734ff84b527d0120863c9808b8ce22a4b8c102c7607eab59a94681b7947",
     "intent": "ad3a134ed902bff5c6f46c1b4b3a09a8780d41d0dadee61f033e86c9c548e62d",
@@ -131,7 +131,7 @@
    "name": "AIM 0#1",
    "seed": 705,
    "steps": 1257,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "b5cf7a00ec7d459f0b1d535732deb1fd7a1ef742bac5d87dbe06e7de52e9f2a6",
     "intent": "7ad7337a4c90961d40b781bca4b9e770aad688191e85849138760980231ea9bd",
@@ -156,7 +156,7 @@
    "name": "AIM 0.5#0",
    "seed": 706,
    "steps": 1257,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "bbea8c3af76c4c74b2d38c973592cb720c0ec5212803bdced7255bc3f48dcd55",
     "intent": "eed4931b98330bee8622735e262f13427078dcbd762eca7da80f9f82cbdd7e10",
@@ -181,7 +181,7 @@
    "name": "AIM 0.5#1",
    "seed": 707,
    "steps": 1838,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "59ebe6db9a1ba93dff270f31787bf72a673a0c10602ad07e635de815b6580298",
     "intent": "1b37d17c9715571c9b39516241d7f765c721e2a67ad9e19aa1b3e6da9e6cbcf8",
@@ -206,7 +206,7 @@
    "name": "AIM 1#0",
    "seed": 708,
    "steps": 1491,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "0e0749a7a9ea570bf5dd4e2b30502cb0c338ebd23878691922a8d38e2237f330",
     "intent": "70c21b98453de0161e0f17755641303e100788d9fea50ede91c297c757114d07",
@@ -231,7 +231,7 @@
    "name": "AIM 1#1",
    "seed": 709,
    "steps": 1223,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "7e856f1530a6291ebbbd3947f64d83266facf4be56131f68fdfe00bcf1ac322c",
     "intent": "c69acaaf87cc75e4a2afe52ff84f38bc1b0b1da3bf31b07f8dd957d3f0108ad6",
@@ -256,7 +256,7 @@
    "name": "AvA#0",
    "seed": 500,
    "steps": 1475,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "e350de97a70ef73acabafc6a5c8df4555e10edd968257005f46239d9f2dc2704",
     "intent": "0f04a13816b50567513693f6fcb30150eb49f7f0af8fa2907ac9d7b3c9144328",
@@ -281,7 +281,7 @@
    "name": "AvA#1",
    "seed": 501,
    "steps": 1279,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "cd6adaa8ade5622a152aa8833d7ad94d2cb3eaf9489090b67e5f31c536d4f4e8",
     "intent": "f907ec0caadabd3a4b058aa06b2dcf96f66707153a285ec858f00b92e162c65d",
@@ -306,7 +306,7 @@
    "name": "AvA#10",
    "seed": 510,
    "steps": 1432,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "4983db79c7a2f7f0fc53979cee114f662bc547db7685065e7bc5d147bed84d1f",
     "intent": "22c015f57b4e4c7d60a282f7929b266438b0bc57985ac5e30369b1aab9e51eac",
@@ -330,47 +330,47 @@
   {
    "name": "AvA#11",
    "seed": 511,
-   "steps": 1116,
-   "config": "1d488918d95647a1",
+   "steps": 1274,
+   "config": "062f2ceaf78fdc1b",
    "final": {
-    "physics": "c1c23c9516c33fa06b0131808078d579b0059fba4adf0e5a1635514d81adcebe",
-    "intent": "aed5091ec9f4706c728ada85b09f99194aa9d40c8d521e4b3fa27ad60f05a735",
-    "contact": "a777bb25be57f9c814f970a0a0a0e95d3d0431fa54f44a2dc4a4a6fbc8185c99",
-    "battle": "13b7c10214b738b92833b0cc1eb85e4417acd1877094a37f6cf7f29facd2fbb4"
+    "physics": "3f1a4f892d8327f5c8b833f581600c13dd188c7bbacbdb98527d2ba315adc050",
+    "intent": "e86a5675449c2d5290bc67aa5044008acef2711e3442cb4809e584e91fffc7e1",
+    "contact": "d43094ce2d9c30e6d127b5834948a77e42573fad95a84b76b81b266c9c0fd159",
+    "battle": "5edcf094d5a7b60ba0ec1c11bea361ace97b7507e6a206d2e84c890f0f521af3"
    },
    "result": {
     "winner": "player",
     "finish": "spin",
-    "duration": 9.300000000000113
+    "duration": 10.616666666666704
    },
    "counters": {
-    "hits": 3,
+    "hits": 5,
     "grinds": 0,
     "breakouts": 0,
     "wobbleBreaks": 0,
-    "impacts": 3,
-    "intentSwitches": 17
+    "impacts": 5,
+    "intentSwitches": 23
    }
   },
   {
    "name": "AvA#12",
    "seed": 512,
-   "steps": 1118,
-   "config": "1d488918d95647a1",
+   "steps": 1178,
+   "config": "062f2ceaf78fdc1b",
    "final": {
-    "physics": "b9f25ba0a854eb4cf5c2e79cf4acf25993eb82951495fce39b35e84d10fbb66b",
-    "intent": "75e8f11869ecfb75ee2811265f0e186e0afb4bce76a5b8073122f611f2d0aed2",
-    "contact": "4555050239b907bbd0f860e52cc2480698c2dfcf2da034bc619235cf0fff7592",
-    "battle": "0fd2d0828337cc48a9f13130be1d04b01e7fa56e8351784db52120fc2515db12"
+    "physics": "c4b31801eeec58c5cc3f5ee47e96000228237d27fd6e63bf850617791f7b476f",
+    "intent": "11e95b5a14082af77cc1418e338c24c79ffbed40f86ba2470620184c3ccbe07e",
+    "contact": "6e827932840764606ae62e72961437a56754db0c4a6e66af8e3f093e5813991b",
+    "battle": "94dd88f933d3e9953db1626067d4d541fb664a23746cbf756885a2cf38b2fff6"
    },
    "result": {
     "winner": "player",
     "finish": "spin",
-    "duration": 9.316666666666778
+    "duration": 9.81666666666675
    },
    "counters": {
     "hits": 5,
-    "grinds": 1,
+    "grinds": 0,
     "breakouts": 0,
     "wobbleBreaks": 0,
     "impacts": 5,
@@ -381,7 +381,7 @@
    "name": "AvA#13",
    "seed": 513,
    "steps": 1420,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "2c52e0fdbda47941164b6e459c3ee386c0596f1d44bd7cadd018a23069408801",
     "intent": "b293134f21204f7200ab2856f7d8026bfe318d10513f7a950724d9f779c051ca",
@@ -406,7 +406,7 @@
    "name": "AvA#14",
    "seed": 514,
    "steps": 1205,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "b8861240a2a497da96cac4b60f6d097128e65a9801e615c38796b4333f179943",
     "intent": "ad243499ca9d8f608f67d4a828cc6675c20c32bf3865d59d65d3a78caa038da9",
@@ -431,7 +431,7 @@
    "name": "AvA#15",
    "seed": 515,
    "steps": 1331,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "7a2cf7661d637b3221aaecb77751b1fdda13d6c6f50619f5cf506c593146f33d",
     "intent": "2dbe75ba229c30de420c490838c3a88d6120c123c605a0422d6575b6ea820b7e",
@@ -456,7 +456,7 @@
    "name": "AvA#2",
    "seed": 502,
    "steps": 1109,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "626c5584d45d077c024db6b8ad519af790e46ec01f4dfbe83d2b76af9209bf9e",
     "intent": "fd18406e827599649d6af4e41f2ca1f6f262e3001e1ab6c1b79335b8ca4e497e",
@@ -481,7 +481,7 @@
    "name": "AvA#3",
    "seed": 503,
    "steps": 1172,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "bfae24efd1df7d256c43068184bb495efcc98bfe37120980f18db5eeb2d1c5fe",
     "intent": "b97e25fd03d60e93d39ec2c29236bb24bc8986e92df4fb72b5416e5a5971b690",
@@ -505,33 +505,33 @@
   {
    "name": "AvA#4",
    "seed": 504,
-   "steps": 1171,
-   "config": "1d488918d95647a1",
+   "steps": 1666,
+   "config": "062f2ceaf78fdc1b",
    "final": {
-    "physics": "b12ec012b1f23ac0f74b92ce63b3ba3057013f1b37c3a412900e29cf45babffd",
-    "intent": "f4fc5c80fa94d205911149102165cbd9e32e880286a3456676a44f02b478f989",
-    "contact": "2e0d9c3837ecb91effc91de2e0959d3ba4447bf9c6ec8aca065fafb811229289",
-    "battle": "19b17637b6890e6de024c21501948020b3f9dd5cc3d710a1f1316add46b51728"
+    "physics": "79f09266d11d2b6e2e77055d529296e777258fb460534dcaaf044f2e110b3b53",
+    "intent": "93a1a20ba842da35db0da9bd525efb7de2ef102999d6a8e094fa248368c153d4",
+    "contact": "07c6591becad07c2d8f19c4b2eb7bda64c4c4f5fa17902028bb68213c95d2165",
+    "battle": "4f39048587c786f7e0f3fd2ea70e7d978c84efa9ba1abfb0c4a41ac869b974bc"
    },
    "result": {
     "winner": "player",
     "finish": "spin",
-    "duration": 9.75833333333342
+    "duration": 13.883333333333185
    },
    "counters": {
-    "hits": 4,
-    "grinds": 0,
+    "hits": 5,
+    "grinds": 1,
     "breakouts": 0,
     "wobbleBreaks": 0,
-    "impacts": 4,
-    "intentSwitches": 20
+    "impacts": 5,
+    "intentSwitches": 21
    }
   },
   {
    "name": "AvA#5",
    "seed": 505,
    "steps": 889,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "8bbde3565cc08d1a303e73afa76479e284624914bee84072be67dd38704b6dd2",
     "intent": "91218602ce70ce99498a3cf91d286cda6038ae3b4963e58620ee711789b61a2f",
@@ -556,7 +556,7 @@
    "name": "AvA#6",
    "seed": 506,
    "steps": 1393,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "f5e1c340526a3bbff3b0a99dc9b4adf19c0b18e1c177841a7a91cf4b77a2b22a",
     "intent": "6ba816a21bcead0b56c21db600288b044685aa23393fb9e3612e9b8383f01edd",
@@ -564,8 +564,8 @@
     "battle": "ac8383e74c9cb9ab8390a29e6ac43d6807e41477a921e60b298f90bc1e641b06"
    },
    "result": {
-    "winner": "player",
-    "finish": "spin",
+    "winner": null,
+    "finish": null,
     "duration": 11.608333333333315
    },
    "counters": {
@@ -581,7 +581,7 @@
    "name": "AvA#7",
    "seed": 507,
    "steps": 1312,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "bbdf004fce8fc992cd961e21d5a6154922ccccc40f5f3c3ac30e2a191b3de540",
     "intent": "70e310bf7d2bac4c99cbe1eeb306f36d31ca6edf380b3872a8ae96d6d7ec4abb",
@@ -605,18 +605,18 @@
   {
    "name": "AvA#8",
    "seed": 508,
-   "steps": 1222,
-   "config": "1d488918d95647a1",
+   "steps": 1276,
+   "config": "062f2ceaf78fdc1b",
    "final": {
-    "physics": "49e2b27112bd2877cd821ac79accd96eb66ffea8b2c9606b2d8d080b0c4fce43",
-    "intent": "cf58234acd7bd09570985e85cfd3a2d8a47e8213f7c7307a469d6cb9e399842d",
-    "contact": "3f87ce51b6e5f4efd8b860148a23e0f5b0558985476bb9107d6ca861a6c2a9ac",
-    "battle": "3effd42506d9c22ca2e8c5ac0de176b2770b76c25dd86e05ceec47ddcddae4c8"
+    "physics": "23882d5e7630f0b4b1f7f424a120a5a159d553857b39defa6839ffdfcde206de",
+    "intent": "87962e43551ed652f9130ee37bfe587fb2393805ed8a5759b81d01a94d6b13a8",
+    "contact": "bf4118832978c4fb57d799f6bf42c1525aa51c4ba6ea8df9830c2f24e10e9307",
+    "battle": "569c45bc80ea02b81afc6a8e11cecf3139b63cba0936c81e8d513ea5bbd16623"
    },
    "result": {
     "winner": "player",
     "finish": "spin",
-    "duration": 10.183333333333396
+    "duration": 10.63333333333337
    },
    "counters": {
     "hits": 3,
@@ -624,14 +624,14 @@
     "breakouts": 0,
     "wobbleBreaks": 0,
     "impacts": 3,
-    "intentSwitches": 11
+    "intentSwitches": 12
    }
   },
   {
    "name": "AvA#9",
    "seed": 509,
    "steps": 926,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "d3285e18569811473453d46f3477d0edf633997692d2734173c2135b711a6909",
     "intent": "40dad844be2442324a6ef86211d9c49d1f4fa11dd1a72a3f06b1ea3ba7b38162",
@@ -656,7 +656,7 @@
    "name": "AvD#0",
    "seed": 100,
    "steps": 1361,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "7775c5b87607837449ab15a2f47c770a1a052d4406e681a7035a11c81af73b60",
     "intent": "fdc10803567b3667e5557ace72f582ad93cae647ad835d34fc21ecf77f57d327",
@@ -681,7 +681,7 @@
    "name": "AvD#1",
    "seed": 101,
    "steps": 1431,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "5f5a59b94283b051fa95b23e486993f95a970a44f8147033ec311c0fdc726ed5",
     "intent": "7ca90ded7078214dc929b010271f746760d77d496aed52a395a00bcd1f69cf89",
@@ -706,7 +706,7 @@
    "name": "AvD#10",
    "seed": 110,
    "steps": 1745,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "3010a10507837c5c4ef8235cd5dbd9057c68b26ca9684e698be1a6ad4cbbc317",
     "intent": "883981dddfb4dfbfc2cf0b1162f57bd7fd54b6f3d857deaa86f4bb16c13dfdba",
@@ -731,7 +731,7 @@
    "name": "AvD#11",
    "seed": 111,
    "steps": 1693,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "467a4319051ae9505ea4ecb7d00d3fbac349fba4d150c70e3e6cb8f32c6bf7cb",
     "intent": "214835a65c920ae4b7919f3dd08df6582e336a8da333e664129810a1df04b268",
@@ -756,7 +756,7 @@
    "name": "AvD#12",
    "seed": 112,
    "steps": 1694,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "248379e49d9d9044eaf0a5af051c9dd61583321ffbbc64f55a3a98ef6aee332e",
     "intent": "e449f21579a727b76e024805cd507bc1ba3ad95ba6556163abc5b5519480a21e",
@@ -781,7 +781,7 @@
    "name": "AvD#13",
    "seed": 113,
    "steps": 1528,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "c48b9cd3b6ecf638f57c69c42fb522f03ef27459ab47cbf8018e91c3815a5d34",
     "intent": "64257348797ace8715de9649f2491cd983cfad40b392eb70f3834df54a44d5b5",
@@ -806,7 +806,7 @@
    "name": "AvD#14",
    "seed": 114,
    "steps": 1807,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "90a8b91dc909c28c241175cd9fcb43b8d253c651f42f8bdc78a97e38a0e715ea",
     "intent": "32df716e0cff95eb0abc48358dcc4c6edf6041d2acf1bbefbdfb416b8b1b00e9",
@@ -831,7 +831,7 @@
    "name": "AvD#15",
    "seed": 115,
    "steps": 1196,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "c0799ca74b93020c410f71969e01a1c13a316ce2590f82b30b9fb9e2bc9821ef",
     "intent": "08ffab9c47ba8ddbb2b565daf5c3eb88c58f4e5258616c74de14c9faeeeeacbd",
@@ -856,7 +856,7 @@
    "name": "AvD#2",
    "seed": 102,
    "steps": 1727,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "9bd0d0ff923cb2e08afcff179e15357a2b9dd8955d9894468ba3ff3ec794bd3a",
     "intent": "b34aa3b1ecaf9c640a63fcfa483fdea95bd01bf0da9ca8ae8ae04615625bc739",
@@ -881,7 +881,7 @@
    "name": "AvD#3",
    "seed": 103,
    "steps": 1405,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "d9edb80640b838eb503a1558d003cc55d0af800aff4a2958ecab1f409d2285fb",
     "intent": "cbbaec83ae5b9a68f49af3e80d205a2cafde35c5a99928b02d3b16827ff76c82",
@@ -906,7 +906,7 @@
    "name": "AvD#4",
    "seed": 104,
    "steps": 1880,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "e61c44a16aae5397dff7ad5c8b6bd27ed03a000864e68db8cf4f343db959d26f",
     "intent": "2fdba8f676a94e27c5d1e8573aa9193b12b8b5a0d1a4293e64b10f8a06afb4f7",
@@ -931,7 +931,7 @@
    "name": "AvD#5",
    "seed": 105,
    "steps": 2113,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "c07db8d642a305599d70a4582da737ca612856261f169fbe94ffef62cba293e3",
     "intent": "cc7375e836253ba87e1453aa95b5c30ce84217a46e7b85519afa00b88279232e",
@@ -956,7 +956,7 @@
    "name": "AvD#6",
    "seed": 106,
    "steps": 1198,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "5d966671610bc90b39fa61e3d4c8d7d0ba1d770100eca3391d152a0d8e262b0b",
     "intent": "6924cbd808239c305f5194f619391bab46a762d7acc489129bdd47506d56523c",
@@ -981,7 +981,7 @@
    "name": "AvD#7",
    "seed": 107,
    "steps": 1351,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "e37f8d260ad4b0c1a2ae2ad19489ec69611217364ce55c86a3d9c34dab486fdd",
     "intent": "a4daef40b6be2dc8b04589b29dd0a7b26bdd5d7232039077bb39c69d2c3e39d0",
@@ -1006,7 +1006,7 @@
    "name": "AvD#8",
    "seed": 108,
    "steps": 1894,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "901dfc858c340df78d8d54672b16ea0794b654081ee812d8f50f62677af7e5c0",
     "intent": "6b2f61cd7b9a13de894e5c8daffea5c86f41ebb2232cca6f1e651e7577777708",
@@ -1031,7 +1031,7 @@
    "name": "AvD#9",
    "seed": 109,
    "steps": 1365,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "c132b8c7872e01a0a5d9e917a17e2f689ce21ff0e48824492c30e6b31e05e09e",
     "intent": "8e079821029141ee418471dedbd68be5f9f5b8fe55d11250a8ff5643d0a48f6a",
@@ -1056,7 +1056,7 @@
    "name": "BvB#0",
    "seed": 400,
    "steps": 3064,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "5c971e975ad1a3b5064e3dbef4a1c5463fbab126c34410b5b3c182f1575494bc",
     "intent": "eaa95128c284d3071f6cb8b7bdbde8b56705e338306cecd7a468d801afc23b86",
@@ -1081,7 +1081,7 @@
    "name": "BvB#1",
    "seed": 401,
    "steps": 3001,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "140152ec48a054df76a341d0587f5073ef66a44b79b678a162754899e985ca5e",
     "intent": "43e0e61797a41062930789203715692875542f3ee5913ee4da470afd886e74ff",
@@ -1106,7 +1106,7 @@
    "name": "BvB#10",
    "seed": 410,
    "steps": 2517,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "7f0b3cf2d76f63f19d8431a10309638fa54e876287449a8d3e0eaf8649b0482c",
     "intent": "e306504aecf53ee33a4dd2b44ad4e5d410deda5c994ab52e44a7bbe7cfd75c79",
@@ -1131,7 +1131,7 @@
    "name": "BvB#11",
    "seed": 411,
    "steps": 3118,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "0fb7da512f15d5d9806ff3e6116e5ae61badf97e4dae9cfa4d348a508e3626a8",
     "intent": "0d31c98b7b930116354457287fc4f2f3098272c14095f36c63c63a0b1a766758",
@@ -1156,7 +1156,7 @@
    "name": "BvB#12",
    "seed": 412,
    "steps": 3029,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "b843de4482e18b4ce1926ee12fd858abc1b453b2a320b3c023ee7c9d93f0158f",
     "intent": "209b3b7629b854ef7c300406192ed24a115528a30bc936ebb1d8115a8645c004",
@@ -1181,7 +1181,7 @@
    "name": "BvB#13",
    "seed": 413,
    "steps": 2955,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "aff029c35e2db7904608782c107a52dcfa8676cd4a48f1328350d1ca96eaa8f3",
     "intent": "c674fb0192f4dc6fd8d0fc3b11fb3a3b730c0aea9997906906c0678b17b12318",
@@ -1206,7 +1206,7 @@
    "name": "BvB#14",
    "seed": 414,
    "steps": 2265,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "2c753a3d6a8db3bd97ac42e3a8df38465665a0e03cc3e2c56972b3013bbd2764",
     "intent": "41451f90dc0e115b0559d77bc9088e625cbe8b7dacd0810a9f357387ef3b34f7",
@@ -1231,7 +1231,7 @@
    "name": "BvB#15",
    "seed": 415,
    "steps": 2799,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "94170e2831ecc81bcb8515f04fa595b317277d7671e1e672f82013e532dbe5a6",
     "intent": "c0e20be2dfdac47098fe9c06089da72709ef94990d39f1ec11f9e07804c14551",
@@ -1256,7 +1256,7 @@
    "name": "BvB#2",
    "seed": 402,
    "steps": 2551,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "04e962fc6177e72abe896f721624c3034a1d8643f1c50f1396f34dd2621b2545",
     "intent": "5e374656c0edcda984c547e04caa3ff5205bbfcab8e3340b5f6af576749b6e8a",
@@ -1281,7 +1281,7 @@
    "name": "BvB#3",
    "seed": 403,
    "steps": 2646,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "422b36041d150745bb9e417645668b354983a938361c8a82ff5cc65909f20e5d",
     "intent": "bc4bcc714f5771e4b5935e4537a029aa98a5d94edcc3f61f5ae984bd45ce7409",
@@ -1306,7 +1306,7 @@
    "name": "BvB#4",
    "seed": 404,
    "steps": 3684,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "d0d29f30d93d808fc9a8b271792c72c3110c584e9f90ee2308c03b77336800fd",
     "intent": "5788fd131d10a26c7c04e04692dbaeb5ee8c3b298226e2cb78d5ce3051e6a562",
@@ -1331,7 +1331,7 @@
    "name": "BvB#5",
    "seed": 405,
    "steps": 2253,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "8c7729e25679006679bf793740a55968134b89306da7239fd5a570ed64c1a809",
     "intent": "9e4cdffafc43be7bb02d6aa137e051a6a30185e552339a8ba3a9e9d5417a1ea5",
@@ -1356,7 +1356,7 @@
    "name": "BvB#6",
    "seed": 406,
    "steps": 2734,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "ea89dc2564e9a48a18bb324131486b5accc863c40e21af5e38041b0a4ce137b0",
     "intent": "c8ed60d1e9e31f7c31be99736a8e223f6172b6cfa61ec9e3a0d9b4d0bc1b5935",
@@ -1381,7 +1381,7 @@
    "name": "BvB#7",
    "seed": 407,
    "steps": 2684,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "20a3203fcc0b9721a4e03bafda57bcdce738914bf04880a9fb1105f329ef0602",
     "intent": "a34cbd5feb6006b310cb2c915959742248f6748b722016e30f963a60676d3904",
@@ -1406,7 +1406,7 @@
    "name": "BvB#8",
    "seed": 408,
    "steps": 2107,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "378759c2addf4642cc9a4d06ed1ca5813721e2dd039b28d9dc9e9deb22b93527",
     "intent": "be339c750a2a8fa8bd7d6ab731990f8d86a2069aab2be7f2e42d521143cb8f16",
@@ -1431,7 +1431,7 @@
    "name": "BvB#9",
    "seed": 409,
    "steps": 2488,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "9f3c2d31d7e3e33a986da4f36d11043648003f8ae076a2bb0f5d4450f63057a7",
     "intent": "231e72acc8680ab5c9c78b75e0dca701c9e50ca606043b3be51c052d4a840e95",
@@ -1456,7 +1456,7 @@
    "name": "CTRL center BB#0",
    "seed": 5010,
    "steps": 3379,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "2fed5b548e94dbce06c2f14bd9ea6350700cbe4420290c1a69f466b2b1b6827a",
     "intent": "3849967ca80becb8d4fc7b26629ae8499d651a16a3c5a546aac83eb24f463b99",
@@ -1481,7 +1481,7 @@
    "name": "CTRL center BB#1",
    "seed": 5011,
    "steps": 3206,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "7ef1fc3e2b6e3837990ccb6beda7113e297c44cb120936320f29511be51bc815",
     "intent": "33f300ed82f733a8c45d04e42c99e186b2cc4260593d0f27c13487ebea6514d8",
@@ -1506,7 +1506,7 @@
    "name": "CTRL center NN#0",
    "seed": 5000,
    "steps": 7200,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "082951ef282a4373125de6b2770c7e72f33ceb13510d4097379f32062820185d",
     "intent": "648cbf97e5e5eca271beda39130a80f4683354ab8e4cf3a88a4f4e08fb0e199a",
@@ -1527,7 +1527,7 @@
    "name": "CTRL center NN#1",
    "seed": 5001,
    "steps": 7200,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "0c27caf09129217ccef9f18b0bbc12c1a92542298b3da3791ac00384b62d1e41",
     "intent": "df497afae58586b7fd543ea97f045fe9fa45b20d0e1131497f8f3d31ff6a5569",
@@ -1548,7 +1548,7 @@
    "name": "CTRL center NR#0",
    "seed": 5020,
    "steps": 1842,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "7088ed839fcc1198792eb60e8024d55910538efc287826a79b4f5dac4a25ac40",
     "intent": "5eaa2ad6510b1160a4e0c91ec33cc3e341996012e344be2828440b1e913f9098",
@@ -1573,7 +1573,7 @@
    "name": "CTRL center NR#1",
    "seed": 5021,
    "steps": 1657,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "837fc0cb10fe614736fb33a08b4916ec54281913a25b872eb10d5ce7ba58e7b4",
     "intent": "fa9aa26e4cc59767942f7d61ec6b220df1d13f092f84af80a2ba2535d702ba29",
@@ -1598,7 +1598,7 @@
    "name": "CTRL graze BB#0",
    "seed": 5210,
    "steps": 3100,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "3dc392b385a47025bd25d4a4467588a4c961ad5d7108cd515d8b4a3830515344",
     "intent": "a2af2160c13dfe78fc9bd0af3f443586203db13b561043284d2a3d5a960b1934",
@@ -1623,7 +1623,7 @@
    "name": "CTRL graze BB#1",
    "seed": 5211,
    "steps": 3321,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "a9dde0a21e52cbf85cab278efec93a4f687c7fa51d48f9f99278362124c1966d",
     "intent": "06937d7dc8085b3b4111913fe5fb40dc1254f91f71132a5f1477f81f67fdb8be",
@@ -1648,7 +1648,7 @@
    "name": "CTRL graze NN#0",
    "seed": 5200,
    "steps": 7200,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "afa96c524ca364398fbeb6e13193a48d7e5704ddebbfc8885d26668cfbb7b945",
     "intent": "5e7589be547e91f9c880e060aae21d1af014d24ac8e038b593b3afb37bea73f2",
@@ -1669,7 +1669,7 @@
    "name": "CTRL graze NN#1",
    "seed": 5201,
    "steps": 7200,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "1bb3526d413bd2dc8494a2ebf9b5450ace4229e6ea3868aac0c3256ef448bb20",
     "intent": "0d2bbfe07ee888e6497df643ea4c2ac3eba6048db1ff302d22d843f046f4196f",
@@ -1690,7 +1690,7 @@
    "name": "CTRL graze NR#0",
    "seed": 5220,
    "steps": 1562,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "2b7db5067665dbffc880fc943b340f54714a61eb27fc95ae84b949283057c81f",
     "intent": "b9d2b1dbce97464e9c4f22cae6b49997b910d3c1dffd50d620932c8f54a50511",
@@ -1715,7 +1715,7 @@
    "name": "CTRL graze NR#1",
    "seed": 5221,
    "steps": 1869,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "fec70720a24d8af99756381e609e51fb0e5b70ef592ac186fe6a9b177b848065",
     "intent": "f528cdd9a057df78d45ad659445e7102717b987044ea327b5479fbf1a1f0ee10",
@@ -1740,7 +1740,7 @@
    "name": "CTRL wall BB#0",
    "seed": 5110,
    "steps": 2815,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "3e3e4e86087cc5d1b66a0ae1e8393b2c92b12eff672f6c8391fdf90b838a0cc0",
     "intent": "5797b04b57ba0cfde52d7935e3b749cf9c10896d4ee63231c9daa5a0424ffeed",
@@ -1765,7 +1765,7 @@
    "name": "CTRL wall BB#1",
    "seed": 5111,
    "steps": 3282,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "e413d4c0bcf65f3ce47956fab04e531b07c1be083dadb72a8d9fadb7a0ce53d1",
     "intent": "5a7ec880e23d51c1923d19909f1992f7985841a3bef50aa45895d3c1745259b3",
@@ -1773,8 +1773,8 @@
     "battle": "8dcb4b358774121fd67940e9cf9d218869df06811cac1bb807058551d54c8902"
    },
    "result": {
-    "winner": "player",
-    "finish": "spin",
+    "winner": null,
+    "finish": null,
     "duration": 27.34999999999909
    },
    "counters": {
@@ -1790,7 +1790,7 @@
    "name": "CTRL wall NN#0",
    "seed": 5100,
    "steps": 7200,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "a2d86b5cd57c064838444b17936f14c6e24c8fc230404c58dba1a7fe37a60e52",
     "intent": "4b246c37b15209b17939257ab7a8aef81533531708601d6a2b167ddebc8cabff",
@@ -1811,7 +1811,7 @@
    "name": "CTRL wall NN#1",
    "seed": 5101,
    "steps": 7200,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "4f69a535c1459fe8440d0942df731b9e80e767d0976f5e30157b8b03453c4494",
     "intent": "753c36bb7926c7a053c0796fe246c02994e1595598296f265e39531bf149835c",
@@ -1831,43 +1831,18 @@
   {
    "name": "CTRL wall NR#0",
    "seed": 5120,
-   "steps": 1378,
-   "config": "1d488918d95647a1",
+   "steps": 1502,
+   "config": "062f2ceaf78fdc1b",
    "final": {
-    "physics": "5a2de94922a6ce32c44cf9c00901198158fc2b5e368b25b628876bcdb8bf75a1",
-    "intent": "7234d32dbe1f9eadf636068d4f7a8fbabe5f0c75ad18a75702ab72be6c1969e4",
-    "contact": "0d7a66a3dfeb3a5452aaecca5b5760530889b805911b36bb7c2bca8a13d5b53a",
-    "battle": "6ff522fcd1dce6cf308634e64d54bd469b70884c6d9afbadc76ef2edb7f040ec"
+    "physics": "f4c1e29a186dfdb783306ab7858a23506fd10446c863c3a0701819faf88a5e60",
+    "intent": "74240175c064715156c664cbca4cb52c6e8c7810a74ba2df31b69efb66da8b99",
+    "contact": "30ae287a6c14e83fed73b81bad1ed3b2110dfe667ed8724479cf1ca996ea27a6",
+    "battle": "4bf80ab9c90d16087c490cd1ae55d003f108b5b91bf75343c00d8c6a3013c584"
    },
    "result": {
     "winner": "player",
     "finish": "spin",
-    "duration": 11.483333333333322
-   },
-   "counters": {
-    "hits": 9,
-    "grinds": 3,
-    "breakouts": 1,
-    "wobbleBreaks": 1,
-    "impacts": 9,
-    "intentSwitches": 40
-   }
-  },
-  {
-   "name": "CTRL wall NR#1",
-   "seed": 5121,
-   "steps": 1546,
-   "config": "1d488918d95647a1",
-   "final": {
-    "physics": "ad058b246116615e201b68d6065d4d38908e5e04e8e17ad93f472f09c3289134",
-    "intent": "7f5a1a1c03a7e2b72896ee856b43fd7650b6b3ff219d915ffef1c8ed54eac5bb",
-    "contact": "9de6386a3b27820b764c473eab0ce6331b5046481b0c4fc0d35901737e2efd18",
-    "battle": "7dab2fc6fba366ee4e639951991a9e09f365135c061a0b6f85f8341d8a07778d"
-   },
-   "result": {
-    "winner": "player",
-    "finish": "spin",
-    "duration": 12.883333333333242
+    "duration": 12.516666666666596
    },
    "counters": {
     "hits": 7,
@@ -1875,14 +1850,39 @@
     "breakouts": 0,
     "wobbleBreaks": 0,
     "impacts": 7,
-    "intentSwitches": 31
+    "intentSwitches": 33
+   }
+  },
+  {
+   "name": "CTRL wall NR#1",
+   "seed": 5121,
+   "steps": 1915,
+   "config": "062f2ceaf78fdc1b",
+   "final": {
+    "physics": "333716336773542ea2fafb5354ca0d2ea61bd78edcc6c173bfa2989aa93db5bd",
+    "intent": "46e1074aec941c971a6f0debb30d834a79633389d57c681157a54e6590e3da17",
+    "contact": "84d35217985c1395247fba137891e8d8a8ebd8f24b83e86956cbc530d0eaf07d",
+    "battle": "c25275566979dd5708ca9912b7df879d70b6bb6f0d5ad2d826fcd286b3524582"
+   },
+   "result": {
+    "winner": "player",
+    "finish": "spin",
+    "duration": 15.958333333333067
+   },
+   "counters": {
+    "hits": 6,
+    "grinds": 2,
+    "breakouts": 1,
+    "wobbleBreaks": 1,
+    "impacts": 6,
+    "intentSwitches": 35
    }
   },
   {
    "name": "DFLT#0",
    "seed": 600,
    "steps": 1352,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "2004ac164900e7157a10f09685fdf0eda963cb1abcae7b47559e575d78cec48c",
     "intent": "47a89b64c8cf09f199752ede0da6880ef72a375927f46acaa1bb6ca109e8c8f2",
@@ -1907,7 +1907,7 @@
    "name": "DFLT#1",
    "seed": 601,
    "steps": 1504,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "f7134dc1ea3439b1af5928697892a137c6a091579a3c7cc737c5e5ef07bb9c00",
     "intent": "32a676d046cdfff1f7fd660697df42f0b02fdbcb3ef4a9438d15778d0bf2d5da",
@@ -1932,7 +1932,7 @@
    "name": "DFLT#10",
    "seed": 610,
    "steps": 1288,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "8520866bf2017041694840e70825ca8a44590be3b8ac855537886caa001e7b97",
     "intent": "0c43347e69215f1eb4d31a5ef8b07ff530f07516ad1e75c766b9b1c43bbb2367",
@@ -1957,7 +1957,7 @@
    "name": "DFLT#11",
    "seed": 611,
    "steps": 1365,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "4bc2750debb7458eb9ab8d787c98d642f550dd660cb86ffc74f897cbbd585748",
     "intent": "df5617d804a269676a6b88196085e5577a2ed3ff7c688f748da57c6dd8152cec",
@@ -1982,7 +1982,7 @@
    "name": "DFLT#12",
    "seed": 612,
    "steps": 1336,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "6aa7b329c160dea61a4ac37404c315887b462a374bfbf46f7db8458f08fe8db2",
     "intent": "0a17ea7dd6264159c98dbb8df92fd22bd8eee98463f832a59c322c1ed3d1e52b",
@@ -2007,7 +2007,7 @@
    "name": "DFLT#13",
    "seed": 613,
    "steps": 1344,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "e208711cb7da35d09eed5cadfb20148437f4191ba83807ef35881edb96e0c8ec",
     "intent": "44f22e043f6b61ef368d9297e724e9117446a422055eb6c261123eee080e898e",
@@ -2032,7 +2032,7 @@
    "name": "DFLT#14",
    "seed": 614,
    "steps": 1901,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "2b74ec1d06e95a5d75e501370d4b5df7689c316b7fa33853d911ca4479d43110",
     "intent": "c17d780e93462414c0e8e751e183d90c4299397acef00b1d21c7d25f421533f5",
@@ -2057,7 +2057,7 @@
    "name": "DFLT#15",
    "seed": 615,
    "steps": 1414,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "b6df559138f0fd417fe0f759981f76c175ba043911e5495bccaaa9dddbeeab83",
     "intent": "3dd46b522389215ab870491c9a41f17b1a3915c8ea3c1b498400eb84c488a208",
@@ -2082,7 +2082,7 @@
    "name": "DFLT#2",
    "seed": 602,
    "steps": 2206,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "6339afefaa537ca7791ed994bcde5df961bd1b7f51552b9d850a6fc1f7126b6c",
     "intent": "ea0227d1c739cb265a156b21afa92641cc540c7b6b63e70a7fbea48ae09930e7",
@@ -2107,7 +2107,7 @@
    "name": "DFLT#3",
    "seed": 603,
    "steps": 1334,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "798e63a8733f187de1f42352813220433315266f7024af18e1b4ebde14ea44d5",
     "intent": "03d34960a1e23718230f7ab5f25d48c29be93fbe17a914f4e68d46b5cb417792",
@@ -2132,7 +2132,7 @@
    "name": "DFLT#4",
    "seed": 604,
    "steps": 1666,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "e673f3f37e1c90d3185f6684378ec9b4345d6003f15208c03bea45c34925c375",
     "intent": "0478478bfad41fa9bc5844462f5efc2909aae2b362c4c346b1307deee00506f9",
@@ -2157,7 +2157,7 @@
    "name": "DFLT#5",
    "seed": 605,
    "steps": 1566,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "e9066ae3c7d65de27ce0bf6b1ae63ae27cc9a0e06fd3dd7454446e79daae6ab8",
     "intent": "537783fe195f641075ea3c36b50f883fbe57e9d0d181dc2ef6cee22954253098",
@@ -2182,7 +2182,7 @@
    "name": "DFLT#6",
    "seed": 606,
    "steps": 1382,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "b851b247a8f9aa1f07827f791384cb74e0d5cf236369d7f4f5bc73ec41803e1e",
     "intent": "940b2f66fa9b7aa165ec1f044a966603080b2e77358cde22c912c07a4080a522",
@@ -2207,7 +2207,7 @@
    "name": "DFLT#7",
    "seed": 607,
    "steps": 1441,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "816f31bdd504f3783bc472fc1628fe50af821b682b72a5c4bcaf9aae3177c1dd",
     "intent": "f555b617b7972a4e67e1b0af92737060e78c72ac6718bbc589d6bf74e347f36d",
@@ -2232,7 +2232,7 @@
    "name": "DFLT#8",
    "seed": 608,
    "steps": 1591,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "61281552cfe94cbe6856cb378d06a79a6339f5f7eaccbed324ff2919def90952",
     "intent": "44fddde66aa85ba554a01ef79c002cb4a28c95031defa698bdc3026aaecbdcd3",
@@ -2256,33 +2256,33 @@
   {
    "name": "DFLT#9",
    "seed": 609,
-   "steps": 1520,
-   "config": "1d488918d95647a1",
+   "steps": 1319,
+   "config": "062f2ceaf78fdc1b",
    "final": {
-    "physics": "70d59850781e037b8d7f621b5b5e3c974522f2e55f0163f5bebe8f9152d8e841",
-    "intent": "90407221c6889e9ddcdde91dcbf8bc3e0a0dfc3bac416d398694ef31298aa502",
-    "contact": "ff07b02237d7fed71e79505a3f0dfdcf3c7842d4c949e7ad314bd47962eb50dc",
-    "battle": "8422d6fc06fd9d18fbabf480e29ec6c85afb58c7c0e58a235438e9f541ab0392"
+    "physics": "158ef963e352a34b0857c998e44df8398e5106d35d5254e7d7697b6020f7c94b",
+    "intent": "af86dd6bf95f5e1992be307b7471fdb7a53c77aa12a7189288827497ec7bce13",
+    "contact": "e813bcb78a154aec6391230f8e773caa200bbc82979c4ace434eb4066842f830",
+    "battle": "45dfb7f9e09ead5f52d2bda0bc762fad03a7f2803bafbaa59c84a78161cc7b3e"
    },
    "result": {
     "winner": "rival",
     "finish": "spin",
-    "duration": 12.666666666666588
+    "duration": 10.991666666666683
    },
    "counters": {
-    "hits": 7,
-    "grinds": 2,
-    "breakouts": 1,
-    "wobbleBreaks": 1,
-    "impacts": 7,
-    "intentSwitches": 29
+    "hits": 6,
+    "grinds": 0,
+    "breakouts": 0,
+    "wobbleBreaks": 0,
+    "impacts": 6,
+    "intentSwitches": 23
    }
   },
   {
    "name": "DvA#0",
    "seed": 200,
    "steps": 1398,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "a4af8563f9f8281be038af13352cecef17d724b897ab5e79fdd8260a0b70e5a0",
     "intent": "7a76da850d5ad518c49060b497da1ee16c0b08c585f1df6797e713b75bfaed15",
@@ -2307,7 +2307,7 @@
    "name": "DvA#1",
    "seed": 201,
    "steps": 2039,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "7d528a303d3bc95a455740c077c106525898fae32fa56137e24980a2bf6ecc13",
     "intent": "b0c36a398a84f6d052d37b11d85218bc63dc56503af64487d65aefca98711162",
@@ -2332,7 +2332,7 @@
    "name": "DvA#10",
    "seed": 210,
    "steps": 2067,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "cee223d5697d466971a5cd24d10fd32767be45b4e3bd3211c95e90c3c1a8821d",
     "intent": "dd87d6d16550ab0c8b92ef72a63134ea70a713b1414022d8207589c7c9256923",
@@ -2357,7 +2357,7 @@
    "name": "DvA#11",
    "seed": 211,
    "steps": 1293,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "9ae834573f0eb36e8b4a3ba452fd8e509f04aa52971cf5734e0bd530f9bf2851",
     "intent": "afa2270f8eb4f320a21b185ca54537304b4dfebceac63c4cf8c55b54d1ca5b54",
@@ -2382,7 +2382,7 @@
    "name": "DvA#12",
    "seed": 212,
    "steps": 1202,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "751b829987b463e6e7e4210aa625576ecf479a869f03f20e26fd96f4c699ce6e",
     "intent": "4c0105ecf27c587e0ac6490219a8fcdcefa47890e49e3d7b873221b18598070a",
@@ -2407,7 +2407,7 @@
    "name": "DvA#13",
    "seed": 213,
    "steps": 2193,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "330a78e02793524f754c241a03a8ae9b518647fa0b1a2be36f522c40f29e5808",
     "intent": "d9961c3a92bdfc43837d50d67be63a80d252691edc47ca69d6929a76f5de6062",
@@ -2432,7 +2432,7 @@
    "name": "DvA#14",
    "seed": 214,
    "steps": 1218,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "c95d099fa159717e705abf75acc2abfaf0741b174f79b5a432c38f37d094db80",
     "intent": "40209276eb92d9e79354069b31235e791051927ddab55f2faf6bda6b73cdee1d",
@@ -2457,7 +2457,7 @@
    "name": "DvA#15",
    "seed": 215,
    "steps": 1353,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "790e9004b648c10cd72325714cc690c44606722f496235eaadd3bbcfecdc53fa",
     "intent": "c28e32de9e0721ad2345d292ed5655d788b7f3d3300d84485b6d86b8d14d705d",
@@ -2482,7 +2482,7 @@
    "name": "DvA#2",
    "seed": 202,
    "steps": 1206,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "c13d4b19b10a6778c48cbdb42d346bf7db290bb45ffd66b0001777fe9d542484",
     "intent": "e2957db038f7662b5964927bc30f516150fc7bcf92f3085f66ed03586ec4e3ac",
@@ -2507,7 +2507,7 @@
    "name": "DvA#3",
    "seed": 203,
    "steps": 1741,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "a1364deba7bdccc23407f656d2505cb33d334034b74dbb3a8ad5407c3ffb472d",
     "intent": "abb943dcb710935354388d5e10fa393955073e2580cc44c8108983664d298118",
@@ -2531,25 +2531,25 @@
   {
    "name": "DvA#4",
    "seed": 204,
-   "steps": 1764,
-   "config": "1d488918d95647a1",
+   "steps": 1659,
+   "config": "062f2ceaf78fdc1b",
    "final": {
-    "physics": "9f9019ce2b707c96d0a6cc0dfee356a3340e85becc51933d567042586f854327",
-    "intent": "d1656cbecee2406788271f526d1940678a203afdc5d2980d5f9499ff235c6534",
-    "contact": "32ca9f297dfec27b0ca3204ee36ced36b3ae071d034e9e5cf1b8f4a91bfca8d4",
-    "battle": "53f343445afa50c75c695c6d4a7be0cab4b2901cd16ea65bd33949c67c261c6f"
+    "physics": "38807578467a3c5fc8fee835139855275a858c0f6bea520d051f087727cf5c9f",
+    "intent": "8aaf44267f1982abfe4e440463dd0e37894e36a202306fc03536c7b1bdc4a4f2",
+    "contact": "fb6fadb23d28e8ebd51e5958c4e98c23f2003ac33710cd6e9c7f8f5fbf10f50b",
+    "battle": "53d8f2cfe4b0d3c91fc5d8a9c1b489deabaf8b08f62a0284f53f18eaa34a3f47"
    },
    "result": {
     "winner": "player",
     "finish": "spin",
-    "duration": 14.699999999999806
+    "duration": 13.824999999999855
    },
    "counters": {
-    "hits": 4,
-    "grinds": 1,
+    "hits": 5,
+    "grinds": 0,
     "breakouts": 0,
     "wobbleBreaks": 0,
-    "impacts": 4,
+    "impacts": 5,
     "intentSwitches": 18
    }
   },
@@ -2557,7 +2557,7 @@
    "name": "DvA#5",
    "seed": 205,
    "steps": 1227,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "0f9702dda315a4a962aa6d732ff514c101a50ea3bd3695e7a3c561d60941213d",
     "intent": "e0847a9aedf5715b35d8051d539e8dcb11eba262781b2d077ad5d772e8b4c010",
@@ -2582,7 +2582,7 @@
    "name": "DvA#6",
    "seed": 206,
    "steps": 1900,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "a4de48ad4ccc817e74d26d2ca4c6b2fb8f24884030d292033a8665c6bf0cfe64",
     "intent": "bc8b7c0b24375e9c69fa88cc19379e4e66acaa58a9fcf85b907db8d7d27582e4",
@@ -2607,7 +2607,7 @@
    "name": "DvA#7",
    "seed": 207,
    "steps": 1729,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "7038a00f13317135bf0f996ec882de183407ebc812a493e1f89522e8ec8b2db6",
     "intent": "f0af11352c1fc94f0594c63666587f8774947ad65b85615216f07c21bfd8cf1c",
@@ -2632,7 +2632,7 @@
    "name": "DvA#8",
    "seed": 208,
    "steps": 1334,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "442ce2a74b6700ef37a5a59587fb9a0ba6a4f5de1525c79d648f0ac5f88467a7",
     "intent": "24e3758bbbb8e777556ac19c3a974ffa8cff9ba11cde0d196b26646d63e61291",
@@ -2657,7 +2657,7 @@
    "name": "DvA#9",
    "seed": 209,
    "steps": 1840,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "3d86c7fc4640ff4137426c95d0853398c8dc2a7980d3ab5801ae088234d95a24",
     "intent": "653034fbcb22d1698f4c59842706baaf857e3f3c0165d52737a280713b505dc3",
@@ -2682,7 +2682,7 @@
    "name": "EDGE A/D aim -1",
    "seed": 1001,
    "steps": 1691,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "30b5dcbc50495a9a093e51a92b84fc3faf30e27a2c5e8c2724a60bed6370d0dd",
     "intent": "fa166474f61fd71d2d0c6f71863f16792daaa99992b35cc515dafe1db7cb5b49",
@@ -2707,7 +2707,7 @@
    "name": "EDGE A/D aim 1",
    "seed": 1000,
    "steps": 1550,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "03b397c8d72472274ea7b4b93c017ffe0364a239c0f6eb5b7d31dcaf36804c68",
     "intent": "c76079ac17c69499157c1542f7798e8657d0e89df0110311f581324484de197d",
@@ -2732,7 +2732,7 @@
    "name": "FEELBAL#1000",
    "seed": 1000,
    "steps": 2630,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "41c9633c275b87a9f0438e9d33fa255bdf64e44f6fed2885b9352a5c515cf264",
     "intent": "5426c88ca15ed7dcb1cb0f40c04d9e25a5890f6f22be9a401f9a9b0908b85688",
@@ -2757,7 +2757,7 @@
    "name": "FEELBAL#1001",
    "seed": 1001,
    "steps": 3354,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "2792c16d4564b58f0efa5112cdfefb936213d3658e692a2d4d0d0b2aaf557df4",
     "intent": "a52f85953056ed710ec75360001a9a8320adfdb0245f5aa2c7021dc8abf0a997",
@@ -2782,7 +2782,7 @@
    "name": "FEELBAL#1002",
    "seed": 1002,
    "steps": 3393,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "4325c189f904a2128db4b989e3271f25859b67fb868ca36264176bc6377d383e",
     "intent": "a86daa192ad6ef65ac96df44e45f0052f0ddcf9de5d9baf53aeccd1c17c69aa2",
@@ -2807,7 +2807,7 @@
    "name": "FEELBAL#1003",
    "seed": 1003,
    "steps": 3270,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "52e40a2d447725033b8fc9fef94511a96949dbe41bdca408c5cdb12ede59ea6b",
     "intent": "567b95528cb1e31c0881bb37c6624f516a2525c7fbdc6b304f1f85ee36875c77",
@@ -2832,7 +2832,7 @@
    "name": "FEELBAL#1004",
    "seed": 1004,
    "steps": 3723,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "8f18e8e69469e897f59a5e5b4ab31fd5f6c479c0f1ba6a8f42dedf49f0611c5d",
     "intent": "41e9ba5fb43fae65672da6686c9459dce65a495d69145c14241ef846ccdfefcf",
@@ -2857,7 +2857,7 @@
    "name": "FEELBAL#1005",
    "seed": 1005,
    "steps": 3384,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "c4f1e7024b4e4b4f2f1fc22091a2d766b69e1758ec1d3639826c92c2819109d4",
     "intent": "9b91f81b4bcc74da3a38e5f052669bb41eb3769e77f841a31baf245c286cc82c",
@@ -2881,118 +2881,143 @@
   {
    "name": "FEELSTA#3000",
    "seed": 3000,
-   "steps": 11022,
-   "config": "1d488918d95647a1",
+   "steps": 7201,
+   "config": "062f2ceaf78fdc1b",
    "final": {
-    "physics": "b41cc977e78f155ac48504e199667f5d48e98258a43f6e99fc17efaa3f21c444",
-    "intent": "4f2fec7142b118fe80a95aa711c92ed1144cd9ab63ec14e2e52c3c05d355a95d",
-    "contact": "d0d2b240ae4011dde7c2b126accd3115ca4af47a11e62f448ecce89174e7940f",
-    "battle": "fe1401ca9b9e49fdf6b34aec05911089ffa89e1ce41b3758bc8fbf48f8cf7051"
+    "physics": "bdfcceaa547f18fdbed2f74350732daa2bd7209d881e385419a232a207284f9e",
+    "intent": "7503bec24154bd872b6041215de1df30748a5e8f9646f8d51b4e2cf57655753a",
+    "contact": "e260a96ae5eb2dbc552cbc37f5af8ccd5fe5435d1b560a6eac1124e73b83ed2b",
+    "battle": "be91e5be29e804066028e2c83b2a390b59352a8bdeb0ff7d03594f1251e94eb7"
    },
    "result": {
     "winner": "player",
     "finish": "spin",
-    "duration": 91.85000000001916
+    "duration": 60.00833333333057
    },
    "counters": {
-    "hits": 4,
-    "grinds": 5,
-    "breakouts": 2,
-    "wobbleBreaks": 2,
-    "impacts": 4,
-    "intentSwitches": 25
+    "hits": 3,
+    "grinds": 4,
+    "breakouts": 0,
+    "wobbleBreaks": 0,
+    "impacts": 3,
+    "intentSwitches": 13
    }
   },
   {
    "name": "FEELSTA#3001",
    "seed": 3001,
-   "steps": 8261,
-   "config": "1d488918d95647a1",
+   "steps": 7201,
+   "config": "062f2ceaf78fdc1b",
    "final": {
-    "physics": "2121e92d77f6e3636634fb1207efe2da338436957f560ea6f90d4745375914ea",
-    "intent": "bfa4ef6242bafcd5a34a9d453f6974eba74d443f5a927789bc4df58fb0036eb9",
-    "contact": "5c79a5070df505d547f3cc818485de92497d547ccac0a8885fa647d6b36d3165",
-    "battle": "1ad3a79a78b654a7b807520d9724fe48e77abe305e13f96995b56c3f7d031bce"
+    "physics": "488fecdcfb9501f341401ccf41f4ae44e96dcbdc6c08c7c75fbdaa3c2790fe36",
+    "intent": "a94e2b319d9dcc6678140549cb51d448e38df530f1992fad7fbb181dc4babd7e",
+    "contact": "89443384fd6d64128e8c1e62a5f38067f324c1be6f157d4a474a3641ad875951",
+    "battle": "812febb8ab534a81f76c3973bba01108f5e174341f15a836a8ffb9bdf4df89d6"
    },
    "result": {
     "winner": "player",
     "finish": "spin",
-    "duration": 68.84166666666752
+    "duration": 60.00833333333057
    },
    "counters": {
     "hits": 1,
-    "grinds": 21,
+    "grinds": 7,
     "breakouts": 0,
     "wobbleBreaks": 0,
     "impacts": 1,
-    "intentSwitches": 52
+    "intentSwitches": 46
    }
   },
   {
    "name": "FEELSTA#3002",
    "seed": 3002,
-   "steps": 10706,
-   "config": "1d488918d95647a1",
+   "steps": 7201,
+   "config": "062f2ceaf78fdc1b",
    "final": {
-    "physics": "222e30f08b0ba259cc5ef0d06ef88b1f346b5fff4354f483ebb65c8643f93590",
-    "intent": "c6502687b7625d75b07e983eefe14679e7faf474b269c57df5b6d6dc59b1ee23",
-    "contact": "d6fca60e2c9d84e73939c3cc71bc06feae4b9b5eedaa68025ed4fb028569b089",
-    "battle": "9a80da5f89d1f8f7fb79fd5de23964eb27182cfa9b797461ae40d1389639296d"
+    "physics": "09a06e44aee00ed977c74b7d9fdaacfd04e1220c328f4f078c06990ab2157ba8",
+    "intent": "ec3242590e53511328515416cdf4e399eba51077777b77e016d32fd6225d1392",
+    "contact": "21ca9fc673324b9b1fbb1df3511bc9e2937838f200f841e28593a9b6156db9b8",
+    "battle": "79f2ea8a449436f6a84c839773e0b8358135fcbd870aa3af9b6219a6c3de2edd"
    },
    "result": {
     "winner": "player",
     "finish": "spin",
-    "duration": 89.21666666668374
+    "duration": 60.00833333333057
    },
    "counters": {
     "hits": 1,
-    "grinds": 5,
-    "breakouts": 1,
-    "wobbleBreaks": 1,
+    "grinds": 3,
+    "breakouts": 0,
+    "wobbleBreaks": 0,
     "impacts": 1,
-    "intentSwitches": 16
+    "intentSwitches": 10
    }
   },
   {
    "name": "FEELSTA#3003",
    "seed": 3003,
-   "steps": 9580,
-   "config": "1d488918d95647a1",
+   "steps": 7201,
+   "config": "062f2ceaf78fdc1b",
    "final": {
-    "physics": "b74dfa2608be24e7dc724ded322a672747e89b2ed050b9b83d3f46d6fd035cbe",
-    "intent": "8ba941bb3bb803372060fea52a5d907c07ac720303f838c7db7f1e4a08dca243",
-    "contact": "db80d42df4b94cab28d2272468df129f6dd19bd27240c57694b1a433df1af33a",
-    "battle": "38d708d2d235cfa696e45c73724d79ebc6e8c02ec7573a2310b234511ce5afb0"
+    "physics": "1e2196753f3c9e64c1f033bed9fae0323d288890cdf0cffa3553760c8b40215a",
+    "intent": "9bb7579f348003803db75bf6ea6784d3bc843ce64c971e54417a9b4b55869019",
+    "contact": "43c4f92f75f4b44b7314cf9a4c04ffe5e3d9198d45cb74ed473319a0085aabe1",
+    "battle": "f9da9ddcae8a1323004422422e52aa3f3adece7b3baead4d188c79f4f5c9aa84"
    },
    "result": {
     "winner": "player",
     "finish": "spin",
-    "duration": 79.83333333334294
+    "duration": 60.00833333333057
    },
    "counters": {
     "hits": 1,
-    "grinds": 8,
+    "grinds": 6,
     "breakouts": 0,
     "wobbleBreaks": 0,
     "impacts": 1,
-    "intentSwitches": 18
+    "intentSwitches": 13
    }
   },
   {
    "name": "LONG A/A#0",
    "seed": 1020,
-   "steps": 1104,
-   "config": "1d488918d95647a1",
+   "steps": 1588,
+   "config": "062f2ceaf78fdc1b",
    "final": {
-    "physics": "25e09aebd11ad04795626f5be72d799932302f4759a1607c1be81b9d956eef67",
-    "intent": "ec0aa53979413fbe64aaef111b29e87aaa32b80fa8c38d44806f8f66da7d5c95",
-    "contact": "87dde633a5d30e20790df1f48f4033eb44b06891a2a50667708eb592ad210e7c",
-    "battle": "3830df25ed04701397164fa2195e3b1eda3c6c82beb45a273d5e1ef45179c870"
+    "physics": "6c5984bf89b8fbf29b4802f300a13cd0a9a8ac9dd136173a0721510b0ddf5f3b",
+    "intent": "6fd06f1ff412633d0d2bcedc0085c24d16c7fea7a6c490d697d0e6d4f9668b54",
+    "contact": "83e480b3ddb8c0188cd7606630f4a2b75599a6fce8c6ce250c8b5f4fe23815b7",
+    "battle": "afc1fda946b670b86c9751d91a9e818d4c26d784669171f7b133f123a8f39165"
    },
    "result": {
     "winner": "player",
     "finish": "spin",
-    "duration": 9.200000000000118
+    "duration": 13.233333333333222
+   },
+   "counters": {
+    "hits": 3,
+    "grinds": 1,
+    "breakouts": 1,
+    "wobbleBreaks": 1,
+    "impacts": 3,
+    "intentSwitches": 20
+   }
+  },
+  {
+   "name": "LONG A/A#1",
+   "seed": 1021,
+   "steps": 1353,
+   "config": "062f2ceaf78fdc1b",
+   "final": {
+    "physics": "8e40e49d5147797cee0c5780ef1bf22fbb41fb535aaacefa30b1ab24f5effdbc",
+    "intent": "e57a3e88bcdf9a6b732bc2b2b42b880e3478e78fa7e8222d79d0d66d023feacd",
+    "contact": "ef0d0257ff1fc7fff07b71c411d8014ed47484df4839649ff76261f2f60fe11e",
+    "battle": "16acfd3687c7e818af79233ced9b29253c4207d5897a27e2cd33d0ccd4ae43c8"
+   },
+   "result": {
+    "winner": "player",
+    "finish": "spin",
+    "duration": 11.275
    },
    "counters": {
     "hits": 4,
@@ -3000,149 +3025,124 @@
     "breakouts": 0,
     "wobbleBreaks": 0,
     "impacts": 4,
-    "intentSwitches": 17
-   }
-  },
-  {
-   "name": "LONG A/A#1",
-   "seed": 1021,
-   "steps": 1204,
-   "config": "1d488918d95647a1",
-   "final": {
-    "physics": "5ea59b48c8c7b9b58da2206d9b21000b83afb7d812126e2f423a2a6b3bffb3eb",
-    "intent": "fc13b6696578ba6b0eb1b80d03d0c16a1808b8d3f2f919edb675eeffd89cad6d",
-    "contact": "9ab442dbe970586ed4f59922630b366bc0dc5cf63e44ba5aecf73c157e81202d",
-    "battle": "8f4982566b24edbe9814135a1e5bfaea9fd77317a2228f15a3347caf25118440"
-   },
-   "result": {
-    "winner": "player",
-    "finish": "spin",
-    "duration": 10.033333333333404
-   },
-   "counters": {
-    "hits": 5,
-    "grinds": 1,
-    "breakouts": 0,
-    "wobbleBreaks": 0,
-    "impacts": 5,
-    "intentSwitches": 23
+    "intentSwitches": 18
    }
   },
   {
    "name": "LONG S/S#0",
    "seed": 1010,
-   "steps": 11592,
-   "config": "1d488918d95647a1",
+   "steps": 7201,
+   "config": "062f2ceaf78fdc1b",
    "final": {
-    "physics": "3779179a7c0fd5e5f81605978ad06ac9ff59873ae85184e8451555a3a42d3d94",
-    "intent": "09e8d14877f28bb398ae81d105bc97a948f38ddc885b6c8a7b529eb37079f436",
-    "contact": "8af8f84c87232d07c86d93c1a98ec2f921c5a6e3a872a73fede6223f7b0d445d",
-    "battle": "3a741728c53f7d5524a7aa31225cfd1e7b57d425fd82496c736e649e4f397282"
+    "physics": "647b579d5c12fb9868b90392193c26f35216466891d151213da78033cbd55dca",
+    "intent": "02d42d92faba3437dda077e013be564613a6edd493befa531e95a65ac6ab2c79",
+    "contact": "2fb9dbaf92226e6eb7c7cf12b8b62593b07204b13be52c29fea63ccc724729d9",
+    "battle": "20b0ab94f9033092f1d23317b363ab2f8618b84e764de190a97901c6dfb8d0d5"
    },
    "result": {
     "winner": "player",
     "finish": "spin",
-    "duration": 96.60000000002294
+    "duration": 60.00833333333057
    },
    "counters": {
     "hits": 2,
-    "grinds": 14,
+    "grinds": 4,
     "breakouts": 0,
     "wobbleBreaks": 0,
     "impacts": 2,
-    "intentSwitches": 23
+    "intentSwitches": 18
    }
   },
   {
    "name": "LONG S/S#1",
    "seed": 1011,
-   "steps": 9374,
-   "config": "1d488918d95647a1",
+   "steps": 7201,
+   "config": "062f2ceaf78fdc1b",
    "final": {
-    "physics": "408a72a3ba2c0788ef9912144fc89db7b738b13aa1a91971bca746e4eec3e5c8",
-    "intent": "62b3df410c5d7732a0c89be44af777344b9ae9886998b1aeeb4b9f4faa0d223a",
-    "contact": "8f3016023594b2d2b984b910284a29a1d7891a8b61af61c6d0392abb4c48d28d",
-    "battle": "acf42109d7c1916973e1504c79d884f407cdcd7228ca1e7836a0447103a6c665"
+    "physics": "121b63b84aa69dc1a14433cbc7fafbc801982c29ed6259610d68a388884cbfda",
+    "intent": "22db131b98c0f5e6636763a3eb4857115b2dfbd7c29116a1a356e32ce09837df",
+    "contact": "7695074e209b9c8d705259c501ae31ab6520a427d72a45a3e6e40b8a2b16eef4",
+    "battle": "739d9a0566ccb1a78f173185dbd48cefb620a892f2eb4779ec304d2029ea40de"
    },
    "result": {
     "winner": "player",
     "finish": "spin",
-    "duration": 78.1166666666749
+    "duration": 60.00833333333057
    },
    "counters": {
     "hits": 0,
-    "grinds": 27,
-    "breakouts": 1,
-    "wobbleBreaks": 1,
+    "grinds": 12,
+    "breakouts": 0,
+    "wobbleBreaks": 0,
     "impacts": 0,
-    "intentSwitches": 66
+    "intentSwitches": 58
    }
   },
   {
    "name": "NNPOW 0.3#0",
    "seed": 4000,
-   "steps": 7452,
-   "config": "1d488918d95647a1",
+   "steps": 7201,
+   "config": "062f2ceaf78fdc1b",
    "final": {
-    "physics": "e66a4f09c3c0eb4bfcdb8f9445bbd99c5759de1a44d66fca83aba2859eb36051",
-    "intent": "67d3edd9296817d713c69d61742b87874c520d64d1dbe03e93293ca80ee2e2c7",
-    "contact": "6a20b4b8f8f788552ec9ac8ce82f5f7052f6cb950eeacc8bcf3bdab9f1cc6a7f",
-    "battle": "3e0081da2c4943458a8f6d3d9607933a3158d9db121062b30f61e67f4f4c7fe0"
+    "physics": "31828222ea0bc910a9e716fb6561af18cc4b7b12eeeece230f16070837ad4ae3",
+    "intent": "1493e502a27ac7cdf2271e9bab7a4a3cdf8a291ad6f5a171fc859031a718917f",
+    "contact": "a0dc0bafa4aa78662e07c81a96185de2a6cf0b2a55869ce5ca7c360bc8480e72",
+    "battle": "9a082644d4427bd617da816a281845d21fa850d703ee5d07dc8d5d4621505229"
    },
    "result": {
     "winner": "player",
     "finish": "spin",
-    "duration": 62.09999999999712
+    "duration": 60.00833333333057
    },
    "counters": {
     "hits": 1,
-    "grinds": 6,
-    "breakouts": 1,
-    "wobbleBreaks": 1,
+    "grinds": 5,
+    "breakouts": 0,
+    "wobbleBreaks": 0,
     "impacts": 1,
-    "intentSwitches": 16
+    "intentSwitches": 11
    }
   },
   {
    "name": "NNPOW 0.3#1",
    "seed": 4001,
-   "steps": 7649,
-   "config": "1d488918d95647a1",
+   "steps": 7201,
+   "config": "062f2ceaf78fdc1b",
    "final": {
-    "physics": "aaad8cc214221c2d71327a189770139c18f14113ba4ad3b7e4b2b16574cee57c",
-    "intent": "13076e75b31a53993571d19decab8bf5431c37ce5e2c7f40561bee7afba07d4f",
-    "contact": "b80d285e97e85bb916c0521bfba875ef7d7a20a7a2206af97e1365b4b9e24d27",
-    "battle": "a671b27de6b058f5dfb57d4d419be53a7434298d026f78a46b30e5c61340a9e8"
+    "physics": "b90a9f03abf740a5b3f4e2088a08b52ee8f58edde2ee826b99e9f917dce02db4",
+    "intent": "44d677f9ac71d1a1b287cc299c1d8dac3942a61e4c87638ff962d26609919a5e",
+    "contact": "1058563b396b5d02430e003df780f07eb49f37710a1a81b46800c8c9eaded409",
+    "battle": "88b529d6bc63c78b9755e366dbf8640c30462c4a8efda4eeb79deee9ee5dfc3e"
    },
    "result": {
     "winner": "player",
     "finish": "spin",
-    "duration": 63.74166666666369
+    "duration": 60.00833333333057
    },
    "counters": {
     "hits": 2,
-    "grinds": 8,
+    "grinds": 0,
     "breakouts": 0,
     "wobbleBreaks": 0,
     "impacts": 2,
-    "intentSwitches": 24
+    "intentSwitches": 21
    }
   },
   {
    "name": "NNPOW 0.3#2",
    "seed": 4002,
-   "steps": 9121,
-   "config": "1d488918d95647a1",
+   "steps": 7201,
+   "config": "062f2ceaf78fdc1b",
    "final": {
-    "physics": "c168ea3e886d7c7123ae07ce795ecf48f342c0cad7631f5bbf8ce3311135ae42",
-    "intent": "26d86856b58b582fbf587fbe296171ebbda4209a8be401fe46efba6609d740d4",
-    "contact": "31f3f04c24446b0123be4e5cea62bff938b48a46284b58de14057bdb5f1ebe50",
-    "battle": "9a54827b3a03876015373c729ea58b18a4409beab5f0ed6531c4267dc6400658"
+    "physics": "5041ccfb9689a1a71ec2e75da7267afc1c1961e068df47cff864e5a2a0fd347b",
+    "intent": "313dd6ade6cc80a007731fe81ff6bae008766fd0647594d314710fe86a75a96e",
+    "contact": "5d1d8862ea4b3fc02437d5001e9b9fa9751b78839a05b82314fc978c1d66d71e",
+    "battle": "5570771f75cdeba8f52b009451d567045605d31105f1223d4d4581630e26a5ac"
    },
    "result": {
     "winner": "player",
     "finish": "spin",
-    "duration": 76.00833333333989
+    "duration": 60.00833333333057
    },
    "counters": {
     "hits": 1,
@@ -3156,233 +3156,233 @@
   {
    "name": "NNPOW 0.3#3",
    "seed": 4003,
-   "steps": 7917,
-   "config": "1d488918d95647a1",
+   "steps": 7201,
+   "config": "062f2ceaf78fdc1b",
    "final": {
-    "physics": "a70a6bafdf6371a20cd06f0e196444832b04f6f2264bb51eec2779a78a7aaca8",
-    "intent": "f5ac8fdc0144405852551e31a9120c50779976663d7a3d23e781e5fde5282f86",
-    "contact": "d7255b1bf8b0840dc537fec8885f5218c84f8256853c1bf8dcfb5372d4e9c8c5",
-    "battle": "cb8f76938a91630a9335d4d69d2ef66ea221f862475f4c22d29b67320a2e5f44"
+    "physics": "8ae35f0ef72d408ad9cd560401d38676cbe19664987628453623979a1f9eb956",
+    "intent": "66483c37698b0527d06a831b1601d6a6b24a7bf423f2e009ab02dd10c65a50ca",
+    "contact": "cb92b3e2441135f65d2bee3a2d2c2f786084e700955d1d0695e24f29c91f1fa3",
+    "battle": "9588fa20beb59161d8c72ebb7613a033d81d9bc103acab4946d0a696d820989a"
    },
    "result": {
     "winner": "player",
     "finish": "spin",
-    "duration": 65.97499999999857
+    "duration": 60.00833333333057
    },
    "counters": {
     "hits": 1,
-    "grinds": 3,
+    "grinds": 1,
     "breakouts": 0,
     "wobbleBreaks": 0,
     "impacts": 1,
-    "intentSwitches": 16
+    "intentSwitches": 11
    }
   },
   {
    "name": "NNPOW 0.45#0",
    "seed": 4010,
-   "steps": 8362,
-   "config": "1d488918d95647a1",
+   "steps": 7201,
+   "config": "062f2ceaf78fdc1b",
    "final": {
-    "physics": "754820a0f396756d98a180b7729aa1dd7bf8e35df079b72a6c6dec7deef73bf6",
-    "intent": "8011dc9952cddb4bef4d041216da459f9b9c439fa62c02555851f338bdf6c404",
-    "contact": "124b58b14077e070129cd550caaa5de106fcd52146b260c905046e84b560bb0e",
-    "battle": "dfc446c57e0e2d2d3864c94127aeddc5c0541db05d417fb71e53bafc7a9fdf4c"
+    "physics": "fd32e0b0042408e4d71560c6b91551e587192c19c283f1333da44b480ab6f4f8",
+    "intent": "3ed03236208702187bc4b654315076ac098027b2cf88dfc5d91742e5062f0872",
+    "contact": "81089dada384d5520f4a4fdd156677f428f650cfc170033bfaba1a8ef2d78fcc",
+    "battle": "f7e4298e66a9afa9704f79f6dc48a91e492d3b142d5a1c3f12390e1643a0188e"
    },
    "result": {
     "winner": "player",
     "finish": "spin",
-    "duration": 69.68333333333486
+    "duration": 60.00833333333057
    },
    "counters": {
     "hits": 1,
-    "grinds": 13,
+    "grinds": 4,
     "breakouts": 0,
     "wobbleBreaks": 0,
     "impacts": 1,
-    "intentSwitches": 33
+    "intentSwitches": 20
    }
   },
   {
    "name": "NNPOW 0.45#1",
    "seed": 4011,
-   "steps": 8658,
-   "config": "1d488918d95647a1",
+   "steps": 7201,
+   "config": "062f2ceaf78fdc1b",
    "final": {
-    "physics": "f32273e757d06db74d7ec843430d6757666312dfaee669959e1fb5cc8a3aea93",
-    "intent": "bfa6eed55b5c05bc8a38f4ad3837c80def5e2230a76ce2943928232c36d0d8a2",
-    "contact": "316584e83f8e3a5fc93721582b31ed0edb18299d64d68f57df0bc6a0adfe7641",
-    "battle": "b839060d31c3dc6d593f0e7d1353165ab5aadf8e13ec61b783d8c02d6fcd51c2"
+    "physics": "c9bf3f3b592f115860256c27cb45acfbd879b31dc971c0b90fcfb03e1fee05fb",
+    "intent": "750606cfd2005c86a62336d4c5a5389c7119c24c9a306fcacb37093bc8f6adff",
+    "contact": "ceda7cd845dd38f3d50b92c155213685eb587fd6d7212bae94e5298abef8a89c",
+    "battle": "f22cba943181e58f13e65e5c3feb777e1529024b516d02861efe8fc68a8ff156"
    },
    "result": {
     "winner": "player",
     "finish": "spin",
-    "duration": 72.15000000000349
+    "duration": 60.00833333333057
    },
    "counters": {
     "hits": 1,
-    "grinds": 4,
-    "breakouts": 1,
-    "wobbleBreaks": 1,
+    "grinds": 2,
+    "breakouts": 0,
+    "wobbleBreaks": 0,
     "impacts": 1,
-    "intentSwitches": 15
+    "intentSwitches": 9
    }
   },
   {
    "name": "NNPOW 0.45#2",
    "seed": 4012,
-   "steps": 8602,
-   "config": "1d488918d95647a1",
+   "steps": 7201,
+   "config": "062f2ceaf78fdc1b",
    "final": {
-    "physics": "2ae8c148926fbd216dc5b173341590fe1be3449496bec773976abcd8f44b98f0",
-    "intent": "34978bf823425a97dbc919f8fa472d6ff2b0658503531eb9f8a5935e09263081",
-    "contact": "2c05e09e29fae96e2dd8098294b887fcd31d91ec5f22d27acb0cbac0beca6534",
-    "battle": "c0a7768cdb867a095c40f06fed0820df00ed1299c3488bcd567017691747ca45"
+    "physics": "8ea53bcc023b63ecd621a5f8ab4c03528ff229045227c92a827fa5f54cf5665c",
+    "intent": "a02e64f7f1c95d78a2cc7e4f43243e63e3102f837a526634b2a11588e58629ec",
+    "contact": "498b922e61bab9316dd97e7fb67435597062a7eba654f58a4171b84d486cdf1c",
+    "battle": "c2d1f846dc9179e1da42cfa625d53852301a57a00fea9c82c63105c8d7a260bd"
    },
    "result": {
     "winner": "player",
     "finish": "spin",
-    "duration": 71.68333333333645
+    "duration": 60.00833333333057
    },
    "counters": {
-    "hits": 3,
-    "grinds": 5,
+    "hits": 2,
+    "grinds": 3,
     "breakouts": 0,
     "wobbleBreaks": 0,
-    "impacts": 3,
-    "intentSwitches": 18
+    "impacts": 2,
+    "intentSwitches": 14
    }
   },
   {
    "name": "NNPOW 0.45#3",
    "seed": 4013,
-   "steps": 8830,
-   "config": "1d488918d95647a1",
+   "steps": 7201,
+   "config": "062f2ceaf78fdc1b",
    "final": {
-    "physics": "aeb53202884ea5d068acd499be5011fb2a700e14be0881c0036eafa6c7d818a9",
-    "intent": "06b52dc531f59415d8a87345a980060b5de0680c3c98ce9398aa6068d2b42b60",
-    "contact": "d87a4906b572995a8405d8042b8473350f09f22a5b56736dbfbfde5b21f373f3",
-    "battle": "f7e45be94b9387a9df02acbb897d345decbc759eea00e604a8affbb0df20e878"
+    "physics": "82daaffcaac3349f548d334165ada210ec7846236a227e1d750223536f2035c8",
+    "intent": "2466b4ff93255b68ab7769481b289b601f439a022f9d5fb4b93d00af9496a86f",
+    "contact": "8456846a46faa7b0c978054e616220995d3e6cc88803c72c849e57579dae5302",
+    "battle": "68f62c971e38b02f3cecdced631ba4167de55854b5d031bb74da18aed83d5a08"
    },
    "result": {
     "winner": "player",
     "finish": "spin",
-    "duration": 73.58333333333796
+    "duration": 60.00833333333057
    },
    "counters": {
     "hits": 1,
-    "grinds": 3,
+    "grinds": 2,
     "breakouts": 0,
     "wobbleBreaks": 0,
     "impacts": 1,
-    "intentSwitches": 17
+    "intentSwitches": 11
    }
   },
   {
    "name": "NNPOW 0.9#0",
    "seed": 4020,
-   "steps": 11594,
-   "config": "1d488918d95647a1",
+   "steps": 7201,
+   "config": "062f2ceaf78fdc1b",
    "final": {
-    "physics": "2a2b87191b7eaff3f2501d12d32ad855ba5284a1c9525851798428943b5cff63",
-    "intent": "a470a926b28a906a7140385a54a7cd51e3b183956bebacdf731246b8dd650c50",
-    "contact": "e18b371ea027e90a5ba51c6bdf867e5e9a63db6025fea8c8a8eeba68a07caeb9",
-    "battle": "788b7da58cc9cd7396272edb9cf00e5220d1af5ac5c5303d3c262c0b68307e34"
+    "physics": "b87ffcdae1ec33201a708bb732a3f8cd422f90dc6b681f47a96048b8fd7e0ce3",
+    "intent": "b8e9c41e4fa27ff7556908785da0d4e44e7833538c5a1f4d52640e01806f09af",
+    "contact": "38a25d973ea7f46b11ddd7695ea2809cb84c8ad97f8e912041746bdbc5242607",
+    "battle": "f2978d52b815b46e30feacde5b7b3165a17c5976328d7f1b5f4b150b17ea845b"
    },
    "result": {
     "winner": "player",
     "finish": "spin",
-    "duration": 96.61666666668962
+    "duration": 60.00833333333057
    },
    "counters": {
     "hits": 1,
-    "grinds": 13,
+    "grinds": 4,
     "breakouts": 0,
     "wobbleBreaks": 0,
     "impacts": 1,
-    "intentSwitches": 53
+    "intentSwitches": 35
    }
   },
   {
    "name": "NNPOW 0.9#1",
    "seed": 4021,
-   "steps": 11495,
-   "config": "1d488918d95647a1",
+   "steps": 7201,
+   "config": "062f2ceaf78fdc1b",
    "final": {
-    "physics": "69767b795bf0176cfa8b65bc45817a8d33dbb2d3409843a63550c04a6bffc4ae",
-    "intent": "126598cd71c11a1bf2ac97bc750ae85df2cac76a9d948900b5a89f34674dcc1a",
-    "contact": "4932e5fcebc887339851a0fe4b1a696338493c051010f56f339353952efdd643",
-    "battle": "95c227fef02956669d3100973bbc15ae9a2360eeb4c8450857f65007fe125844"
+    "physics": "d18d60e15d89999541b0b9ed9ed4d4d4dfd0ec6ca3fb5502c9ab514a5f9f5067",
+    "intent": "745cb8a6573cb41089ff80d83c2cde2d403beee82280cf18c4783cf453000e10",
+    "contact": "2c1344f7fd3d0212b1c5b7fd31c8cac3ea4c9247ee5766ad0a8a7c6185450847",
+    "battle": "a8488ddd75c258e3f9977cb3a47ff6d3b47bfbebf5b818d0bfe2cf3cd1e2c655"
    },
    "result": {
     "winner": "player",
     "finish": "spin",
-    "duration": 95.79166666668897
+    "duration": 60.00833333333057
    },
    "counters": {
     "hits": 2,
-    "grinds": 8,
-    "breakouts": 1,
-    "wobbleBreaks": 1,
+    "grinds": 7,
+    "breakouts": 0,
+    "wobbleBreaks": 0,
     "impacts": 2,
-    "intentSwitches": 37
+    "intentSwitches": 31
    }
   },
   {
    "name": "NNPOW 0.9#2",
    "seed": 4022,
-   "steps": 11575,
-   "config": "1d488918d95647a1",
+   "steps": 7201,
+   "config": "062f2ceaf78fdc1b",
    "final": {
-    "physics": "25d13311099e817396a701dd5caba40e335a78d8582a3b5710aed7a9f0fe31c8",
-    "intent": "0a70e9ee95541baa7d89d9dc43ecf7e23f3e94e3ac8d74aca116f865475d7bab",
-    "contact": "9bd26c04c6c2c2213bfdc6108d858e763f04b5cc654eab070fae2bab3a31efe0",
-    "battle": "24066fc08481aa2dfc8116a14636a897c206df72e672eee0c604dffb4c0104c8"
+    "physics": "fe362a90faa1cd675fd21433f1220e60ea8dbdcbea6f6ded6a2cf695cb39d360",
+    "intent": "5fefb456aaa1e52669b326f696dce0c1a771a26a58f7478e89e848c86c464e8e",
+    "contact": "921f4e0fa7dfd8ed13b952fd34aaf5e61e44f6b66182fe65a6ab16c40ba334c8",
+    "battle": "375ba573ece2ada94fb787425984191b3254a8eefd22a3d83f24903fbbb5e18f"
    },
    "result": {
     "winner": "player",
     "finish": "spin",
-    "duration": 96.45833333335617
+    "duration": 60.00833333333057
    },
    "counters": {
     "hits": 4,
-    "grinds": 8,
-    "breakouts": 1,
-    "wobbleBreaks": 1,
+    "grinds": 5,
+    "breakouts": 0,
+    "wobbleBreaks": 0,
     "impacts": 4,
-    "intentSwitches": 20
+    "intentSwitches": 14
    }
   },
   {
    "name": "NNPOW 0.9#3",
    "seed": 4023,
-   "steps": 11868,
-   "config": "1d488918d95647a1",
+   "steps": 7201,
+   "config": "062f2ceaf78fdc1b",
    "final": {
-    "physics": "4ab790d28031400c20dbaae61c0e48bb8425389def4531ff139ffb5499f6e64b",
-    "intent": "a50ca275a0384dacfcb7a1f020fd0dddabb5937a26ef897a660b2b66eee5508c",
-    "contact": "e3ace285110c14d253ea2ffe0598b58607c0d1fcbfaa84adc30b1edd579300f3",
-    "battle": "37b271627294b904bd2353aa3b0c9ba75c1204387c3c32032978fed708d49373"
+    "physics": "cfc5851b14379fb758028d15c219f3fb31c4cd0206ae5fae5485bc7a83b68e00",
+    "intent": "52c69a87c12c579310a4e7582371f53424a17d502530e147fed7c708c647449e",
+    "contact": "e01f115fa81afd0157261e4aab050013e4c7e86651d0b89ffc1510a4b0ce819d",
+    "battle": "34b8d1f9c1cec6a7678c467bb3780baf33dab5b848f6088f5a8ce1fb26ff6da7"
    },
    "result": {
     "winner": "player",
     "finish": "spin",
-    "duration": 98.90000000002478
+    "duration": 60.00833333333057
    },
    "counters": {
-    "hits": 2,
+    "hits": 1,
     "grinds": 4,
-    "breakouts": 2,
-    "wobbleBreaks": 2,
-    "impacts": 2,
-    "intentSwitches": 27
+    "breakouts": 0,
+    "wobbleBreaks": 0,
+    "impacts": 1,
+    "intentSwitches": 18
    }
   },
   {
    "name": "PHASE 0",
    "seed": 800,
    "steps": 1655,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "3c5fb911e9feee9d996677dddca25d8166726910f2335170b441392858576be9",
     "intent": "0effe94fb1265234638b024bf3520087b70c873509c75f6b074fa9758414f8c4",
@@ -3407,7 +3407,7 @@
    "name": "PHASE 1",
    "seed": 800,
    "steps": 1607,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "e0e7b007677fb83306a9e481ac8a440eeac13a5527e7daaae6016eed845a88ac",
     "intent": "066d6695dafe11f0d476ede6689ccd7db41d6f2ef2fa221a46ee43a4f10d3f61",
@@ -3432,7 +3432,7 @@
    "name": "PHASE 2",
    "seed": 800,
    "steps": 1291,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "098f22710e024d40c30be875e47ab3597577ddc35530d3d4d93a1c5d46668b39",
     "intent": "7f899941330800dab1cde53d1be34bcc36cf62d7f1d62e4be6612b3ddb5fa1d6",
@@ -3457,7 +3457,7 @@
    "name": "PHASE 3",
    "seed": 800,
    "steps": 1099,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "a576b084f8f1c89f80d121b08d285f0a68029d214050f79cf267848ddd275b21",
     "intent": "d6c774d3530ff659a33fed68166d4af4eb35a88034f6ec177e67c4ea7674672b",
@@ -3482,7 +3482,7 @@
    "name": "PHASE 4",
    "seed": 800,
    "steps": 1412,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "d43490c7947c8c5acad3ec0a869e1e369d0d46db4a8c8af42981f0da13c4aab6",
     "intent": "456977330cb6fc67a0509c49b94acdc52f7bcf6c199e78ac62ecbc82252d2637",
@@ -3507,7 +3507,7 @@
    "name": "PHASE 5",
    "seed": 800,
    "steps": 1622,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "c78b049d49dc78dacac768df0c97f11c7e09f4d12b7dd6ccebeed17c32f0bc5c",
     "intent": "30251b212fea4a46180d8696adba602501b77bea152e5b6eb72e51fcd6334eec",
@@ -3532,7 +3532,7 @@
    "name": "POWER 0.3#0",
    "seed": 900,
    "steps": 2009,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "d138253657c56a6cae852b44237a4e60bdce5bb2a8b36de486d0dce320cc600c",
     "intent": "752cf4aa707d5c5f64317445f3b579edeeb57d478a5f11963da3cff3c7a66b4a",
@@ -3557,7 +3557,7 @@
    "name": "POWER 0.3#1",
    "seed": 901,
    "steps": 1947,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "79e021d301143aa36dedd9ae97eac13352d2c92810ea55c00aededb2ade59c50",
     "intent": "588f029cdcf08f640e9cb31396ced1ae7c0471c382526407a71c6c44ed71b79b",
@@ -3582,7 +3582,7 @@
    "name": "POWER 0.5#0",
    "seed": 902,
    "steps": 2533,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "369453d7caf51fca19648cdcb14b605da7dc866765319a7c194c398778e04682",
     "intent": "6981e4503c0aa0afa570ee64aa7965e25dbec2d26282f89c036adac6a92158f8",
@@ -3607,7 +3607,7 @@
    "name": "POWER 0.5#1",
    "seed": 903,
    "steps": 2866,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "660a9a36abc8f217db307e5a3c6f3f818990491de67e94852e172e60361e1426",
     "intent": "567874310cdff40690442244161482c3d88b63f84540565450d8c599fc1ac53d",
@@ -3632,7 +3632,7 @@
    "name": "POWER 0.7#0",
    "seed": 904,
    "steps": 3511,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "e11bb903bb4767cdb01ccc34eb80233330b219bd25935b724f55f1a81d0ba2d7",
     "intent": "ce8a3dc8f337143e24ba1641f8a1a523be59f1712c794f8c9d1522caff78f6d0",
@@ -3640,8 +3640,8 @@
     "battle": "61334b27fe8c13b841be7845d6074e89678213c283da9edf0a3d1ca66c538295"
    },
    "result": {
-    "winner": "rival",
-    "finish": "spin",
+    "winner": null,
+    "finish": null,
     "duration": 29.258333333332313
    },
    "counters": {
@@ -3657,7 +3657,7 @@
    "name": "POWER 0.7#1",
    "seed": 905,
    "steps": 3528,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "ed980870cc57cfe51cfdb4ca390a9742f9526547fe37717f9cc1677cf5fb66c4",
     "intent": "5b773dbe56335a3d3e391b2aeda9eac6fd4e881cfb78548f9a62af2a4aa5e360",
@@ -3682,7 +3682,7 @@
    "name": "POWER 0.85#0",
    "seed": 906,
    "steps": 3096,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "9bdfbb9b01c9ebc79fdd2c62ec87472565d1103b92aa85aeb30dd85e1a1fb2b8",
     "intent": "5aa67c61a7eaee544de39f6e34f6253fd196241766d23e37d3493204fc9a8c90",
@@ -3707,7 +3707,7 @@
    "name": "POWER 0.85#1",
    "seed": 907,
    "steps": 3687,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "b2d4356f55d7c86056c931841fb8a89d2bc37f40706e530a7c30633cbed20905",
     "intent": "e6cf25c5e1d0c7c12a7b9028830225d5a9ec6f6a5fdf467d26e9248f62293b5b",
@@ -3732,7 +3732,7 @@
    "name": "POWER 1#0",
    "seed": 908,
    "steps": 2882,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "3d500b9d4cb1883f0010b6441d34935cd48808fdb27586b4a5f128ee8bb1b460",
     "intent": "1aa41a0af9d2cac0a6d5ccbbb9730531ed83516fad567132e73be082f0ee73d8",
@@ -3757,7 +3757,7 @@
    "name": "POWER 1#1",
    "seed": 909,
    "steps": 3096,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "c1138433609cd7a3855347059e577cf9722f7c0063ea42c678c31fcbc0d4ffd9",
     "intent": "0ab2523ba2329bec81d583a1c31f8f66836beecdd84e1fff0ddb2f4cba5d3b39",
@@ -3781,33 +3781,33 @@
   {
    "name": "SvA#0",
    "seed": 300,
-   "steps": 1585,
-   "config": "1d488918d95647a1",
+   "steps": 1612,
+   "config": "062f2ceaf78fdc1b",
    "final": {
-    "physics": "0942c5e35b4d8e4d7ce64a113f6df40cdbdda01ff1f1ed0764f00fc77d53ec8b",
-    "intent": "d4c29e524f6abf8819a1353419fe0a2c44d9ea917ceb57d0052fa3c7f2dbad62",
-    "contact": "857a40cce8eb6dc57d94a458d0999513f0033c18d3e058256842fe0b0f18819f",
-    "battle": "562f4ff1dd40f0c283ff675d4ae1b54bd752c03b52e96398b0b120011e516991"
+    "physics": "66dc3eba11abc483498b6034f001f6f38c2efa59b801adbe7e07d8e98523b2c5",
+    "intent": "fb3cc65d92d2ca2639d454be880dece2bbc169701af00d3fa414f7f3b67f91a6",
+    "contact": "e8b432c587bacbe198c67ab425d27f2380cb91d8eb8a5ab9e5bba979a7d1cf62",
+    "battle": "6e54a220a7b1f88454ed591cf78b58362f5d3af080a47536e7671b7e3d2d6462"
    },
    "result": {
     "winner": "player",
     "finish": "spin",
-    "duration": 13.208333333333224
+    "duration": 13.433333333333211
    },
    "counters": {
     "hits": 5,
-    "grinds": 2,
+    "grinds": 6,
     "breakouts": 0,
     "wobbleBreaks": 0,
     "impacts": 5,
-    "intentSwitches": 29
+    "intentSwitches": 28
    }
   },
   {
    "name": "SvA#1",
    "seed": 301,
    "steps": 2137,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "6a4a4c9b50a64bca7e08b9a54af21744382e2b5dc1e404a975f7797f669a5578",
     "intent": "d0474cabc00a3028d94d1c96c1829a03c5f15504c647cc37ee3ae6af7d1d4445",
@@ -3832,7 +3832,7 @@
    "name": "SvA#10",
    "seed": 310,
    "steps": 2454,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "39016bd351c53e5b55a423721f55746631d9bb50e9cbc137fd27c9b3eca703e2",
     "intent": "6cbee94b46172803f5e9fa07fcea2ca73ae1ce583536609793d0fca30e9e6dc7",
@@ -3857,12 +3857,12 @@
    "name": "SvA#11",
    "seed": 311,
    "steps": 1472,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
-    "physics": "f6949e41774c78c174f425483b436345d92fcd08ae2972edb75d5d69f73f643c",
-    "intent": "9ad1073c17da3f61dea7f2b9d68888523a2cda61f7a1dbdebe5afdc2dbbf64bc",
-    "contact": "60fbee366293750db709bba6c674d2315a080c1b9b5949a7fb16b1dd9edd9760",
-    "battle": "f73b58838bd8d4bf61b57b731e6d9734a756cf466486a780171102a1d2fcc7c0"
+    "physics": "c663d3a09ee3b4286ce9480bbbc27119145809e66a1b1aa2d4a1f2db03506993",
+    "intent": "f9ee88010521aeadb7508824f97991b724bd6c11d7c7ce73a064f010e98f1a9d",
+    "contact": "ae0ac3036621d2fbbbe4d46b4aa9e29da715292354aad6c0c0dc40b9fee5a521",
+    "battle": "cfa33a107bd2a8651f4bc11fc40f62c6b46c31f1ec62eb6a4f50f320ed691d39"
    },
    "result": {
     "winner": "player",
@@ -3870,19 +3870,19 @@
     "duration": 12.26666666666661
    },
    "counters": {
-    "hits": 5,
-    "grinds": 1,
+    "hits": 6,
+    "grinds": 0,
     "breakouts": 0,
     "wobbleBreaks": 0,
-    "impacts": 5,
-    "intentSwitches": 26
+    "impacts": 6,
+    "intentSwitches": 25
    }
   },
   {
    "name": "SvA#12",
    "seed": 312,
    "steps": 1802,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "2a7aa1e07fa712a4c6b3ae6fb971225eb175749224dd86761d1b769cff8ede31",
     "intent": "f55fe199154a67d140e500e909a4ee58f5b9d17c446eba7fe7c40123ba01345d",
@@ -3907,7 +3907,7 @@
    "name": "SvA#13",
    "seed": 313,
    "steps": 2079,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "554e61cc21a28ea70961dc5297ff69bcebe975d5256eb13f0c872bafb8d7e5cf",
     "intent": "39fb48000055452d27d8a341a6210e2aeb9b1ff1a1801a8eb93e9a30adaae8d9",
@@ -3932,7 +3932,7 @@
    "name": "SvA#14",
    "seed": 314,
    "steps": 1814,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "a22a35f211134009fc369424cff3f32a753808b755cbb55556e98c86ae1dcb56",
     "intent": "e8adaa954a81a59bd14a686303efbc31ea461985229670caa7b40e07193369dc",
@@ -3957,7 +3957,7 @@
    "name": "SvA#15",
    "seed": 315,
    "steps": 1933,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "b2732cf1773ae9b80e9e842183bd95db26b9d71c0eeb85894d57c3f294b012a1",
     "intent": "9a86c9df7e87f54f4a0737dd653f1ea39f3486a3801ba95833c596fc566a3054",
@@ -3981,83 +3981,83 @@
   {
    "name": "SvA#2",
    "seed": 302,
-   "steps": 1557,
-   "config": "1d488918d95647a1",
+   "steps": 1626,
+   "config": "062f2ceaf78fdc1b",
    "final": {
-    "physics": "c2b9783a6e873bfc1969439b2eaa3d6471275a28722debe5c5003039391ae247",
-    "intent": "0d09379b831b7afe889f098b7f12727e5a3ddb4e97e34a3e2df02ba7f74539b7",
-    "contact": "c145053c7d61a4160888ff981689cd2b90dc776f659b4e6b41bc9b0e645e30ef",
-    "battle": "5841f55dd153f43124588052243ef5a8c3606e8460590fadb0fc237c9c3d64d9"
+    "physics": "e19d8eaabd1055e8963a95c46ceee1dadba1021e88d3c9b7cca7f29c1a255874",
+    "intent": "c9476d089220ae7223b92517b32ab4eace29b3526794476150985216fa01720a",
+    "contact": "07dc053136374a0e1ac042b40770f6fb3707b27347245cc116bcf0cec95925f4",
+    "battle": "c499d4e1465a93c12a8fdca4d1ab306bebc194069876480f39b754d005081c59"
    },
    "result": {
     "winner": "player",
     "finish": "spin",
-    "duration": 12.974999999999904
+    "duration": 13.549999999999871
    },
    "counters": {
     "hits": 7,
-    "grinds": 1,
+    "grinds": 2,
     "breakouts": 0,
     "wobbleBreaks": 0,
     "impacts": 7,
-    "intentSwitches": 39
+    "intentSwitches": 43
    }
   },
   {
    "name": "SvA#3",
    "seed": 303,
-   "steps": 1905,
-   "config": "1d488918d95647a1",
+   "steps": 1757,
+   "config": "062f2ceaf78fdc1b",
    "final": {
-    "physics": "d0623cac3be74a14ed6c638cd55a600b5d76907439e24c225e6a652b918b9bc0",
-    "intent": "00badc383e596ecea0b569761369aa4d72e1a56aba860de9e17bd1ca5cc3c3a4",
-    "contact": "afcb16080a34cc5e1b74fe96030039f8d618c3732854b028fe071c8cf4169048",
-    "battle": "7733c5492fa0a1ecac32b68649fb5525eb8e1bcafb95bbd886cf0316b3ba02e9"
+    "physics": "aa6c84651a44fb7e4dab65625226f2f4e733ef6c9783d90f92764f26df36be84",
+    "intent": "3373a2c2ab7be04a29e791816c7482f33a186990ad1cd015ce08f53b10f248ae",
+    "contact": "e58c20f5957ec1f80c9d8b7ca9a45d9e7bad59be837f539a653b57236bee2456",
+    "battle": "b018288e75e9be3d92dca3fd1da85e95505baf4520da82a23755a62c23028712"
    },
    "result": {
     "winner": "player",
     "finish": "spin",
-    "duration": 15.874999999999739
+    "duration": 14.641666666666476
    },
    "counters": {
-    "hits": 8,
-    "grinds": 3,
+    "hits": 6,
+    "grinds": 8,
     "breakouts": 0,
     "wobbleBreaks": 0,
-    "impacts": 8,
-    "intentSwitches": 43
+    "impacts": 6,
+    "intentSwitches": 37
    }
   },
   {
    "name": "SvA#4",
    "seed": 304,
-   "steps": 1948,
-   "config": "1d488918d95647a1",
+   "steps": 1921,
+   "config": "062f2ceaf78fdc1b",
    "final": {
-    "physics": "bb86cc5704eefc52f877b5a4fafb156d8abe788ac24e2c34ce4ff3806dffc0ae",
-    "intent": "1cbf7d5693200fab2ab5cb37de8126bdc58f594218caa8dc10152a226d5f68d9",
-    "contact": "f2488230b5a8927b7df0a7f364ac2cbf4a3318dbe891a817dfc0080aab069a3d",
-    "battle": "b3f2b07c3cdb9cc64c59a3ed2a99d556de68aeb6215c52b1f1ca1c7de9c246a8"
+    "physics": "5cb3c3b4a83141b31cf01fcf3ec13d3238a8a64ce84de3d00e4afa099d027cd1",
+    "intent": "c5cce135a03aef3736ce9f1ff0b79e1d1f381fd4ad0f93204080b2fab63a8078",
+    "contact": "d80c1f0e84b09f91ffdcb41d8f2926aad5207a0c850eba4676fa95339cd0b696",
+    "battle": "3c60227f0bbbcd4d47ffdf0b6fe0c596f01ac5c7edac52d76c90457068ed716a"
    },
    "result": {
     "winner": "player",
     "finish": "spin",
-    "duration": 16.233333333333054
+    "duration": 16.008333333333066
    },
    "counters": {
     "hits": 6,
-    "grinds": 4,
+    "grinds": 7,
     "breakouts": 0,
     "wobbleBreaks": 0,
     "impacts": 6,
-    "intentSwitches": 38
+    "intentSwitches": 28
    }
   },
   {
    "name": "SvA#5",
    "seed": 305,
    "steps": 1668,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "7d7261e14c6a228788475e2e1f498def7415e73dd0152ee3b4ea2a28c7dea1fb",
     "intent": "2ac403939b637ffecd4d4b22ba2cb913b69a5bbcb6e4e5f2d7828865d4bc4cc7",
@@ -4082,7 +4082,7 @@
    "name": "SvA#6",
    "seed": 306,
    "steps": 2245,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "ec09d61055158a0956754b5ca9fd604ffe944cb03f9e081fc7f55832a900207d",
     "intent": "7f2968251f14f620f20241bde5deb50073c70a425a85f1616073a6281fe1911c",
@@ -4107,7 +4107,7 @@
    "name": "SvA#7",
    "seed": 307,
    "steps": 1875,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "10f9d1f21976b4e36fbd11050d811e3ff1ce35fe9acc2949f3a7518ee5dd3f1d",
     "intent": "c0d6b800ef4610b8927f2e2ffa82564c0ae1f9b51ec3ae39c63fc7ae1ad30170",
@@ -4132,7 +4132,7 @@
    "name": "SvA#8",
    "seed": 308,
    "steps": 1469,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "9effac1180b6466d3e48dc4c0ea8674a6d79e59a89e577a5ba87603b56199677",
     "intent": "c0af59c6730a8dec0af5ce944028eb18bef84a49fd9eacba5ca067e05b99c598",
@@ -4157,7 +4157,7 @@
    "name": "SvA#9",
    "seed": 309,
    "steps": 1734,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "abe95549378b1fb84590fbb737f5ec176e161bef7198011f7d06c09f8a129904",
     "intent": "25e06690d2dc4259be02ce61f82a64d200b2828403c5388fcd74935630c31272",
@@ -4182,7 +4182,7 @@
    "name": "WALL#0",
    "seed": 1100,
    "steps": 1471,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "a76f1eeec4e457af8e511280a215778f92ce49cde9916dda4e4299c5f6ed5e6f",
     "intent": "cfb0b5e5f34d88afbc003e6cfdac70cc77306ea528e9725fa8ea18563fbf8459",
@@ -4206,18 +4206,18 @@
   {
    "name": "WALL#1",
    "seed": 1101,
-   "steps": 1157,
-   "config": "1d488918d95647a1",
+   "steps": 1155,
+   "config": "062f2ceaf78fdc1b",
    "final": {
-    "physics": "e5824699380c144d73a0a6d32ef8ea7cc276072178adaa4897ba516bf306e46b",
-    "intent": "1c4fea02ad5c6cc90f5b3288837595511c890da725d9ae505bbd9cbf26621350",
-    "contact": "d2daa79b627949a1619f1f7b73316175b98fb0231b92bd3fbd207e0377c8c0c2",
-    "battle": "afb76bb7eef5d6ae2f2cc96f48b5508abd94b4648233fb3566f8c2e7b9819548"
+    "physics": "d4d6df622db205aa0a036768b8416c823675914075ac0bafe58fdb373704f892",
+    "intent": "12ca89a7f202c969727e4f00388e3bcb8f6716cb421e63ea84ddf19d4fd64656",
+    "contact": "e48d654733d58f013d7b365b125a0cc085b0c8e01d628d381689a01503b159db",
+    "battle": "c8d6182665302bf753f659dede09308f71667a4f10903955fd1cbb781b91549b"
    },
    "result": {
     "winner": "player",
     "finish": "spin",
-    "duration": 9.64166666666676
+    "duration": 9.625000000000094
    },
    "counters": {
     "hits": 5,
@@ -4232,7 +4232,7 @@
    "name": "WALL#10",
    "seed": 1110,
    "steps": 1170,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "ab2ec073691198685d1ce4ab116b3195aa011172fd0d0eab1421b785085b4b8d",
     "intent": "90e9076fc961154edc5af37b797500b2a7342cd47154d9aba0a512186ac97a31",
@@ -4257,7 +4257,7 @@
    "name": "WALL#11",
    "seed": 1111,
    "steps": 1154,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "bbeb92301482bca391e2bb12a919ecd9ae2073b49ff21910645cca4b9df677a0",
     "intent": "fe10698a4499f6ac30466f726081f2ccffb1f303cd630c44dc312af702a96f50",
@@ -4282,7 +4282,7 @@
    "name": "WALL#2",
    "seed": 1102,
    "steps": 1323,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "234f7ee39d3c35d35d2c11ad627e33eef60f79244210cac7ba221bf64c213c65",
     "intent": "f91128593ccaabfc0a43aea24cdfbd8dc9f0f1e4ab2987ef0fa54007aad25982",
@@ -4307,7 +4307,7 @@
    "name": "WALL#3",
    "seed": 1103,
    "steps": 1668,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "5cbdc87d23b0a5d16814d2ff5ebe1ba522cd16bb501f4db23e38f8ad4c799d03",
     "intent": "a1a55700dee61da0cf7419dc9c40709bb708efbfbb0489fbe6a381ca3ccb54fa",
@@ -4315,8 +4315,8 @@
     "battle": "0e041707bae53d170e810b2ab4b101a7d82bf0217b03a49804b8c82883fdb2b1"
    },
    "result": {
-    "winner": "player",
-    "finish": "spin",
+    "winner": null,
+    "finish": null,
     "duration": 13.899999999999851
    },
    "counters": {
@@ -4332,7 +4332,7 @@
    "name": "WALL#4",
    "seed": 1104,
    "steps": 1019,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "b66fcb89c614de2d529ec8a82cb73d1f399fd422b7e8220d52b04373d35aaa8e",
     "intent": "dfbdc770a79be3a44fa960815bcebf47729874c8a5f26f46c0fe4b2859bbc554",
@@ -4357,7 +4357,7 @@
    "name": "WALL#5",
    "seed": 1105,
    "steps": 1252,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "f45613b9402e3ec74f55faa6f240b4f28369df938250349777126de32c15709e",
     "intent": "46125a1bc94e16a49530b4f77d2579e612874500f6eac2bcb3b4dddedfa29e47",
@@ -4381,18 +4381,18 @@
   {
    "name": "WALL#6",
    "seed": 1106,
-   "steps": 1339,
-   "config": "1d488918d95647a1",
+   "steps": 1282,
+   "config": "062f2ceaf78fdc1b",
    "final": {
-    "physics": "f0a3faeb41aa893ea42607038a3c517542139ff92dc42ec7349d7019dba57f86",
-    "intent": "02c135ad03d44c3ee170b8d8b0977e3f283e30a2de8e6df90ad5ed373d1316bf",
-    "contact": "d8eadc609ea595469f59ec552d3258c128b8ec09fdf00fefbed7d61986213566",
-    "battle": "2efd5e8a52807f0d8e029fde37701364bc77c326153c6322c559c71a1ad9b455"
+    "physics": "e3b03b445ec49331895cdb0fb58bc074365d59215a66848ca9b0bd622e5036b0",
+    "intent": "5fc0bcd1dfe9b615f8c308ac70b1cfc817c5d360db344de677c2de5d3d5b4875",
+    "contact": "8b99364b4692a4c88815745f43d0a104f029d58d1b5366ddac2f37024e5a0461",
+    "battle": "242778ff65e7c091f6b01afcbbc73e67ecf6d751c608f047cd9b97cd1e654e05"
    },
    "result": {
     "winner": "rival",
     "finish": "spin",
-    "duration": 11.15833333333334
+    "duration": 10.683333333333367
    },
    "counters": {
     "hits": 4,
@@ -4407,7 +4407,7 @@
    "name": "WALL#7",
    "seed": 1107,
    "steps": 1122,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "d4fdf36fa8a3ff807ed39077c144e65e9e40a3c94108ace8cb86809ea693aef3",
     "intent": "ef2bbc1c506d4b1741e72793b452969d77ea585d61e599438f5b12bc14102608",
@@ -4432,7 +4432,7 @@
    "name": "WALL#8",
    "seed": 1108,
    "steps": 1388,
-   "config": "1d488918d95647a1",
+   "config": "062f2ceaf78fdc1b",
    "final": {
     "physics": "2177e16be094417d3f138ab16a40e4f3c10850d481d9a977934392cc788d0035",
     "intent": "bec07fe6736d7688b7221887dd578614ee57633f473623c3af7521343ed0fe47",
@@ -4456,18 +4456,18 @@
   {
    "name": "WALL#9",
    "seed": 1109,
-   "steps": 1144,
-   "config": "1d488918d95647a1",
+   "steps": 1246,
+   "config": "062f2ceaf78fdc1b",
    "final": {
-    "physics": "3385ef4f9aa2ed1008105ff2162361029abfdfa023c60abffe87d7ed192b711b",
-    "intent": "448922f79f7092eb652e9fb1471bfc9468405b4fd6eb46860fef2fbf74915436",
-    "contact": "a1dd85c3e15eea3f890603e848f9449d04ee1fba98e355b6677a5c7073996b44",
-    "battle": "a1c4bb8d3bd57edadf555c6dce242e376c196243a812653a9a2e47470446c8bf"
+    "physics": "75f9c9cafe4ddb4df82130e74113fb7b837bc89594d4023524bb65a261b4d87f",
+    "intent": "c09fdb7e23bdb42897820a833df44375578fbdbe4c08af166b661b3cb0390c66",
+    "contact": "2ae243c02e57d107272143e97186f3f59cf531b72ed96d92499a957103ba3455",
+    "battle": "de42a8971ef907cd3243c4ae09771192e707610e92d2943f05a5c7dcc036d8d4"
    },
    "result": {
     "winner": "player",
     "finish": "spin",
-    "duration": 9.533333333333433
+    "duration": 10.383333333333384
    },
    "counters": {
     "hits": 5,
@@ -4475,7 +4475,7 @@
     "breakouts": 0,
     "wobbleBreaks": 0,
     "impacts": 5,
-    "intentSwitches": 22
+    "intentSwitches": 21
    }
   }
  ]

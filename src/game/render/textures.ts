@@ -203,3 +203,142 @@ export function createGaleEmblemTexture(): THREE.CanvasTexture {
     ctx.restore();
   }, 2);
 }
+
+/**
+ * 四种类型的中心徽标（M6，全部原创图形；只沿用“黑底圆徽 + 类型色外环 + 白色图案”的形式）：
+ *  - 攻击：三道向前弯折的獠牙；  - 防守：六边形盾 + 内三角；
+ *  - 平衡：三道风刃新月 + 四角星（与疾风新月同构，绿色）；  - 耐力：环绕轨道 + 中心圆核。
+ */
+const EMBLEM_COLOR: Record<string, [string, string, string]> = {
+  attack: ['#ff3b2f', '#ffb3a8', '#9c140d'],
+  defense: ['#1f6bff', '#a8c8ff', '#1240c8'],
+  balance: ['#22c25a', '#b8f5cb', '#0e7a34'],
+  stamina: ['#8b5cf6', '#dccbff', '#4b20b8'],
+};
+
+export function createTypeEmblemTexture(role: 'attack' | 'defense' | 'balance' | 'stamina'): THREE.CanvasTexture {
+  const [ring, light, deep] = EMBLEM_COLOR[role];
+  return canvasTexture(256, (ctx, S) => {
+    const c = S / 2;
+    const bg = ctx.createRadialGradient(c, c * 0.85, 0, c, c, c);
+    bg.addColorStop(0, '#1a2136');
+    bg.addColorStop(0.75, '#070a12');
+    bg.addColorStop(1, '#020306');
+    ctx.fillStyle = bg;
+    ctx.beginPath();
+    ctx.arc(c, c, c, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.lineWidth = S * 0.045;
+    ctx.strokeStyle = ring;
+    ctx.beginPath();
+    ctx.arc(c, c, c * 0.93, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.lineWidth = S * 0.008;
+    ctx.strokeStyle = 'rgba(235,240,255,0.7)';
+    ctx.beginPath();
+    ctx.arc(c, c, c * 0.84, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.save();
+    ctx.translate(c, c);
+    const k = c * 0.72;
+    const grad = (y0: number, y1: number) => {
+      const g = ctx.createLinearGradient(0, y0, 0, y1);
+      g.addColorStop(0, '#ffffff');
+      g.addColorStop(0.35, light);
+      g.addColorStop(1, deep);
+      return g;
+    };
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = S * 0.012;
+    ctx.lineJoin = 'round';
+    if (role === 'attack') {
+      for (let i = 0; i < 3; i++) {
+        ctx.save();
+        ctx.rotate((i / 3) * Math.PI * 2);
+        ctx.fillStyle = grad(-k, -k * 0.15);
+        ctx.beginPath();
+        ctx.moveTo(-k * 0.16, -k * 0.18);
+        ctx.lineTo(-k * 0.1, -k * 0.7);
+        ctx.quadraticCurveTo(k * 0.2, -k * 1.02, k * 0.58, -k * 0.74);
+        ctx.quadraticCurveTo(k * 0.2, -k * 0.62, k * 0.14, -k * 0.16);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+        ctx.restore();
+      }
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.arc(0, 0, k * 0.13, 0, Math.PI * 2);
+      ctx.fill();
+    } else if (role === 'defense') {
+      ctx.fillStyle = grad(-k * 0.85, k * 0.85);
+      ctx.beginPath();
+      for (let i = 0; i < 6; i++) {
+        const a = (i / 6) * Math.PI * 2 - Math.PI / 2;
+        ctx.lineTo(Math.cos(a) * k * 0.82, Math.sin(a) * k * 0.82);
+      }
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+      ctx.fillStyle = '#0a1024';
+      ctx.beginPath();
+      for (let i = 0; i < 6; i++) {
+        const a = (i / 6) * Math.PI * 2 - Math.PI / 2;
+        ctx.lineTo(Math.cos(a) * k * 0.56, Math.sin(a) * k * 0.56);
+      }
+      ctx.closePath();
+      ctx.fill();
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      for (let i = 0; i < 3; i++) {
+        const a = (i / 3) * Math.PI * 2 - Math.PI / 2;
+        ctx.lineTo(Math.cos(a) * k * 0.36, Math.sin(a) * k * 0.36);
+      }
+      ctx.closePath();
+      ctx.fill();
+    } else if (role === 'balance') {
+      for (let i = 0; i < 3; i++) {
+        ctx.save();
+        ctx.rotate((i / 3) * Math.PI * 2 - 0.35);
+        ctx.fillStyle = grad(-k, -k * 0.2);
+        ctx.beginPath();
+        ctx.moveTo(-k * 0.12, -k * 0.22);
+        ctx.quadraticCurveTo(-k * 0.05, -k * 0.95, k * 0.62, -k * 0.86);
+        ctx.quadraticCurveTo(k * 0.18, -k * 0.62, k * 0.16, -k * 0.2);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+        ctx.restore();
+      }
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      for (let i = 0; i < 8; i++) {
+        const a = (i / 8) * Math.PI * 2 - Math.PI / 2;
+        const r = (i % 2 === 0 ? 0.26 : 0.08) * k;
+        ctx.lineTo(Math.cos(a) * r, Math.sin(a) * r);
+      }
+      ctx.closePath();
+      ctx.fill();
+    } else {
+      ctx.lineWidth = S * 0.03;
+      for (let i = 0; i < 2; i++) {
+        ctx.save();
+        ctx.rotate(i * Math.PI * 0.5 + 0.4);
+        ctx.strokeStyle = i ? light : '#ffffff';
+        ctx.beginPath();
+        ctx.ellipse(0, 0, k * 0.86, k * 0.38, 0, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+      }
+      const core = ctx.createRadialGradient(-k * 0.08, -k * 0.1, 0, 0, 0, k * 0.32);
+      core.addColorStop(0, '#ffffff');
+      core.addColorStop(0.5, light);
+      core.addColorStop(1, deep);
+      ctx.fillStyle = core;
+      ctx.beginPath();
+      ctx.arc(0, 0, k * 0.3, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.restore();
+  }, 2);
+}

@@ -2,30 +2,58 @@ import { ARENA, pocketAtAngle } from '../arena/arenaSpec';
 import { TABLE_Y } from '../arena/ArenaPhysics';
 import { BEY_TUNING, BeyPhysics } from '../beys/BeyPhysics';
 import type { AssembledBey } from '../beys/parts/assemble';
+import type { AiLevel } from '../beys/motionIntent';
 import { computeLaunch, type Side } from '../launcher/launch';
 import type { LaunchCommand } from '../launcher/PullStringGesture';
 import { BEY_COLLIDER_PARTS, type ContactSubject } from '../physics/ContactService';
-import type { PhysicsWorld } from '../physics/PhysicsWorld';
+import { PHYSICS_DT, type PhysicsWorld } from '../physics/PhysicsWorld';
+import { BURST_TUNING, BurstObserver } from './burst';
 import { ContactFeedback, type ContactSample, type ImpactDecision } from './contactFeedback';
 import { boundingRadius, canSkip, classifyContact, emptyEvidence, queryContact, type ContactClass, type ContactEvidence } from './contactSampling';
 import { impactTier, type ImpactTier } from './impactTiers';
+import { RoundJudge, type FinishType, type MatchRules, type RoundCause, type SideObservation } from './match';
 
-export type FinishType = 'spin' | 'over' | 'xtreme';
+export { FINISH_LABEL, FINISH_POINTS, type FinishType } from './match';
 
-export const FINISH_POINTS: Record<FinishType, number> = { spin: 1, over: 2, xtreme: 3 };
-export const FINISH_LABEL: Record<FinishType, string> = {
-  spin: '旋转终结',
-  over: '出界终结',
-  xtreme: '极限终结',
-};
-
+/** 一个回合的结果（比赛层的累计见 match.ts） */
 export interface BattleResult {
-  winner: Side;
-  loser: Side;
-  finish: FinishType;
+  kind: 'win' | 'draw';
+  winner: Side | null;
+  loser: Side | null;
+  finish: FinishType | null;
+  /** 胜方得分（平局 0；自灭 1） */
   points: number;
+  own: boolean;
+  toppled: boolean;
+  cause: RoundCause;
+  /** 判定时刻（秒） */
   duration: number;
 }
+
+/** 爆裂事件（表现层用：Blade 沿撞击方向飞出） */
+export interface BurstEvent {
+  side: Side;
+  time: number;
+  /** 接触点（世界坐标）与飞出方向（水平单位向量，背离对手） */
+  x: number;
+  y: number;
+  z: number;
+  dx: number;
+  dz: number;
+}
+
+/** 终结判定的物理阈值（数值与 v1 相同） */
+export const FINISH_TUNING = {
+  /** 停转：转速低于它 */
+  stopSpin: 2.5,
+  /** 倾倒：倾角大于它且转速低于 toppleSpin */
+  toppleTilt: 1.1,
+  toppleSpin: 12,
+  /** 离开战斗区：半径超过场地半径 + outMargin，或掉到台面附近 */
+  outMargin: 0.35,
+  /** 口袋识别的最大半径余量 */
+  pocketReach: 2.2,
+};
 
 export interface ImpactEvent {
   /** 冲击强度 0..1 */
@@ -86,6 +114,14 @@ export const SMASH_TUNING = {
 };
 
 /**
+ * 实验臂开关（M5 筛选实验用）。默认值与基线逐位等价，不进参数指纹；某一臂经预注册规则采用后，
+ * 再并入 SMASH_TUNING 并重新生成 golden。
+ *  - approachK：咬合法向冲量的接近速度一次项（v2.0 §6.1 / G14 修正方向：正撞应显著高于同滑移速度的轻擦），
+ *    jn += μ × approachK × bite × 接近速度。0 = 基线。
+ */
+export const SMASH_EXPERIMENT = { approachK: 0 };
+
+/**
  * 一场对战：管理两台陀螺的物理实体、撞击结算和胜负判定。
  * 不依赖 Three.js，可以在 Node 里做无头模拟测试。
  */
@@ -112,15 +148,37 @@ export class BattleSystem {
   private lastHit = -1;
   private readonly pw: PhysicsWorld;
   private readonly specs: Record<Side, AssembledBey>;
-  private stoppedFor: Record<Side, number> = { player: 0, rival: 0 };
   /** 物理步之前的线速度：Rapier 求解碰撞后两者已经分开，接近速度必须用碰撞前的值 */
   private readonly preVel: Record<Side, { x: number; z: number }> = { player: { x: 0, z: 0 }, rival: { x: 0, z: 0 } };
 
-  /** contactFeedback = false 时不读取接触（只给“读取接触不改变物理”的对照测试用） */
-  constructor(pw: PhysicsWorld, specs: Record<Side, AssembledBey>, opts: { contactFeedback?: boolean } = {}) {
+  /** 回合终结判定（发起 / 确认两时刻，见 match.ts） */
+  readonly judgeRound: RoundJudge;
+  /**
+   * 爆裂（v2.0 §6.3）：接触段 + 应力。只读 ContactService 的身体级法向冲量；
+   * PhysicsWorld 没有开启 ContactService 时为 null（不判定爆裂，只用于无观测的对照测试）。
+   */
+  readonly burst: BurstObserver | null;
+  readonly bursts: BurstEvent[] = [];
+  /** 最近一次与对手确认接触（法向冲量 > 0）的时刻；从未接触为 -Infinity */
+  lastContact = -Infinity;
+  private stepIndex = 0;
+
+  /**
+   * contactFeedback = false 时不读取接触反馈（只给“读取接触不改变物理”的对照测试用）；
+   * rules 覆盖回合规则（例如诊断用 120 s 上限）；kBurst 覆盖爆裂系数（undefined = BURST_TUNING.kBurst）。
+   */
+  constructor(
+    pw: PhysicsWorld,
+    specs: Record<Side, AssembledBey>,
+    opts: { contactFeedback?: boolean; rules?: Partial<MatchRules>; kBurst?: number | null; ai?: Partial<Record<Side, AiLevel>> } = {},
+  ) {
     this.pw = pw;
     this.specs = specs;
+    this.ai = opts.ai ?? {};
     this.sampling = opts.contactFeedback !== false;
+    this.judgeRound = new RoundJudge(opts.rules);
+    const res = (s: AssembledBey) => ({ lock: s.ratchet.lock, burstGuard: s.bit.burstGuard });
+    this.burst = pw.contacts ? new BurstObserver(PHYSICS_DT, [res(specs.player), res(specs.rival)], opts.kBurst === undefined ? BURST_TUNING.kBurst : opts.kBurst) : null;
     // 只读接触观测：告诉 ContactService 哪些碰撞体属于哪一台（只读 beys，不改变任何状态）
     const cs = pw.contacts;
     if (cs) {
@@ -136,10 +194,17 @@ export class BattleSystem {
   }
 
   private readonly sampling: boolean;
+  /** 每一方的 AI 难度（只改决策参数）；省略 = 标准 */
+  private readonly ai: Partial<Record<Side, AiLevel>>;
+  /** 统计：每一方进入轨道冲刺的次数（只读 BeyPhysics.dashing 的上升沿，结算展示用） */
+  readonly dashStarts: Record<Side, number> = { player: 0, rival: 0 };
+  private readonly wasDashing: Record<Side, boolean> = { player: false, rival: false };
 
   launch(side: Side, cmd: LaunchCommand): BeyPhysics {
     this.beys[side]?.dispose();
-    const bey = new BeyPhysics(this.pw, this.specs[side], computeLaunch(this.specs[side], side, cmd));
+    const params = computeLaunch(this.specs[side], side, cmd);
+    const level = this.ai[side];
+    const bey = new BeyPhysics(this.pw, this.specs[side], level ? { ...params, ai: level } : params);
     this.beys[side] = bey;
     // 发射过渡：两台都在场时设定各自的初始倾斜方向（只在第一步之前生效一次）
     const other = this.beys[side === 'player' ? 'rival' : 'player'];
@@ -193,8 +258,42 @@ export class BattleSystem {
       }
     }
 
+    // 爆裂：实测法向冲量按接触段累积（判定只读观测，不施力）
+    this.stepIndex++;
+    const cs = this.pw.contacts;
+    const bp = cs?.bodyPair('player', 'rival') ?? null;
+    const imp = bp?.normalImpulse ?? 0;
+    const confirmed = cs ? imp > 0 : this.contactClass.impulseResponse;
+    if (confirmed) this.lastContact = this.time;
+    if (this.burst && !this.result) {
+      const hits = this.burst.step(this.stepIndex, imp, [a.spin, b.spin]);
+      for (const i of hits) this.onBurst(i === 0 ? 'player' : 'rival', bp);
+    }
+
+    for (const side of ['player', 'rival'] as Side[]) {
+      const d = this.beys[side]!.dashing;
+      if (d && !this.wasDashing[side]) this.dashStarts[side]++;
+      this.wasDashing[side] = d;
+    }
+
     this.watchStall(a, b, dt);
     if (!this.result) this.judge(dt);
+  }
+
+  /** 爆裂发生：记录表现事件，Blade 从刚体上脱离（Ratchet + Bit 留下来摇摆至停） */
+  private onBurst(side: Side, bp: ReturnType<NonNullable<PhysicsWorld['contacts']>['bodyPair']>): void {
+    const bey = this.beys[side]!;
+    const other = this.beys[side === 'player' ? 'rival' : 'player']!;
+    const p = bey.body.translation();
+    const o = other.body.translation();
+    const pt = bp?.deepestPair?.deepest ?? null;
+    let dx = p.x - o.x;
+    let dz = p.z - o.z;
+    const l = Math.hypot(dx, dz) || 1;
+    dx /= l;
+    dz /= l;
+    this.bursts.push({ side, time: this.time, x: pt?.x ?? p.x, y: pt?.y ?? p.y + bey.spec.layers.blade.center, z: pt?.z ?? p.z, dx, dz });
+    bey.burstApart();
   }
 
   /** 僵持时长（秒）与触发脱困次数 */
@@ -236,7 +335,7 @@ export class BattleSystem {
       const wobbling = isDeathWobble({
         touching: d < a.spec.blade.radius + b.spec.blade.radius + 0.05,
         lowSpin: low.spinRatio,
-        lowTiltExcess: low.tilt - low.spec.tip.drift,
+        lowTiltExcess: low.tilt - low.spec.bit.drift,
         highSpin: high.spinRatio,
         highCanDrive: high.spin > T.minStableSpin * 2,
         highInBreakout: high.breakout > 0,
@@ -376,7 +475,7 @@ export class BattleSystem {
     );
     // 撞得越正、越快，刀刃越能咬住；轻轻擦过只有少量咬合
     const engage = Math.max(T.engageMin, Math.min(1, (approach + T.engageBase) / T.engageRef));
-    const jn = mu * T.normal * bite * engage * slide;
+    const jn = SMASH_EXPERIMENT.approachK > 0 ? mu * T.normal * bite * engage * slide + mu * SMASH_EXPERIMENT.approachK * bite * approach : mu * T.normal * bite * engage * slide;
     const jt = mu * T.tangent * bite * engage * slide;
 
     // 接触点（世界坐标）：刀刃高度。冲量作用在这里，高于质心 → 自然产生撞后摆动
@@ -419,46 +518,34 @@ export class BattleSystem {
     });
   }
 
-  /** 判断某台陀螺是否已被终结 */
-  finishOf(bey: BeyPhysics, side: Side, dt: number): FinishType | null {
+  /** 一台陀螺本步的终结观测（判定只读这些，阈值见 FINISH_TUNING） */
+  observe(bey: BeyPhysics, side: Side): SideObservation {
+    const F = FINISH_TUNING;
     const p = bey.body.translation();
     const r = Math.hypot(p.x, p.z);
-    if (r > ARENA.radius + 0.35 || p.y < TABLE_Y + 0.5) {
-      const pocket = r > ARENA.radius && r < ARENA.radius + 2.2 ? pocketAtAngle(Math.atan2(p.z, p.x)) : undefined;
-      return pocket?.kind === 'xtreme' ? 'xtreme' : 'over';
+    let out: SideObservation['out'] = null;
+    if (r > ARENA.radius + F.outMargin || p.y < TABLE_Y + 0.5) {
+      const pocket = r > ARENA.radius && r < ARENA.radius + F.pocketReach ? pocketAtAngle(Math.atan2(p.z, p.x)) : undefined;
+      out = pocket?.kind === 'xtreme' ? 'xtreme' : 'over';
     }
-    const stopped = bey.spin < 2.5 || (bey.tilt > 1.1 && bey.spin < 12);
-    this.stoppedFor[side] = stopped ? this.stoppedFor[side] + dt : 0;
-    if (this.stoppedFor[side] > 0.5) return 'spin';
-    return null;
+    const toppled = bey.tilt > F.toppleTilt && bey.spin < F.toppleSpin;
+    const idx = side === 'player' ? 0 : 1;
+    return {
+      out,
+      backInArena: r < ARENA.radius && bey.spin >= F.stopSpin,
+      stopped: bey.spin < F.stopSpin || toppled,
+      toppled,
+      burst: !!this.burst?.meter.burst.includes(idx),
+      sinceContact: this.time - this.lastContact,
+      spin: bey.spin,
+    };
   }
 
   private judge(dt: number): void {
-    const a = this.beys.player!;
-    const b = this.beys.rival!;
-    const fa = this.finishOf(a, 'player', dt);
-    const fb = this.finishOf(b, 'rival', dt);
-    let loser: Side | null = null;
-    let finish: FinishType | null = null;
-    if (fa && fb) {
-      // 同时终结：出界优先于旋转终结；都一样则比较剩余转速
-      loser = FINISH_POINTS[fa] >= FINISH_POINTS[fb] ? 'player' : 'rival';
-      if (fa === fb) loser = a.spin <= b.spin ? 'player' : 'rival';
-      finish = loser === 'player' ? fa : fb;
-    } else if (fa) {
-      loser = 'player';
-      finish = fa;
-    } else if (fb) {
-      loser = 'rival';
-      finish = fb;
-    } else if (this.time > 120) {
-      loser = a.spin < b.spin ? 'player' : 'rival';
-      finish = 'spin';
-    }
-    if (loser && finish) {
-      const winner: Side = loser === 'player' ? 'rival' : 'player';
-      this.result = { winner, loser, finish, points: FINISH_POINTS[finish], duration: this.time };
-    }
+    const o = this.judgeRound.step(dt, { player: this.observe(this.beys.player!, 'player'), rival: this.observe(this.beys.rival!, 'rival') });
+    if (!o) return;
+    this.burst?.finish();
+    this.result = { kind: o.kind, winner: o.winner, loser: o.loser, finish: o.finish, points: o.points, own: o.own, toppled: o.toppled, cause: o.cause, duration: o.time };
   }
 
   dispose(): void {

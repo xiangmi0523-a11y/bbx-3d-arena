@@ -183,7 +183,7 @@ describe('ContactService 只读接触观测', () => {
     const at = log.find((l) => l.step === begins[0].step)!;
     const parts = [...at.pairs.values()].filter((p) => p.physicalContact && p.a.owner === 'player' && p.b.owner === 'rival').map((p) => p.key);
     expect(parts.length).toBeGreaterThan(0);
-    for (const k of parts) expect(k).toMatch(/^player:(blade|disc)\|rival:(blade|disc)$/);
+    for (const k of parts) expect(k).toMatch(/^player:(blade|ratchet)\|rival:(blade|ratchet)$/);
     expect(normalChecked).toBeGreaterThan(0);
     expect(log.some((l) => (l.bodies.get('player|rival')?.normalImpulse ?? 0) > 0)).toBe(true);
     pw.dispose();
@@ -282,7 +282,7 @@ describe('ContactService 只读接触观测', () => {
             const rr = Math.hypot(pos.x, pos.z);
             expect((q.nx * pos.x + q.nz * pos.z) / rr, '墙壁法线朝外').toBeGreaterThan(0.5);
           }
-          if (p.b.part === 'floor' && p.a.part === 'tip') {
+          if (p.b.part === 'floor' && p.a.part === 'bit') {
             floor++;
             expect(q.ny, '地面法线向下（陀螺 → 地面）').toBeLessThan(-0.5);
           }
@@ -352,8 +352,8 @@ describe('ContactService 在真实对局上的不变量与读写边界', () => {
     }
   }, 600000);
 
-  it('关闭观测时不创建服务、不注册身份（默认行为与旧系统相同）', () => {
-    const pw = new PhysicsWorld(R);
+  it('显式关闭观测时不创建服务、不注册身份（M2 起默认开启，供爆裂与自灭判定使用）', () => {
+    const pw = new PhysicsWorld(R, { observeContacts: false });
     createArenaPhysics(pw);
     expect(pw.contacts).toBeNull();
     pw.dispose();
@@ -363,7 +363,7 @@ describe('ContactService 在真实对局上的不变量与读写边界', () => {
     const { pw, cs } = arena({ x: 0, z: 0, spin: 600 }, null, [STA, DEF_RIVAL]);
     const log = run(pw, cs, 240, invariants);
     // 每个结束事件之前的那一步必须有真实证据，结束那一步必须没有
-    const ev = log.flatMap((l) => l.events.filter((e) => e.kind === 'end' && e.key === 'player:tip|arena:floor'));
+    const ev = log.flatMap((l) => l.events.filter((e) => e.kind === 'end' && e.key === 'player:bit|arena:floor'));
     for (const e of ev) {
       const before = log.find((l) => l.step === e.step - 1)!.pairs.get(e.key)!;
       const at = log.find((l) => l.step === e.step)!.pairs.get(e.key);

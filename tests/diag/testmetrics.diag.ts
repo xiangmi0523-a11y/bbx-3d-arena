@@ -16,7 +16,7 @@ test('test metrics', async () => {
   let walls = 0, wt = 0, near = 0;
   for (let i = 0; i < 6; i++) {
     const aim = ((i % 3) - 1) * 0.3;
-    const r = await diagnoseBattle({ player: { power: 0.7 + (i % 3) * 0.15, aim, tilt: 0 }, rival: { power: 0.8, aim: -aim, tilt: 0 }, rivalLoadout: { blade: 'gale-crescent', disc: 'tri-lock', tip: 'rush-rubber' }, maxSeconds: 40 });
+    const r = await diagnoseBattle({ player: { power: 0.7 + (i % 3) * 0.15, aim, tilt: 0 }, rival: { power: 0.8, aim: -aim, tilt: 0 }, rivalLoadout: { blade: 'gale-crescent', ratchet: 'tri-lock', bit: 'rush-rubber' }, maxSeconds: 40 });
     walls += r.wallHits.player + r.wallHits.rival; wt += r.duration; near += r.nearWall.player + r.nearWall.rival;
   }
   mkdirSync('test-results/diag', { recursive: true });

@@ -75,3 +75,41 @@ jobs:
           path: test-results/
           retention-days: 14
           if-no-files-found: ignore
+
+  e2e:
+    name: 端到端（横屏 844×390 · 触摸 · 完整比赛流程）
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: 安装依赖
+        run: npm ci
+
+      - name: 网页构建
+        run: npm run build
+
+      # Playwright 只在这个任务里临时安装（不写入 package.json）
+      - name: 安装 Playwright + Chromium
+        run: |
+          npm install --no-save playwright@1.48.2
+          npx playwright install --with-deps chromium
+
+      - name: 端到端流程（截图以 base64 打印在日志里，行首 SHOT-B64）
+        env:
+          E2E_LOG_SHOTS: '1'
+        run: node scripts/e2e.mjs
+
+      - name: 上传截图
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-${{ github.sha }}
+          path: test-results/
+          retention-days: 14
+          if-no-files-found: ignore

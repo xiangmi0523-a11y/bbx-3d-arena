@@ -6,13 +6,16 @@ import { ARENA_SCALE } from '../arena/arenaSpec';
 import { AudioFX } from '../audio/AudioFX';
 import { BattleSystem, type BattleResult, type ImpactEvent } from '../battle/BattleSystem';
 import { impactTier } from '../battle/impactTiers';
+import { describeOutcome, Match, type RoundOutcome } from '../battle/match';
+import { floorHeight } from '../arena/arenaSpec';
+import type { AiLevel } from '../beys/motionIntent';
 import { createBeyVisual, type BeyVisual } from '../beys/BeyVisualFactory';
 import { assembleBey, swapPart, type AssembledBey } from '../beys/parts/assemble';
-import { listParts, PLAYER_LOADOUT, RIVAL_LOADOUT, sanitizeLoadout } from '../beys/parts/catalog';
-import type { BeyLoadout, PartKind, PartSpec } from '../beys/parts/types';
+import { buildName, listParts, PLAYER_LOADOUT, ROLE_INFO, sanitizeLoadout, signatureOf, SIGNATURE_LIST, SIGNATURES, type SignatureKey } from '../beys/parts/catalog';
+import type { BeyLoadout, BeyRole, PartKind, PartSpec } from '../beys/parts/types';
 import { BattleCamera } from '../camera/BattleCamera';
 import { GarageView, renderThumbnails, type FocusRect } from '../garage/GarageView';
-import { launchDirection, launchPoint, rivalCommand, type Side } from '../launcher/launch';
+import { aiLaunchCommand, launchDirection, launchPoint, powerTier, type Side } from '../launcher/launch';
 import { LauncherModel } from '../launcher/LauncherModel';
 import { IDLE_PULL, PullStringGesture, type LaunchCommand, type PullState } from '../launcher/PullStringGesture';
 import { loadRapier, PhysicsWorld, PHYSICS_DT, type Rapier } from '../physics/PhysicsWorld';
@@ -22,14 +25,71 @@ import { initialQuality, QualityController, type QualityLevel, type QualityPrese
 import { SaveStore, type SaveData } from '../storage/SaveStore';
 import { Store } from './Store';
 
-export type GamePhase = 'loading' | 'title' | 'garage' | 'aim' | 'battle' | 'paused' | 'result' | 'error';
+/**
+ * 引擎阶段。title = 全部菜单页（具体哪一页由 screen 决定，3D 背景是竞技场概览）；
+ * aim → battle → roundEnd 为一个回合；先到 4 分后进入 matchEnd（比赛结算）。
+ */
+export type GamePhase = 'loading' | 'title' | 'garage' | 'aim' | 'battle' | 'roundEnd' | 'matchEnd' | 'paused' | 'error';
+
+/** 菜单页（v2.0 §10.2 最小 6 屏：主界面 / 陀螺库 / 组装 / 模式与对手 / 竞技场选择 / 战斗准备） */
+export type MenuScreen = 'home' | 'library' | 'mode' | 'arena' | 'prep';
+export type ArenaId = 'standard' | 'velocity' | 'sky';
+export type ModeId = 'free' | 'challenge' | 'tournament' | 'survival';
+
+export interface MatchSetup {
+  mode: ModeId;
+  arena: ArenaId;
+  difficulty: AiLevel;
+  /** 对手：签名构筑，或每场随机 */
+  rival: SignatureKey | 'random';
+}
+
+export interface Settings {
+  /** 减特效：关闭爆裂慢动作与镜头震动（v2.0 §10.3 无障碍） */
+  reduceEffects: boolean;
+  sound: boolean;
+}
 
 export interface BeyHud {
   name: string;
   code: string;
+  role: BeyRole;
+  color: number;
   spin: number; // 0..1
   rpm: number;
   dashing: boolean;
+  /** 爆裂应力 0..1（v2.0 §6.3） */
+  stress: number;
+  burst: boolean;
+}
+
+export interface RoundStats {
+  /** 两台之间的确认接触段数 */
+  contacts: number;
+  /** 最大单段实测法向冲量（N·s） */
+  maxImpulse: number;
+  dashes: Record<Side, number>;
+  peakStress: Record<Side, number>;
+  duration: number;
+}
+
+export interface RoundView {
+  number: number;
+  outcome: RoundOutcome;
+  /** 胜负原因一句话 */
+  text: string;
+  stats: RoundStats;
+}
+
+export interface MatchView {
+  target: number;
+  score: Record<Side, number>;
+  /** 当前（或下一个）回合序号 */
+  round: number;
+  /** 3–3 决胜轮 */
+  decider: boolean;
+  rounds: RoundView[];
+  winner: Side | null;
 }
 
 export interface GarageState {
@@ -49,7 +109,14 @@ export interface GameSnapshot {
   loadout: BeyLoadout;
   time: number;
   hits: number;
+  /** 本回合的判定结果（回合结束后有值） */
   result: BattleResult | null;
+  screen: MenuScreen;
+  setup: MatchSetup;
+  rivalLoadout: BeyLoadout;
+  match: MatchView | null;
+  lastRound: RoundView | null;
+  settings: Settings;
   save: SaveData;
   fps: number;
   quality: QualityLevel;
@@ -58,12 +125,33 @@ export interface GameSnapshot {
 }
 
 const hudOf = (spec: AssembledBey): BeyHud => ({
-  name: spec.blade.name,
-  code: `${spec.blade.code} · ${spec.disc.code} · ${spec.tip.code}`,
+  name: buildName(spec.loadout),
+  code: `${spec.blade.code} · ${spec.ratchet.code} · ${spec.bit.code}`,
+  role: spec.role,
+  color: signatureOf(spec.loadout)?.color ?? ROLE_INFO[spec.role].color,
   spin: 0,
   rpm: 0,
   dashing: false,
+  stress: 0,
+  burst: false,
 });
+
+/** 回合结束后的休整时间（秒，v2.0 §6.5：显示比分，3 秒后进入下一回合） */
+export const ROUND_REST = 3;
+/** 爆裂表现：慢动作时长与时间缩放（只改表现时间流速，物理步长不变，v2.0 §6.3） */
+const BURST_SLOWMO = { time: 0.4, scale: 0.35 };
+
+/** 爆裂后飞出的 Blade（只是表现：物理上 Blade 碰撞体已移除） */
+interface FlyingBlade {
+  side: Side;
+  obj: THREE.Object3D;
+  vx: number;
+  vy: number;
+  vz: number;
+  spin: number;
+  tumble: number;
+  landed: boolean;
+}
 
 const SIDES: Side[] = ['player', 'rival'];
 
@@ -121,8 +209,20 @@ export class GameEngine {
   private resizeObserver: ResizeObserver | null = null;
   private disposed = false;
   private pausedFrom: GamePhase = 'battle';
+  /** 进行中的比赛（先到 4 分） */
+  private match: Match | null = null;
+  private roundViews: RoundView[] = [];
+  private restTimer = 0;
+  private burstSeen = 0;
+  private slowmo = 0;
+  private flying: FlyingBlade[] = [];
+  /** 组装界面关闭后回到哪个菜单页 */
+  private garageReturn: MenuScreen = 'home';
+  /** 本回合玩家实际使用的发射力度（三档之一，测试读取） */
+  private lastLaunchPower: number | null = null;
 
-  constructor(container: HTMLElement, loadouts: Record<Side, BeyLoadout> = { player: PLAYER_LOADOUT, rival: RIVAL_LOADOUT }) {
+  /** 默认对局 = v2.0 §3.5 的新手向默认组合：森衡（平衡）对 磐盾（防守）；存档里有上次的构筑时用存档 */
+  constructor(container: HTMLElement, loadouts: Record<Side, BeyLoadout> = { player: SIGNATURES.senheng.loadout, rival: SIGNATURES.pandun.loadout }) {
     this.container = container;
     this.specs = { player: assembleBey(loadouts.player), rival: assembleBey(loadouts.rival) };
     this.launchers = { player: new LauncherModel(0xe8302a), rival: new LauncherModel(0x1f7cf0) };
@@ -137,6 +237,12 @@ export class GameEngine {
       time: 0,
       hits: 0,
       result: null,
+      screen: 'home',
+      setup: { mode: 'free', arena: 'standard', difficulty: 'pro', rival: 'pandun' },
+      rivalLoadout: { ...loadouts.rival },
+      match: null,
+      lastRound: null,
+      settings: { reduceEffects: false, sound: true },
       save: this.save.data,
       fps: 0,
       quality: this.quality.level,
@@ -177,12 +283,57 @@ export class GameEngine {
 
   // ───────────────────────── 公开指令（UI 调用） ─────────────────────────
 
-  /** 标题 → 准备发射 */
-  start(): void {
+  // ── 菜单导航（title 阶段内切换页面，3D 背景不变） ──
+
+  navigate(screen: MenuScreen): void {
     if (this.phase !== 'title') return;
+    this.store.set({ screen });
+  }
+
+  /** 修改比赛设置；对手换成某个签名构筑时立即换上它的模型 */
+  setSetup(patch: Partial<MatchSetup>): void {
+    const setup = { ...this.store.get().setup, ...patch };
+    this.store.set({ setup });
+    if (patch.rival && patch.rival !== 'random') this.applyRivalLoadout(SIGNATURES[patch.rival].loadout);
+  }
+
+  /** 陀螺库：装备一个签名构筑（零件可再到组装界面自由替换） */
+  equipSignature(key: SignatureKey): void {
+    if (this.phase !== 'title') return;
+    const loadout = SIGNATURES[key].loadout;
+    this.applyPlayerLoadout(loadout);
+    this.resetRound();
+    void this.save.update({ lastLoadout: loadout }).then((save) => this.store.set({ save }));
+  }
+
+  setSettings(patch: Partial<Settings>): void {
+    const settings = { ...this.store.get().settings, ...patch };
+    this.store.set({ settings });
+    this.audio.setMuted(!settings.sound);
+  }
+
+  /** 战斗准备 → 开始一场比赛（先到 4 分），进入第 1 回合的发射准备 */
+  startMatch(): void {
+    if (this.phase !== 'title' && this.phase !== 'matchEnd') return;
+    const setup = this.store.get().setup;
+    if (setup.rival === 'random') {
+      const mine = signatureOf(this.specs.player.loadout)?.key;
+      const pool = SIGNATURE_LIST.filter((x) => x.key !== mine);
+      this.applyRivalLoadout(pool[Math.floor(Math.random() * pool.length)].loadout);
+    }
+    this.match = new Match();
+    this.roundViews = [];
+    this.publishMatch();
+    this.store.set({ lastRound: null });
     this.resetRound();
     this.setPhase('aim');
     this.cam.setMode('aim');
+  }
+
+  /** 兼容旧入口（键盘 / 自动化测试）：标题直接开始一场比赛 */
+  start(): void {
+    if (this.phase !== 'title') return;
+    this.startMatch();
   }
 
   pullStart(x: number, y: number, maxPull: number): void {
@@ -209,11 +360,14 @@ export class GameEngine {
     this.store.set({ pull: IDLE_PULL });
   }
 
-  /** 直接用指令发射（键盘、测试） */
+  /** 发射（拉绳松手、键盘、测试）。力度归到三档（轻 / 中 / 重），对手按难度决定自己的发射 */
   launch(cmd: LaunchCommand): void {
     if (this.phase !== 'aim' || !this.battle) return;
-    this.battle.launch('player', cmd);
-    this.battle.launch('rival', rivalCommand());
+    const tier = powerTier(cmd.power);
+    const playerCmd = { ...cmd, power: tier.power };
+    this.lastLaunchPower = tier.power;
+    this.battle.launch('player', playerCmd);
+    this.battle.launch('rival', aiLaunchCommand(Math.random, this.store.get().setup.difficulty));
     for (const side of SIDES) {
       const v = this.visuals[side]!;
       this.scene.attach(v.root);
@@ -224,12 +378,12 @@ export class GameEngine {
     this.setPhase('battle');
     this.cam.setMode('battle');
     this.cam.impact(0.35, 0.2);
-    this.audio.launch(cmd.power);
+    this.audio.launch(playerCmd.power);
     navigator.vibrate?.(20);
   }
 
   pause(): void {
-    if (this.phase === 'battle' || this.phase === 'aim') {
+    if (this.phase === 'battle' || this.phase === 'aim' || this.phase === 'roundEnd') {
       this.pausedFrom = this.phase;
       this.gesture.cancel();
       this.audio.stopHum();
@@ -245,15 +399,38 @@ export class GameEngine {
     this.last = performance.now();
   }
 
-  /** 重新开始：回到发射准备 */
-  restart(): void {
-    this.resetRound();
-    this.setPhase('aim');
-    this.cam.setMode('aim');
+  /** 回合结算页：不等 3 秒，直接进入下一回合（或比赛结算） */
+  continueRound(): void {
+    if (this.phase !== 'roundEnd') return;
+    this.advanceMatch();
   }
 
-  toTitle(): void {
+  /** 重赛：同样的设置再打一场 */
+  rematch(): void {
+    if (this.phase !== 'matchEnd' && this.phase !== 'paused') return;
+    this.setPhase('title');
+    this.startMatch();
+  }
+
+  /** 旧入口：重新开始 = 重赛 */
+  restart(): void {
+    if (this.match && (this.phase === 'paused' || this.phase === 'matchEnd' || this.phase === 'roundEnd')) {
+      this.setPhase('title');
+      this.startMatch();
+    }
+  }
+
+  /** 战斗中切换镜头：跟随 ↔ 全场 */
+  toggleCamera(): void {
+    if (this.phase !== 'battle' && this.phase !== 'roundEnd') return;
+    this.cam.setMode(this.cam.mode === 'battle' ? 'overview' : 'battle');
+  }
+
+  toTitle(screen: MenuScreen = 'home'): void {
+    this.match = null;
+    this.publishMatch();
     this.resetRound();
+    this.store.set({ screen, lastRound: null });
     this.setPhase('title');
     this.cam.setMode('overview');
   }
@@ -269,7 +446,11 @@ export class GameEngine {
   // ── 组装界面 ──
 
   openGarage(): void {
-    if (this.phase !== 'title' && this.phase !== 'result') return;
+    if (this.phase !== 'title' && this.phase !== 'matchEnd') return;
+    // 关闭后回到打开它的那一页（比赛结算页 → 战斗准备）
+    this.garageReturn = this.phase === 'matchEnd' ? 'prep' : this.store.get().screen;
+    this.match = null;
+    this.publishMatch();
     this.resetRound();
     const draft = { ...this.store.get().loadout };
     this.garage?.dispose();
@@ -376,6 +557,7 @@ export class GameEngine {
     };
     return {
       phase: this.phase,
+      launchPower: this.lastLaunchPower,
       time: b?.time ?? 0,
       hits: b?.hits ?? 0,
       player: read('player'),
@@ -403,8 +585,8 @@ export class GameEngine {
       playerVisual: this.visuals.player
         ? {
             blade: this.visuals.player.blade.name,
-            disc: this.visuals.player.disc.name,
-            tip: this.visuals.player.tip.name,
+            ratchet: this.visuals.player.ratchet.name,
+            bit: this.visuals.player.bit.name,
           }
         : null,
     };
@@ -481,13 +663,149 @@ export class GameEngine {
     this.garage?.dispose();
     this.garage = null;
     this.resetRound();
+    this.store.set({ screen: this.garageReturn });
     this.setPhase('title');
     this.cam.setMode('overview', true);
   }
 
+  private applyRivalLoadout(loadout: BeyLoadout): void {
+    this.specs.rival = assembleBey(loadout);
+    this.visuals.rival?.root.removeFromParent();
+    this.visuals.rival?.dispose();
+    this.visuals.rival = undefined;
+    this.store.set({ rivalLoadout: { ...loadout }, rival: hudOf(this.specs.rival) });
+    if (this.phase === 'title' && this.pw) this.resetRound();
+  }
+
+  /** 把比赛状态发布到 store（UI 只读） */
+  private publishMatch(): void {
+    const m = this.match;
+    this.store.set({
+      match: m
+        ? { target: m.target, score: { ...m.score }, round: m.roundNumber, decider: m.decider, rounds: [...this.roundViews], winner: m.winner }
+        : null,
+    });
+  }
+
+  /** 回合结束：计分、生成结算数据，进入 3 秒休整 */
+  private onRoundEnd(result: BattleResult): void {
+    const battle = this.battle!;
+    const m = this.match;
+    const outcome = battle.judgeRound.outcome!;
+    const number = m ? m.roundNumber : 1;
+    if (m && !m.over) m.record(outcome);
+    const names = { player: this.store.get().player.name, rival: this.store.get().rival.name };
+    const meter = battle.burst?.meter;
+    const view: RoundView = {
+      number,
+      outcome,
+      text: describeOutcome(outcome, names),
+      stats: {
+        contacts: battle.burst?.episodeCount ?? 0,
+        maxImpulse: battle.burst?.maxEpisodeImpulse ?? 0,
+        dashes: { ...battle.dashStarts },
+        peakStress: { player: meter?.stress[0] ?? 0, rival: meter?.stress[1] ?? 0 },
+        duration: result.duration,
+      },
+    };
+    this.roundViews.push(view);
+    this.restTimer = 0;
+    this.publishMatch();
+    this.store.set({ result, lastRound: view });
+    this.setPhase('roundEnd');
+    this.cam.setMode('result');
+    if (result.kind === 'win') this.audio.click();
+  }
+
+  /** 休整结束：比赛已分胜负 → 比赛结算；否则下一回合（平局重赛同一回合序号不增加） */
+  private advanceMatch(): void {
+    const m = this.match;
+    if (!m || m.over) {
+      this.finishMatch();
+      return;
+    }
+    this.resetRound();
+    this.setPhase('aim');
+    this.cam.setMode('aim');
+  }
+
+  private finishMatch(): void {
+    this.setPhase('matchEnd');
+    this.cam.setMode('result');
+    this.audio.stopHum();
+    this.audio.stopGrind();
+    const m = this.match;
+    if (!m || this.resultRecorded) return;
+    this.resultRecorded = true;
+    const won = m.winner === 'player';
+    const d = this.save.data;
+    void this.save
+      .update({
+        wins: d.wins + (won ? 1 : 0),
+        losses: d.losses + (won ? 0 : 1),
+        points: d.points + (won ? m.score.player : 0),
+        lastLoadout: this.specs.player.loadout,
+      })
+      .then((save) => this.store.set({ save }));
+  }
+
+  /** 爆裂表现：Blade 从陀螺上脱离，沿撞击方向带着自转飞出、落地（物理上 Blade 碰撞体已在 BattleSystem 移除） */
+  private spawnBurst(side: Side, ev: { x: number; y: number; z: number; dx: number; dz: number }): void {
+    const v = this.visuals[side];
+    if (!v) return;
+    const slot = v.slots.blade;
+    this.scene.attach(slot);
+    this.flying.push({ side, obj: slot, vx: ev.dx * 3.4, vy: 3.2, vz: ev.dz * 3.4, spin: 18, tumble: 5 + Math.random() * 3, landed: false });
+    const reduce = this.store.get().settings.reduceEffects;
+    this.feedback.playImpact({ strength: 1, tier: 'heavy', approach: 0, impulse: 0, dvRel: 12, x: ev.x, y: ev.y, z: ev.z, nx: ev.dx, nz: ev.dz, episode: 0, feedback: 'play' });
+    if (!reduce) {
+      this.slowmo = BURST_SLOWMO.time;
+      this.cam.impact(0.9, 0.5);
+    }
+    navigator.vibrate?.([30, 40, 60]);
+  }
+
+  private updateFlying(dt: number): void {
+    for (const f of this.flying) {
+      if (f.landed) continue;
+      f.vy -= 20 * dt;
+      const o = f.obj;
+      o.position.x += f.vx * dt;
+      o.position.y += f.vy * dt;
+      o.position.z += f.vz * dt;
+      o.rotateY(-f.spin * dt);
+      o.rotateX(f.tumble * dt * 0.3);
+      const r = Math.hypot(o.position.x, o.position.z);
+      const floor = r < 5.4 ? floorHeight(r) : -0.6;
+      if (o.position.y < floor + 0.02 && f.vy < 0) {
+        o.position.y = floor + 0.02;
+        if (Math.abs(f.vy) > 1.2) {
+          f.vy = -f.vy * 0.3;
+          f.vx *= 0.5;
+          f.vz *= 0.5;
+          f.spin *= 0.5;
+        } else {
+          f.landed = true;
+        }
+      }
+    }
+  }
+
+  /** 新回合前把飞出的 Blade 装回去 */
+  private restoreFlying(): void {
+    for (const f of this.flying) {
+      const v = this.visuals[f.side];
+      if (!v) continue;
+      v.root.add(f.obj);
+      f.obj.position.set(0, this.specs[f.side].layers.blade.bottom, 0);
+      f.obj.quaternion.identity();
+    }
+    this.flying = [];
+  }
+
   private buildThumbnails(): void {
     try {
-      const parts: PartSpec[] = [...listParts('blade'), ...listParts('disc'), ...listParts('tip')];
+      const parts: PartSpec[] = [...listParts('blade'), ...listParts('ratchet'), ...listParts('bit')];
       const thumbs = renderThumbnails(parts, (r) => this.makeEnv(r));
       this.store.set({ garage: { ...this.store.get().garage, thumbs } });
     } catch (err) {
@@ -642,6 +960,9 @@ export class GameEngine {
 
   /** 清空并重建一回合：新的物理世界、陀螺挂回发射器 */
   private resetRound(): void {
+    this.restoreFlying();
+    this.burstSeen = 0;
+    this.slowmo = 0;
     this.battle?.dispose();
     this.pw?.dispose();
     this.fx.clear();
@@ -653,7 +974,7 @@ export class GameEngine {
 
     this.pw = new PhysicsWorld(this.R);
     createArenaPhysics(this.pw);
-    this.battle = new BattleSystem(this.pw, this.specs);
+    this.battle = new BattleSystem(this.pw, this.specs, { ai: { rival: this.store.get().setup.difficulty } });
     const battle = this.battle;
     this.pw.beforeStep = (dt) => battle.preStep(dt);
     this.pw.afterStep = (dt) => battle.postStep(dt);
@@ -716,7 +1037,7 @@ export class GameEngine {
     }
     // 只在对战相关画面测帧率（组装界面生成缩略图时的长帧不算）
     const ph = this.phase;
-    if (ph === 'battle' || ph === 'aim' || ph === 'result') this.quality.sample(elapsed / 1000);
+    if (ph === 'battle' || ph === 'aim' || ph === 'roundEnd') this.quality.sample(elapsed / 1000);
     if (this.phase === 'garage' && this.garage) {
       this.garage.update(dt);
       this.renderer.render(this.garage.scene, this.garage.camera);
@@ -802,10 +1123,21 @@ export class GameEngine {
       this.visuals.rival!.root.rotation.y -= 2 * dt;
     }
 
-    if (phase === 'battle' || phase === 'result') {
+    if (phase === 'battle' || phase === 'roundEnd' || phase === 'matchEnd') {
       const a0 = performance.now();
-      this.perf.dtSum += dt;
-      this.perf.physSteps += this.pw!.advance(dt);
+      // 爆裂慢动作：只放慢表现时间（每帧推进的物理时间变少），物理步长不变
+      let simDt = dt;
+      if (this.slowmo > 0) {
+        this.slowmo -= dt;
+        simDt = dt * BURST_SLOWMO.scale;
+      }
+      this.perf.dtSum += simDt;
+      this.perf.physSteps += this.pw!.advance(simDt);
+      for (; this.burstSeen < battle.bursts.length; this.burstSeen++) {
+        const ev = battle.bursts[this.burstSeen];
+        this.spawnBurst(ev.side, ev);
+      }
+      this.updateFlying(simDt);
       const a1 = performance.now();
       // 撞击反馈 + 持续摩擦层（BattleFeedback：特效、音频、镜头）
       const g0 = performance.now();
@@ -814,10 +1146,14 @@ export class GameEngine {
       this.syncBeys();
       this.perf.physics += a1 - a0;
       this.perf.sync += performance.now() - a1;
-      if (battle.result && phase === 'battle') this.onResult(battle.result);
+      if (battle.result && phase === 'battle') this.onRoundEnd(battle.result);
+      if (phase === 'roundEnd') {
+        this.restTimer += dt;
+        if (this.restTimer >= ROUND_REST) this.advanceMatch();
+      }
       const a = battle.beys.player;
       const b = battle.beys.rival;
-      if (a && b) this.audio.setHum((a.spinRatio + b.spinRatio) / 2);
+      if (a && b && phase === 'battle') this.audio.setHum((a.spinRatio + b.spinRatio) / 2);
     }
 
     if (phase !== 'paused') {
@@ -831,7 +1167,7 @@ export class GameEngine {
       targets.length = 0;
       for (const s of SIDES) {
         const b = battle.beys[s];
-        if (!b || (phase === 'result' && b !== battle.beys[battle.result!.winner])) continue;
+        if (!b || ((phase === 'roundEnd' || phase === 'matchEnd') && battle.result?.winner && b !== battle.beys[battle.result.winner])) continue;
         const t = this.camTargetPool[targets.length];
         t.position.copy(this.visuals[s]?.root.position ?? (b.body.translation() as THREE.Vector3Like));
         const v = b.body.linvel();
@@ -846,12 +1182,21 @@ export class GameEngine {
     this.uiTimer += realDt;
     if (this.uiTimer > 1 / 15) {
       this.uiTimer = 0;
-      if (phase === 'battle' || phase === 'result') {
+      if (phase === 'battle' || phase === 'roundEnd') {
+        const meter = battle.burst?.meter;
         const hud = (s: Side): BeyHud => {
           const b = battle.beys[s];
           const base = hudOf(this.specs[s]);
           if (!b) return base;
-          return { ...base, spin: b.spinRatio, rpm: Math.round((b.spin * 60) / (Math.PI * 2)) * 10, dashing: b.dashing };
+          const i = s === 'player' ? 0 : 1;
+          return {
+            ...base,
+            spin: b.spinRatio,
+            rpm: Math.round((b.spin * 60) / (Math.PI * 2)) * 10,
+            dashing: b.dashing,
+            stress: meter?.stress[i] ?? 0,
+            burst: b.bursted,
+          };
         };
         this.store.set({ player: hud('player'), rival: hud('rival'), time: battle.time, hits: battle.hits, fps: this.fpsAcc.fps });
       } else if (this.store.get().fps !== this.fpsAcc.fps) {
@@ -888,24 +1233,6 @@ export class GameEngine {
     }
   }
 
-  private onResult(result: BattleResult): void {
-    this.setPhase('result');
-    this.cam.setMode('result');
-    this.store.set({ result });
-    if (!this.resultRecorded) {
-      this.resultRecorded = true;
-      const d = this.save.data;
-      const won = result.winner === 'player';
-      void this.save
-        .update({
-          wins: d.wins + (won ? 1 : 0),
-          losses: d.losses + (won ? 0 : 1),
-          points: d.points + (won ? result.points : 0),
-          lastLoadout: this.specs.player.loadout,
-        })
-        .then((save) => this.store.set({ save }));
-    }
-  }
 }
 
 function withTimeout<T>(p: Promise<T>, ms: number, fallback: T): Promise<T> {

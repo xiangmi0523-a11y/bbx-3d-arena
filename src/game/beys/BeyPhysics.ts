@@ -1,7 +1,7 @@
 import type RAPIER from '@dimforge/rapier3d-compat';
 import { ARENA, floorHeight } from '../arena/arenaSpec';
 import { GRAVITY, type PhysicsWorld } from '../physics/PhysicsWorld';
-import { MotionIntent } from './motionIntent';
+import { MotionIntent, type AiLevel } from './motionIntent';
 import { REF_INERTIA, type AssembledBey } from './parts/assemble';
 
 export interface Vec3 {
@@ -21,7 +21,34 @@ export interface LaunchParams {
   tiltAxis?: Vec3;
   /** 战术意图的随机种子（省略则取 Math.random） */
   seed?: number;
+  /** AI 难度（只改决策参数，见 motionIntent.ts AI_LEVELS）；省略 = 'pro' 标准 */
+  ai?: AiLevel;
 }
+
+/**
+ * 自转账本（v2.0 S1 任务 1.3 / E7）：一台陀螺本回合按来源分解的转速变化（rad/s，累计量）。
+ * 只做记账：与物理计算并行累加，不参与任何物理量的计算（golden 逐位不变）。
+ *  - base / scrape / rail / drive / steer / burst / air：preStep 里游戏层衰减的各个分项（已按惯量比换算，按实际扣除量分摊）；
+ *  - smash：刀刃咬合结算的掉速（BattleSystem.resolveSmash → loseSpin）；
+ *  - contactLoss / contactGain：两次 preStep 之间 Rapier 积分对转速的改变（接触摩擦、陀螺耦合等），扣除 smash 后按正负分开。
+ */
+export interface SpinLedger {
+  base: number;
+  scrape: number;
+  rail: number;
+  drive: number;
+  steer: number;
+  burst: number;
+  air: number;
+  smash: number;
+  contactLoss: number;
+  contactGain: number;
+}
+
+export const emptyLedger = (): SpinLedger => ({ base: 0, scrape: 0, rail: 0, drive: 0, steer: 0, burst: 0, air: 0, smash: 0, contactLoss: 0, contactGain: 0 });
+
+/** 爆裂后剩余部分的额外转速衰减（rad/s²，按参考惯量；只影响回合结束后的表现） */
+const BURST_SPINDOWN = 60;
 
 /** 陀螺物理调参（集中在这里，方便后续平衡性调整） */
 export const BEY_TUNING = {
@@ -126,8 +153,20 @@ export const BEY_TUNING = {
    * （与脱困 breakoutGrip 同一假设），方向仍由进动相位 + 墙边修正决定。0 = 关闭。
    */
   edgeGrip: 0.3,
-  /** 低于这个咬合度的轴心（针尖）没有牵引。P2.2.1 为 0.5，球头（0.35）完全没有牵引，会停在碗底 */
+  /**
+   * 低于这个咬合度的轴心没有牵引。P2.2.1 为 0.5，球头（0.35）完全没有牵引，会停在碗底；
+   * 0.2 时针尖（0.1）被二值门整个关掉，针尖对针尖可无接触僵持 35–87 s（v2.0 R3 的结构根因）。
+   * v2.0 R3 实验值 0.1 未通过预注册规则（M2 实验 B：针尖对针尖 2 s 重接触 61% < 90%，无接触低速段最长 47 s > 5 s），
+   * 按规则保持 0.2。根因：滚动阻力下限 (rollBase + rollFriction × 摩擦) × g ≈ 0.45 m/s² 与针尖经相位调制后的平均导向推力
+   * （≈ 3 m/s² × 平均偏置 0.15）相当，碗面中心平台的回中梯度只有约 0.08 m/s²——三者合起来针尖几乎不动。留给 M4 处理。
+   */
   driveMinGrip: 0.2,
+  /**
+   * v2.0 R8 轨道冲刺齿轮门控：1 = 只有带齿轮的 Bit（gear = true）能在轨道上冲刺，加速度与转速代价固定（不再乘 grip）；
+   * 0 = 旧行为（任何 grip > 0 的轴心都冲刺，按 grip 缩放）。真实机制是齿轮与轨道齿条啮合，与抓地力无关。
+   * M2 起采用（v2.0 D-A5 已确定）。实测轨道冲刺在签名矩阵里平均每回合只有约 0.01 s：陀螺很少走到轨道区，见 M4。
+   */
+  railGearOnly: 1,
   /**
    * 轴心滚动 / 滑动阻力：水平减速度 = (rollBase + rollFriction × 轴心摩擦) × g。
    * 没有这一项时，陀螺在碗边的离心轨道几乎不损失能量，会长时间绕外圈（P2.1 诊断：最长 24 秒没有交锋）。
@@ -141,8 +180,8 @@ export const BEY_TUNING = {
  * 本地原点在轴心最底部，Y 轴为旋转轴。
  *
  * 真实参与碰撞的部分：
- *  - Tip 球形接触点与场地之间的摩擦，会把转动转化成在碗面上的移动；
- *  - Blade / Disc 圆柱与对手、墙壁之间的碰撞与摩擦（转速差会产生切向冲量）。
+ *  - Bit 球形接触点与场地之间的摩擦，会把转动转化成在碗面上的移动；
+ *  - Blade / Ratchet 圆柱与对手、墙壁之间的碰撞与摩擦（转速差会产生切向冲量）。
  * 额外施加的力只有两类，用于模拟刚体引擎没有直接表达的现象：
  *  - 陀螺仪自稳：转速越高越不容易倾倒，转速低时自然倒下；
  *  - 齿轮咬合轨道的冲刺。
@@ -175,12 +214,17 @@ export class BeyPhysics {
   knockResyncs = 0;
   /** 本步进动相位是否在跟随被撞歪的实际倾斜 */
   knocked = false;
+  /** 自转账本（只记账，见 SpinLedger） */
+  readonly ledger: SpinLedger = emptyLedger();
+  /** 上一次 preStep 写回的转速、之后 loseSpin 扣掉的量（账本用） */
+  private ledgerWritten = -1;
+  private ledgerSmash = 0;
 
   constructor(pw: PhysicsWorld, spec: AssembledBey, launch: LaunchParams) {
     this.pw = pw;
     this.spec = spec;
     // 战术意图的随机种子：游戏里来自 Math.random（每局不同），测试里由固定种子决定
-    this.intent = new MotionIntent(spec, launch.seed ?? Math.floor(Math.random() * 2 ** 32));
+    this.intent = new MotionIntent(spec, launch.seed ?? Math.floor(Math.random() * 2 ** 32), launch.ai);
     const { R, world } = pw;
     this.spinSign = spec.blade.spin === 'right' ? -1 : 1; // 右旋 = 俯视顺时针 = 绕 +Y 负方向
     this.inertiaRatio = REF_INERTIA / spec.spinInertia;
@@ -188,7 +232,7 @@ export class BeyPhysics {
     // 针尖几乎没有扶正力矩，被猛撞容易大幅倾斜、边缘刮地掉速
     const tipK = BEY_TUNING.tipStability;
     this.gyroFactor =
-      Math.sqrt(spec.spinInertia / REF_INERTIA) * (1 - tipK + tipK * Math.min(1.3, spec.tip.contactRadius / 0.12));
+      Math.sqrt(spec.spinInertia / REF_INERTIA) * (1 - tipK + tipK * Math.min(1.3, spec.bit.contactRadius / 0.12));
 
     const tilt = launch.tilt ?? 0;
     const axis = launch.tiltAxis ?? { x: 1, y: 0, z: 0 };
@@ -209,26 +253,26 @@ export class BeyPhysics {
         .setAngularDamping(0),
     );
 
-    const { tip, disc, blade, layers } = spec;
+    const { bit, ratchet, blade, layers } = spec;
     const events = R.ActiveEvents.COLLISION_EVENTS;
 
-    // Tip：接地球 + 轴杆
-    const ball = R.ColliderDesc.ball(tip.contactRadius)
-      .setTranslation(0, tip.contactRadius, 0)
-      .setMass(tip.mass * 0.6)
-      .setFriction(tip.friction)
+    // Bit：接地球 + 轴杆
+    const ball = R.ColliderDesc.ball(bit.contactRadius)
+      .setTranslation(0, bit.contactRadius, 0)
+      .setMass(bit.mass * 0.6)
+      .setFriction(bit.friction)
       // 摩擦相乘：低摩擦轴心在斜面上打滑、被重力拉回中心；高摩擦轴心抓地、绕场移动
       .setFrictionCombineRule(R.CoefficientCombineRule.Multiply)
       .setRestitution(0.1);
-    const shaftH = Math.max(0.02, layers.tip.top - tip.contactRadius);
+    const shaftH = Math.max(0.02, layers.bit.top - bit.contactRadius);
     const shaft = R.ColliderDesc.cylinder(shaftH / 2, 0.11)
-      .setTranslation(0, tip.contactRadius + shaftH / 2, 0)
-      .setMass(tip.mass * 0.4)
+      .setTranslation(0, bit.contactRadius + shaftH / 2, 0)
+      .setMass(bit.mass * 0.4)
       .setFriction(0.2);
-    // Disc
-    const discDesc = R.ColliderDesc.cylinder(disc.height / 2, disc.radius)
-      .setTranslation(0, layers.disc.center, 0)
-      .setMass(disc.mass)
+    // Ratchet
+    const ratchetDesc = R.ColliderDesc.cylinder(ratchet.height / 2, ratchet.radius)
+      .setTranslation(0, layers.ratchet.center, 0)
+      .setMass(ratchet.mass)
       .setFriction(0.3)
       // 金属对撞几乎不反弹：恢复系数低，弹开主要来自刀刃咬合冲量
       .setRestitution(0.1)
@@ -241,12 +285,13 @@ export class BeyPhysics {
       .setRestitution(blade.restitution * 0.4)
       .setActiveEvents(events);
 
-    for (const d of [ball, shaft, discDesc]) this.colliders.push(world.createCollider(d, this.body));
+    for (const d of [ball, shaft, ratchetDesc]) this.colliders.push(world.createCollider(d, this.body));
     this.bladeCollider = world.createCollider(bladeDesc, this.body);
     this.colliders.push(this.bladeCollider);
 
     this.launchHeading = Math.atan2(launch.velocity.z, launch.velocity.x);
     this.spin = launch.spin;
+    this.ledgerWritten = launch.spin;
     this.launchSpin = Math.max(1, launch.spin);
     this.body.setLinvel(launch.velocity, true);
     const up = this.up();
@@ -381,15 +426,35 @@ export class BeyPhysics {
 
     // 1) 转速衰减：轴心恒定摩擦 + 空气阻力 + 倾倒刮地
     let mag = Math.abs(spinSigned);
+    // 账本：上一步写回之后的变化 = Rapier 积分 + 咬合掉速（只记账）
+    if (this.ledgerWritten >= 0) {
+      const d = mag - this.ledgerWritten + this.ledgerSmash;
+      if (d < 0) this.ledger.contactLoss -= d;
+      else this.ledger.contactGain += d;
+    }
+    this.ledgerSmash = 0;
+    let lScrape = 0;
+    let lRail = 0;
+    let lDrive = 0;
+    let lSteer = 0;
     // 轴心摩擦、牵引、刮地都是“力矩”，转速下降 = 力矩 / 转动惯量：
     // 同样的轴心，惯量大（重量集中在外缘）的陀螺掉速更慢 → 耐力型的优势来自零件本身
-    let decay = this.spec.tip.spinDecay;
-    if (this.tilt > 0.5) decay += T.scrapeDecay * Math.min(1, (this.tilt - 0.5) * 2);
+    let decay = this.spec.bit.spinDecay;
+    if (this.tilt > 0.5) {
+      lScrape = T.scrapeDecay * Math.min(1, (this.tilt - 0.5) * 2);
+      decay += T.scrapeDecay * Math.min(1, (this.tilt - 0.5) * 2);
+    }
+    // 爆裂后只剩 Ratchet + Bit：失去刀刃的惯量与驱动，很快停转倾倒（回合已由规则结束，只是表现）
+    if (this.bursted) decay += BURST_SPINDOWN;
 
     // 2) 极限轨道：齿轮轴心咬合轨道冲刺
     this.dashing = false;
-    const grip = this.spec.tip.gearGrip;
-    if (grip > 0 && this.grounded && r > ARENA.railInner && r < ARENA.railOuter + 0.05 && mag > T.minStableSpin) {
+    const grip = this.spec.bit.gearGrip;
+    // 齿轮门控（R8）：冲刺资格来自齿轮，强度不随抓地力缩放
+    const gearOnly = T.railGearOnly > 0;
+    const canDash = gearOnly ? this.spec.bit.gear : grip > 0;
+    const dashK = gearOnly ? 1 : grip;
+    if (!this.bursted && canDash && this.grounded && r > ARENA.railInner && r < ARENA.railOuter + 0.05 && mag > T.minStableSpin) {
       const ex = pos.x / r;
       const ez = pos.z / r;
       // ω × e_r 的水平分量（ω 竖直），冲刺方向为其反方向（齿轮在外圈齿条上滚动）
@@ -403,10 +468,11 @@ export class BeyPhysics {
       const v = body.linvel();
       const along = v.x * dx + v.z * dz;
       if (along < T.railMaxSpeed) {
-        const accel = T.railDash * grip * Math.min(1, mag / (this.launchSpin * 0.4));
+        const accel = T.railDash * dashK * Math.min(1, mag / (this.launchSpin * 0.4));
         const m = body.mass();
         body.applyImpulse({ x: dx * accel * m * dt, y: 0, z: dz * accel * m * dt }, true);
-        decay += T.railSpinCost * grip;
+        decay += T.railSpinCost * dashK;
+        lRail = T.railSpinCost * dashK;
         this.dashing = true;
       }
     }
@@ -446,7 +512,7 @@ export class BeyPhysics {
     // 墙边：没有牵引的轴心（针尖）贴近外圈时，与脱困同理按 edgeGrip 计算牵引（倾斜着压在陡坡上，接触点外移）
     if (T.edgeGrip > 0 && this.intent.edgeW > 0) driveGrip = Math.max(driveGrip, T.edgeGrip * Math.min(1, this.intent.edgeW * 2));
     let steering = 0;
-    if (driveGrip >= T.driveMinGrip && this.grounded && !this.dashing && mag > T.minStableSpin * 2) {
+    if (!this.bursted && driveGrip >= T.driveMinGrip && this.grounded && !this.dashing && mag > T.minStableSpin * 2) {
       const ratio = Math.min(1, mag / this.launchSpin);
       const v = body.linvel();
       let dx = -Math.sin(this.precession) * this.spinSign;
@@ -493,9 +559,11 @@ export class BeyPhysics {
         const a = T.driveAccel * driveGrip * r2 * body.mass() * dt;
         body.applyImpulse({ x: dx * a, y: 0, z: dz * a }, true);
         decay += T.driveSpinCost * driveGrip;
+        lDrive = T.driveSpinCost * driveGrip;
       }
       // 改变轴的倾斜方向需要力矩：按调制深度额外消耗转速
       decay += T.steerSpinCost * steering * driveGrip;
+      lSteer = T.steerSpinCost * steering * driveGrip;
     }
 
     // 轴心滚动 / 滑动阻力：在碗面上持续损失水平速度，绕圈的陀螺会慢慢滑回中央与对手相遇
@@ -503,14 +571,28 @@ export class BeyPhysics {
       const v = body.linvel();
       const sp = Math.hypot(v.x, v.z);
       if (sp > 1e-3) {
-        const dv = Math.min(sp, (T.rollBase + T.rollFriction * this.spec.tip.friction) * -GRAVITY * dt);
+        const dv = Math.min(sp, (T.rollBase + T.rollFriction * this.spec.bit.friction) * -GRAVITY * dt);
         const m = body.mass();
         body.applyImpulse({ x: (-v.x / sp) * dv * m, y: 0, z: (-v.z / sp) * dv * m }, true);
       }
     }
 
+    const mag0 = mag;
     decay = decay * this.inertiaRatio + T.airDrag * mag;
     mag = Math.max(0, mag - decay * dt);
+    // 账本：本步实际扣除量按各分项比例分摊（转速见底时扣除量 < decay·dt）
+    if (decay > 0) {
+      const L = this.ledger;
+      const f = ((mag0 - mag) / (decay * dt)) * dt;
+      const k = this.inertiaRatio * f;
+      L.base += this.spec.bit.spinDecay * k;
+      L.scrape += lScrape * k;
+      L.rail += lRail * k;
+      L.drive += lDrive * k;
+      L.steer += lSteer * k;
+      if (this.bursted) L.burst += BURST_SPINDOWN * k;
+      L.air += T.airDrag * mag0 * f;
+    }
 
     // 3) 陀螺仪自稳：转得越快越能保持直立；角动量 L = Iω 越大越难被撞歪（防御 / 耐力型更稳）
     const s =
@@ -519,7 +601,7 @@ export class BeyPhysics {
       // 目标姿态：轴心类型决定的“自然倾角”，倾斜方向以进动角速度绕竖直轴旋转。
       // 倾斜的轴心与地面的接触点偏离转轴，摩擦力方向随进动旋转，
       // 由 Rapier 的摩擦自然产生花瓣形移动轨迹（攻击型轴心倾角大、移动激烈）。
-      const lean = this.spec.tip.drift * Math.min(1, mag / (this.launchSpin * 0.5));
+      const lean = this.spec.bit.drift * Math.min(1, mag / (this.launchSpin * 0.5));
       // 自然进动角速度（只由转速决定）
       let rate = this.spinSign * -(T.precessBase + T.precessSpin / Math.max(20, mag));
       // 战术意图：牵引方向（= 倾斜方向 + 90°·旋向）接近期望方向时进动放慢、背离时加快。
@@ -562,6 +644,22 @@ export class BeyPhysics {
       true,
     );
     this.spin = mag;
+    this.ledgerWritten = mag;
+  }
+
+  /** 已爆裂（Blade 已脱离） */
+  bursted = false;
+
+  /**
+   * 爆裂：Blade 从刚体上脱离（移除刀刃碰撞体，Rapier 按剩余碰撞体重算质量），剩下的 Ratchet + Bit 失去驱动并很快停转。
+   * 只在规则判定爆裂之后调用；表现层另外播放 Blade 飞出的动画。
+   */
+  burstApart(): void {
+    if (this.bursted) return;
+    this.bursted = true;
+    const i = this.colliders.indexOf(this.bladeCollider);
+    if (i >= 0) this.colliders.splice(i, 1);
+    this.pw.world.removeCollider(this.bladeCollider, true);
   }
 
   /** 施加水平撞击冲量 */
@@ -586,6 +684,8 @@ export class BeyPhysics {
     const spinSigned = w.x * up.x + w.y * up.y + w.z * up.z;
     const sign = Math.sign(spinSigned) || this.spinSign;
     const delta = Math.min(Math.abs(spinSigned), amount) * sign;
+    this.ledger.smash += Math.abs(delta);
+    this.ledgerSmash += Math.abs(delta);
     this.body.setAngvel({ x: w.x - up.x * delta, y: w.y - up.y * delta, z: w.z - up.z * delta }, true);
   }
 

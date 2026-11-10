@@ -45,7 +45,7 @@ test('contact mix', async () => {
       key: 'WALLX',
       scenarios: Array.from({ length: 60 }, (_, i) => {
         const aim = ((i % 3) - 1) * 0.3;
-        return { name: `WALLX#${i}`, player: DEF_PLAYER, rival: { blade: 'gale-crescent', disc: 'tri-lock', tip: 'rush-rubber' }, pCmd: { power: 0.7 + (i % 3) * 0.15, aim, tilt: 0 }, rCmd: { power: 0.8, aim: -aim, tilt: 0 }, seed: 1100 + i, maxSeconds: 40 };
+        return { name: `WALLX#${i}`, player: DEF_PLAYER, rival: { blade: 'gale-crescent', ratchet: 'tri-lock', bit: 'rush-rubber' }, pCmd: { power: 0.7 + (i % 3) * 0.15, aim, tilt: 0 }, rCmd: { power: 0.8, aim: -aim, tilt: 0 }, seed: 1100 + i, maxSeconds: 40 };
       }),
     },
   ];

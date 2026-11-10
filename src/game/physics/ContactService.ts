@@ -37,7 +37,7 @@ import type RAPIER from '@dimforge/rapier3d-compat';
 export interface ContactTag {
   /** 主体：'player' / 'rival' / 'arena' / 'unknown' */
   readonly owner: string;
-  /** 部件：tip / shaft / disc / blade / floor / wall#i / pocket#i.piece / table / h<handle> */
+  /** 部件：bit / shaft / ratchet / blade / floor / wall#i / pocket#i.piece / table / h<handle> */
   readonly part: string;
   /** owner:part */
   readonly id: string;
@@ -611,5 +611,5 @@ export class ContactService {
   }
 }
 
-/** 陀螺碰撞体的部件名（与 BeyPhysics 构造顺序一致：球形针尖、轴杆、Disc、Blade） */
-export const BEY_COLLIDER_PARTS = ['tip', 'shaft', 'disc', 'blade'] as const;
+/** 陀螺碰撞体的部件名（与 BeyPhysics 构造顺序一致：接地球 Bit、轴杆、Ratchet、Blade） */
+export const BEY_COLLIDER_PARTS = ['bit', 'shaft', 'ratchet', 'blade'] as const;

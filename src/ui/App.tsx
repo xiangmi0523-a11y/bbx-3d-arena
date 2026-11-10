@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
-import { FINISH_LABEL } from '../game/battle/BattleSystem';
-import { GameEngine, type BeyHud, type GameSnapshot } from '../game/core/GameEngine';
-import { GarageScreen } from './GarageScreen';
-import { LauncherPad } from './LauncherPad';
+import { GameEngine, type GameSnapshot } from '../game/core/GameEngine';
 import type { QualityLevel } from '../game/render/Quality';
+import { GarageScreen } from './GarageScreen';
+import { BattleHud, MatchEndScreen, RoundBanner } from './hud';
+import { LauncherPad } from './LauncherPad';
+import { ArenaScreen, HomeScreen, LibraryScreen, ModeScreen, PrepScreen } from './screens';
 
 declare global {
   interface Window {
@@ -42,8 +43,9 @@ function useSnapshot(engine: GameEngine): GameSnapshot {
 
 function Overlay({ engine }: { engine: GameEngine }) {
   const s = useSnapshot(engine);
+  const [settings, setSettings] = useState(false);
 
-  // 桌面调试快捷键：空格=标准力度发射，P=暂停，R=重新开始
+  // 桌面调试快捷键：空格 = 开赛 / 中档发射，回车 = 跳过回合休整，P = 暂停，R = 重赛
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       const phase = engine.store.get().phase;
@@ -51,6 +53,8 @@ function Overlay({ engine }: { engine: GameEngine }) {
         e.preventDefault();
         if (phase === 'title') engine.start();
         else if (phase === 'aim') engine.launch({ power: 0.85, aim: 0, tilt: 0 });
+      } else if (e.code === 'Enter') {
+        engine.continueRound();
       } else if (e.code === 'KeyP') {
         if (phase === 'paused') engine.resume();
         else engine.pause();
@@ -62,9 +66,11 @@ function Overlay({ engine }: { engine: GameEngine }) {
     return () => window.removeEventListener('keydown', onKey);
   }, [engine]);
 
+  const inBattle = s.phase === 'aim' || s.phase === 'battle' || s.phase === 'roundEnd';
+
   return (
     <div className="overlay">
-      {s.phase !== "garage" && <RotateHint />}
+      {s.phase !== 'garage' && <RotateHint />}
       {s.phase === 'loading' && <div className="center-card">正在加载物理引擎…</div>}
       {s.phase === 'error' && (
         <div className="center-card error">
@@ -75,55 +81,31 @@ function Overlay({ engine }: { engine: GameEngine }) {
       )}
 
       {s.phase === 'title' && (
-        <div className="title-screen">
-          <div className="logo">
-            <span className="logo-a">BBX</span>
-            <span className="logo-b">3D 陀螺竞技场</span>
-          </div>
-          <div className="matchup">
-            <BeyCard hud={s.player} side="player" />
-            <div className="vs">VS</div>
-            <BeyCard hud={s.rival} side="rival" />
-          </div>
-          <div className="title-actions">
-            <button className="btn big" onClick={() => engine.openGarage()} data-testid="open-garage">
-              组装陀螺
+        <>
+          {s.screen === 'home' && <HomeScreen engine={engine} s={s} />}
+          {s.screen === 'library' && <LibraryScreen engine={engine} s={s} />}
+          {s.screen === 'mode' && <ModeScreen engine={engine} s={s} />}
+          {s.screen === 'arena' && <ArenaScreen engine={engine} s={s} />}
+          {s.screen === 'prep' && <PrepScreen engine={engine} s={s} />}
+          {s.screen === 'home' && (
+            <button className="btn icon settings-btn" onClick={() => setSettings(true)} aria-label="设置" data-testid="open-settings">
+              设置
             </button>
-            <button className="btn primary big" onClick={() => engine.start()} data-testid="start">
-              开始对战
-            </button>
-          </div>
-          <div className="record">
-            战绩 {s.save.wins} 胜 {s.save.losses} 负 · 累计 {s.save.points} 分
-          </div>
-        </div>
+          )}
+        </>
       )}
 
       {s.phase === 'garage' && <GarageScreen engine={engine} s={s} />}
 
-
-      {(s.phase === 'aim' || s.phase === 'battle' || s.phase === 'result') && (
-        <>
-          <div className="hud-top">
-            <SpinBar hud={s.player} side="player" />
-            <div className="hud-center">
-              <div className="timer">{s.phase === 'aim' ? '准备' : s.time.toFixed(1)}</div>
-              <div className="hits">撞击 {s.hits}</div>
-            </div>
-            <SpinBar hud={s.rival} side="rival" />
-          </div>
-          <button className="btn icon pause-btn" onClick={() => engine.pause()} aria-label="暂停" data-testid="pause">
-            ❚❚
-          </button>
-        </>
-      )}
-
+      {inBattle && <BattleHud engine={engine} s={s} />}
       {s.phase === 'aim' && (
         <>
-          <div className="aim-tip">拉绳越长、松手越快，转速越高；拉动时左右偏移可调整发射方向</div>
+          <div className="aim-tip">按住右侧拉绳向下拉：越长、松手越快越有力（轻 / 中 / 重三档）；拉动时左右偏移调整方向</div>
           <LauncherPad engine={engine} pull={s.pull} />
         </>
       )}
+      {s.phase === 'roundEnd' && <RoundBanner engine={engine} s={s} />}
+      {s.phase === 'matchEnd' && <MatchEndScreen engine={engine} s={s} />}
 
       {s.phase === 'paused' && (
         <div className="modal">
@@ -133,38 +115,28 @@ function Overlay({ engine }: { engine: GameEngine }) {
               继续
             </button>
             <button className="btn" onClick={() => engine.restart()} data-testid="restart">
-              重新开始
+              重赛
             </button>
-            <button className="btn ghost" onClick={() => engine.toTitle()}>
-              返回标题
+            <button className="btn ghost" onClick={() => engine.toTitle()} data-testid="quit">
+              返回主界面
             </button>
-            <QualityPicker engine={engine} level={s.quality} />
+            <SettingsBody engine={engine} s={s} />
           </div>
         </div>
       )}
 
-      {s.phase === 'result' && s.result && (
-        <div className="result-banner" data-testid="result">
-          <div className={`result-title ${s.result.winner === 'player' ? 'win' : 'lose'}`}>
-            {s.result.winner === 'player' ? '胜利！' : '败北'}
-          </div>
-          <div className="result-finish">
-            {FINISH_LABEL[s.result.finish]} · {s.result.points} 分 · {s.result.duration.toFixed(1)} 秒
-          </div>
-          <div className="result-actions">
-            <button className="btn primary" onClick={() => engine.restart()} data-testid="again">
-              再来一局
-            </button>
-            <button className="btn" onClick={() => engine.openGarage()}>
-              更换部件
-            </button>
-            <button className="btn ghost" onClick={() => engine.toTitle()}>
-              返回标题
+      {settings && s.phase === 'title' && (
+        <div className="modal" onClick={() => setSettings(false)}>
+          <div className="modal-card" onClick={(e: React.MouseEvent) => e.stopPropagation()} data-testid="settings">
+            <h2>设置</h2>
+            <SettingsBody engine={engine} s={s} />
+            <button className="btn primary" onClick={() => setSettings(false)}>
+              完成
             </button>
           </div>
         </div>
       )}
-      {s.fps > 0 && s.phase !== "garage" && <PerfBadge engine={engine} fps={s.fps} quality={s.quality} />}
+      {s.fps > 0 && s.phase !== 'garage' && <PerfBadge engine={engine} fps={s.fps} quality={s.quality} />}
     </div>
   );
 }
@@ -207,45 +179,32 @@ function PerfBadge({ engine, fps, quality }: { engine: GameEngine; fps: number; 
 
 const QUALITY_LABEL: Record<QualityLevel, string> = { low: '流畅', medium: '均衡', high: '高清', ultra: '极致' };
 
-function QualityPicker({ engine, level }: { engine: GameEngine; level: QualityLevel }) {
+/** 设置（S4 最小面板：画质 / 音效 / 减特效；完整设置页在 S6） */
+function SettingsBody({ engine, s }: { engine: GameEngine; s: GameSnapshot }) {
+  const st = s.settings;
   return (
-    <div className="quality">
-      <div className="quality-label">画质（自动调整中：{QUALITY_LABEL[level]}）</div>
-      <div className="quality-row">
-        {(['low', 'medium', 'high', 'ultra'] as QualityLevel[]).map((q) => (
-          <button key={q} className={`btn tiny ${q === level ? 'on' : ''}`} onClick={() => engine.setQuality(q)}>
-            {QUALITY_LABEL[q]}
+    <div className="settings-body">
+      <div className="quality">
+        <div className="quality-label">画质（自动调整中：{QUALITY_LABEL[s.quality]}）</div>
+        <div className="quality-row">
+          {(['low', 'medium', 'high', 'ultra'] as QualityLevel[]).map((q) => (
+            <button key={q} className={`btn tiny ${q === s.quality ? 'on' : ''}`} onClick={() => engine.setQuality(q)}>
+              {QUALITY_LABEL[q]}
+            </button>
+          ))}
+          <button className="btn tiny ghost" onClick={() => engine.setQuality('auto')}>
+            自动
           </button>
-        ))}
-        <button className="btn tiny ghost" onClick={() => engine.setQuality('auto')}>
-          自动
+        </div>
+      </div>
+      <div className="toggle-row">
+        <button className={`btn tiny ${st.sound ? 'on' : ''}`} onClick={() => engine.setSettings({ sound: !st.sound })} data-testid="toggle-sound">
+          音效：{st.sound ? '开' : '关'}
+        </button>
+        <button className={`btn tiny ${st.reduceEffects ? 'on' : ''}`} onClick={() => engine.setSettings({ reduceEffects: !st.reduceEffects })} data-testid="toggle-fx">
+          减特效：{st.reduceEffects ? '开' : '关'}
         </button>
       </div>
-    </div>
-  );
-}
-
-function BeyCard({ hud, side }: { hud: BeyHud; side: 'player' | 'rival' }) {
-  return (
-    <div className={`bey-card ${side}`}>
-      <div className="bey-side">{side === 'player' ? '你' : '电脑'}</div>
-      <div className="bey-name">{hud.name}</div>
-      <div className="bey-code">{hud.code}</div>
-    </div>
-  );
-}
-
-function SpinBar({ hud, side }: { hud: BeyHud; side: 'player' | 'rival' }) {
-  return (
-    <div className={`spinbar ${side}`}>
-      <div className="spinbar-label">
-        <span>{hud.name}</span>
-        {hud.dashing && <span className="dash">XTREME DASH</span>}
-      </div>
-      <div className="spinbar-track">
-        <div className="spinbar-fill" style={{ width: `${Math.round(hud.spin * 100)}%` }} />
-      </div>
-      <div className="spinbar-rpm">{hud.rpm > 0 ? `${hud.rpm} rpm` : ''}</div>
     </div>
   );
 }

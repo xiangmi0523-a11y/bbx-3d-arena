@@ -48,6 +48,12 @@ export function buildFloorMesh(spec: ArenaSpec, rings: number, segments: number)
   return { vertices: new Float32Array(vertices), indices: new Uint32Array(indices) };
 }
 
+/**
+ * 场地材料参数。wallRestitution：外墙恢复系数，基线 0.5；v2.0 R7 的 0.2 只作为 A/B 实验臂（§6.7），
+ * 按预注册规则（墙反弹不高于刀刃反弹、贴墙不劣于基线、分类型终结率无单类型恶化 > 5 个百分点）决定是否采用。
+ */
+export const ARENA_PHYSICS = { wallRestitution: 0.5 };
+
 export function createArenaPhysics(pw: PhysicsWorld, spec: ArenaSpec = ARENA): ArenaColliders {
   const { R, world } = pw;
   const handles = new Set<number>();
@@ -77,7 +83,7 @@ export function createArenaPhysics(pw: PhysicsWorld, spec: ArenaSpec = ARENA): A
       .setTranslation(Math.cos(a) * rc, wallBottom + half, Math.sin(a) * rc)
       .setRotation(yawQuat(-a))
       .setFriction(0.25)
-      .setRestitution(0.5);
+      .setRestitution(ARENA_PHYSICS.wallRestitution);
     const c = world.createCollider(desc, fixed);
     walls.push(c);
     handles.add(c.handle);

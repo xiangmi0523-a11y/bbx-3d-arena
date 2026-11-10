@@ -13,7 +13,7 @@ import { seeded } from './feelSim';
  * 场景全部用真实 Rapier 与真实陀螺碰撞体；只在测试里直接摆放位置 / 姿态 / 速度。
  */
 /** 平衡套装（球头轴心） */
-const BAL_LOADOUT_FOR_TEST: BeyLoadout = { blade: 'gale-crescent', disc: 'hex-lock', tip: 'dome-ball' };
+const BAL_LOADOUT_FOR_TEST: BeyLoadout = { blade: 'gale-crescent', ratchet: 'hex-lock', bit: 'dome-ball' };
 type R = Awaited<ReturnType<typeof loadRapier>>;
 let RAP: R;
 beforeAll(async () => {

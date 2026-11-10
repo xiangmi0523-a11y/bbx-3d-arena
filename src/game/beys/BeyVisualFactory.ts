@@ -1,17 +1,19 @@
 import * as THREE from 'three';
 import { createSpinBlurTexture } from '../render/textures';
+import { buildConceptBlade } from './models/conceptBlade';
 import { buildGaleBlade } from './models/galeBlade';
+import { polishedMetal, satinMetal, typePlastic, typeSolid } from './models/materials';
 import { buildRatchetDisc } from './models/ratchetDisc';
 import type { AssembledBey } from './parts/assemble';
-import type { BladeSpec, DiscSpec, PartKind, PartSpec, TipSpec } from './parts/types';
+import type { BitSpec, BladeSpec, PartKind, PartSpec, RatchetSpec } from './parts/types';
 
 /**
  * 陀螺视觉模型工厂：根据部件的 visual 参数程序化生成真 3D 网格（全部原创造型）。
  *
  * 每个部件都是独立的 Group（底面在本地 y=0），有自己的几何与材质：
  *  - Blade：金属刃 + 彩色涂层 + 透明塑料护盖 + 装甲片 / 铆钉 / 刻线等细节；
- *  - Disc：齿轮锁盘，按锁齿数 / 尖锐度生成；
- *  - Tip：外壳 + 接地部分（齿轮平底 / 球 / 针尖 / 橡胶）。
+ *  - Ratchet：锁齿棘轮，按锁齿数 / 尖锐度生成；
+ *  - Bit：外壳 + 接地部分（齿轮平底 / 球 / 针尖 / 橡胶）。
  * 组装界面和战斗共用这里的构建函数，保证两处模型完全一致。
  */
 
@@ -20,8 +22,8 @@ export interface BeyVisual {
   /** 三个部件槽，位置为该部件在组装体中的底部高度 */
   slots: Record<PartKind, THREE.Group>;
   blade: THREE.Group;
-  disc: THREE.Group;
-  tip: THREE.Group;
+  ratchet: THREE.Group;
+  bit: THREE.Group;
   /** 高速旋转时显示的残影盘 */
   blur: THREE.Mesh;
   dispose(): void;
@@ -162,10 +164,14 @@ function rivet(material: THREE.Material, r = 0.022, h = 0.02): THREE.Mesh {
 
 // ───────────────────────── Blade ─────────────────────────
 
+const CONCEPT_STYLES: string[] = ['fang', 'bastion', 'crown'];
+
 export function buildBladeModel(spec: BladeSpec): THREE.Group {
   const v = spec.visual;
-  // P2.3：按设计参考图重制的刀刃走独立的建模文件
+  // P2.3：按设计参考图重制的刀刃走独立的建模文件；M6：其余三把按任务书概念板重制
   if (v.style === 'gale') return buildGaleBlade(spec);
+  // 旧的程序化造型保留在下面作后备（新造型缺失时使用），正式部件已全部改用概念板造型
+  if (CONCEPT_STYLES.includes(v.style)) return buildConceptBlade(spec);
   const g = new THREE.Group();
   g.name = `blade:${spec.id}`;
   const R = spec.radius;
@@ -299,15 +305,15 @@ export function buildBladeModel(spec: BladeSpec): THREE.Group {
   return g;
 }
 
-// ───────────────────────── Disc ─────────────────────────
+// ───────────────────────── Ratchet ─────────────────────────
 
-export function buildDiscModel(spec: DiscSpec): THREE.Group {
+export function buildRatchetModel(spec: RatchetSpec): THREE.Group {
   if (spec.visual.style === 'ratchet') return buildRatchetDisc(spec);
   const g = new THREE.Group();
-  g.name = `disc:${spec.id}`;
+  g.name = `ratchet:${spec.id}`;
   const v = spec.visual;
   const R = spec.radius;
-  const N = v.points;
+  const N = spec.teeth;
   const sharp = v.sharpness;
   const profile =
     N === 0
@@ -335,25 +341,31 @@ export function buildDiscModel(spec: DiscSpec): THREE.Group {
   return g;
 }
 
-// ───────────────────────── Tip ─────────────────────────
+// ───────────────────────── Bit ─────────────────────────
 
-export function buildTipModel(spec: TipSpec): THREE.Group {
+export function buildBitModel(spec: BitSpec): THREE.Group {
   const g = new THREE.Group();
-  g.name = `tip:${spec.id}`;
+  g.name = `bit:${spec.id}`;
   const v = spec.visual;
   const r = spec.contactRadius;
   const H = spec.height;
-  const housing = paint(0x1d2028, 0.4);
-  const col = paint(v.color, 0.3);
-  // 外壳：倒圆锥 + 色环 + 卡扣
-  g.add(mesh(new THREE.CylinderGeometry(0.22, 0.12, H * 0.55, 40), housing, H - H * 0.275));
-  g.add(mesh(new THREE.CylinderGeometry(0.226, 0.226, H * 0.12, 40), col, H - H * 0.06 - 0.004));
+  // M6：外壳用类型色注塑件（任务书概念板：攻击红 / 防守蓝 / 平衡绿 / 耐力紫），卡扣与接地件为金属
+  const tint = v.tint ?? spec.role;
+  const housing = typeSolid(tint);
+  const col = typePlastic(tint);
+  const mMetal = polishedMetal();
+  const mSatin = satinMetal();
+  // 外壳：多面倒圆锥（8 面）+ 金属色环 + 卡扣
+  const shell = new THREE.CylinderGeometry(0.22, 0.12, H * 0.55, 8, 1);
+  g.add(mesh(shell, housing, H - H * 0.275));
+  g.add(mesh(new THREE.CylinderGeometry(0.226, 0.226, H * 0.12, 40), mSatin, H - H * 0.06 - 0.004));
   ring(g, 3, 0.2, H * 0.86, (a) => {
-    const clip = new THREE.Mesh(new THREE.BoxGeometry(0.05, H * 0.18, 0.04), metal(0xc9ced8));
+    const clip = new THREE.Mesh(new THREE.BoxGeometry(0.05, H * 0.18, 0.04), mMetal);
     clip.rotation.y = -a;
     return clip;
   });
   if (v.shape === 'gear-flat') {
+    // 平齿轴：金属齿轮（与轨道齿条啮合，冲刺资格的视觉表达）+ 平底
     const gear = mesh(
       extrudeFlat(
         polarShape((t) => (Math.sin(t * 12) > 0 ? r * 1.14 : r * 0.92), 192),
@@ -361,23 +373,23 @@ export function buildTipModel(spec: TipSpec): THREE.Group {
         0.006,
         2,
       ),
-      metal(v.accent, 0.3),
+      mMetal,
       r * 0.7,
     );
     g.add(gear);
     g.add(mesh(new THREE.CylinderGeometry(r * 0.86, r, r * 0.7, 40), col, r * 0.35));
   } else if (v.shape === 'ball') {
-    g.add(mesh(new THREE.CylinderGeometry(0.1, r * 0.9, H * 0.5, 32), col, r + H * 0.2));
-    g.add(mesh(new THREE.SphereGeometry(r, 32, 20), new THREE.MeshPhysicalMaterial({ color: v.accent, roughness: 0.08, clearcoat: 1 }), r));
+    g.add(mesh(new THREE.CylinderGeometry(0.1, r * 0.9, H * 0.5, 32), housing, r + H * 0.2));
+    g.add(mesh(new THREE.SphereGeometry(r, 32, 20), col, r));
   } else if (v.shape === 'point') {
     g.add(mesh(new THREE.CylinderGeometry(0.1, 0.05, H * 0.45, 32), col, H * 0.45));
-    const needle = mesh(new THREE.ConeGeometry(0.06, H * 0.42, 32), metal(0xe6eaf0, 0.12), H * 0.21);
+    const needle = mesh(new THREE.ConeGeometry(0.06, H * 0.42, 32), mMetal, H * 0.21);
     needle.rotation.x = Math.PI;
     g.add(needle);
-    g.add(mesh(new THREE.SphereGeometry(r, 16, 12), metal(0xe6eaf0, 0.1), r));
+    g.add(mesh(new THREE.SphereGeometry(r, 16, 12), mMetal, r));
   } else {
     // 橡胶平底：哑光宽底 + 防滑纹
-    g.add(mesh(new THREE.CylinderGeometry(r * 0.9, r * 1.02, r * 0.85, 40), new THREE.MeshStandardMaterial({ color: v.color, roughness: 0.92 }), r * 0.42));
+    g.add(mesh(new THREE.CylinderGeometry(r * 0.9, r * 1.02, r * 0.85, 40), satin(0x15171c), r * 0.42));
     ring(g, 10, r * 0.98, r * 0.42, (a) => {
       const groove = new THREE.Mesh(new THREE.BoxGeometry(0.015, r * 0.7, 0.03), satin(0x0b0c0f));
       groove.rotation.y = -a;
@@ -389,7 +401,7 @@ export function buildTipModel(spec: TipSpec): THREE.Group {
 }
 
 export function buildPartModel(part: PartSpec): THREE.Group {
-  const g = part.kind === 'blade' ? buildBladeModel(part) : part.kind === 'disc' ? buildDiscModel(part) : buildTipModel(part);
+  const g = part.kind === 'blade' ? buildBladeModel(part) : part.kind === 'ratchet' ? buildRatchetModel(part) : buildBitModel(part);
   g.traverse((o) => {
     if ((o as THREE.Mesh).isMesh) {
       o.castShadow = true;
@@ -419,20 +431,20 @@ export function createBeyVisual(spec: AssembledBey): BeyVisual {
   const root = new THREE.Group();
   root.name = `bey:${spec.blade.id}`;
   const slots = {
-    tip: new THREE.Group(),
-    disc: new THREE.Group(),
+    bit: new THREE.Group(),
+    ratchet: new THREE.Group(),
     blade: new THREE.Group(),
   } as Record<PartKind, THREE.Group>;
-  const tip = buildPartModel(spec.tip);
-  const disc = buildPartModel(spec.disc);
+  const bit = buildPartModel(spec.bit);
+  const ratchet = buildPartModel(spec.ratchet);
   const blade = buildPartModel(spec.blade);
-  slots.tip.add(tip);
-  slots.disc.add(disc);
+  slots.bit.add(bit);
+  slots.ratchet.add(ratchet);
   slots.blade.add(blade);
-  slots.tip.position.y = spec.layers.tip.bottom;
-  slots.disc.position.y = spec.layers.disc.bottom;
+  slots.bit.position.y = spec.layers.bit.bottom;
+  slots.ratchet.position.y = spec.layers.ratchet.bottom;
   slots.blade.position.y = spec.layers.blade.bottom;
-  root.add(slots.tip, slots.disc, slots.blade);
+  root.add(slots.bit, slots.ratchet, slots.blade);
 
   const blurMat = new THREE.MeshBasicMaterial({
     map: createSpinBlurTexture(spec.blade.visual.primary),
@@ -456,8 +468,8 @@ export function createBeyVisual(spec: AssembledBey): BeyVisual {
     root,
     slots,
     blade,
-    disc,
-    tip,
+    ratchet,
+    bit,
     blur,
     dispose() {
       disposeObject(root);

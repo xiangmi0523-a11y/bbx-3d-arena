@@ -5,7 +5,7 @@ import { PhysicsWorld, type Rapier } from '../../src/game/physics/PhysicsWorld';
 
 /** 从真实的 Rapier 刚体上读出来的碰撞体形状（只读，不复制 BeyPhysics 的建形逻辑） */
 export interface ColliderInfo {
-  label: 'tip-ball' | 'tip-shaft' | 'disc' | 'blade';
+  label: 'bit-ball' | 'bit-shaft' | 'ratchet' | 'blade';
   shape: 'ball' | 'cylinder';
   radius: number;
   /** 圆柱半高（球为 0） */
@@ -15,7 +15,7 @@ export interface ColliderInfo {
   mass: number;
 }
 
-const LABELS: ColliderInfo['label'][] = ['tip-ball', 'tip-shaft', 'disc', 'blade'];
+const LABELS: ColliderInfo['label'][] = ['bit-ball', 'bit-shaft', 'ratchet', 'blade'];
 
 /**
  * 在一个临时物理世界里按游戏同样的方式构建 BeyPhysics（原点、零速度、零转速、无倾角），

@@ -3,13 +3,13 @@ import { buildPartModel, disposeObject } from '../beys/BeyVisualFactory';
 import type { AssembledBey } from '../beys/parts/assemble';
 import type { PartKind, PartSpec } from '../beys/parts/types';
 
-const KINDS: PartKind[] = ['tip', 'disc', 'blade'];
+const KINDS: PartKind[] = ['bit', 'ratchet', 'blade'];
 
 /** 分解模式下各部件相对组装位置的偏移 */
 const EXPLODE: Record<PartKind, { y: number; tilt: number }> = {
   blade: { y: 0.55, tilt: 0.35 },
-  disc: { y: 0.22, tilt: 0.2 },
-  tip: { y: -0.18, tilt: 0.1 },
+  ratchet: { y: 0.22, tilt: 0.2 },
+  bit: { y: -0.18, tilt: 0.1 },
 };
 
 interface Slot {
@@ -158,7 +158,7 @@ export class GarageView {
     slot.leaving = {
       model: slot.model,
       t: 0,
-      dir: new THREE.Vector3(Math.cos(a), kind === 'tip' ? -0.6 : 1.2, Math.sin(a)),
+      dir: new THREE.Vector3(Math.cos(a), kind === 'bit' ? -0.6 : 1.2, Math.sin(a)),
     };
     const model = buildPartModel(part);
     slot.holder.add(model);
@@ -218,7 +218,7 @@ export class GarageView {
         const t = slot.enter;
         const ease = 1 - Math.pow(1 - t, 3);
         const bounce = t > 0.75 ? Math.sin(((t - 0.75) / 0.25) * Math.PI) * 0.04 : 0;
-        enterY = (1 - ease) * (kind === 'tip' ? -0.7 : 0.9) + bounce;
+        enterY = (1 - ease) * (kind === 'bit' ? -0.7 : 0.9) + bounce;
         enterScale = 0.7 + 0.3 * ease;
         slot.model.rotation.y = (1 - ease) * 3;
         if (prev < 0.75 && t >= 0.75) this.onSnap?.();
@@ -283,7 +283,7 @@ export function renderThumbnails(parts: PartSpec[], env: (r: THREE.WebGLRenderer
     scene.add(model);
     const d = sz * 1.7;
     // 陀尖从侧下方看（接地形状才是重点），其他部件从斜上方看
-    if (part.kind === 'tip') camera.position.set(0, -d * 0.18, d);
+    if (part.kind === 'bit') camera.position.set(0, -d * 0.18, d);
     else camera.position.set(0, d * 0.62, d * 0.8);
     camera.lookAt(0, 0, 0);
     renderer.render(scene, camera);

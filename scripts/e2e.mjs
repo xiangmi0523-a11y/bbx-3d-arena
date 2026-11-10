@@ -29,6 +29,19 @@ const check = (name, ok, detail = '') => {
   console.log(`${ok ? '✅' : '❌'} ${name}${detail ? ' — ' + detail : ''}`);
 };
 
+// E2E_LOG_SHOTS=1：每张截图另存一份 CSS 像素尺寸的 JPEG，以 base64 分块打印到日志（行首 SHOT-B64），
+// 供无法下载 Actions Artifact 的环境查看界面
+const LOG_SHOTS = !!process.env.E2E_LOG_SHOTS;
+async function shot(page, name) {
+  await page.screenshot({ path: `${OUT}/${name}.png` });
+  if (!LOG_SHOTS) return;
+  const buf = await page.screenshot({ type: 'jpeg', quality: 62, scale: 'css' });
+  const b64 = buf.toString('base64');
+  const W = 3000;
+  console.log(`SHOT-META ${name} ${b64.length} ${Math.ceil(b64.length / W)}`);
+  for (let i = 0; i < b64.length; i += W) console.log(`SHOT-B64 ${name} ${i / W} ${b64.slice(i, i + W)}`);
+}
+
 const browser = await chromium.launch({ args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'] });
 try {
   const context = await browser.newContext({
@@ -48,9 +61,38 @@ try {
 
   await page.goto(`http://localhost:${PORT}/`);
   await page.waitForFunction(() => window.__game?.store.get().phase === 'title', null, { timeout: 30000 });
-  check('加载：Rapier 初始化完成并进入标题', true);
+  check('加载：Rapier 初始化完成并进入主界面', await page.evaluate(() => window.__game.store.get().screen === 'home'));
   await page.waitForTimeout(800);
-  await page.screenshot({ path: `${OUT}/01-title.png` });
+  await shot(page, '01-home');
+
+  // ── 陀螺库：四个签名构筑，装备森衡 ──
+  await page.tap('[data-testid=open-library]');
+  await page.waitForSelector('[data-testid=library]');
+  await page.waitForTimeout(300);
+  await shot(page, '02-library');
+  check('陀螺库：四个签名构筑卡片', (await page.locator('.sig-card').count()) === 4);
+  await page.tap('[data-testid=equip-senheng]');
+  const eq = await page.evaluate(() => window.__game.store.get().loadout);
+  check('陀螺库：装备森衡 = 疾风新月 + 六齿棘轮 + 平齿轴', eq.blade === 'gale-crescent' && eq.ratchet === 'hex-lock' && eq.bit === 'gear-flat', JSON.stringify(eq));
+  // ── M6 模型：四个签名构筑在组装界面的 3D 展示（任务书概念板的视觉语言） ──
+  for (const key of ['lieren', 'pandun', 'senheng', 'ziyao']) {
+    await page.tap(`[data-testid=equip-${key}]`);
+    await page.tap('[data-testid=library-garage]');
+    await page.waitForFunction(() => window.__game.store.get().phase === 'garage', null, { timeout: 120000 });
+    await page.waitForTimeout(1200);
+    await shot(page, `20-model-${key}`);
+    if (key === 'senheng') {
+      await page.tap('[data-testid=explode]');
+      await page.waitForTimeout(1000);
+      await shot(page, '21-model-exploded');
+      await page.tap('[data-testid=explode]');
+    }
+    await page.tap('[data-testid=garage-back]');
+    await page.waitForSelector('[data-testid=library]');
+  }
+  await page.tap('[data-testid=equip-senheng]');
+  await page.tap('[data-testid=back]');
+  await page.waitForSelector('[data-testid=home]');
 
   // ── 组装界面 ──
   await page.tap('[data-testid=open-garage]');
@@ -58,26 +100,26 @@ try {
   await page.waitForFunction(() => Object.keys(window.__game.store.get().garage.thumbs).length >= 12, null, { timeout: 120000 });
   check('组装界面：打开并由 3D 模型生成 12 张部件缩略图', true);
   await page.waitForTimeout(800);
-  await page.screenshot({ path: `${OUT}/10-garage.png` });
+  await shot(page, '10-garage');
 
   const before = await page.evaluate(() => window.__game.store.get().garage.draft);
-  await page.tap('[data-testid=tab-disc]');
+  await page.tap('[data-testid=tab-ratchet]');
   await page.tap('[data-testid=part-quad-edge]');
   await page.waitForTimeout(180);
   await page.screenshot({ path: `${OUT}/11-garage-swap-anim.png` });
   const afterDisc = await page.evaluate(() => window.__game.store.get().garage.draft);
   check(
     '换齿轮盘：只改 Disc，Blade/Tip 不变',
-    afterDisc.disc === 'quad-edge' && afterDisc.blade === before.blade && afterDisc.tip === before.tip,
+    afterDisc.ratchet === 'quad-edge' && afterDisc.blade === before.blade && afterDisc.bit === before.bit,
     JSON.stringify(afterDisc),
   );
   await page.tap('[data-testid=tab-blade]');
   await page.tap('[data-testid=part-titan-crown]');
-  await page.tap('[data-testid=tab-tip]');
+  await page.tap('[data-testid=tab-bit]');
   await page.tap('[data-testid=part-needle-point]');
   await page.waitForTimeout(700);
   const draft = await page.evaluate(() => window.__game.store.get().garage.draft);
-  check('换刀刃和陀尖：三个部件各自独立', draft.blade === 'titan-crown' && draft.disc === 'quad-edge' && draft.tip === 'needle-point', JSON.stringify(draft));
+  check('换刀刃和陀尖：三个部件各自独立', draft.blade === 'titan-crown' && draft.ratchet === 'quad-edge' && draft.bit === 'needle-point', JSON.stringify(draft));
 
   // 拖动旋转（触摸）
   const stage = await page.locator('[data-testid=garage-stage]').boundingBox();
@@ -103,20 +145,40 @@ try {
 
   await page.tap('[data-testid=explode]');
   await page.waitForTimeout(900);
-  await page.screenshot({ path: `${OUT}/13-garage-exploded.png` });
+  await shot(page, '13-garage-exploded');
   check('分解模式切换', await page.evaluate(() => window.__game.store.get().garage.exploded));
   await page.tap('[data-testid=explode]');
 
   await page.tap('[data-testid=garage-confirm]');
   await page.waitForFunction(() => window.__game.store.get().phase === 'title');
   const lo = await page.evaluate(() => window.__game.store.get().loadout);
-  check('确认出战：组装结果传回游戏', lo.blade === 'titan-crown' && lo.disc === 'quad-edge' && lo.tip === 'needle-point', JSON.stringify(lo));
+  check('确认出战：组装结果传回游戏', lo.blade === 'titan-crown' && lo.ratchet === 'quad-edge' && lo.bit === 'needle-point', JSON.stringify(lo));
 
+  // ── 开始对战：模式与对手 → 竞技场 → 战斗准备 → 第 1 回合 ──
   await page.tap('[data-testid=start]');
+  await page.waitForSelector('[data-testid=mode]');
+  await page.tap('[data-testid=rival-pandun]');
+  await page.tap('[data-testid=diff-pro]');
+  await page.waitForTimeout(300);
+  await shot(page, '03-mode');
+  const setup = await page.evaluate(() => window.__game.store.get().setup);
+  check('模式与对手：自由对战 · 磐盾 · 进阶', setup.mode === 'free' && setup.rival === 'pandun' && setup.difficulty === 'pro', JSON.stringify(setup));
+  await page.tap('[data-testid=mode-next]');
+  await page.waitForSelector('[data-testid=arena]');
+  await page.waitForTimeout(300);
+  await shot(page, '04-arena');
+  await page.tap('[data-testid=arena-next]');
+  await page.waitForSelector('[data-testid=prep]');
+  await page.waitForTimeout(300);
+  await shot(page, '05-prep');
+  const rl = await page.evaluate(() => window.__game.store.get().rivalLoadout);
+  check('战斗准备：对手为磐盾签名构筑（针尖轴）', rl.blade === 'tidal-bastion' && rl.ratchet === 'ring-guard' && rl.bit === 'needle-point', JSON.stringify(rl));
+  await page.tap('[data-testid=prep-start]');
   await page.waitForFunction(() => window.__game.store.get().phase === 'aim');
-  check('开始：进入发射准备', true);
+  const m0 = await page.evaluate(() => window.__game.store.get().match);
+  check('开始比赛：第 1 回合发射准备，比分 0:0', !!m0 && m0.round === 1 && m0.score.player === 0 && m0.score.rival === 0, JSON.stringify(m0 && m0.score));
   await page.waitForTimeout(1200);
-  await page.screenshot({ path: `${OUT}/02-aim.png` });
+  await shot(page, '06-aim');
 
   // 用 CDP 发送真实的触摸事件：按住拉绳 → 向下拉 + 右偏 → 松手
   const cdp = await context.newCDPSession(page);
@@ -131,7 +193,7 @@ try {
     await page.waitForTimeout(30);
   }
   const midPull = await page.evaluate(() => window.__game.store.get().pull);
-  await page.screenshot({ path: `${OUT}/03-pulling.png` });
+  await shot(page, '07-pulling');
   check('拉绳：触摸拖动被识别', midPull.active && midPull.pull > 0.2, `pull=${midPull.pull.toFixed(2)} aim=${midPull.aim.toFixed(2)}`);
   for (let i = 9; i <= 14; i++) {
     await touch('touchMove', x0 + i * 4, y0 + i * 18);
@@ -140,12 +202,14 @@ try {
   await touch('touchEnd', 0, 0);
   await page.waitForFunction(() => window.__game.store.get().phase === 'battle', null, { timeout: 3000 });
   check('松手发射：进入战斗', true);
+  const launched = await page.evaluate(() => window.__game.debugState());
+  check('发射力度归到三档之一（0.65 / 0.8 / 0.95）', [0.65, 0.8, 0.95].some((p) => Math.abs((launched.launchPower ?? p) - p) < 1e-9), `power=${launched.launchPower}`);
 
   // 战斗中的物理陀螺与视觉模型都来自组装结果
   const bl = await page.evaluate(() => window.__game.debugState());
   check(
     '战斗使用组装结果（物理 + 模型一致）',
-    bl.player.loadout.blade === 'titan-crown' && bl.playerVisual.blade === 'blade:titan-crown' && bl.playerVisual.disc === 'disc:quad-edge' && bl.playerVisual.tip === 'tip:needle-point',
+    bl.player.loadout.blade === 'titan-crown' && bl.playerVisual.blade === 'blade:titan-crown' && bl.playerVisual.ratchet === 'ratchet:quad-edge' && bl.playerVisual.bit === 'bit:needle-point',
     JSON.stringify(bl.playerVisual),
   );
   check('画质：iPhone 起始为“均衡”档（流畅优先）', bl.initialQuality === 'medium', `起始=${bl.initialQuality}，当前=${bl.quality}（软件渲染帧率低，会自动降档）`);
@@ -216,7 +280,7 @@ try {
     moved += Math.hypot(s.player.x - prev.player.x, s.player.z - prev.player.z);
     prev = s;
   }
-  await page.screenshot({ path: `${OUT}/04-battle.png` });
+  await shot(page, '08-battle');
   const s1 = await page.evaluate(() => window.__game.debugState());
   check('物理：陀螺刚体在运动', moved > 0.3 && s1.time > s0.time, `轨迹长度 ${moved.toFixed(2)}，转速 ${s1.player.spin.toFixed(0)} rad/s`);
   check('物理：陀螺落在场地上（没有穿模掉落）', s1.player.y > -0.2 && s1.rival.y > -0.2, `y=${s1.player.y.toFixed(2)}/${s1.rival.y.toFixed(2)}`);
@@ -302,26 +366,51 @@ try {
   const p2 = await page.evaluate(() => window.__game.debugState().time);
   check('继续：物理恢复', p2 > p1, `t=${p2.toFixed(2)}`);
 
-  // 快进物理直到胜负（无头 Chromium 用软件 GPU，实时跑太慢）
-  await page.evaluate(() => window.__game.debugFastForward(150));
-  await page.waitForFunction(() => window.__game.store.get().phase === 'result', null, { timeout: 10000 }).catch(() => {});
-  const end = await page.evaluate(() => window.__game.debugState());
-  await page.waitForTimeout(1200);
-  await page.screenshot({ path: `${OUT}/06-result.png` });
-  check('胜负判定：出现结算', !!end.result, end.result ? `${end.result.winner} ${end.result.finish} ${end.result.duration.toFixed(1)}s 撞击 ${end.hits}` : '超时');
+  // 快进物理直到本回合判定（无头 Chromium 用软件 GPU，实时跑太慢）
+  await page.evaluate(() => window.__game.debugFastForward(70));
+  await page.waitForFunction(() => window.__game.store.get().phase === 'roundEnd', null, { timeout: 15000 }).catch(() => {});
+  const end = await page.evaluate(() => window.__game.store.get());
+  await page.waitForTimeout(500);
+  await shot(page, '09-round-end');
+  check('回合判定：出现回合横幅与比分', end.phase === 'roundEnd' && !!end.lastRound, end.lastRound ? `${end.lastRound.text} · 比分 ${end.match.score.player}:${end.match.score.rival}` : end.phase);
 
-  // 重新开始
-  await page.tap('[data-testid=again]').catch(() => page.evaluate(() => window.__game.restart()));
+  // 打完整场比赛：每回合重新发射 → 快进 → 跳过休整，直到先到 4 分
+  let guard = 0;
+  while (guard++ < 30) {
+    const ph = await page.evaluate(() => window.__game.store.get().phase);
+    if (ph === 'matchEnd') break;
+    if (ph === 'roundEnd') await page.evaluate(() => window.__game.continueRound());
+    else if (ph === 'aim') {
+      await page.evaluate(() => window.__game.launch({ power: 0.9, aim: (Math.random() - 0.5) * 0.8, tilt: 0 }));
+      await page.evaluate(() => window.__game.debugFastForward(70));
+    }
+    await page.waitForTimeout(150);
+  }
+  await page.waitForFunction(() => window.__game.store.get().phase === 'matchEnd', null, { timeout: 15000 }).catch(() => {});
+  const fin = await page.evaluate(() => window.__game.store.get());
+  await page.waitForTimeout(500);
+  await shot(page, '10-match-end');
+  check(
+    '比赛结算：先到 4 分者胜，回合记录完整',
+    fin.phase === 'matchEnd' && !!fin.match?.winner && Math.max(fin.match.score.player, fin.match.score.rival) >= 4 && fin.match.rounds.length >= 2,
+    fin.match ? `${fin.match.score.player}:${fin.match.score.rival} · ${fin.match.rounds.length} 回合 · ${fin.match.rounds.map((x) => x.outcome.finish ?? 'draw').join(',')}` : fin.phase,
+  );
+  const sv = fin.save;
+  check('比赛结算：战绩写入存档', sv.wins + sv.losses >= 1, JSON.stringify({ wins: sv.wins, losses: sv.losses, points: sv.points }));
+
+  // 重赛
+  await page.tap('[data-testid=again]').catch(() => page.evaluate(() => window.__game.rematch()));
   await page.waitForFunction(() => window.__game.store.get().phase === 'aim');
   const r = await page.evaluate(() => window.__game.debugState());
-  check('重新开始：回到发射准备，物理世界已重置', r.player === null && r.time === 0);
+  const m1 = await page.evaluate(() => window.__game.store.get().match);
+  check('重赛：新比赛第 1 回合，物理世界已重置', r.player === null && r.time === 0 && m1.round === 1 && m1.score.player === 0);
   const rc = await page.evaluate(() => window.__game.debugContact());
   check('P2.3.2 重新开始：摩擦层清空（无火花、无摩擦音频链）', rc.fx.grindLive === 0 && !rc.fx.glow && !rc.audio.grind, JSON.stringify(rc.fx));
 
   // 竖屏布局
   await page.setViewportSize({ width: 390, height: 844 });
   await page.waitForTimeout(600);
-  await page.screenshot({ path: `${OUT}/07-portrait.png` });
+  await shot(page, '11-portrait');
   check('竖屏：显示横屏提示', await page.locator('.rotate-hint').isVisible());
 
   check('控制台无报错', errors.length === 0, errors.slice(0, 3).join(' | '));

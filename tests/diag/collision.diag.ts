@@ -14,8 +14,8 @@ const LABEL = process.env.DIAG_LABEL ?? 'current';
 
 const MATCHUPS = [
   { name: '默认：攻击型 vs 防御型', player: undefined, rival: undefined },
-  { name: '重攻：泰坦王冠 + 针尖 vs 防御型', player: { blade: 'titan-crown', disc: 'quad-edge', tip: 'needle-point' }, rival: undefined },
-  { name: '同为攻击型', player: undefined, rival: { blade: 'gale-crescent', disc: 'tri-lock', tip: 'rush-rubber' } },
+  { name: '重攻：泰坦王冠 + 针尖 vs 防御型', player: { blade: 'titan-crown', ratchet: 'quad-edge', bit: 'needle-point' }, rival: undefined },
+  { name: '同为攻击型', player: undefined, rival: { blade: 'gale-crescent', ratchet: 'tri-lock', bit: 'rush-rubber' } },
 ];
 
 test('collision diagnostics', async () => {

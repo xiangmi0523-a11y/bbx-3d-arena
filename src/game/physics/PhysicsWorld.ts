@@ -38,8 +38,9 @@ export class PhysicsWorld {
   /** 每个固定步之后调用（读取碰撞） */
   afterStep: ((dt: number) => void) | null = null;
   /**
-   * 只读接触观测（阶段 1 第二项 A）：构造时 observeContacts = true 才创建，默认关闭。
-   * 在 world.step 之后、afterStep 之前观测一次；只读取窄相位数据，不改变物理（见 ContactService.ts）。
+   * 只读接触观测（阶段 1 第二项 A）：默认开启（M2 起爆裂与自灭判定读取它的实测法向冲量）；
+   * observeContacts = false 只用于“无观测”的对照测试。
+   * 在 world.step 之后、afterStep 之前观测一次；只读取窄相位数据，不改变物理（见 ContactService.ts，golden 逐位验证）。
    */
   readonly contacts: ContactService | null;
 
@@ -49,7 +50,7 @@ export class PhysicsWorld {
     this.world.timestep = PHYSICS_DT;
     this.world.integrationParameters.numSolverIterations = 8;
     this.events = new R.EventQueue(true);
-    this.contacts = opts.observeContacts ? new ContactService(this.world) : null;
+    this.contacts = opts.observeContacts !== false ? new ContactService(this.world) : null;
   }
 
   /**

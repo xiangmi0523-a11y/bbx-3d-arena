@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import type { GameEngine } from '../game/core/GameEngine';
 import type { PullState } from '../game/launcher/PullStringGesture';
+import { powerTier } from '../game/launcher/launch';
+import { PowerTiers } from './hud';
 
 /**
  * 拉绳发射操作区（触摸 / 鼠标通用）：
@@ -79,13 +81,10 @@ export function LauncherPad({ engine, pull }: { engine: GameEngine; pull: PullSt
           />
         </svg>
       )}
-      <div className="power-meter" aria-label="发射力度">
-        <div className="power-fill" style={{ height: `${power}%`, background: `hsl(${hue},90%,55%)` }} />
-        <span>{pull.active ? power : '—'}</span>
-      </div>
+      <PowerTiers power={pull.power} active={pull.active} />
       {pull.active && (
         <div className="aim-readout">
-          方向 {pull.aim > 0.15 ? '右' : pull.aim < -0.15 ? '左' : '中'} · 拉速 {Math.round(pull.speed * 100)}
+          方向 {pull.aim > 0.15 ? '右' : pull.aim < -0.15 ? '左' : '中'} · 力度 {powerTier(pull.power).label}（{power}）
         </div>
       )}
     </>

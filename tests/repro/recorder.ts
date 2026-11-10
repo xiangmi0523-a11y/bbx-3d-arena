@@ -64,7 +64,7 @@ export interface Trace {
   /** 每块开始前的状态（第 k 个对应第 k*chunkSteps 步之前） */
   keyframes?: { step: number; player: BeyState; rival: BeyState }[];
   events: TraceEvent[];
-  result: { winner: string; finish: string; duration: number } | null;
+  result: { winner: string | null; finish: string | null; duration: number } | null;
   counters: { hits: number; grinds: number; breakouts: number; wobbleBreaks: number; impacts: number; intentSwitches: number };
   random: { setup: DeterminismReport; run: DeterminismReport };
   /** detail 范围内逐步展开的完整状态（只在定位差异时使用） */
@@ -142,7 +142,7 @@ export function recordRun(R: R, sc: Scn, opts: RecordOptions = {}): Trace {
   let trace!: Trace;
   let setupReport!: DeterminismReport;
   const runRes = withDeterminism(sc.seed, (live) => {
-    const { pw, b, A, B } = setup(R, sc, { observeContacts: !!opts.observeContacts });
+    const { pw, b, A, B } = setup(R, sc, { observeContacts: opts.observeContacts !== false });
     setupReport = structuredClone(live);
     // 标记 Rapier 求解区间：区分引擎内部计时读取与游戏代码读取时间（只包一层调用，不改参数和顺序）
     const world = pw.world;
