@@ -1,12 +1,12 @@
 {
  "generatedFrom": "2d6131f63f97f87da3c225ad1b9bb7407a530501",
- "config": "1d488918d95647a1",
+ "config": "06858d36c7193999",
  "runs": [
   {
    "name": "AIM -0.5#0",
    "seed": 702,
    "steps": 1555,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "54988061e3ee8c661a792ddabdb2e0a721d16c63aa561cdfaff5009ffaad2302",
     "intent": "01a16ca6b8751575c8e988180bcf92cdc03968f48863a70a9471744db7c46c6b",
@@ -31,7 +31,7 @@
    "name": "AIM -0.5#1",
    "seed": 703,
    "steps": 1987,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "afc6d39af658ea84cdd4d9711aa01670de78ddb110ac3aa3c8d69a2abc9bde8f",
     "intent": "285146811b0600300daf66ef9aa1754cfc2a78f5c879cc4a00d90d5ab580c48e",
@@ -56,7 +56,7 @@
    "name": "AIM -1#0",
    "seed": 700,
    "steps": 1481,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "725b69e27ef3d21e1677287302c4653d2ece67bea853af0ef8ae5ab4e5168cee",
     "intent": "d3441751e7c89f7e822775cfde68d749d032108421bc08fc744593d47bf9cfb9",
@@ -81,7 +81,7 @@
    "name": "AIM -1#1",
    "seed": 701,
    "steps": 1448,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "b28bf5cf5310147c5fe5ede9c94442faa3c138a7b981c6c1b413a15ebc7d8add",
     "intent": "25ce84de0de70d8ce799a84fcdc093a332ab558174495b57c5539e8ee975f413",
@@ -106,7 +106,7 @@
    "name": "AIM 0#0",
    "seed": 704,
    "steps": 1456,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "ca3b9734ff84b527d0120863c9808b8ce22a4b8c102c7607eab59a94681b7947",
     "intent": "ad3a134ed902bff5c6f46c1b4b3a09a8780d41d0dadee61f033e86c9c548e62d",
@@ -131,7 +131,7 @@
    "name": "AIM 0#1",
    "seed": 705,
    "steps": 1257,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "b5cf7a00ec7d459f0b1d535732deb1fd7a1ef742bac5d87dbe06e7de52e9f2a6",
     "intent": "7ad7337a4c90961d40b781bca4b9e770aad688191e85849138760980231ea9bd",
@@ -156,7 +156,7 @@
    "name": "AIM 0.5#0",
    "seed": 706,
    "steps": 1257,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "bbea8c3af76c4c74b2d38c973592cb720c0ec5212803bdced7255bc3f48dcd55",
     "intent": "eed4931b98330bee8622735e262f13427078dcbd762eca7da80f9f82cbdd7e10",
@@ -181,7 +181,7 @@
    "name": "AIM 0.5#1",
    "seed": 707,
    "steps": 1838,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "59ebe6db9a1ba93dff270f31787bf72a673a0c10602ad07e635de815b6580298",
     "intent": "1b37d17c9715571c9b39516241d7f765c721e2a67ad9e19aa1b3e6da9e6cbcf8",
@@ -206,7 +206,7 @@
    "name": "AIM 1#0",
    "seed": 708,
    "steps": 1491,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "0e0749a7a9ea570bf5dd4e2b30502cb0c338ebd23878691922a8d38e2237f330",
     "intent": "70c21b98453de0161e0f17755641303e100788d9fea50ede91c297c757114d07",
@@ -231,7 +231,7 @@
    "name": "AIM 1#1",
    "seed": 709,
    "steps": 1223,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "7e856f1530a6291ebbbd3947f64d83266facf4be56131f68fdfe00bcf1ac322c",
     "intent": "c69acaaf87cc75e4a2afe52ff84f38bc1b0b1da3bf31b07f8dd957d3f0108ad6",
@@ -256,7 +256,7 @@
    "name": "AvA#0",
    "seed": 500,
    "steps": 1475,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "e350de97a70ef73acabafc6a5c8df4555e10edd968257005f46239d9f2dc2704",
     "intent": "0f04a13816b50567513693f6fcb30150eb49f7f0af8fa2907ac9d7b3c9144328",
@@ -281,7 +281,7 @@
    "name": "AvA#1",
    "seed": 501,
    "steps": 1279,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "cd6adaa8ade5622a152aa8833d7ad94d2cb3eaf9489090b67e5f31c536d4f4e8",
     "intent": "f907ec0caadabd3a4b058aa06b2dcf96f66707153a285ec858f00b92e162c65d",
@@ -306,7 +306,7 @@
    "name": "AvA#10",
    "seed": 510,
    "steps": 1432,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "4983db79c7a2f7f0fc53979cee114f662bc547db7685065e7bc5d147bed84d1f",
     "intent": "22c015f57b4e4c7d60a282f7929b266438b0bc57985ac5e30369b1aab9e51eac",
@@ -331,7 +331,7 @@
    "name": "AvA#11",
    "seed": 511,
    "steps": 1116,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "c1c23c9516c33fa06b0131808078d579b0059fba4adf0e5a1635514d81adcebe",
     "intent": "aed5091ec9f4706c728ada85b09f99194aa9d40c8d521e4b3fa27ad60f05a735",
@@ -356,7 +356,7 @@
    "name": "AvA#12",
    "seed": 512,
    "steps": 1118,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "b9f25ba0a854eb4cf5c2e79cf4acf25993eb82951495fce39b35e84d10fbb66b",
     "intent": "75e8f11869ecfb75ee2811265f0e186e0afb4bce76a5b8073122f611f2d0aed2",
@@ -381,7 +381,7 @@
    "name": "AvA#13",
    "seed": 513,
    "steps": 1420,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "2c52e0fdbda47941164b6e459c3ee386c0596f1d44bd7cadd018a23069408801",
     "intent": "b293134f21204f7200ab2856f7d8026bfe318d10513f7a950724d9f779c051ca",
@@ -406,7 +406,7 @@
    "name": "AvA#14",
    "seed": 514,
    "steps": 1205,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "b8861240a2a497da96cac4b60f6d097128e65a9801e615c38796b4333f179943",
     "intent": "ad243499ca9d8f608f67d4a828cc6675c20c32bf3865d59d65d3a78caa038da9",
@@ -431,7 +431,7 @@
    "name": "AvA#15",
    "seed": 515,
    "steps": 1331,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "7a2cf7661d637b3221aaecb77751b1fdda13d6c6f50619f5cf506c593146f33d",
     "intent": "2dbe75ba229c30de420c490838c3a88d6120c123c605a0422d6575b6ea820b7e",
@@ -456,7 +456,7 @@
    "name": "AvA#2",
    "seed": 502,
    "steps": 1109,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "626c5584d45d077c024db6b8ad519af790e46ec01f4dfbe83d2b76af9209bf9e",
     "intent": "fd18406e827599649d6af4e41f2ca1f6f262e3001e1ab6c1b79335b8ca4e497e",
@@ -481,7 +481,7 @@
    "name": "AvA#3",
    "seed": 503,
    "steps": 1172,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "bfae24efd1df7d256c43068184bb495efcc98bfe37120980f18db5eeb2d1c5fe",
     "intent": "b97e25fd03d60e93d39ec2c29236bb24bc8986e92df4fb72b5416e5a5971b690",
@@ -506,7 +506,7 @@
    "name": "AvA#4",
    "seed": 504,
    "steps": 1171,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "b12ec012b1f23ac0f74b92ce63b3ba3057013f1b37c3a412900e29cf45babffd",
     "intent": "f4fc5c80fa94d205911149102165cbd9e32e880286a3456676a44f02b478f989",
@@ -531,7 +531,7 @@
    "name": "AvA#5",
    "seed": 505,
    "steps": 889,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "8bbde3565cc08d1a303e73afa76479e284624914bee84072be67dd38704b6dd2",
     "intent": "91218602ce70ce99498a3cf91d286cda6038ae3b4963e58620ee711789b61a2f",
@@ -556,7 +556,7 @@
    "name": "AvA#6",
    "seed": 506,
    "steps": 1393,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "f5e1c340526a3bbff3b0a99dc9b4adf19c0b18e1c177841a7a91cf4b77a2b22a",
     "intent": "6ba816a21bcead0b56c21db600288b044685aa23393fb9e3612e9b8383f01edd",
@@ -581,7 +581,7 @@
    "name": "AvA#7",
    "seed": 507,
    "steps": 1312,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "bbdf004fce8fc992cd961e21d5a6154922ccccc40f5f3c3ac30e2a191b3de540",
     "intent": "70e310bf7d2bac4c99cbe1eeb306f36d31ca6edf380b3872a8ae96d6d7ec4abb",
@@ -606,7 +606,7 @@
    "name": "AvA#8",
    "seed": 508,
    "steps": 1222,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "49e2b27112bd2877cd821ac79accd96eb66ffea8b2c9606b2d8d080b0c4fce43",
     "intent": "cf58234acd7bd09570985e85cfd3a2d8a47e8213f7c7307a469d6cb9e399842d",
@@ -631,7 +631,7 @@
    "name": "AvA#9",
    "seed": 509,
    "steps": 926,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "d3285e18569811473453d46f3477d0edf633997692d2734173c2135b711a6909",
     "intent": "40dad844be2442324a6ef86211d9c49d1f4fa11dd1a72a3f06b1ea3ba7b38162",
@@ -656,7 +656,7 @@
    "name": "AvD#0",
    "seed": 100,
    "steps": 1361,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "7775c5b87607837449ab15a2f47c770a1a052d4406e681a7035a11c81af73b60",
     "intent": "fdc10803567b3667e5557ace72f582ad93cae647ad835d34fc21ecf77f57d327",
@@ -681,7 +681,7 @@
    "name": "AvD#1",
    "seed": 101,
    "steps": 1431,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "5f5a59b94283b051fa95b23e486993f95a970a44f8147033ec311c0fdc726ed5",
     "intent": "7ca90ded7078214dc929b010271f746760d77d496aed52a395a00bcd1f69cf89",
@@ -706,7 +706,7 @@
    "name": "AvD#10",
    "seed": 110,
    "steps": 1745,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "3010a10507837c5c4ef8235cd5dbd9057c68b26ca9684e698be1a6ad4cbbc317",
     "intent": "883981dddfb4dfbfc2cf0b1162f57bd7fd54b6f3d857deaa86f4bb16c13dfdba",
@@ -731,7 +731,7 @@
    "name": "AvD#11",
    "seed": 111,
    "steps": 1693,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "467a4319051ae9505ea4ecb7d00d3fbac349fba4d150c70e3e6cb8f32c6bf7cb",
     "intent": "214835a65c920ae4b7919f3dd08df6582e336a8da333e664129810a1df04b268",
@@ -756,7 +756,7 @@
    "name": "AvD#12",
    "seed": 112,
    "steps": 1694,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "248379e49d9d9044eaf0a5af051c9dd61583321ffbbc64f55a3a98ef6aee332e",
     "intent": "e449f21579a727b76e024805cd507bc1ba3ad95ba6556163abc5b5519480a21e",
@@ -781,7 +781,7 @@
    "name": "AvD#13",
    "seed": 113,
    "steps": 1528,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "c48b9cd3b6ecf638f57c69c42fb522f03ef27459ab47cbf8018e91c3815a5d34",
     "intent": "64257348797ace8715de9649f2491cd983cfad40b392eb70f3834df54a44d5b5",
@@ -806,7 +806,7 @@
    "name": "AvD#14",
    "seed": 114,
    "steps": 1807,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "90a8b91dc909c28c241175cd9fcb43b8d253c651f42f8bdc78a97e38a0e715ea",
     "intent": "32df716e0cff95eb0abc48358dcc4c6edf6041d2acf1bbefbdfb416b8b1b00e9",
@@ -831,7 +831,7 @@
    "name": "AvD#15",
    "seed": 115,
    "steps": 1196,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "c0799ca74b93020c410f71969e01a1c13a316ce2590f82b30b9fb9e2bc9821ef",
     "intent": "08ffab9c47ba8ddbb2b565daf5c3eb88c58f4e5258616c74de14c9faeeeeacbd",
@@ -856,7 +856,7 @@
    "name": "AvD#2",
    "seed": 102,
    "steps": 1727,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "9bd0d0ff923cb2e08afcff179e15357a2b9dd8955d9894468ba3ff3ec794bd3a",
     "intent": "b34aa3b1ecaf9c640a63fcfa483fdea95bd01bf0da9ca8ae8ae04615625bc739",
@@ -881,7 +881,7 @@
    "name": "AvD#3",
    "seed": 103,
    "steps": 1405,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "d9edb80640b838eb503a1558d003cc55d0af800aff4a2958ecab1f409d2285fb",
     "intent": "cbbaec83ae5b9a68f49af3e80d205a2cafde35c5a99928b02d3b16827ff76c82",
@@ -906,7 +906,7 @@
    "name": "AvD#4",
    "seed": 104,
    "steps": 1880,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "e61c44a16aae5397dff7ad5c8b6bd27ed03a000864e68db8cf4f343db959d26f",
     "intent": "2fdba8f676a94e27c5d1e8573aa9193b12b8b5a0d1a4293e64b10f8a06afb4f7",
@@ -931,7 +931,7 @@
    "name": "AvD#5",
    "seed": 105,
    "steps": 2113,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "c07db8d642a305599d70a4582da737ca612856261f169fbe94ffef62cba293e3",
     "intent": "cc7375e836253ba87e1453aa95b5c30ce84217a46e7b85519afa00b88279232e",
@@ -956,7 +956,7 @@
    "name": "AvD#6",
    "seed": 106,
    "steps": 1198,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "5d966671610bc90b39fa61e3d4c8d7d0ba1d770100eca3391d152a0d8e262b0b",
     "intent": "6924cbd808239c305f5194f619391bab46a762d7acc489129bdd47506d56523c",
@@ -981,7 +981,7 @@
    "name": "AvD#7",
    "seed": 107,
    "steps": 1351,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "e37f8d260ad4b0c1a2ae2ad19489ec69611217364ce55c86a3d9c34dab486fdd",
     "intent": "a4daef40b6be2dc8b04589b29dd0a7b26bdd5d7232039077bb39c69d2c3e39d0",
@@ -1006,7 +1006,7 @@
    "name": "AvD#8",
    "seed": 108,
    "steps": 1894,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "901dfc858c340df78d8d54672b16ea0794b654081ee812d8f50f62677af7e5c0",
     "intent": "6b2f61cd7b9a13de894e5c8daffea5c86f41ebb2232cca6f1e651e7577777708",
@@ -1031,7 +1031,7 @@
    "name": "AvD#9",
    "seed": 109,
    "steps": 1365,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "c132b8c7872e01a0a5d9e917a17e2f689ce21ff0e48824492c30e6b31e05e09e",
     "intent": "8e079821029141ee418471dedbd68be5f9f5b8fe55d11250a8ff5643d0a48f6a",
@@ -1056,7 +1056,7 @@
    "name": "BvB#0",
    "seed": 400,
    "steps": 3064,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "5c971e975ad1a3b5064e3dbef4a1c5463fbab126c34410b5b3c182f1575494bc",
     "intent": "eaa95128c284d3071f6cb8b7bdbde8b56705e338306cecd7a468d801afc23b86",
@@ -1081,7 +1081,7 @@
    "name": "BvB#1",
    "seed": 401,
    "steps": 3001,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "140152ec48a054df76a341d0587f5073ef66a44b79b678a162754899e985ca5e",
     "intent": "43e0e61797a41062930789203715692875542f3ee5913ee4da470afd886e74ff",
@@ -1106,7 +1106,7 @@
    "name": "BvB#10",
    "seed": 410,
    "steps": 2517,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "7f0b3cf2d76f63f19d8431a10309638fa54e876287449a8d3e0eaf8649b0482c",
     "intent": "e306504aecf53ee33a4dd2b44ad4e5d410deda5c994ab52e44a7bbe7cfd75c79",
@@ -1131,7 +1131,7 @@
    "name": "BvB#11",
    "seed": 411,
    "steps": 3118,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "0fb7da512f15d5d9806ff3e6116e5ae61badf97e4dae9cfa4d348a508e3626a8",
     "intent": "0d31c98b7b930116354457287fc4f2f3098272c14095f36c63c63a0b1a766758",
@@ -1156,7 +1156,7 @@
    "name": "BvB#12",
    "seed": 412,
    "steps": 3029,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "b843de4482e18b4ce1926ee12fd858abc1b453b2a320b3c023ee7c9d93f0158f",
     "intent": "209b3b7629b854ef7c300406192ed24a115528a30bc936ebb1d8115a8645c004",
@@ -1181,7 +1181,7 @@
    "name": "BvB#13",
    "seed": 413,
    "steps": 2955,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "aff029c35e2db7904608782c107a52dcfa8676cd4a48f1328350d1ca96eaa8f3",
     "intent": "c674fb0192f4dc6fd8d0fc3b11fb3a3b730c0aea9997906906c0678b17b12318",
@@ -1206,7 +1206,7 @@
    "name": "BvB#14",
    "seed": 414,
    "steps": 2265,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "2c753a3d6a8db3bd97ac42e3a8df38465665a0e03cc3e2c56972b3013bbd2764",
     "intent": "41451f90dc0e115b0559d77bc9088e625cbe8b7dacd0810a9f357387ef3b34f7",
@@ -1231,7 +1231,7 @@
    "name": "BvB#15",
    "seed": 415,
    "steps": 2799,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "94170e2831ecc81bcb8515f04fa595b317277d7671e1e672f82013e532dbe5a6",
     "intent": "c0e20be2dfdac47098fe9c06089da72709ef94990d39f1ec11f9e07804c14551",
@@ -1256,7 +1256,7 @@
    "name": "BvB#2",
    "seed": 402,
    "steps": 2551,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "04e962fc6177e72abe896f721624c3034a1d8643f1c50f1396f34dd2621b2545",
     "intent": "5e374656c0edcda984c547e04caa3ff5205bbfcab8e3340b5f6af576749b6e8a",
@@ -1281,7 +1281,7 @@
    "name": "BvB#3",
    "seed": 403,
    "steps": 2646,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "422b36041d150745bb9e417645668b354983a938361c8a82ff5cc65909f20e5d",
     "intent": "bc4bcc714f5771e4b5935e4537a029aa98a5d94edcc3f61f5ae984bd45ce7409",
@@ -1306,7 +1306,7 @@
    "name": "BvB#4",
    "seed": 404,
    "steps": 3684,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "d0d29f30d93d808fc9a8b271792c72c3110c584e9f90ee2308c03b77336800fd",
     "intent": "5788fd131d10a26c7c04e04692dbaeb5ee8c3b298226e2cb78d5ce3051e6a562",
@@ -1331,7 +1331,7 @@
    "name": "BvB#5",
    "seed": 405,
    "steps": 2253,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "8c7729e25679006679bf793740a55968134b89306da7239fd5a570ed64c1a809",
     "intent": "9e4cdffafc43be7bb02d6aa137e051a6a30185e552339a8ba3a9e9d5417a1ea5",
@@ -1356,7 +1356,7 @@
    "name": "BvB#6",
    "seed": 406,
    "steps": 2734,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "ea89dc2564e9a48a18bb324131486b5accc863c40e21af5e38041b0a4ce137b0",
     "intent": "c8ed60d1e9e31f7c31be99736a8e223f6172b6cfa61ec9e3a0d9b4d0bc1b5935",
@@ -1381,7 +1381,7 @@
    "name": "BvB#7",
    "seed": 407,
    "steps": 2684,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "20a3203fcc0b9721a4e03bafda57bcdce738914bf04880a9fb1105f329ef0602",
     "intent": "a34cbd5feb6006b310cb2c915959742248f6748b722016e30f963a60676d3904",
@@ -1406,7 +1406,7 @@
    "name": "BvB#8",
    "seed": 408,
    "steps": 2107,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "378759c2addf4642cc9a4d06ed1ca5813721e2dd039b28d9dc9e9deb22b93527",
     "intent": "be339c750a2a8fa8bd7d6ab731990f8d86a2069aab2be7f2e42d521143cb8f16",
@@ -1431,7 +1431,7 @@
    "name": "BvB#9",
    "seed": 409,
    "steps": 2488,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "9f3c2d31d7e3e33a986da4f36d11043648003f8ae076a2bb0f5d4450f63057a7",
     "intent": "231e72acc8680ab5c9c78b75e0dca701c9e50ca606043b3be51c052d4a840e95",
@@ -1456,7 +1456,7 @@
    "name": "CTRL center BB#0",
    "seed": 5010,
    "steps": 3379,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "2fed5b548e94dbce06c2f14bd9ea6350700cbe4420290c1a69f466b2b1b6827a",
     "intent": "3849967ca80becb8d4fc7b26629ae8499d651a16a3c5a546aac83eb24f463b99",
@@ -1481,7 +1481,7 @@
    "name": "CTRL center BB#1",
    "seed": 5011,
    "steps": 3206,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "7ef1fc3e2b6e3837990ccb6beda7113e297c44cb120936320f29511be51bc815",
     "intent": "33f300ed82f733a8c45d04e42c99e186b2cc4260593d0f27c13487ebea6514d8",
@@ -1506,7 +1506,7 @@
    "name": "CTRL center NN#0",
    "seed": 5000,
    "steps": 7200,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "082951ef282a4373125de6b2770c7e72f33ceb13510d4097379f32062820185d",
     "intent": "648cbf97e5e5eca271beda39130a80f4683354ab8e4cf3a88a4f4e08fb0e199a",
@@ -1527,7 +1527,7 @@
    "name": "CTRL center NN#1",
    "seed": 5001,
    "steps": 7200,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "0c27caf09129217ccef9f18b0bbc12c1a92542298b3da3791ac00384b62d1e41",
     "intent": "df497afae58586b7fd543ea97f045fe9fa45b20d0e1131497f8f3d31ff6a5569",
@@ -1548,7 +1548,7 @@
    "name": "CTRL center NR#0",
    "seed": 5020,
    "steps": 1842,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "7088ed839fcc1198792eb60e8024d55910538efc287826a79b4f5dac4a25ac40",
     "intent": "5eaa2ad6510b1160a4e0c91ec33cc3e341996012e344be2828440b1e913f9098",
@@ -1573,7 +1573,7 @@
    "name": "CTRL center NR#1",
    "seed": 5021,
    "steps": 1657,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "837fc0cb10fe614736fb33a08b4916ec54281913a25b872eb10d5ce7ba58e7b4",
     "intent": "fa9aa26e4cc59767942f7d61ec6b220df1d13f092f84af80a2ba2535d702ba29",
@@ -1598,7 +1598,7 @@
    "name": "CTRL graze BB#0",
    "seed": 5210,
    "steps": 3100,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "3dc392b385a47025bd25d4a4467588a4c961ad5d7108cd515d8b4a3830515344",
     "intent": "a2af2160c13dfe78fc9bd0af3f443586203db13b561043284d2a3d5a960b1934",
@@ -1623,7 +1623,7 @@
    "name": "CTRL graze BB#1",
    "seed": 5211,
    "steps": 3321,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "a9dde0a21e52cbf85cab278efec93a4f687c7fa51d48f9f99278362124c1966d",
     "intent": "06937d7dc8085b3b4111913fe5fb40dc1254f91f71132a5f1477f81f67fdb8be",
@@ -1648,7 +1648,7 @@
    "name": "CTRL graze NN#0",
    "seed": 5200,
    "steps": 7200,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "afa96c524ca364398fbeb6e13193a48d7e5704ddebbfc8885d26668cfbb7b945",
     "intent": "5e7589be547e91f9c880e060aae21d1af014d24ac8e038b593b3afb37bea73f2",
@@ -1669,7 +1669,7 @@
    "name": "CTRL graze NN#1",
    "seed": 5201,
    "steps": 7200,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "1bb3526d413bd2dc8494a2ebf9b5450ace4229e6ea3868aac0c3256ef448bb20",
     "intent": "0d2bbfe07ee888e6497df643ea4c2ac3eba6048db1ff302d22d843f046f4196f",
@@ -1690,7 +1690,7 @@
    "name": "CTRL graze NR#0",
    "seed": 5220,
    "steps": 1562,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "2b7db5067665dbffc880fc943b340f54714a61eb27fc95ae84b949283057c81f",
     "intent": "b9d2b1dbce97464e9c4f22cae6b49997b910d3c1dffd50d620932c8f54a50511",
@@ -1715,7 +1715,7 @@
    "name": "CTRL graze NR#1",
    "seed": 5221,
    "steps": 1869,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "fec70720a24d8af99756381e609e51fb0e5b70ef592ac186fe6a9b177b848065",
     "intent": "f528cdd9a057df78d45ad659445e7102717b987044ea327b5479fbf1a1f0ee10",
@@ -1740,7 +1740,7 @@
    "name": "CTRL wall BB#0",
    "seed": 5110,
    "steps": 2815,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "3e3e4e86087cc5d1b66a0ae1e8393b2c92b12eff672f6c8391fdf90b838a0cc0",
     "intent": "5797b04b57ba0cfde52d7935e3b749cf9c10896d4ee63231c9daa5a0424ffeed",
@@ -1765,7 +1765,7 @@
    "name": "CTRL wall BB#1",
    "seed": 5111,
    "steps": 3282,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "e413d4c0bcf65f3ce47956fab04e531b07c1be083dadb72a8d9fadb7a0ce53d1",
     "intent": "5a7ec880e23d51c1923d19909f1992f7985841a3bef50aa45895d3c1745259b3",
@@ -1790,7 +1790,7 @@
    "name": "CTRL wall NN#0",
    "seed": 5100,
    "steps": 7200,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "a2d86b5cd57c064838444b17936f14c6e24c8fc230404c58dba1a7fe37a60e52",
     "intent": "4b246c37b15209b17939257ab7a8aef81533531708601d6a2b167ddebc8cabff",
@@ -1811,7 +1811,7 @@
    "name": "CTRL wall NN#1",
    "seed": 5101,
    "steps": 7200,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "4f69a535c1459fe8440d0942df731b9e80e767d0976f5e30157b8b03453c4494",
     "intent": "753c36bb7926c7a053c0796fe246c02994e1595598296f265e39531bf149835c",
@@ -1832,7 +1832,7 @@
    "name": "CTRL wall NR#0",
    "seed": 5120,
    "steps": 1378,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "5a2de94922a6ce32c44cf9c00901198158fc2b5e368b25b628876bcdb8bf75a1",
     "intent": "7234d32dbe1f9eadf636068d4f7a8fbabe5f0c75ad18a75702ab72be6c1969e4",
@@ -1857,7 +1857,7 @@
    "name": "CTRL wall NR#1",
    "seed": 5121,
    "steps": 1546,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "ad058b246116615e201b68d6065d4d38908e5e04e8e17ad93f472f09c3289134",
     "intent": "7f5a1a1c03a7e2b72896ee856b43fd7650b6b3ff219d915ffef1c8ed54eac5bb",
@@ -1882,7 +1882,7 @@
    "name": "DFLT#0",
    "seed": 600,
    "steps": 1352,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "2004ac164900e7157a10f09685fdf0eda963cb1abcae7b47559e575d78cec48c",
     "intent": "47a89b64c8cf09f199752ede0da6880ef72a375927f46acaa1bb6ca109e8c8f2",
@@ -1907,7 +1907,7 @@
    "name": "DFLT#1",
    "seed": 601,
    "steps": 1504,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "f7134dc1ea3439b1af5928697892a137c6a091579a3c7cc737c5e5ef07bb9c00",
     "intent": "32a676d046cdfff1f7fd660697df42f0b02fdbcb3ef4a9438d15778d0bf2d5da",
@@ -1932,7 +1932,7 @@
    "name": "DFLT#10",
    "seed": 610,
    "steps": 1288,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "8520866bf2017041694840e70825ca8a44590be3b8ac855537886caa001e7b97",
     "intent": "0c43347e69215f1eb4d31a5ef8b07ff530f07516ad1e75c766b9b1c43bbb2367",
@@ -1957,7 +1957,7 @@
    "name": "DFLT#11",
    "seed": 611,
    "steps": 1365,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "4bc2750debb7458eb9ab8d787c98d642f550dd660cb86ffc74f897cbbd585748",
     "intent": "df5617d804a269676a6b88196085e5577a2ed3ff7c688f748da57c6dd8152cec",
@@ -1982,7 +1982,7 @@
    "name": "DFLT#12",
    "seed": 612,
    "steps": 1336,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "6aa7b329c160dea61a4ac37404c315887b462a374bfbf46f7db8458f08fe8db2",
     "intent": "0a17ea7dd6264159c98dbb8df92fd22bd8eee98463f832a59c322c1ed3d1e52b",
@@ -2007,7 +2007,7 @@
    "name": "DFLT#13",
    "seed": 613,
    "steps": 1344,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "e208711cb7da35d09eed5cadfb20148437f4191ba83807ef35881edb96e0c8ec",
     "intent": "44f22e043f6b61ef368d9297e724e9117446a422055eb6c261123eee080e898e",
@@ -2032,7 +2032,7 @@
    "name": "DFLT#14",
    "seed": 614,
    "steps": 1901,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "2b74ec1d06e95a5d75e501370d4b5df7689c316b7fa33853d911ca4479d43110",
     "intent": "c17d780e93462414c0e8e751e183d90c4299397acef00b1d21c7d25f421533f5",
@@ -2057,7 +2057,7 @@
    "name": "DFLT#15",
    "seed": 615,
    "steps": 1414,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "b6df559138f0fd417fe0f759981f76c175ba043911e5495bccaaa9dddbeeab83",
     "intent": "3dd46b522389215ab870491c9a41f17b1a3915c8ea3c1b498400eb84c488a208",
@@ -2082,7 +2082,7 @@
    "name": "DFLT#2",
    "seed": 602,
    "steps": 2206,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "6339afefaa537ca7791ed994bcde5df961bd1b7f51552b9d850a6fc1f7126b6c",
     "intent": "ea0227d1c739cb265a156b21afa92641cc540c7b6b63e70a7fbea48ae09930e7",
@@ -2107,7 +2107,7 @@
    "name": "DFLT#3",
    "seed": 603,
    "steps": 1334,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "798e63a8733f187de1f42352813220433315266f7024af18e1b4ebde14ea44d5",
     "intent": "03d34960a1e23718230f7ab5f25d48c29be93fbe17a914f4e68d46b5cb417792",
@@ -2132,7 +2132,7 @@
    "name": "DFLT#4",
    "seed": 604,
    "steps": 1666,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "e673f3f37e1c90d3185f6684378ec9b4345d6003f15208c03bea45c34925c375",
     "intent": "0478478bfad41fa9bc5844462f5efc2909aae2b362c4c346b1307deee00506f9",
@@ -2157,7 +2157,7 @@
    "name": "DFLT#5",
    "seed": 605,
    "steps": 1566,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "e9066ae3c7d65de27ce0bf6b1ae63ae27cc9a0e06fd3dd7454446e79daae6ab8",
     "intent": "537783fe195f641075ea3c36b50f883fbe57e9d0d181dc2ef6cee22954253098",
@@ -2182,7 +2182,7 @@
    "name": "DFLT#6",
    "seed": 606,
    "steps": 1382,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "b851b247a8f9aa1f07827f791384cb74e0d5cf236369d7f4f5bc73ec41803e1e",
     "intent": "940b2f66fa9b7aa165ec1f044a966603080b2e77358cde22c912c07a4080a522",
@@ -2207,7 +2207,7 @@
    "name": "DFLT#7",
    "seed": 607,
    "steps": 1441,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "816f31bdd504f3783bc472fc1628fe50af821b682b72a5c4bcaf9aae3177c1dd",
     "intent": "f555b617b7972a4e67e1b0af92737060e78c72ac6718bbc589d6bf74e347f36d",
@@ -2232,7 +2232,7 @@
    "name": "DFLT#8",
    "seed": 608,
    "steps": 1591,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "61281552cfe94cbe6856cb378d06a79a6339f5f7eaccbed324ff2919def90952",
     "intent": "44fddde66aa85ba554a01ef79c002cb4a28c95031defa698bdc3026aaecbdcd3",
@@ -2257,7 +2257,7 @@
    "name": "DFLT#9",
    "seed": 609,
    "steps": 1520,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "70d59850781e037b8d7f621b5b5e3c974522f2e55f0163f5bebe8f9152d8e841",
     "intent": "90407221c6889e9ddcdde91dcbf8bc3e0a0dfc3bac416d398694ef31298aa502",
@@ -2282,7 +2282,7 @@
    "name": "DvA#0",
    "seed": 200,
    "steps": 1398,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "a4af8563f9f8281be038af13352cecef17d724b897ab5e79fdd8260a0b70e5a0",
     "intent": "7a76da850d5ad518c49060b497da1ee16c0b08c585f1df6797e713b75bfaed15",
@@ -2307,7 +2307,7 @@
    "name": "DvA#1",
    "seed": 201,
    "steps": 2039,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "7d528a303d3bc95a455740c077c106525898fae32fa56137e24980a2bf6ecc13",
     "intent": "b0c36a398a84f6d052d37b11d85218bc63dc56503af64487d65aefca98711162",
@@ -2332,7 +2332,7 @@
    "name": "DvA#10",
    "seed": 210,
    "steps": 2067,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "cee223d5697d466971a5cd24d10fd32767be45b4e3bd3211c95e90c3c1a8821d",
     "intent": "dd87d6d16550ab0c8b92ef72a63134ea70a713b1414022d8207589c7c9256923",
@@ -2357,7 +2357,7 @@
    "name": "DvA#11",
    "seed": 211,
    "steps": 1293,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "9ae834573f0eb36e8b4a3ba452fd8e509f04aa52971cf5734e0bd530f9bf2851",
     "intent": "afa2270f8eb4f320a21b185ca54537304b4dfebceac63c4cf8c55b54d1ca5b54",
@@ -2382,7 +2382,7 @@
    "name": "DvA#12",
    "seed": 212,
    "steps": 1202,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "751b829987b463e6e7e4210aa625576ecf479a869f03f20e26fd96f4c699ce6e",
     "intent": "4c0105ecf27c587e0ac6490219a8fcdcefa47890e49e3d7b873221b18598070a",
@@ -2407,7 +2407,7 @@
    "name": "DvA#13",
    "seed": 213,
    "steps": 2193,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "330a78e02793524f754c241a03a8ae9b518647fa0b1a2be36f522c40f29e5808",
     "intent": "d9961c3a92bdfc43837d50d67be63a80d252691edc47ca69d6929a76f5de6062",
@@ -2432,7 +2432,7 @@
    "name": "DvA#14",
    "seed": 214,
    "steps": 1218,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "c95d099fa159717e705abf75acc2abfaf0741b174f79b5a432c38f37d094db80",
     "intent": "40209276eb92d9e79354069b31235e791051927ddab55f2faf6bda6b73cdee1d",
@@ -2457,7 +2457,7 @@
    "name": "DvA#15",
    "seed": 215,
    "steps": 1353,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "790e9004b648c10cd72325714cc690c44606722f496235eaadd3bbcfecdc53fa",
     "intent": "c28e32de9e0721ad2345d292ed5655d788b7f3d3300d84485b6d86b8d14d705d",
@@ -2482,7 +2482,7 @@
    "name": "DvA#2",
    "seed": 202,
    "steps": 1206,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "c13d4b19b10a6778c48cbdb42d346bf7db290bb45ffd66b0001777fe9d542484",
     "intent": "e2957db038f7662b5964927bc30f516150fc7bcf92f3085f66ed03586ec4e3ac",
@@ -2507,7 +2507,7 @@
    "name": "DvA#3",
    "seed": 203,
    "steps": 1741,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "a1364deba7bdccc23407f656d2505cb33d334034b74dbb3a8ad5407c3ffb472d",
     "intent": "abb943dcb710935354388d5e10fa393955073e2580cc44c8108983664d298118",
@@ -2532,7 +2532,7 @@
    "name": "DvA#4",
    "seed": 204,
    "steps": 1764,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "9f9019ce2b707c96d0a6cc0dfee356a3340e85becc51933d567042586f854327",
     "intent": "d1656cbecee2406788271f526d1940678a203afdc5d2980d5f9499ff235c6534",
@@ -2557,7 +2557,7 @@
    "name": "DvA#5",
    "seed": 205,
    "steps": 1227,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "0f9702dda315a4a962aa6d732ff514c101a50ea3bd3695e7a3c561d60941213d",
     "intent": "e0847a9aedf5715b35d8051d539e8dcb11eba262781b2d077ad5d772e8b4c010",
@@ -2582,7 +2582,7 @@
    "name": "DvA#6",
    "seed": 206,
    "steps": 1900,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "a4de48ad4ccc817e74d26d2ca4c6b2fb8f24884030d292033a8665c6bf0cfe64",
     "intent": "bc8b7c0b24375e9c69fa88cc19379e4e66acaa58a9fcf85b907db8d7d27582e4",
@@ -2607,7 +2607,7 @@
    "name": "DvA#7",
    "seed": 207,
    "steps": 1729,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "7038a00f13317135bf0f996ec882de183407ebc812a493e1f89522e8ec8b2db6",
     "intent": "f0af11352c1fc94f0594c63666587f8774947ad65b85615216f07c21bfd8cf1c",
@@ -2632,7 +2632,7 @@
    "name": "DvA#8",
    "seed": 208,
    "steps": 1334,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "442ce2a74b6700ef37a5a59587fb9a0ba6a4f5de1525c79d648f0ac5f88467a7",
     "intent": "24e3758bbbb8e777556ac19c3a974ffa8cff9ba11cde0d196b26646d63e61291",
@@ -2657,7 +2657,7 @@
    "name": "DvA#9",
    "seed": 209,
    "steps": 1840,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "3d86c7fc4640ff4137426c95d0853398c8dc2a7980d3ab5801ae088234d95a24",
     "intent": "653034fbcb22d1698f4c59842706baaf857e3f3c0165d52737a280713b505dc3",
@@ -2682,7 +2682,7 @@
    "name": "EDGE A/D aim -1",
    "seed": 1001,
    "steps": 1691,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "30b5dcbc50495a9a093e51a92b84fc3faf30e27a2c5e8c2724a60bed6370d0dd",
     "intent": "fa166474f61fd71d2d0c6f71863f16792daaa99992b35cc515dafe1db7cb5b49",
@@ -2707,7 +2707,7 @@
    "name": "EDGE A/D aim 1",
    "seed": 1000,
    "steps": 1550,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "03b397c8d72472274ea7b4b93c017ffe0364a239c0f6eb5b7d31dcaf36804c68",
     "intent": "c76079ac17c69499157c1542f7798e8657d0e89df0110311f581324484de197d",
@@ -2732,7 +2732,7 @@
    "name": "FEELBAL#1000",
    "seed": 1000,
    "steps": 2630,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "41c9633c275b87a9f0438e9d33fa255bdf64e44f6fed2885b9352a5c515cf264",
     "intent": "5426c88ca15ed7dcb1cb0f40c04d9e25a5890f6f22be9a401f9a9b0908b85688",
@@ -2757,7 +2757,7 @@
    "name": "FEELBAL#1001",
    "seed": 1001,
    "steps": 3354,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "2792c16d4564b58f0efa5112cdfefb936213d3658e692a2d4d0d0b2aaf557df4",
     "intent": "a52f85953056ed710ec75360001a9a8320adfdb0245f5aa2c7021dc8abf0a997",
@@ -2782,7 +2782,7 @@
    "name": "FEELBAL#1002",
    "seed": 1002,
    "steps": 3393,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "4325c189f904a2128db4b989e3271f25859b67fb868ca36264176bc6377d383e",
     "intent": "a86daa192ad6ef65ac96df44e45f0052f0ddcf9de5d9baf53aeccd1c17c69aa2",
@@ -2807,7 +2807,7 @@
    "name": "FEELBAL#1003",
    "seed": 1003,
    "steps": 3270,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "52e40a2d447725033b8fc9fef94511a96949dbe41bdca408c5cdb12ede59ea6b",
     "intent": "567b95528cb1e31c0881bb37c6624f516a2525c7fbdc6b304f1f85ee36875c77",
@@ -2832,7 +2832,7 @@
    "name": "FEELBAL#1004",
    "seed": 1004,
    "steps": 3723,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "8f18e8e69469e897f59a5e5b4ab31fd5f6c479c0f1ba6a8f42dedf49f0611c5d",
     "intent": "41e9ba5fb43fae65672da6686c9459dce65a495d69145c14241ef846ccdfefcf",
@@ -2857,7 +2857,7 @@
    "name": "FEELBAL#1005",
    "seed": 1005,
    "steps": 3384,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "c4f1e7024b4e4b4f2f1fc22091a2d766b69e1758ec1d3639826c92c2819109d4",
     "intent": "9b91f81b4bcc74da3a38e5f052669bb41eb3769e77f841a31baf245c286cc82c",
@@ -2882,7 +2882,7 @@
    "name": "FEELSTA#3000",
    "seed": 3000,
    "steps": 11022,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "b41cc977e78f155ac48504e199667f5d48e98258a43f6e99fc17efaa3f21c444",
     "intent": "4f2fec7142b118fe80a95aa711c92ed1144cd9ab63ec14e2e52c3c05d355a95d",
@@ -2907,7 +2907,7 @@
    "name": "FEELSTA#3001",
    "seed": 3001,
    "steps": 8261,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "2121e92d77f6e3636634fb1207efe2da338436957f560ea6f90d4745375914ea",
     "intent": "bfa4ef6242bafcd5a34a9d453f6974eba74d443f5a927789bc4df58fb0036eb9",
@@ -2932,7 +2932,7 @@
    "name": "FEELSTA#3002",
    "seed": 3002,
    "steps": 10706,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "222e30f08b0ba259cc5ef0d06ef88b1f346b5fff4354f483ebb65c8643f93590",
     "intent": "c6502687b7625d75b07e983eefe14679e7faf474b269c57df5b6d6dc59b1ee23",
@@ -2957,7 +2957,7 @@
    "name": "FEELSTA#3003",
    "seed": 3003,
    "steps": 9580,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "b74dfa2608be24e7dc724ded322a672747e89b2ed050b9b83d3f46d6fd035cbe",
     "intent": "8ba941bb3bb803372060fea52a5d907c07ac720303f838c7db7f1e4a08dca243",
@@ -2982,7 +2982,7 @@
    "name": "LONG A/A#0",
    "seed": 1020,
    "steps": 1104,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "25e09aebd11ad04795626f5be72d799932302f4759a1607c1be81b9d956eef67",
     "intent": "ec0aa53979413fbe64aaef111b29e87aaa32b80fa8c38d44806f8f66da7d5c95",
@@ -3007,7 +3007,7 @@
    "name": "LONG A/A#1",
    "seed": 1021,
    "steps": 1204,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "5ea59b48c8c7b9b58da2206d9b21000b83afb7d812126e2f423a2a6b3bffb3eb",
     "intent": "fc13b6696578ba6b0eb1b80d03d0c16a1808b8d3f2f919edb675eeffd89cad6d",
@@ -3032,7 +3032,7 @@
    "name": "LONG S/S#0",
    "seed": 1010,
    "steps": 11592,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "3779179a7c0fd5e5f81605978ad06ac9ff59873ae85184e8451555a3a42d3d94",
     "intent": "09e8d14877f28bb398ae81d105bc97a948f38ddc885b6c8a7b529eb37079f436",
@@ -3057,7 +3057,7 @@
    "name": "LONG S/S#1",
    "seed": 1011,
    "steps": 9374,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "408a72a3ba2c0788ef9912144fc89db7b738b13aa1a91971bca746e4eec3e5c8",
     "intent": "62b3df410c5d7732a0c89be44af777344b9ae9886998b1aeeb4b9f4faa0d223a",
@@ -3082,7 +3082,7 @@
    "name": "NNPOW 0.3#0",
    "seed": 4000,
    "steps": 7452,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "e66a4f09c3c0eb4bfcdb8f9445bbd99c5759de1a44d66fca83aba2859eb36051",
     "intent": "67d3edd9296817d713c69d61742b87874c520d64d1dbe03e93293ca80ee2e2c7",
@@ -3107,7 +3107,7 @@
    "name": "NNPOW 0.3#1",
    "seed": 4001,
    "steps": 7649,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "aaad8cc214221c2d71327a189770139c18f14113ba4ad3b7e4b2b16574cee57c",
     "intent": "13076e75b31a53993571d19decab8bf5431c37ce5e2c7f40561bee7afba07d4f",
@@ -3132,7 +3132,7 @@
    "name": "NNPOW 0.3#2",
    "seed": 4002,
    "steps": 9121,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "c168ea3e886d7c7123ae07ce795ecf48f342c0cad7631f5bbf8ce3311135ae42",
     "intent": "26d86856b58b582fbf587fbe296171ebbda4209a8be401fe46efba6609d740d4",
@@ -3157,7 +3157,7 @@
    "name": "NNPOW 0.3#3",
    "seed": 4003,
    "steps": 7917,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "a70a6bafdf6371a20cd06f0e196444832b04f6f2264bb51eec2779a78a7aaca8",
     "intent": "f5ac8fdc0144405852551e31a9120c50779976663d7a3d23e781e5fde5282f86",
@@ -3182,7 +3182,7 @@
    "name": "NNPOW 0.45#0",
    "seed": 4010,
    "steps": 8362,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "754820a0f396756d98a180b7729aa1dd7bf8e35df079b72a6c6dec7deef73bf6",
     "intent": "8011dc9952cddb4bef4d041216da459f9b9c439fa62c02555851f338bdf6c404",
@@ -3207,7 +3207,7 @@
    "name": "NNPOW 0.45#1",
    "seed": 4011,
    "steps": 8658,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "f32273e757d06db74d7ec843430d6757666312dfaee669959e1fb5cc8a3aea93",
     "intent": "bfa6eed55b5c05bc8a38f4ad3837c80def5e2230a76ce2943928232c36d0d8a2",
@@ -3232,7 +3232,7 @@
    "name": "NNPOW 0.45#2",
    "seed": 4012,
    "steps": 8602,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "2ae8c148926fbd216dc5b173341590fe1be3449496bec773976abcd8f44b98f0",
     "intent": "34978bf823425a97dbc919f8fa472d6ff2b0658503531eb9f8a5935e09263081",
@@ -3257,7 +3257,7 @@
    "name": "NNPOW 0.45#3",
    "seed": 4013,
    "steps": 8830,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "aeb53202884ea5d068acd499be5011fb2a700e14be0881c0036eafa6c7d818a9",
     "intent": "06b52dc531f59415d8a87345a980060b5de0680c3c98ce9398aa6068d2b42b60",
@@ -3282,7 +3282,7 @@
    "name": "NNPOW 0.9#0",
    "seed": 4020,
    "steps": 11594,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "2a2b87191b7eaff3f2501d12d32ad855ba5284a1c9525851798428943b5cff63",
     "intent": "a470a926b28a906a7140385a54a7cd51e3b183956bebacdf731246b8dd650c50",
@@ -3307,7 +3307,7 @@
    "name": "NNPOW 0.9#1",
    "seed": 4021,
    "steps": 11495,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "69767b795bf0176cfa8b65bc45817a8d33dbb2d3409843a63550c04a6bffc4ae",
     "intent": "126598cd71c11a1bf2ac97bc750ae85df2cac76a9d948900b5a89f34674dcc1a",
@@ -3332,7 +3332,7 @@
    "name": "NNPOW 0.9#2",
    "seed": 4022,
    "steps": 11575,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "25d13311099e817396a701dd5caba40e335a78d8582a3b5710aed7a9f0fe31c8",
     "intent": "0a70e9ee95541baa7d89d9dc43ecf7e23f3e94e3ac8d74aca116f865475d7bab",
@@ -3357,7 +3357,7 @@
    "name": "NNPOW 0.9#3",
    "seed": 4023,
    "steps": 11868,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "4ab790d28031400c20dbaae61c0e48bb8425389def4531ff139ffb5499f6e64b",
     "intent": "a50ca275a0384dacfcb7a1f020fd0dddabb5937a26ef897a660b2b66eee5508c",
@@ -3382,7 +3382,7 @@
    "name": "PHASE 0",
    "seed": 800,
    "steps": 1655,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "3c5fb911e9feee9d996677dddca25d8166726910f2335170b441392858576be9",
     "intent": "0effe94fb1265234638b024bf3520087b70c873509c75f6b074fa9758414f8c4",
@@ -3407,7 +3407,7 @@
    "name": "PHASE 1",
    "seed": 800,
    "steps": 1607,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "e0e7b007677fb83306a9e481ac8a440eeac13a5527e7daaae6016eed845a88ac",
     "intent": "066d6695dafe11f0d476ede6689ccd7db41d6f2ef2fa221a46ee43a4f10d3f61",
@@ -3432,7 +3432,7 @@
    "name": "PHASE 2",
    "seed": 800,
    "steps": 1291,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "098f22710e024d40c30be875e47ab3597577ddc35530d3d4d93a1c5d46668b39",
     "intent": "7f899941330800dab1cde53d1be34bcc36cf62d7f1d62e4be6612b3ddb5fa1d6",
@@ -3457,7 +3457,7 @@
    "name": "PHASE 3",
    "seed": 800,
    "steps": 1099,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "a576b084f8f1c89f80d121b08d285f0a68029d214050f79cf267848ddd275b21",
     "intent": "d6c774d3530ff659a33fed68166d4af4eb35a88034f6ec177e67c4ea7674672b",
@@ -3482,7 +3482,7 @@
    "name": "PHASE 4",
    "seed": 800,
    "steps": 1412,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "d43490c7947c8c5acad3ec0a869e1e369d0d46db4a8c8af42981f0da13c4aab6",
     "intent": "456977330cb6fc67a0509c49b94acdc52f7bcf6c199e78ac62ecbc82252d2637",
@@ -3507,7 +3507,7 @@
    "name": "PHASE 5",
    "seed": 800,
    "steps": 1622,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "c78b049d49dc78dacac768df0c97f11c7e09f4d12b7dd6ccebeed17c32f0bc5c",
     "intent": "30251b212fea4a46180d8696adba602501b77bea152e5b6eb72e51fcd6334eec",
@@ -3532,7 +3532,7 @@
    "name": "POWER 0.3#0",
    "seed": 900,
    "steps": 2009,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "d138253657c56a6cae852b44237a4e60bdce5bb2a8b36de486d0dce320cc600c",
     "intent": "752cf4aa707d5c5f64317445f3b579edeeb57d478a5f11963da3cff3c7a66b4a",
@@ -3557,7 +3557,7 @@
    "name": "POWER 0.3#1",
    "seed": 901,
    "steps": 1947,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "79e021d301143aa36dedd9ae97eac13352d2c92810ea55c00aededb2ade59c50",
     "intent": "588f029cdcf08f640e9cb31396ced1ae7c0471c382526407a71c6c44ed71b79b",
@@ -3582,7 +3582,7 @@
    "name": "POWER 0.5#0",
    "seed": 902,
    "steps": 2533,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "369453d7caf51fca19648cdcb14b605da7dc866765319a7c194c398778e04682",
     "intent": "6981e4503c0aa0afa570ee64aa7965e25dbec2d26282f89c036adac6a92158f8",
@@ -3607,7 +3607,7 @@
    "name": "POWER 0.5#1",
    "seed": 903,
    "steps": 2866,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "660a9a36abc8f217db307e5a3c6f3f818990491de67e94852e172e60361e1426",
     "intent": "567874310cdff40690442244161482c3d88b63f84540565450d8c599fc1ac53d",
@@ -3632,7 +3632,7 @@
    "name": "POWER 0.7#0",
    "seed": 904,
    "steps": 3511,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "e11bb903bb4767cdb01ccc34eb80233330b219bd25935b724f55f1a81d0ba2d7",
     "intent": "ce8a3dc8f337143e24ba1641f8a1a523be59f1712c794f8c9d1522caff78f6d0",
@@ -3657,7 +3657,7 @@
    "name": "POWER 0.7#1",
    "seed": 905,
    "steps": 3528,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "ed980870cc57cfe51cfdb4ca390a9742f9526547fe37717f9cc1677cf5fb66c4",
     "intent": "5b773dbe56335a3d3e391b2aeda9eac6fd4e881cfb78548f9a62af2a4aa5e360",
@@ -3682,7 +3682,7 @@
    "name": "POWER 0.85#0",
    "seed": 906,
    "steps": 3096,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "9bdfbb9b01c9ebc79fdd2c62ec87472565d1103b92aa85aeb30dd85e1a1fb2b8",
     "intent": "5aa67c61a7eaee544de39f6e34f6253fd196241766d23e37d3493204fc9a8c90",
@@ -3707,7 +3707,7 @@
    "name": "POWER 0.85#1",
    "seed": 907,
    "steps": 3687,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "b2d4356f55d7c86056c931841fb8a89d2bc37f40706e530a7c30633cbed20905",
     "intent": "e6cf25c5e1d0c7c12a7b9028830225d5a9ec6f6a5fdf467d26e9248f62293b5b",
@@ -3732,7 +3732,7 @@
    "name": "POWER 1#0",
    "seed": 908,
    "steps": 2882,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "3d500b9d4cb1883f0010b6441d34935cd48808fdb27586b4a5f128ee8bb1b460",
     "intent": "1aa41a0af9d2cac0a6d5ccbbb9730531ed83516fad567132e73be082f0ee73d8",
@@ -3757,7 +3757,7 @@
    "name": "POWER 1#1",
    "seed": 909,
    "steps": 3096,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "c1138433609cd7a3855347059e577cf9722f7c0063ea42c678c31fcbc0d4ffd9",
     "intent": "0ab2523ba2329bec81d583a1c31f8f66836beecdd84e1fff0ddb2f4cba5d3b39",
@@ -3782,7 +3782,7 @@
    "name": "SvA#0",
    "seed": 300,
    "steps": 1585,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "0942c5e35b4d8e4d7ce64a113f6df40cdbdda01ff1f1ed0764f00fc77d53ec8b",
     "intent": "d4c29e524f6abf8819a1353419fe0a2c44d9ea917ceb57d0052fa3c7f2dbad62",
@@ -3807,7 +3807,7 @@
    "name": "SvA#1",
    "seed": 301,
    "steps": 2137,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "6a4a4c9b50a64bca7e08b9a54af21744382e2b5dc1e404a975f7797f669a5578",
     "intent": "d0474cabc00a3028d94d1c96c1829a03c5f15504c647cc37ee3ae6af7d1d4445",
@@ -3832,7 +3832,7 @@
    "name": "SvA#10",
    "seed": 310,
    "steps": 2454,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "39016bd351c53e5b55a423721f55746631d9bb50e9cbc137fd27c9b3eca703e2",
     "intent": "6cbee94b46172803f5e9fa07fcea2ca73ae1ce583536609793d0fca30e9e6dc7",
@@ -3857,7 +3857,7 @@
    "name": "SvA#11",
    "seed": 311,
    "steps": 1472,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "f6949e41774c78c174f425483b436345d92fcd08ae2972edb75d5d69f73f643c",
     "intent": "9ad1073c17da3f61dea7f2b9d68888523a2cda61f7a1dbdebe5afdc2dbbf64bc",
@@ -3882,7 +3882,7 @@
    "name": "SvA#12",
    "seed": 312,
    "steps": 1802,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "2a7aa1e07fa712a4c6b3ae6fb971225eb175749224dd86761d1b769cff8ede31",
     "intent": "f55fe199154a67d140e500e909a4ee58f5b9d17c446eba7fe7c40123ba01345d",
@@ -3907,7 +3907,7 @@
    "name": "SvA#13",
    "seed": 313,
    "steps": 2079,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "554e61cc21a28ea70961dc5297ff69bcebe975d5256eb13f0c872bafb8d7e5cf",
     "intent": "39fb48000055452d27d8a341a6210e2aeb9b1ff1a1801a8eb93e9a30adaae8d9",
@@ -3932,7 +3932,7 @@
    "name": "SvA#14",
    "seed": 314,
    "steps": 1814,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "a22a35f211134009fc369424cff3f32a753808b755cbb55556e98c86ae1dcb56",
     "intent": "e8adaa954a81a59bd14a686303efbc31ea461985229670caa7b40e07193369dc",
@@ -3957,7 +3957,7 @@
    "name": "SvA#15",
    "seed": 315,
    "steps": 1933,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "b2732cf1773ae9b80e9e842183bd95db26b9d71c0eeb85894d57c3f294b012a1",
     "intent": "9a86c9df7e87f54f4a0737dd653f1ea39f3486a3801ba95833c596fc566a3054",
@@ -3982,7 +3982,7 @@
    "name": "SvA#2",
    "seed": 302,
    "steps": 1557,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "c2b9783a6e873bfc1969439b2eaa3d6471275a28722debe5c5003039391ae247",
     "intent": "0d09379b831b7afe889f098b7f12727e5a3ddb4e97e34a3e2df02ba7f74539b7",
@@ -4007,7 +4007,7 @@
    "name": "SvA#3",
    "seed": 303,
    "steps": 1905,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "d0623cac3be74a14ed6c638cd55a600b5d76907439e24c225e6a652b918b9bc0",
     "intent": "00badc383e596ecea0b569761369aa4d72e1a56aba860de9e17bd1ca5cc3c3a4",
@@ -4032,7 +4032,7 @@
    "name": "SvA#4",
    "seed": 304,
    "steps": 1948,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "bb86cc5704eefc52f877b5a4fafb156d8abe788ac24e2c34ce4ff3806dffc0ae",
     "intent": "1cbf7d5693200fab2ab5cb37de8126bdc58f594218caa8dc10152a226d5f68d9",
@@ -4057,7 +4057,7 @@
    "name": "SvA#5",
    "seed": 305,
    "steps": 1668,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "7d7261e14c6a228788475e2e1f498def7415e73dd0152ee3b4ea2a28c7dea1fb",
     "intent": "2ac403939b637ffecd4d4b22ba2cb913b69a5bbcb6e4e5f2d7828865d4bc4cc7",
@@ -4082,7 +4082,7 @@
    "name": "SvA#6",
    "seed": 306,
    "steps": 2245,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "ec09d61055158a0956754b5ca9fd604ffe944cb03f9e081fc7f55832a900207d",
     "intent": "7f2968251f14f620f20241bde5deb50073c70a425a85f1616073a6281fe1911c",
@@ -4107,7 +4107,7 @@
    "name": "SvA#7",
    "seed": 307,
    "steps": 1875,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "10f9d1f21976b4e36fbd11050d811e3ff1ce35fe9acc2949f3a7518ee5dd3f1d",
     "intent": "c0d6b800ef4610b8927f2e2ffa82564c0ae1f9b51ec3ae39c63fc7ae1ad30170",
@@ -4132,7 +4132,7 @@
    "name": "SvA#8",
    "seed": 308,
    "steps": 1469,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "9effac1180b6466d3e48dc4c0ea8674a6d79e59a89e577a5ba87603b56199677",
     "intent": "c0af59c6730a8dec0af5ce944028eb18bef84a49fd9eacba5ca067e05b99c598",
@@ -4157,7 +4157,7 @@
    "name": "SvA#9",
    "seed": 309,
    "steps": 1734,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "abe95549378b1fb84590fbb737f5ec176e161bef7198011f7d06c09f8a129904",
     "intent": "25e06690d2dc4259be02ce61f82a64d200b2828403c5388fcd74935630c31272",
@@ -4182,7 +4182,7 @@
    "name": "WALL#0",
    "seed": 1100,
    "steps": 1471,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "a76f1eeec4e457af8e511280a215778f92ce49cde9916dda4e4299c5f6ed5e6f",
     "intent": "cfb0b5e5f34d88afbc003e6cfdac70cc77306ea528e9725fa8ea18563fbf8459",
@@ -4207,7 +4207,7 @@
    "name": "WALL#1",
    "seed": 1101,
    "steps": 1157,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "e5824699380c144d73a0a6d32ef8ea7cc276072178adaa4897ba516bf306e46b",
     "intent": "1c4fea02ad5c6cc90f5b3288837595511c890da725d9ae505bbd9cbf26621350",
@@ -4232,7 +4232,7 @@
    "name": "WALL#10",
    "seed": 1110,
    "steps": 1170,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "ab2ec073691198685d1ce4ab116b3195aa011172fd0d0eab1421b785085b4b8d",
     "intent": "90e9076fc961154edc5af37b797500b2a7342cd47154d9aba0a512186ac97a31",
@@ -4257,7 +4257,7 @@
    "name": "WALL#11",
    "seed": 1111,
    "steps": 1154,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "bbeb92301482bca391e2bb12a919ecd9ae2073b49ff21910645cca4b9df677a0",
     "intent": "fe10698a4499f6ac30466f726081f2ccffb1f303cd630c44dc312af702a96f50",
@@ -4282,7 +4282,7 @@
    "name": "WALL#2",
    "seed": 1102,
    "steps": 1323,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "234f7ee39d3c35d35d2c11ad627e33eef60f79244210cac7ba221bf64c213c65",
     "intent": "f91128593ccaabfc0a43aea24cdfbd8dc9f0f1e4ab2987ef0fa54007aad25982",
@@ -4307,7 +4307,7 @@
    "name": "WALL#3",
    "seed": 1103,
    "steps": 1668,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "5cbdc87d23b0a5d16814d2ff5ebe1ba522cd16bb501f4db23e38f8ad4c799d03",
     "intent": "a1a55700dee61da0cf7419dc9c40709bb708efbfbb0489fbe6a381ca3ccb54fa",
@@ -4332,7 +4332,7 @@
    "name": "WALL#4",
    "seed": 1104,
    "steps": 1019,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "b66fcb89c614de2d529ec8a82cb73d1f399fd422b7e8220d52b04373d35aaa8e",
     "intent": "dfbdc770a79be3a44fa960815bcebf47729874c8a5f26f46c0fe4b2859bbc554",
@@ -4357,7 +4357,7 @@
    "name": "WALL#5",
    "seed": 1105,
    "steps": 1252,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "f45613b9402e3ec74f55faa6f240b4f28369df938250349777126de32c15709e",
     "intent": "46125a1bc94e16a49530b4f77d2579e612874500f6eac2bcb3b4dddedfa29e47",
@@ -4382,7 +4382,7 @@
    "name": "WALL#6",
    "seed": 1106,
    "steps": 1339,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "f0a3faeb41aa893ea42607038a3c517542139ff92dc42ec7349d7019dba57f86",
     "intent": "02c135ad03d44c3ee170b8d8b0977e3f283e30a2de8e6df90ad5ed373d1316bf",
@@ -4407,7 +4407,7 @@
    "name": "WALL#7",
    "seed": 1107,
    "steps": 1122,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "d4fdf36fa8a3ff807ed39077c144e65e9e40a3c94108ace8cb86809ea693aef3",
     "intent": "ef2bbc1c506d4b1741e72793b452969d77ea585d61e599438f5b12bc14102608",
@@ -4432,7 +4432,7 @@
    "name": "WALL#8",
    "seed": 1108,
    "steps": 1388,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "2177e16be094417d3f138ab16a40e4f3c10850d481d9a977934392cc788d0035",
     "intent": "bec07fe6736d7688b7221887dd578614ee57633f473623c3af7521343ed0fe47",
@@ -4457,7 +4457,7 @@
    "name": "WALL#9",
    "seed": 1109,
    "steps": 1144,
-   "config": "1d488918d95647a1",
+   "config": "06858d36c7193999",
    "final": {
     "physics": "3385ef4f9aa2ed1008105ff2162361029abfdfa023c60abffe87d7ed192b711b",
     "intent": "448922f79f7092eb652e9fb1471bfc9468405b4fd6eb46860fef2fbf74915436",
