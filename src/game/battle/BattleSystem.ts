@@ -114,6 +114,14 @@ export const SMASH_TUNING = {
 };
 
 /**
+ * 实验臂开关（M5 筛选实验用）。默认值与基线逐位等价，不进参数指纹；某一臂经预注册规则采用后，
+ * 再并入 SMASH_TUNING 并重新生成 golden。
+ *  - approachK：咬合法向冲量的接近速度一次项（v2.0 §6.1 / G14 修正方向：正撞应显著高于同滑移速度的轻擦），
+ *    jn += μ × approachK × bite × 接近速度。0 = 基线。
+ */
+export const SMASH_EXPERIMENT = { approachK: 0 };
+
+/**
  * 一场对战：管理两台陀螺的物理实体、撞击结算和胜负判定。
  * 不依赖 Three.js，可以在 Node 里做无头模拟测试。
  */
@@ -467,7 +475,7 @@ export class BattleSystem {
     );
     // 撞得越正、越快，刀刃越能咬住；轻轻擦过只有少量咬合
     const engage = Math.max(T.engageMin, Math.min(1, (approach + T.engageBase) / T.engageRef));
-    const jn = mu * T.normal * bite * engage * slide;
+    const jn = SMASH_EXPERIMENT.approachK > 0 ? mu * T.normal * bite * engage * slide + mu * SMASH_EXPERIMENT.approachK * bite * approach : mu * T.normal * bite * engage * slide;
     const jt = mu * T.tangent * bite * engage * slide;
 
     // 接触点（世界坐标）：刀刃高度。冲量作用在这里，高于质心 → 自然产生撞后摆动

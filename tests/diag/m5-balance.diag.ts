@@ -10,6 +10,8 @@
  */
 import { test } from 'vitest';
 import { ARENA_PHYSICS } from '../../src/game/arena/ArenaPhysics';
+import { SMASH_EXPERIMENT } from '../../src/game/battle/BattleSystem';
+import { BEY_TUNING } from '../../src/game/beys/BeyPhysics';
 import { ARENA } from '../../src/game/arena/arenaSpec';
 import type { SpinLedger } from '../../src/game/beys/BeyPhysics';
 import { SIGNATURE_LIST } from '../../src/game/beys/parts/catalog';
@@ -200,3 +202,137 @@ test('F：竞技场 A/B（R6 口袋宽度 × R7 墙恢复系数），签名矩�
     });
   }
 }, 1_800_000);
+
+// ───────────────────────────── G. 平衡筛选（探索性，不作采用依据） ─────────────────────────────
+/**
+ * E7 账本显示：掉速主因是 Rapier 接触摩擦（Bit 倾斜接地的摩擦力矩，随 Bit 摩擦与接地半径增大），而不是 spinDecay；
+ * F 显示：口袋加宽几乎不产生击飞（从中心爬出碗沿需约 8.4 m/s）。本部分只筛选候选杠杆的方向与量级，
+ * 每臂 320 回合；任何一臂要采用，必须另跑预注册的确认实验（每臂 ≥ 390 回合，规则写在提交说明里）。
+ * 臂：base / 接近速度咬合项 approachK 0.6、1.2 / 中心平台取消 centerFlat 0 / 外圈加陡减半 edge 0.03 / 滚动阻力下限 rollBase 0.005。
+ */
+interface Arm {
+  arm: string;
+  smash?: number;
+  arena?: { centerFlat?: number; edge?: number };
+  tune?: Partial<typeof BEY_TUNING>;
+}
+function withArm<T>(a: Arm, fn: () => T): T {
+  const oldS = SMASH_EXPERIMENT.approachK;
+  const oldA = { centerFlat: ARENA.centerFlat, edge: ARENA.edge };
+  const t = BEY_TUNING as unknown as Record<string, number>;
+  const oldT: Record<string, number> = {};
+  if (a.smash !== undefined) SMASH_EXPERIMENT.approachK = a.smash;
+  if (a.arena) Object.assign(ARENA, a.arena);
+  for (const [k, v] of Object.entries(a.tune ?? {})) {
+    oldT[k] = t[k];
+    t[k] = v as number;
+  }
+  try {
+    return fn();
+  } finally {
+    SMASH_EXPERIMENT.approachK = oldS;
+    Object.assign(ARENA, oldA);
+    Object.assign(t, oldT);
+  }
+}
+
+test('G：平衡杠杆筛选（签名矩阵 + 针尖对针尖探针）', async () => {
+  const R: RT = await loadRapier();
+  const POW = [0.65, 0.8, 0.95];
+  const arms: Arm[] = [
+    { arm: 'base' },
+    { arm: 'approachK0.6', smash: 0.6 },
+    { arm: 'approachK1.2', smash: 1.2 },
+    { arm: 'centerFlat0', arena: { centerFlat: 0 } },
+    { arm: 'edge0.03', arena: { edge: 0.03 } },
+    { arm: 'rollBase0.005', tune: { rollBase: 0.005 } },
+  ];
+  const pandun = SIGNATURE_LIST.find((x) => x.key === 'pandun')!.loadout;
+  for (const a of arms) {
+    const t0 = Date.now();
+    const rep = withArm(a, () => {
+      const recs: { p: string; r: string; kind: string; finish: string | null; own: boolean; winner: string | null; steps: number; contacts: number }[] = [];
+      SIGNATURE_LIST.forEach((p, pi) =>
+        SIGNATURE_LIST.forEach((r, ri) => {
+          for (let i = 0; i < SEEDS; i++) {
+            const seed = 20000 + pi * 1000 + ri * 100 + i;
+            const rnd = seeded(seed * 7 + 13);
+            const sc: Scn = { name: `${p.key}-${r.key}#${i}`, group: 'SIG', player: p.loadout, rival: r.loadout, pCmd: { power: POW[i % 3], aim: (rnd() - 0.5) * 1.2, tilt: 0 }, rCmd: rivalCommand(rnd), seed, maxSeconds: 61, init: '签名矩阵' };
+            const orig = Math.random;
+            Math.random = seeded(sc.seed);
+            try {
+              const { pw, b } = setup(R, sc, { observeContacts: true });
+              const max = Math.round(61 / PHYSICS_DT);
+              let s = 0;
+              for (; s < max && !b.result; s++) pw.step();
+              const o = b.judgeRound.outcome;
+              recs.push({ p: p.key, r: r.key, kind: o?.kind ?? 'none', finish: o?.finish ?? null, own: !!o?.own, winner: o?.winner ?? null, steps: s, contacts: b.burst?.episodeCount ?? 0 });
+              pw.dispose();
+            } finally {
+              Math.random = orig;
+            }
+          }
+        }),
+      );
+      // 针尖对针尖（磐盾镜像）8 场，回合上限 120 s：无接触低速段最长、接触段数
+      const probe: { idleMax: number; contacts: number; dur: number }[] = [];
+      for (let i = 0; i < 8; i++) {
+        const rnd = seeded(7000 + i);
+        const sc: Scn = { name: `PvP#${i}`, group: 'PvP', player: pandun, rival: pandun, pCmd: { power: POW[i % 3], aim: (rnd() - 0.5) * 1.2, tilt: 0 }, rCmd: rivalCommand(rnd), seed: 7000 + i, maxSeconds: 120, init: '磐盾镜像' };
+        const orig = Math.random;
+        Math.random = seeded(sc.seed);
+        try {
+          const { pw, b, A, B } = setup(R, sc, { observeContacts: true });
+          const cs = pw.contacts!;
+          let idle = 0;
+          let idleMax = 0;
+          let s = 0;
+          for (; s < 14400 && !b.result; s++) {
+            pw.step();
+            const imp = cs.bodyPair('player', 'rival')?.normalImpulse ?? 0;
+            const va = A.body.linvel();
+            const vb = B.body.linvel();
+            if (Math.hypot(va.x, va.z) < 0.2 && Math.hypot(vb.x, vb.z) < 0.2 && imp <= 0) idleMax = Math.max(idleMax, (idle += PHYSICS_DT));
+            else idle = 0;
+          }
+          probe.push({ idleMax: Math.round(idleMax * 10) / 10, contacts: b.burst?.episodeCount ?? 0, dur: Math.round((s / 120) * 10) / 10 });
+          pw.dispose();
+        } finally {
+          Math.random = orig;
+        }
+      }
+      return { recs, probe };
+    });
+    const { recs, probe } = rep;
+    const n = recs.length;
+    const c: Record<string, number> = {};
+    for (const x of recs) {
+      const k = x.kind === 'win' ? (x.finish as string) : x.kind;
+      c[k] = (c[k] ?? 0) + 1;
+    }
+    const per: Record<string, number> = {};
+    for (const sg of SIGNATURE_LIST) {
+      let dec = 0;
+      let w = 0;
+      for (const x of recs) {
+        const side = x.p === sg.key ? 'player' : x.r === sg.key ? 'rival' : null;
+        if (!side || x.p === x.r || x.kind !== 'win') continue;
+        dec++;
+        if (x.winner === side) w++;
+      }
+      per[sg.key] = dec ? Math.round((w / dec) * 1000) / 1000 : NaN;
+    }
+    const dflt = recs.filter((x) => x.p === 'senheng' && x.r === 'pandun');
+    out(`M5-G ${a.arm}`, {
+      ms: Date.now() - t0,
+      rounds: n,
+      shares: Object.fromEntries(Object.entries(c).map(([k, v]) => [k, Math.round((v / n) * 1000) / 1000])),
+      own: recs.filter((x) => x.own).length,
+      winRate: per,
+      defaultPlayerWins: `${dflt.filter((x) => x.winner === 'player').length}/${dflt.length}`,
+      durationP50: [...recs.map((x) => x.steps / 120)].sort((x, y) => x - y)[Math.floor(n / 2)],
+      contactsP50: [...recs.map((x) => x.contacts)].sort((x, y) => x - y)[Math.floor(n / 2)],
+      needleMirror: probe,
+    });
+  }
+}, 3_000_000);
