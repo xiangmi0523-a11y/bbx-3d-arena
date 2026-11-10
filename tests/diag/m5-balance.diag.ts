@@ -12,7 +12,7 @@ import { test } from 'vitest';
 import { ARENA_PHYSICS } from '../../src/game/arena/ArenaPhysics';
 import { SMASH_EXPERIMENT } from '../../src/game/battle/BattleSystem';
 import { BEY_TUNING } from '../../src/game/beys/BeyPhysics';
-import { ARENA } from '../../src/game/arena/arenaSpec';
+import { ARENA, floorHeight } from '../../src/game/arena/arenaSpec';
 import type { SpinLedger } from '../../src/game/beys/BeyPhysics';
 import { BITS, BLADES, SIGNATURE_LIST } from '../../src/game/beys/parts/catalog';
 import { assembleBey, REF_INERTIA } from '../../src/game/beys/parts/assemble';
@@ -214,12 +214,12 @@ test('F：竞技场 A/B（R6 口袋宽度 × R7 墙恢复系数），签名矩�
 interface Arm {
   arm: string;
   smash?: number;
-  arena?: { centerFlat?: number; edge?: number };
+  arena?: { centerFlat?: number; edge?: number; bowl?: number };
   tune?: Partial<typeof BEY_TUNING>;
 }
 function withArm<T>(a: Arm, fn: () => T): T {
   const oldS = SMASH_EXPERIMENT.approachK;
-  const oldA = { centerFlat: ARENA.centerFlat, edge: ARENA.edge };
+  const oldA = { centerFlat: ARENA.centerFlat, edge: ARENA.edge, bowl: ARENA.bowl };
   const t = BEY_TUNING as unknown as Record<string, number>;
   const oldT: Record<string, number> = {};
   if (a.smash !== undefined) SMASH_EXPERIMENT.approachK = a.smash;
@@ -595,5 +595,112 @@ test('I：接触掉速来源分解（对撞 / 倾角分桶 + 刀刃摩擦 0 / Bi
       };
     }
     out(`M5-I ${a.arm}`, { ms: Date.now() - t0, perSignature: per, finishes: res.fin });
+  }
+}, 3_000_000);
+
+// ───────────────────────────── J. 碗面深度筛选（探索性，竞技场几何：采用需 Huang 确认） ─────────────────────────────
+/**
+ * I 的结论：对撞期间两边的掉速大致对称（Rapier 摩擦冲量作用在双方），攻击型的额外掉速来自滚动移动；
+ * 攻击型赢不了的根本原因是击飞几乎不可能（从中心爬出碗沿约需 8.4 m/s）。本部分只筛选碗面深度（碗沿高度）对终结分布与平衡的影响：
+ *   base（bowl 0.045，碗沿 1.76）/ bowl 0.03（1.33）/ bowl 0.03 + edge 0.03（1.16）/ bowl 0.02 + edge 0.03（0.87）/ bowl 0.03 + edge 0.03 + centerFlat 0。
+ * v2.0 §5.4 标准场目标：自转 55–65%、出界 10–20%、爆裂 15–25%、极限 3–8%、回合 12–18 s；自灭（出界前 1.5 s 无接触）不高于基线 5 个点。
+ */
+test('J：碗面深度筛选（终结分布 + 对阵 + 自灭）', async () => {
+  const R: RT = await loadRapier();
+  const POW = [0.65, 0.8, 0.95];
+  const arms: Arm[] = [
+    { arm: 'base' },
+    { arm: 'bowl0.03', arena: { bowl: 0.03 } },
+    { arm: 'bowl0.03+edge0.03', arena: { bowl: 0.03, edge: 0.03 } },
+    { arm: 'bowl0.02+edge0.03', arena: { bowl: 0.02, edge: 0.03 } },
+    { arm: 'bowl0.03+edge0.03+flat0', arena: { bowl: 0.03, edge: 0.03, centerFlat: 0 } },
+  ];
+  const PAIRS: [string, string, string][] = [
+    ['A>S', 'lieren', 'ziyao'],
+    ['S>D', 'ziyao', 'pandun'],
+    ['D>A', 'pandun', 'lieren'],
+    ['default', 'senheng', 'pandun'],
+    ['B-A', 'senheng', 'lieren'],
+    ['B-S', 'senheng', 'ziyao'],
+  ];
+  for (const a of arms) {
+    const t0 = Date.now();
+    const recs = withArm(a, () => {
+      const rs: { p: string; r: string; kind: string; finish: string | null; own: boolean; winner: string | null; steps: number }[] = [];
+      SIGNATURE_LIST.forEach((p, pi) =>
+        SIGNATURE_LIST.forEach((r, ri) => {
+          for (let i = 0; i < SEEDS; i++) {
+            const seed = 20000 + pi * 1000 + ri * 100 + i;
+            const rnd = seeded(seed * 7 + 13);
+            const sc: Scn = { name: `${p.key}-${r.key}#${i}`, group: 'SIG', player: p.loadout, rival: r.loadout, pCmd: { power: POW[i % 3], aim: (rnd() - 0.5) * 1.2, tilt: 0 }, rCmd: rivalCommand(rnd), seed, maxSeconds: 61, init: '签名矩阵' };
+            const orig = Math.random;
+            Math.random = seeded(sc.seed);
+            try {
+              const { pw, b } = setup(R, sc, { observeContacts: true });
+              const max = Math.round(61 / PHYSICS_DT);
+              let s = 0;
+              for (; s < max && !b.result; s++) pw.step();
+              const o = b.judgeRound.outcome;
+              rs.push({ p: p.key, r: r.key, kind: o?.kind ?? 'none', finish: o?.finish ?? null, own: !!o?.own, winner: o?.winner ?? null, steps: s });
+              pw.dispose();
+            } finally {
+              Math.random = orig;
+            }
+          }
+        }),
+      );
+      return rs;
+    });
+    const n = recs.length;
+    const c: Record<string, number> = {};
+    for (const x of recs) {
+      const k = x.kind === 'win' ? (x.finish as string) : x.kind;
+      c[k] = (c[k] ?? 0) + 1;
+    }
+    const pairs: Record<string, string> = {};
+    for (const [tag, x, y] of PAIRS) {
+      let wx = 0;
+      let wy = 0;
+      let d = 0;
+      const how: Record<string, number> = {};
+      for (const q of recs) {
+        if (!((q.p === x && q.r === y) || (q.p === y && q.r === x))) continue;
+        const xs = q.p === x ? 'player' : 'rival';
+        if (q.kind !== 'win') {
+          d++;
+          continue;
+        }
+        const w = q.winner === xs ? x : y;
+        if (w === x) wx++;
+        else wy++;
+        const hk = `${w}:${q.finish}${q.own ? '(自灭)' : ''}`;
+        how[hk] = (how[hk] ?? 0) + 1;
+      }
+      pairs[tag] = `${x} ${wx}:${wy} ${y}（平 ${d}）${JSON.stringify(how)}`;
+    }
+    const per: Record<string, number> = {};
+    for (const sg of SIGNATURE_LIST) {
+      let dec = 0;
+      let w = 0;
+      for (const x of recs) {
+        const side = x.p === sg.key ? 'player' : x.r === sg.key ? 'rival' : null;
+        if (!side || x.p === x.r || x.kind !== 'win') continue;
+        dec++;
+        if (x.winner === side) w++;
+      }
+      per[sg.key] = dec ? Math.round((w / dec) * 1000) / 1000 : NaN;
+    }
+    const rim = floorHeight(ARENA.radius, { ...ARENA, ...(a.arena ?? {}) });
+    out(`M5-J ${a.arm}`, {
+      ms: Date.now() - t0,
+      rimHeight: r2(rim),
+      escapeSpeed: r2(Math.sqrt(2 * 20 * rim)),
+      rounds: n,
+      shares: Object.fromEntries(Object.entries(c).map(([k, v]) => [k, Math.round((v / n) * 1000) / 1000])),
+      ownShare: Math.round((recs.filter((x) => x.own).length / n) * 1000) / 1000,
+      winRate: per,
+      pairs,
+      durationP50: [...recs.map((x) => x.steps / 120)].sort((x, y) => x - y)[Math.floor(n / 2)],
+    });
   }
 }, 3_000_000);
