@@ -12,5 +12,5 @@ run() {
   echo "::endgroup::"
 }
 
-# M5b（docs/engineering/m5b-experiment-plan.md）：E-CF 结果见提交 474cee7 的 CI 运行；本次运行 E-A1 重击模型筛选（探索性，D1）
-run "E-A1 重击模型筛选" npx vitest run --config vitest.diag.config.ts tests/diag/m5b-claw.diag.ts -t "E-A1"
+# M5b（docs/engineering/m5b-experiment-plan.md）：E-CF / E-A1 结果见 docs/engineering/m5b-results.md；本次运行 E-A1b（κ × R6 口袋 + 重击方向，探索性）
+run "E-A1b 重击 × 口袋筛选" npx vitest run --config vitest.diag.config.ts tests/diag/m5b-claw.diag.ts -t "E-A1b"

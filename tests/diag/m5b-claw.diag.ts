@@ -10,6 +10,7 @@
  * 用法：npx vitest run --config vitest.diag.config.ts tests/diag/m5b-claw.diag.ts -t "E-A1"
  */
 import { test } from 'vitest';
+import { ARENA, floorHeight, pocketAtAngle } from '../../src/game/arena/arenaSpec';
 import { CLAW_EXPERIMENT } from '../../src/game/battle/clawStrike';
 import { loadRapier } from '../../src/game/physics/PhysicsWorld';
 import { matrixScenarios, out, quantile, r2, r3, runRound, summarize, type RoundRec } from './m5b.shared';
@@ -90,5 +91,114 @@ test('E-A1：重击模型筛选（探索性，m5b-experiment-plan.md §3.2）', 
     selected: pick ? { arm: pick.arm, kappa: pick.kappa, outShare: pick.outShare } : null,
     note: pick ? '进入 E-A2 确认实验' : '没有一臂进入 13–28%：报告方向与原因，不进入 E-A2',
     baseOutShare: r3(base.outShare),
+  });
+}, 3_000_000);
+
+// ───────────────────────────── E-A1b：κ × R6 口袋 + 重击方向测量（m5b-experiment-plan.md §3.2b） ─────────────────────────────
+
+function withPockets<T>(w: [number, number] | null, fn: () => T): T {
+  const old = ARENA.pockets.map((p) => p.width);
+  if (w) for (const p of ARENA.pockets) p.width = p.kind === 'xtreme' ? w[1] : w[0];
+  try {
+    return fn();
+  } finally {
+    ARENA.pockets.forEach((p, i) => (p.width = old[i]));
+  }
+}
+
+/** 每回合的重击方向统计（只读）：速度变化 ≥ 6 u/s 的一方，沿新速度方向到碗沿的交点是否在口袋扇区、速度是否足以爬出碗沿 */
+function knockTracker() {
+  const st = { big: 0, toPocket: 0, enough: 0, both: 0 };
+  let prev: { x: number; z: number }[] | null = null;
+  let strikes = 0;
+  const onStep = (ctx: { b: { claw: { strikes: number } }; A: { body: { linvel(): { x: number; y: number; z: number }; translation(): { x: number; y: number; z: number } } }; B: { body: { linvel(): { x: number; y: number; z: number }; translation(): { x: number; y: number; z: number } } } }) => {
+    const beys = [ctx.A, ctx.B];
+    const vel = beys.map((x) => x.body.linvel());
+    if (prev && ctx.b.claw.strikes > strikes) {
+      const rim = floorHeight(ARENA.radius);
+      for (let k = 0; k < 2; k++) {
+        const v = vel[k];
+        const dv = Math.hypot(v.x - prev[k].x, v.z - prev[k].z);
+        if (dv < 6) continue;
+        st.big++;
+        const p = beys[k].body.translation();
+        const a = v.x * v.x + v.z * v.z;
+        const bq = 2 * (p.x * v.x + p.z * v.z);
+        const c = p.x * p.x + p.z * p.z - ARENA.radius * ARENA.radius;
+        const disc = bq * bq - 4 * a * c;
+        if (a < 1e-9 || disc < 0) continue;
+        const t = (-bq + Math.sqrt(disc)) / (2 * a);
+        const hx = p.x + v.x * t;
+        const hz = p.z + v.z * t;
+        const toPocket = !!pocketAtAngle(Math.atan2(hz, hx));
+        const r = Math.hypot(p.x, p.z);
+        const enough = a >= 2 * 20 * Math.max(0, rim - floorHeight(Math.min(r, ARENA.radius)));
+        if (toPocket) st.toPocket++;
+        if (enough) st.enough++;
+        if (toPocket && enough) st.both++;
+      }
+    }
+    strikes = ctx.b.claw.strikes;
+    prev = vel.map((v) => ({ x: v.x, z: v.z }));
+  };
+  return { st, onStep };
+}
+
+test('E-A1b：重击 κ × R6 口袋 + 重击方向（探索性，m5b-experiment-plan.md §3.2b）', async () => {
+  const R = await loadRapier();
+  const R6: [number, number] = [2.5, 3.85];
+  const arms: { arm: string; kappa: number | null; pockets: [number, number] | null }[] = [
+    { arm: 'base', kappa: null, pockets: null },
+    { arm: 'base+R6', kappa: null, pockets: R6 },
+    { arm: 'claw0.05', kappa: 0.05, pockets: null },
+    { arm: 'claw0.05+R6', kappa: 0.05, pockets: R6 },
+    { arm: 'claw0.1', kappa: 0.1, pockets: null },
+    { arm: 'claw0.1+R6', kappa: 0.1, pockets: R6 },
+    { arm: 'claw0.2', kappa: 0.2, pockets: null },
+    { arm: 'claw0.2+R6', kappa: 0.2, pockets: R6 },
+  ];
+  const rows: { arm: string; kappa: number | null; r6: boolean; outShare: number; ownShare: number; maxSpeed: number; audit: ReturnType<typeof clawAudit> }[] = [];
+  for (const a of arms) {
+    const t0 = Date.now();
+    const knock = { big: 0, toPocket: 0, enough: 0, both: 0 };
+    const recs = withPockets(a.pockets, () =>
+      withClaw(a.kappa, () =>
+        matrixScenarios(20000, 20).map((sc) => {
+          const kt = knockTracker();
+          return runRound(R, sc, kt.onStep, (ctx, rec) => {
+            const c = ctx.b.claw;
+            rec.extra = { strikes: c.strikes, rejected: c.rejectedEnergy, maxDv: c.maxDv, sumDv: c.sumDv, maxRelDke: c.strikes ? c.maxRelDke : 0, momentumResid: c.momentumResid, maxSpinLoss: c.maxSpinLoss };
+            knock.big += kt.st.big;
+            knock.toPocket += kt.st.toPocket;
+            knock.enough += kt.st.enough;
+            knock.both += kt.st.both;
+          });
+        }),
+      ),
+    );
+    const sum = summarize(recs);
+    const audit = clawAudit(recs);
+    rows.push({ arm: a.arm, kappa: a.kappa, r6: !!a.pockets, outShare: sum.outShare, ownShare: sum.ownShare, maxSpeed: sum.maxSpeed, audit });
+    const k = knock.big || 1;
+    out(`M5B-A1b ${a.arm}`, {
+      ms: Date.now() - t0,
+      kappa: a.kappa,
+      pockets: a.pockets ?? 'base',
+      ...sum,
+      audit,
+      bigKnocks: { perRound: r2(knock.big / recs.length), toPocketPct: r2((knock.toPocket / k) * 100), enoughSpeedPct: r2((knock.enough / k) * 100), bothPct: r2((knock.both / k) * 100) },
+    });
+  }
+  // 预注册选臂规则（§3.2b）：审计零违规、最大水平速度 ≤ 25、自灭 ≤ 同口袋旧模型臂 + 5 个百分点；出界 + 极限在 13–28% 内且最接近 20%
+  const ref = (r6: boolean) => rows.find((x) => x.kappa === null && x.r6 === r6)!;
+  const eligible = rows.filter((r) => r.kappa !== null && r.audit.rejectedEnergy === 0 && r.audit.badRounds === 0 && r.audit.maxRelDke <= 1e-9 && r.maxSpeed <= 25 && r.ownShare <= ref(r.r6).ownShare + 0.05 + 1e-9);
+  const inBand = eligible.filter((r) => r.outShare >= 0.13 && r.outShare <= 0.28);
+  const pick = [...inBand].sort((x, y) => Math.abs(x.outShare - 0.2) - Math.abs(y.outShare - 0.2))[0] ?? null;
+  out('M5B-A1b selection', {
+    rows: rows.map((r) => ({ arm: r.arm, outShare: r.outShare, ownShare: r.ownShare, maxSpeed: r.maxSpeed })),
+    eligible: eligible.map((r) => r.arm),
+    inBand: inBand.map((r) => r.arm),
+    selected: pick ? { arm: pick.arm, kappa: pick.kappa, r6: pick.r6, outShare: pick.outShare } : null,
+    note: pick ? '进入 E-A2 确认实验' : '没有一臂进入 13–28%：结论为击飞需要 AI 主动把对手撞向口袋（M4），不再加大 κ 或改竞技场几何',
   });
 }, 3_000_000);
