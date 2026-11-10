@@ -28,6 +28,12 @@ export const FINISH_LABEL: Record<FinishType, string> = {
   xtreme: '极限终结',
 };
 
+/**
+ * 转速比较的判定精度（相对）：两方转速相差不超过 SPIN_TIE_RATIO × 较高转速时视为相同。
+ * 用于两处，口径一致：超时判定（平局重赛）与同一步双方爆裂（产品决定 D3：转速更低的一方爆裂；精度内相同 → 双方爆裂，按同时终结判平局）。
+ */
+export const SPIN_TIE_RATIO = 0.01;
+
 export const MATCH_RULES = {
   /** 先到多少分获胜 */
   target: 4,
@@ -37,8 +43,8 @@ export const MATCH_RULES = {
   confirmWindow: 0.5,
   /** 自灭判定：出界 / 极限发起前这么久（秒）内没有与对手确认接触 */
   ownFinishWindow: 1.5,
-  /** 超时判定时双方转速相差不到这个比例视为相同（平局重赛） */
-  timeoutTieRatio: 0.01,
+  /** 超时判定时双方转速相差不到这个比例视为相同（平局重赛），见 SPIN_TIE_RATIO */
+  timeoutTieRatio: SPIN_TIE_RATIO,
 };
 
 export type MatchRules = typeof MATCH_RULES;

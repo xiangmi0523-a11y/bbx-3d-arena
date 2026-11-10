@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { BurstMeter, BurstObserver, EpisodeTracker } from '../src/game/battle/burst';
+import { MATCH_RULES, RoundJudge, SPIN_TIE_RATIO, type SideObservation } from '../src/game/battle/match';
 
 const DT = 1 / 120;
 
@@ -59,18 +60,39 @@ describe('爆裂系统：应力（纯逻辑）', () => {
     expect(b.add(0, 2)).toEqual([0, 1]);
   });
 
-  it('镜像组合（抗爆参数相同）同一步到阈值：转得更慢的一方爆裂；转速完全相同才同时爆裂', () => {
+  it('镜像组合（抗爆参数相同）同一步到阈值：转速更低的一方爆裂（D3，比较绝对转速）', () => {
     const res = [{ lock: 0.5, burstGuard: 0.5 }, { lock: 0.5, burstGuard: 0.5 }] as [{ lock: number; burstGuard: number }, { lock: number; burstGuard: number }];
     const a = new BurstMeter(res, 0.1);
-    expect(a.add(0, 2, [0.8, 0.6])).toEqual([]);
-    expect(a.add(1, 0.6, [0.8, 0.6])).toEqual([1]);
+    expect(a.add(0, 2, [80, 60])).toEqual([]);
+    expect(a.add(1, 0.6, [80, 60])).toEqual([1]);
     expect(a.burst).toEqual([1]);
     expect(a.stress[0]).toBeLessThan(1);
-    expect(a.add(2, 5, [0.8, 0.6])).toEqual([]); // 爆裂后不再累积
+    expect(a.add(2, 5, [80, 60])).toEqual([]); // 爆裂后不再累积
     const b = new BurstMeter(res, 0.1);
-    expect(b.add(0, 3, [0.4, 0.9])).toEqual([0]);
-    const c = new BurstMeter(res, 0.1);
-    expect(c.add(0, 3, [0.7, 0.7])).toEqual([0, 1]);
+    expect(b.add(0, 3, [40, 90])).toEqual([0]);
+  });
+
+  it('同爆裁决的判定精度：转速相差 ≤ 1%（SPIN_TIE_RATIO，与超时判定同一口径）→ 双方同时爆裂（确定性平局）；> 1% → 更低的一方', () => {
+    expect(SPIN_TIE_RATIO).toBe(0.01);
+    expect(MATCH_RULES.timeoutTieRatio).toBe(SPIN_TIE_RATIO);
+    const res = [{ lock: 0.5, burstGuard: 0.5 }, { lock: 0.5, burstGuard: 0.5 }] as [{ lock: number; burstGuard: number }, { lock: number; burstGuard: number }];
+    const tie = (s0: number, s1: number) => new BurstMeter(res, 0.1).add(0, 3, [s0, s1]);
+    expect(tie(70, 70)).toEqual([0, 1]);
+    expect(tie(100, 99.2)).toEqual([0, 1]); // 0.8% < 1%：精度内相同
+    expect(tie(99.2, 100)).toEqual([0, 1]);
+    expect(tie(100, 98.9)).toEqual([1]); // 1.1% > 1%：转速更低的一方爆裂
+    expect(tie(98.9, 100)).toEqual([0]);
+    // 确定性：同样的输入永远同样的结果
+    for (let i = 0; i < 5; i++) expect(tie(100, 99.5)).toEqual([0, 1]);
+  });
+
+  it('同时爆裂进入回合裁判：判“同时终结”平局', () => {
+    const j = new RoundJudge();
+    const obs = (burst: boolean): SideObservation => ({ out: null, backInArena: true, stopped: false, toppled: false, burst, sinceContact: 0, spin: 70 });
+    let o = null;
+    for (let s = 0; s < 240 && !o; s++) o = j.step(DT, { player: obs(true), rival: obs(true) });
+    expect(o?.kind).toBe('draw');
+    expect(o?.cause).toBe('simultaneous');
   });
 
   it('未标定（k = null）：只观测，永不爆裂', () => {

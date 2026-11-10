@@ -266,7 +266,7 @@ export class BattleSystem {
     const confirmed = cs ? imp > 0 : this.contactClass.impulseResponse;
     if (confirmed) this.lastContact = this.time;
     if (this.burst && !this.result) {
-      const hits = this.burst.step(this.stepIndex, imp, [a.spinRatio, b.spinRatio]);
+      const hits = this.burst.step(this.stepIndex, imp, [a.spin, b.spin]);
       for (const i of hits) this.onBurst(i === 0 ? 'player' : 'rival', bp);
     }
 

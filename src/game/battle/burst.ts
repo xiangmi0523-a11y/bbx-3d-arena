@@ -17,6 +17,8 @@
  * stress ≥ threshold 即爆裂（不可逆）。kBurst = null 表示尚未标定：只观测、不判定爆裂。
  */
 
+import { SPIN_TIE_RATIO } from './match';
+
 export const BURST_TUNING = {
   /**
    * 爆裂应力系数 k_burst（应力 / (N·s)，已除以 lock × burstGuard）。
@@ -148,12 +150,18 @@ export class BurstMeter {
       if (this.episodeDelta[i] > this.peakEpisodeDelta[i]) this.peakEpisodeDelta[i] = this.episodeDelta[i];
       if (this.stress[i] >= this.threshold) hits.push(i);
     }
-    if (hits.length === 2 && spin && spin[0] !== spin[1]) {
-      const keep = spin[0] < spin[1] ? 0 : 1;
-      hits.length = 0;
-      hits.push(keep);
-      // 没爆裂的一方停在阈值之下（回合即将由规则结束，只影响显示）
-      this.stress[1 - keep] = Math.min(this.stress[1 - keep], this.threshold * 0.999);
+    // 同一步双方都到阈值（分母 lock × burstGuard 相同的组合必然如此，因为冲量是双方共用的同一份实测值）：
+    // 产品决定 D3——转速（绝对值，rad/s）更低的一方爆裂；两方转速在判定精度 SPIN_TIE_RATIO 内相同 → 双方同时爆裂，
+    // 由回合裁判按“同时终结”判平局。全部是确定性比较，不引入随机。
+    if (hits.length === 2 && spin) {
+      const [s0, s1] = spin;
+      if (Math.abs(s0 - s1) > SPIN_TIE_RATIO * Math.max(s0, s1, 1e-9)) {
+        const keep = s0 < s1 ? 0 : 1;
+        hits.length = 0;
+        hits.push(keep);
+        // 没爆裂的一方停在阈值之下（回合即将由规则结束，只影响显示）
+        this.stress[1 - keep] = Math.min(this.stress[1 - keep], this.threshold * 0.999);
+      }
     }
     if (hits.length) {
       this.burst.push(...hits);

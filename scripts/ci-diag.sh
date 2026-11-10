@@ -12,6 +12,5 @@ run() {
   echo "::endgroup::"
 }
 
-# 阶段 M2：回合裁判的 golden 变化归因 + 针尖探针（R3）+ 签名矩阵与爆裂 k 标定（R8 / §6.3）
-# （M2 最终参数实测与 M5a 账本、竞技场 A/B 已有结论，见 docs/engineering/m5-ledger-report.md）
-run "M5 碗面深度筛选（探索性：竞技场几何，采用需产品确认）" npx vitest run --config vitest.diag.config.ts tests/diag/m5-balance.diag.ts -t "J："
+# D3（同爆裁决改为比较绝对转速）可能改变 golden 中同一步双方爆裂的场次：重跑 golden 归因并导出新 golden（行首 GOLDEN-B64）
+run "golden 归因与导出（M2 A 部分）" env M2_PARTS=A M2_GOLDEN_DUMP=1 npx vitest run --config vitest.diag.config.ts tests/diag/m2-experiment.diag.ts
