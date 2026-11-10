@@ -12,5 +12,5 @@ run() {
   echo "::endgroup::"
 }
 
-# D3（同爆裁决改为比较绝对转速）可能改变 golden 中同一步双方爆裂的场次：重跑 golden 归因并导出新 golden（行首 GOLDEN-B64）
-run "golden 归因与导出（M2 A 部分）" env M2_PARTS=A M2_GOLDEN_DUMP=1 npx vitest run --config vitest.diag.config.ts tests/diag/m2-experiment.diag.ts
+# M5b（docs/engineering/m5b-experiment-plan.md）：E-CF 取消碗面中心平台的确认实验（预注册，D2）
+run "E-CF 中心平台确认实验" npx vitest run --config vitest.diag.config.ts tests/diag/m5b-confirm.diag.ts -t "E-CF"
