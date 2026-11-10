@@ -5,14 +5,15 @@
  * 判定优先级：爆裂 > 出界 / 极限 > 自转。
  *
  * “发起”与“确认”两个时刻（官方规则的判定完备性）：
- *  - 发起：陀螺整体进入口袋 / 部件分离（爆裂）/ 停转（转速归零或倾倒）的那一步；
- *  - 确认：发起后 confirmWindow 秒内没有被逆转（回到战斗区且仍在转 / 重新转起来）；爆裂不可逆。
+ *  - 发起：陀螺整体进入口袋 / 部件分离（爆裂）/ 停转（转速归零或倾倒）的那一步（发起时刻记为该步开始时）；
+ *  - 确认：发起后持续超过 confirmWindow 秒没有被逆转（回到战斗区且仍在转 / 重新转起来）；爆裂不可逆。
+ *    持续时间按步长逐步累加、严格大于窗口才确认——与旧版 stoppedFor > 0.5 的判定逐位相同（golden 可比）。
  *  - 已发起但被逆转的终结视为从未发起。
  *  - 同时终结：双方在同一 confirmWindow 窗口内都发起终结 → 平局，本回合重赛、不计分。
  *  - 同一方在窗口内先后发起多种终结时取优先级最高的一种（发起时刻按最早的那次）。
  * 自灭（Own Finish，游戏自定规则，不是官方规则）：出界 / 极限终结发起前 ownFinishWindow 秒内与对手没有确认接触，
  * 对方只得 1 分。
- * 回合超时：roundTimeLimit 秒仍无终结 → 自转高者胜（自转终结 1 分）；转速几乎相同判平局重赛。
+ * 回合超时：回合时间超过 roundTimeLimit 秒仍无终结 → 自转高者胜（自转终结 1 分）；转速几乎相同判平局重赛。
  */
 import type { Side } from '../launcher/launch';
 
@@ -62,8 +63,10 @@ export interface SideObservation {
 
 export interface PendingFinish {
   kind: FinishType;
-  /** 发起时刻（回合内秒数） */
+  /** 发起时刻（回合内秒数，发起那一步开始时） */
   t0: number;
+  /** 已持续的时间（逐步累加步长，含发起那一步） */
+  held: number;
   own: boolean;
   toppled: boolean;
 }
@@ -91,7 +94,6 @@ export interface RoundOutcome {
 const SIDES: Side[] = ['player', 'rival'];
 const other = (s: Side): Side => (s === 'player' ? 'rival' : 'player');
 const PRIORITY: Record<FinishType, number> = { spin: 0, over: 1, xtreme: 1, burst: 2 };
-const EPS = 1e-9;
 
 /** 一个回合的终结判定（每个物理步调用一次 step） */
 export class RoundJudge {
@@ -126,10 +128,13 @@ export class RoundJudge {
       if (!k) continue;
       const own = (k === 'over' || k === 'xtreme') && o.sinceContact > R.ownFinishWindow;
       const cur = this.pending[s];
-      if (!cur) this.pending[s] = { kind: k, t0: t, own, toppled: o.toppled };
-      else if (PRIORITY[k] > PRIORITY[cur.kind]) this.pending[s] = { kind: k, t0: cur.t0, own, toppled: false };
-      else if (PRIORITY[k] === PRIORITY[cur.kind] && k !== cur.kind) cur.kind = k; // 出界口袋 ↔ 极限口袋：以当前所在为准
-      else if (k === 'spin' && o.toppled) cur.toppled = true;
+      if (!cur) this.pending[s] = { kind: k, t0: t - dt, held: dt, own, toppled: o.toppled };
+      else {
+        cur.held += dt;
+        if (PRIORITY[k] > PRIORITY[cur.kind]) this.pending[s] = { kind: k, t0: cur.t0, held: cur.held, own, toppled: false };
+        else if (PRIORITY[k] === PRIORITY[cur.kind] && k !== cur.kind) cur.kind = k; // 出界口袋 ↔ 极限口袋：以当前所在为准
+        else if (k === 'spin' && o.toppled) cur.toppled = true;
+      }
     }
 
     const a = this.pending.player;
@@ -137,7 +142,7 @@ export class RoundJudge {
     const first: Side | null = a && b ? (a.t0 <= b.t0 ? 'player' : 'rival') : a ? 'player' : b ? 'rival' : null;
     if (first) {
       const p = this.pending[first]!;
-      if (t - p.t0 >= R.confirmWindow - EPS) {
+      if (p.held > R.confirmWindow) {
         const q = this.pending[other(first)];
         if (q) this.outcome = { kind: 'draw', winner: null, loser: null, finish: null, points: 0, own: false, toppled: false, cause: 'simultaneous', time: t, initiatedAt: p.t0 };
         else {
@@ -145,10 +150,10 @@ export class RoundJudge {
           this.outcome = { kind: 'win', winner: other(first), loser: first, finish: p.kind, points, own: p.own, toppled: p.kind === 'spin' && p.toppled, cause: 'finish', time: t, initiatedAt: p.t0 };
         }
       }
-    } else if (t >= R.roundTimeLimit - EPS) {
+    } else if (t > R.roundTimeLimit) {
       const sa = obs.player.spin;
       const sb = obs.rival.spin;
-      if (Math.abs(sa - sb) <= R.timeoutTieRatio * Math.max(sa, sb, EPS))
+      if (Math.abs(sa - sb) <= R.timeoutTieRatio * Math.max(sa, sb, 1e-9))
         this.outcome = { kind: 'draw', winner: null, loser: null, finish: null, points: 0, own: false, toppled: false, cause: 'timeout-tie', time: t, initiatedAt: t };
       else {
         const loser: Side = sa < sb ? 'player' : 'rival';

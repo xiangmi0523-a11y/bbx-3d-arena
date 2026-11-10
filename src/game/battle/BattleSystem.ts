@@ -2,6 +2,7 @@ import { ARENA, pocketAtAngle } from '../arena/arenaSpec';
 import { TABLE_Y } from '../arena/ArenaPhysics';
 import { BEY_TUNING, BeyPhysics } from '../beys/BeyPhysics';
 import type { AssembledBey } from '../beys/parts/assemble';
+import type { AiLevel } from '../beys/motionIntent';
 import { computeLaunch, type Side } from '../launcher/launch';
 import type { LaunchCommand } from '../launcher/PullStringGesture';
 import { BEY_COLLIDER_PARTS, type ContactSubject } from '../physics/ContactService';
@@ -158,9 +159,14 @@ export class BattleSystem {
    * contactFeedback = false 时不读取接触反馈（只给“读取接触不改变物理”的对照测试用）；
    * rules 覆盖回合规则（例如诊断用 120 s 上限）；kBurst 覆盖爆裂系数（undefined = BURST_TUNING.kBurst）。
    */
-  constructor(pw: PhysicsWorld, specs: Record<Side, AssembledBey>, opts: { contactFeedback?: boolean; rules?: Partial<MatchRules>; kBurst?: number | null } = {}) {
+  constructor(
+    pw: PhysicsWorld,
+    specs: Record<Side, AssembledBey>,
+    opts: { contactFeedback?: boolean; rules?: Partial<MatchRules>; kBurst?: number | null; ai?: Partial<Record<Side, AiLevel>> } = {},
+  ) {
     this.pw = pw;
     this.specs = specs;
+    this.ai = opts.ai ?? {};
     this.sampling = opts.contactFeedback !== false;
     this.judgeRound = new RoundJudge(opts.rules);
     const res = (s: AssembledBey) => ({ lock: s.ratchet.lock, burstGuard: s.bit.burstGuard });
@@ -180,10 +186,17 @@ export class BattleSystem {
   }
 
   private readonly sampling: boolean;
+  /** 每一方的 AI 难度（只改决策参数）；省略 = 标准 */
+  private readonly ai: Partial<Record<Side, AiLevel>>;
+  /** 统计：每一方进入轨道冲刺的次数（只读 BeyPhysics.dashing 的上升沿，结算展示用） */
+  readonly dashStarts: Record<Side, number> = { player: 0, rival: 0 };
+  private readonly wasDashing: Record<Side, boolean> = { player: false, rival: false };
 
   launch(side: Side, cmd: LaunchCommand): BeyPhysics {
     this.beys[side]?.dispose();
-    const bey = new BeyPhysics(this.pw, this.specs[side], computeLaunch(this.specs[side], side, cmd));
+    const params = computeLaunch(this.specs[side], side, cmd);
+    const level = this.ai[side];
+    const bey = new BeyPhysics(this.pw, this.specs[side], level ? { ...params, ai: level } : params);
     this.beys[side] = bey;
     // 发射过渡：两台都在场时设定各自的初始倾斜方向（只在第一步之前生效一次）
     const other = this.beys[side === 'player' ? 'rival' : 'player'];
@@ -245,8 +258,14 @@ export class BattleSystem {
     const confirmed = cs ? imp > 0 : this.contactClass.impulseResponse;
     if (confirmed) this.lastContact = this.time;
     if (this.burst && !this.result) {
-      const hits = this.burst.step(this.stepIndex, imp);
+      const hits = this.burst.step(this.stepIndex, imp, [a.spinRatio, b.spinRatio]);
       for (const i of hits) this.onBurst(i === 0 ? 'player' : 'rival', bp);
+    }
+
+    for (const side of ['player', 'rival'] as Side[]) {
+      const d = this.beys[side]!.dashing;
+      if (d && !this.wasDashing[side]) this.dashStarts[side]++;
+      this.wasDashing[side] = d;
     }
 
     this.watchStall(a, b, dt);

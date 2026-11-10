@@ -192,6 +192,7 @@
     "breakoutGrip": 0.35,
     "edgeGrip": 0.3,
     "driveMinGrip": 0.2,
+    "railGearOnly": 1,
     "rollBase": 0.02,
     "rollFriction": 0.02
   },

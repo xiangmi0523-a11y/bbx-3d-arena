@@ -1,7 +1,7 @@
 import type RAPIER from '@dimforge/rapier3d-compat';
 import { ARENA, floorHeight } from '../arena/arenaSpec';
 import { GRAVITY, type PhysicsWorld } from '../physics/PhysicsWorld';
-import { MotionIntent } from './motionIntent';
+import { MotionIntent, type AiLevel } from './motionIntent';
 import { REF_INERTIA, type AssembledBey } from './parts/assemble';
 
 export interface Vec3 {
@@ -21,6 +21,8 @@ export interface LaunchParams {
   tiltAxis?: Vec3;
   /** 战术意图的随机种子（省略则取 Math.random） */
   seed?: number;
+  /** AI 难度（只改决策参数，见 motionIntent.ts AI_LEVELS）；省略 = 'pro' 标准 */
+  ai?: AiLevel;
 }
 
 /** 爆裂后剩余部分的额外转速衰减（rad/s²，按参考惯量；只影响回合结束后的表现） */
@@ -132,14 +134,17 @@ export const BEY_TUNING = {
   /**
    * 低于这个咬合度的轴心没有牵引。P2.2.1 为 0.5，球头（0.35）完全没有牵引，会停在碗底；
    * 0.2 时针尖（0.1）被二值门整个关掉，针尖对针尖可无接触僵持 35–87 s（v2.0 R3 的结构根因）。
-   * v2.0 R3 实验值 0.1：针尖获得弱但非零的牵引（30 × 0.1 = 3 m/s²，平齿轴的十分之一），牵引仍按 grip 连续缩放。
+   * v2.0 R3 实验值 0.1 未通过预注册规则（M2 实验 B：针尖对针尖 2 s 重接触 61% < 90%，无接触低速段最长 47 s > 5 s），
+   * 按规则保持 0.2。根因：滚动阻力下限 (rollBase + rollFriction × 摩擦) × g ≈ 0.45 m/s² 与针尖经相位调制后的平均导向推力
+   * （≈ 3 m/s² × 平均偏置 0.15）相当，碗面中心平台的回中梯度只有约 0.08 m/s²——三者合起来针尖几乎不动。留给 M4 处理。
    */
   driveMinGrip: 0.2,
   /**
    * v2.0 R8 轨道冲刺齿轮门控：1 = 只有带齿轮的 Bit（gear = true）能在轨道上冲刺，加速度与转速代价固定（不再乘 grip）；
    * 0 = 旧行为（任何 grip > 0 的轴心都冲刺，按 grip 缩放）。真实机制是齿轮与轨道齿条啮合，与抓地力无关。
+   * M2 起采用（v2.0 D-A5 已确定）。实测轨道冲刺在签名矩阵里平均每回合只有约 0.01 s：陀螺很少走到轨道区，见 M4。
    */
-  railGearOnly: 0,
+  railGearOnly: 1,
   /**
    * 轴心滚动 / 滑动阻力：水平减速度 = (rollBase + rollFriction × 轴心摩擦) × g。
    * 没有这一项时，陀螺在碗边的离心轨道几乎不损失能量，会长时间绕外圈（P2.1 诊断：最长 24 秒没有交锋）。
@@ -192,7 +197,7 @@ export class BeyPhysics {
     this.pw = pw;
     this.spec = spec;
     // 战术意图的随机种子：游戏里来自 Math.random（每局不同），测试里由固定种子决定
-    this.intent = new MotionIntent(spec, launch.seed ?? Math.floor(Math.random() * 2 ** 32));
+    this.intent = new MotionIntent(spec, launch.seed ?? Math.floor(Math.random() * 2 ** 32), launch.ai);
     const { R, world } = pw;
     this.spinSign = spec.blade.spin === 'right' ? -1 : 1; // 右旋 = 俯视顺时针 = 绕 +Y 负方向
     this.inertiaRatio = REF_INERTIA / spec.spinInertia;

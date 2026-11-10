@@ -20,9 +20,13 @@
 export const BURST_TUNING = {
   /**
    * 爆裂应力系数 k_burst（应力 / (N·s)，已除以 lock × burstGuard）。
-   * null = 未标定：只统计接触段与应力，不触发爆裂。标定方法见 tests/diag/burst-calib.diag.ts。
+   * null = 未标定：只统计接触段与应力，不触发爆裂。
+   * M2 标定（tests/diag/m2-experiment.diag.ts C 部分，v2.0 签名矩阵 4×4×20 = 320 回合，固定种子，离线精确扫描）：
+   * 按 §5.4 标准场爆裂终结目标 15–25% 取中值 20% → 0.00224（15–25% 对应约 0.00210–0.00240，爆裂占比随 k 变化很陡）。
+   * 单次重击段（Σ ≈ 26 N·s）的应力增量：紫曜（lock × burstGuard = 0.25）≈ 0.23，森衡（0.64）≈ 0.09。
+   * 这是 [待验证] 的初值：Bit 的 burstGuard 初值与平衡调参（M5）完成后需重新标定。
    */
-  kBurst: null as number | null,
+  kBurst: 0.00224 as number | null,
   /** 接触段内两次确认接触的最大间隔（秒） */
   holdTime: 0.1,
   /** 爆裂阈值 */
@@ -128,8 +132,13 @@ export class BurstMeter {
     return this.k !== null;
   }
 
-  /** 本步两台陀螺之间的法向冲量（实测）。返回本步新爆裂的一方（没有则为空数组） */
-  add(step: number, impulse: number): BurstHits {
+  /**
+   * 本步两台陀螺之间的法向冲量（实测）。返回本步新爆裂的一方（没有则为空数组）。
+   * spin：双方当前转速比例。同一步双方同时达到阈值（只会发生在 lock × burstGuard 完全相同的组合，
+   * 例如镜像对局——同一份冲量、同一个分母）时，转得更慢的一方爆裂：锁扣被反向力矩顶开，角动量越小越难抵抗。
+   * 不传 spin 或转速完全相同则双方都爆裂（规则判同时终结）。
+   */
+  add(step: number, impulse: number, spin?: [number, number]): BurstHits {
     const hits: BurstHits = [];
     if (this.k === null || impulse <= 0 || this.burst.length) return hits;
     for (let i = 0; i < 2; i++) {
@@ -138,6 +147,13 @@ export class BurstMeter {
       this.episodeDelta[i] += d;
       if (this.episodeDelta[i] > this.peakEpisodeDelta[i]) this.peakEpisodeDelta[i] = this.episodeDelta[i];
       if (this.stress[i] >= this.threshold) hits.push(i);
+    }
+    if (hits.length === 2 && spin && spin[0] !== spin[1]) {
+      const keep = spin[0] < spin[1] ? 0 : 1;
+      hits.length = 0;
+      hits.push(keep);
+      // 没爆裂的一方停在阈值之下（回合即将由规则结束，只影响显示）
+      this.stress[1 - keep] = Math.min(this.stress[1 - keep], this.threshold * 0.999);
     }
     if (hits.length) {
       this.burst.push(...hits);
@@ -180,13 +196,13 @@ export class BurstObserver {
     this.meter = new BurstMeter(res, k);
   }
 
-  step(step: number, impulse: number): BurstHits {
+  step(step: number, impulse: number, spin?: [number, number]): BurstHits {
     const done = this.episodes.step(step, impulse);
     if (done) {
       this.closed.push(done);
       this.meter.endEpisode();
     }
-    return this.meter.add(step, impulse);
+    return this.meter.add(step, impulse, spin);
   }
 
   /** 回合结束：收尾当前段 */

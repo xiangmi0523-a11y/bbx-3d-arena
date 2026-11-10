@@ -59,6 +59,20 @@ describe('爆裂系统：应力（纯逻辑）', () => {
     expect(b.add(0, 2)).toEqual([0, 1]);
   });
 
+  it('镜像组合（抗爆参数相同）同一步到阈值：转得更慢的一方爆裂；转速完全相同才同时爆裂', () => {
+    const res = [{ lock: 0.5, burstGuard: 0.5 }, { lock: 0.5, burstGuard: 0.5 }] as [{ lock: number; burstGuard: number }, { lock: number; burstGuard: number }];
+    const a = new BurstMeter(res, 0.1);
+    expect(a.add(0, 2, [0.8, 0.6])).toEqual([]);
+    expect(a.add(1, 0.6, [0.8, 0.6])).toEqual([1]);
+    expect(a.burst).toEqual([1]);
+    expect(a.stress[0]).toBeLessThan(1);
+    expect(a.add(2, 5, [0.8, 0.6])).toEqual([]); // 爆裂后不再累积
+    const b = new BurstMeter(res, 0.1);
+    expect(b.add(0, 3, [0.4, 0.9])).toEqual([0]);
+    const c = new BurstMeter(res, 0.1);
+    expect(c.add(0, 3, [0.7, 0.7])).toEqual([0, 1]);
+  });
+
   it('未标定（k = null）：只观测，永不爆裂', () => {
     const m = new BurstMeter([{ lock: 0.5, burstGuard: 0.35 }, { lock: 0.5, burstGuard: 0.35 }], null);
     expect(m.active).toBe(false);

@@ -21,7 +21,7 @@ describe('回合裁判：四种终结与分值（v2.0 §6.5）', () => {
     expect(MATCH_RULES.roundTimeLimit).toBe(60);
   });
 
-  it('自转终结：停转持续 0.5 s 才确认（与旧规则 stoppedFor > 0.5 s 同一步）', () => {
+  it('自转终结：停转持续超过 0.5 s 才确认（与旧规则 stoppedFor > 0.5 s 同一步）', () => {
     let stopAt = 0;
     const o = run((t) => {
       const stopped = t >= 10;
@@ -29,8 +29,16 @@ describe('回合裁判：四种终结与分值（v2.0 §6.5）', () => {
       return { player: live(), rival: { ...live(stopped ? 1 : 100), stopped } };
     })!;
     expect(o).toMatchObject({ kind: 'win', winner: 'player', loser: 'rival', finish: 'spin', points: 1, cause: 'finish', own: false });
-    // 第 61 个停转步确认（60 个步长 = 0.5 s）
-    expect(Math.round((o.time - stopAt) / DT)).toBe(60);
+    // 旧规则：每个停转步累加一个步长，累计严格大于 0.5 的那一步确认
+    let acc = 0;
+    let k = 0;
+    while (!(acc > 0.5)) {
+      acc += DT;
+      k++;
+    }
+    expect(Math.round((o.time - stopAt) / DT)).toBe(k - 1);
+    // 发起时刻 = 第一个停转步开始时；确认时已持续 k 个步长
+    expect(Math.round((o.time - o.initiatedAt) / DT)).toBe(k);
   });
 
   it('出界 / 极限终结：发起后 0.5 s 内回到战斗区且仍在转 → 视为从未发起', () => {
@@ -49,8 +57,10 @@ describe('回合裁判：四种终结与分值（v2.0 §6.5）', () => {
   it('极限终结：确认后对方得 3 分；发起前 1.5 s 内接触过（不是自灭）', () => {
     const o = run((t) => ({ player: live(), rival: { ...live(), out: t >= 5 ? 'xtreme' : null, backInArena: t < 5, sinceContact: 0.2 } }))!;
     expect(o).toMatchObject({ kind: 'win', winner: 'player', finish: 'xtreme', points: 3, own: false });
-    expect(o.initiatedAt).toBeCloseTo(5, 6);
-    expect(o.time - o.initiatedAt).toBeCloseTo(MATCH_RULES.confirmWindow, 6);
+    // 第一次观测到进袋的是结束于 t = 5 的那一步：发起时刻为该步开始时
+    expect(o.initiatedAt).toBeCloseTo(5 - DT, 6);
+    expect(o.time - o.initiatedAt).toBeGreaterThan(MATCH_RULES.confirmWindow);
+    expect(o.time - o.initiatedAt).toBeLessThan(MATCH_RULES.confirmWindow + 1.5 * DT);
   });
 
   it('自灭：出界前 1.5 s 内没有与对手接触 → 对方只得 1 分', () => {
@@ -66,7 +76,7 @@ describe('回合裁判：四种终结与分值（v2.0 §6.5）', () => {
   it('优先级：停转中又被打进口袋 → 按口袋终结（发起时刻按最早的停转）；口袋中爆裂 → 爆裂', () => {
     const a = run((t) => ({ player: live(), rival: { ...live(1), stopped: t >= 5, out: t >= 5.2 ? 'xtreme' : null, backInArena: t < 5.2, sinceContact: 0.1 } }))!;
     expect(a).toMatchObject({ finish: 'xtreme', points: 3 });
-    expect(a.initiatedAt).toBeCloseTo(5, 6);
+    expect(a.initiatedAt).toBeCloseTo(5 - DT, 6);
     const b = run((t) => ({ player: live(), rival: { ...live(), out: t >= 5 ? 'over' : null, backInArena: t < 5, burst: t >= 5.1, sinceContact: 0 } }))!;
     expect(b).toMatchObject({ finish: 'burst', points: 2 });
   });
@@ -81,11 +91,14 @@ describe('回合裁判：四种终结与分值（v2.0 §6.5）', () => {
   it('超时（60 s）：自转高者胜，自转终结 1 分；转速相同平局', () => {
     const o = run(() => ({ player: live(40), rival: live(55) }))!;
     expect(o).toMatchObject({ kind: 'win', winner: 'rival', finish: 'spin', points: 1, cause: 'timeout' });
-    expect(o.time).toBeCloseTo(60, 6);
+    // 旧规则同样是“时间严格超过上限”的那一步判定
+    expect(o.time).toBeGreaterThan(60);
+    expect(o.time).toBeLessThan(60 + 1.5 * DT);
     const tie = run(() => ({ player: live(50), rival: live(50.2) }))!;
     expect(tie).toMatchObject({ kind: 'draw', cause: 'timeout-tie' });
     const long = run(() => ({ player: live(40), rival: live(55) }), 130, { roundTimeLimit: 120 })!;
-    expect(long.time).toBeCloseTo(120, 6);
+    expect(long.time).toBeGreaterThan(120);
+    expect(long.time).toBeLessThan(120 + 1.5 * DT);
   });
 
   it('倾倒停转记为“失衡倒下”，不是“被击倒”', () => {

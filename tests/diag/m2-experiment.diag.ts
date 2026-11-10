@@ -22,7 +22,7 @@ import { gzipSync } from 'node:zlib';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { test } from 'vitest';
 import golden from '../fixtures/repro-golden.json';
-import { EpisodeTracker } from '../../src/game/battle/burst';
+import { BURST_TUNING, EpisodeTracker } from '../../src/game/battle/burst';
 import { MATCH_RULES, type RoundOutcome } from '../../src/game/battle/match';
 import { BEY_TUNING } from '../../src/game/beys/BeyPhysics';
 import { SIGNATURE_LIST, type SignatureBuild } from '../../src/game/beys/parts/catalog';
@@ -85,7 +85,18 @@ let R: RT;
 const rapier = async () => (R ??= await loadRapier());
 
 // ───────────────────────────── A. golden 变化归因 ─────────────────────────────
-test('A：回合裁判的 golden 变化归因（A1 = 120 s 上限应逐位一致；A2 = 60 s 只影响原时长 > 60 s 的场次）', async () => {
+/** 旧物理（M2 改动前）：轨道冲刺不门控、爆裂不判定 */
+function withOldPhysics<T>(fn: () => T): T {
+  const k = BURST_TUNING.kBurst;
+  BURST_TUNING.kBurst = null;
+  try {
+    return withTune({ railGearOnly: 0 }, fn);
+  } finally {
+    BURST_TUNING.kBurst = k;
+  }
+}
+
+test('A：golden 变化归因（A1 旧物理 + 120 s 应逐位一致；A2 旧物理 + 60 s 只影响原时长 > 60 s；A3 最终参数，可导出新 golden）', async () => {
   if (!parts.has('A')) return;
   await rapier();
   const all = scenariosV2();
@@ -99,15 +110,21 @@ test('A：回合裁判的 golden 变化归因（A1 = 120 s 上限应逐位一致
     out(`M2-A ${label}`, { identical: rep.identical, total: rep.total, missing: rep.missing, diffs: rows.length, unexpected: unexpected.length, rows });
     return rows;
   };
-  const a1 = withRules({ roundTimeLimit: 120 }, () => all.map((sc) => summarize(recordRun(R, sc, { keyframes: false }))));
-  classify('A1(120s)', compareTraces(a1.map(behavior), G.runs.map(behavior)), () => false);
-  const a2 = all.map((sc) => summarize(recordRun(R, sc, { keyframes: false })));
+  const a1 = withOldPhysics(() => withRules({ roundTimeLimit: 120 }, () => all.map((sc) => summarize(recordRun(R, sc, { keyframes: false })))));
+  classify('A1(old,120s)', compareTraces(a1.map(behavior), G.runs.map(behavior)), () => false);
+  const a2 = withOldPhysics(() => all.map((sc) => summarize(recordRun(R, sc, { keyframes: false }))));
   const longOld = (g: TraceSummary) => (g.result?.duration ?? 0) > 60 || g.result === null;
-  const rows = classify('A2(60s)', compareTraces(a2.map(behavior), G.runs.map(behavior)), longOld);
-  const predicted = G.runs.filter((g) => (g.result?.duration ?? 0) > 60).map((g) => g.name);
+  const rows = classify('A2(old,60s)', compareTraces(a2.map(behavior), G.runs.map(behavior)), longOld);
+  const predicted = G.runs.filter((g) => longOld(g)).map((g) => g.name);
   out('M2-A prediction', { predictedChanged: predicted.length, actuallyChanged: rows.length, predictedButSame: predicted.filter((n) => !rows.some((r) => r.name === n)) });
+  // A3：最终参数（R8 齿轮门控 + 已标定的爆裂 + 60 s），相对 A2 的变化全部来自 R8 与爆裂
+  const a3 = all.map((sc) => summarize(recordRun(R, sc, { keyframes: false })));
+  const vsA2 = compareTraces(a3.map(behavior), a2.map(behavior));
+  const finish: Record<string, number> = {};
+  for (const r of a3) finish[r.result?.finish ?? String(r.result?.winner ?? 'none')] = (finish[r.result?.finish ?? String(r.result?.winner ?? 'none')] ?? 0) + 1;
+  out('M2-A A3(final) vs A2', { identical: vsA2.identical, diffs: vsA2.diffs.length, finishes: finish, bursts: a3.filter((r) => r.result?.finish === 'burst').map((r) => r.name) });
   if (process.env.M2_GOLDEN_DUMP) {
-    const byName = [...a2].sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0));
+    const byName = [...a3].sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0));
     const json = JSON.stringify({ generatedFrom: process.env.GITHUB_SHA ?? 'local', config: configFingerprint(R), runs: byName }, null, 1) + '\n';
     const b64 = gzipSync(Buffer.from(json)).toString('base64');
     const W = 3000;
@@ -298,7 +315,7 @@ function outcomeAtK(rec: RoundRec, ki: number | null): Res {
   if (ki === null) return natural();
   const b = rec.burstAt[ki];
   if (!b) return natural();
-  const i0 = n ? Math.round(n.initiatedAt / PHYSICS_DT) - 1 : rec.steps;
+  const i0 = n ? Math.round(n.initiatedAt / PHYSICS_DT) : rec.steps;
   const c0 = n ? Math.round(n.time / PHYSICS_DT) - 1 : rec.steps;
   if (b[0] < i0 || !n) return b[1] === 2 ? { kind: 'draw', loser: null, burstDraw: true } : { kind: 'burst', loser: b[1] as 0 | 1 };
   if (b[0] <= c0 && n.kind === 'win') {
@@ -424,4 +441,52 @@ test('C：签名矩阵（v2.0 签名构筑）终结分布、轨道冲刺与爆�
   }
   mkdirSync('test-results/m2', { recursive: true });
   writeFileSync('test-results/m2/signature-matrix.json', JSON.stringify(report, null, 1));
+}, 1_800_000);
+
+// ───────────────────────────── D. 最终参数实测（爆裂实际触发） ─────────────────────────────
+test('D：最终参数下的签名矩阵实测（爆裂实时判定、镜像同爆按转速裁决）', async () => {
+  if (!parts.has('D')) return;
+  await rapier();
+  const recs: RoundRec[] = [];
+  SIGNATURE_LIST.forEach((p, pi) =>
+    SIGNATURE_LIST.forEach((r, ri) => {
+      for (let i = 0; i < SEEDS; i++) recs.push(signatureRound(p, r, i, 20000 + pi * 1000 + ri * 100 + i));
+    }),
+  );
+  const c: Record<string, number> = {};
+  for (const x of recs) {
+    const k = !x.natural ? 'none' : x.natural.kind === 'draw' ? 'draw' : (x.natural.finish as string);
+    c[k] = (c[k] ?? 0) + 1;
+  }
+  const keys = SIGNATURE_LIST.map((s) => s.key);
+  const per: Record<string, unknown> = {};
+  for (const key of keys) {
+    let decided = 0;
+    let wins = 0;
+    let burstLoss = 0;
+    let n = 0;
+    for (const x of recs) {
+      const side = x.p === key ? 'player' : x.r === key ? 'rival' : null;
+      if (!side || x.p === x.r) continue;
+      n++;
+      const o = x.natural;
+      if (!o || o.kind !== 'win') continue;
+      decided++;
+      if (o.winner === side) wins++;
+      if (o.finish === 'burst' && o.loser === side) burstLoss++;
+    }
+    per[key] = { n, decided, winRate: decided ? r3(wins / decided) : NaN, winCI: wilson(wins, decided), burstLossRate: n ? r3(burstLoss / n) : NaN };
+  }
+  const mirror = recs.filter((x) => x.p === x.r);
+  const dflt = recs.filter((x) => x.p === 'senheng' && x.r === 'pandun');
+  out('M2-D live', {
+    rounds: recs.length,
+    shares: Object.fromEntries(Object.entries(c).map(([k, v]) => [k, r3(v / recs.length)])),
+    burstCI: wilson(c.burst ?? 0, recs.length),
+    perSignature: per,
+    mirrorDraws: mirror.filter((x) => x.natural?.kind === 'draw').length,
+    mirrorRounds: mirror.length,
+    defaultSenhengVsPandun: { n: dflt.length, playerWins: dflt.filter((x) => x.natural?.winner === 'player').length, finishes: dflt.map((x) => x.natural?.finish ?? x.natural?.kind) },
+    durationP50: r3(q(recs.map((x) => x.natural?.time ?? x.steps / 120), 0.5)),
+  });
 }, 1_800_000);
