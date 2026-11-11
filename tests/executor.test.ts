@@ -187,12 +187,12 @@ describe('C0 执行顺序与中间状态读取：新旧路径并排推进，刚�
       if (s === 120 || s === 360) x.A.breakout = 0.7;
     });
     expect(c1.breakoutDrive).toBeGreaterThan(0);
-    // 墙边：磐盾（针尖）在第 10 步被放到外圈、沿切向运动
-    const c2 = lockstep(R, scn('pandun', 'ziyao', 20012), 600, (s, x) => {
-      if (s === 10) {
+    // 墙边：磐盾（针尖）在发射过渡结束后（第 300 / 500 步）被放到外圈、带朝外的速度（意图的墙边保护在发射过渡期不计算）
+    const c2 = lockstep(R, scn('pandun', 'ziyao', 20012), 700, (s, x) => {
+      if (s === 300 || s === 500) {
         const r = 4.1;
         x.A.body.setTranslation({ x: r, y: floorHeight(r) + 0.1, z: 0 }, true);
-        x.A.body.setLinvel({ x: 0.5, y: 0, z: 3 }, true);
+        x.A.body.setLinvel({ x: 1.5, y: 0, z: 2.5 }, true);
       }
     });
     expect(c2.edgeOnly).toBeGreaterThan(0);
