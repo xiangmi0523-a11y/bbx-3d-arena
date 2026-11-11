@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { assembleBey, computeStats, REF_INERTIA } from '../src/game/beys/parts/assemble';
 import { BITS, BLADES, listParts, RATCHETS, sanitizeLoadout, SIGNATURE_LIST, SIGNATURES } from '../src/game/beys/parts/catalog';
-import { migrateSave } from '../src/game/storage/SaveStore';
+import { STARTER_PARTS } from '../src/game/modes/challenge';
+import { DEFAULT_SETTINGS, migrateSave } from '../src/game/storage/SaveStore';
 import params from './fixtures/params-v2.json';
 
 /**
@@ -84,19 +85,42 @@ describe('v2.0 零件数据契约', () => {
   });
 });
 
-describe('存档 v1 → v2 迁移', () => {
-  it('v1 的 disc / tip 槽位迁移为 ratchet / bit，战绩保留', () => {
+describe('存档迁移（v1 → v2 → v3）', () => {
+  const fresh = { parts: [...STARTER_PARTS], arenas: ['standard'], cleared: [], titles: [], settings: DEFAULT_SETTINGS };
+  it('v1 的 disc / tip 槽位迁移为 ratchet / bit，战绩保留；收集按新玩家初始化（6 个初始零件 + 标准竞技场）', () => {
     const v1 = { version: 1, wins: 3, losses: 2, points: 7, lastLoadout: { blade: 'titan-crown', disc: 'ring-guard', tip: 'needle-point' } };
-    expect(migrateSave(v1)).toEqual({ version: 2, wins: 3, losses: 2, points: 7, lastLoadout: { blade: 'titan-crown', ratchet: 'ring-guard', bit: 'needle-point' } });
+    expect(migrateSave(v1)).toEqual({ version: 3, wins: 3, losses: 2, points: 7, lastLoadout: { blade: 'titan-crown', ratchet: 'ring-guard', bit: 'needle-point' }, ...fresh });
   });
 
-  it('v2 原样读取；缺字段 / 坏数据不抛错：认不出的存档返回 null，坏的组装方案为 null，数字字段回退 0', () => {
+  it('v2 → v3；缺字段 / 坏数据不抛错：认不出的存档返回 null，坏的组装方案为 null，数字字段回退 0', () => {
     const v2 = { version: 2, wins: 1, losses: 0, points: 2, lastLoadout: { blade: 'blaze-fang', ratchet: 'tri-lock', bit: 'gear-flat' } };
-    expect(migrateSave(v2)).toEqual(v2);
+    expect(migrateSave(v2)).toEqual({ ...v2, version: 3, ...fresh });
     expect(migrateSave(null)).toBeNull();
     expect(migrateSave('x')).toBeNull();
     expect(migrateSave({ version: 9 })).toBeNull();
-    expect(migrateSave({ version: 1, wins: 'a', lastLoadout: { blade: 'x' } })).toEqual({ version: 2, wins: 0, losses: 0, points: 0, lastLoadout: null });
+    expect(migrateSave({ version: 1, wins: 'a', lastLoadout: { blade: 'x' } })).toEqual({ version: 3, wins: 0, losses: 0, points: 0, lastLoadout: null, ...fresh });
+  });
+
+  it('v3 原样读取并校验：初始零件永远拥有、不认识的零件 / 竞技场 / 关卡丢弃、设置字段逐项回退默认', () => {
+    const v3 = {
+      version: 3,
+      wins: 5,
+      losses: 1,
+      points: 900,
+      lastLoadout: { blade: 'titan-crown', ratchet: 'tri-lock', bit: 'dome-ball' },
+      parts: ['blade:titan-crown', 'bit:nope', 'blade:titan-crown'],
+      arenas: ['velocity', 'moon'],
+      cleared: [2, 1, 1, 99, 1.5],
+      titles: ['持久猎手', 3],
+      settings: { reduceEffects: true, sound: 'no', camera: 'overview', quality: 'high', showFps: false },
+    };
+    const m = migrateSave(v3)!;
+    expect(m.parts).toEqual([...STARTER_PARTS, 'blade:titan-crown']);
+    expect(m.arenas).toEqual(['standard', 'velocity']);
+    expect(m.cleared).toEqual([1, 2]);
+    expect(m.titles).toEqual(['持久猎手']);
+    expect(m.settings).toEqual({ reduceEffects: true, sound: true, camera: 'overview', quality: 'high', showFps: false });
+    expect(m.lastLoadout).toEqual(v3.lastLoadout);
   });
 
   it('迁移后的部件 id 仍由 sanitizeLoadout 校验：不认识的部件单独回退', () => {

@@ -12,5 +12,5 @@ run() {
   echo "::endgroup::"
 }
 
-# D3（同爆裁决改为比较绝对转速）可能改变 golden 中同一步双方爆裂的场次：重跑 golden 归因并导出新 golden（行首 GOLDEN-B64）
-run "golden 归因与导出（M2 A 部分）" env M2_PARTS=A M2_GOLDEN_DUMP=1 npx vitest run --config vitest.diag.config.ts tests/diag/m2-experiment.diag.ts
+# M7 体验分支（v2/s3-experience）：只改界面、存档与挑战逻辑，不涉及物理；物理实验在 v2/s3-balance 分支运行
+echo "M7 分支：没有需要运行的物理诊断"

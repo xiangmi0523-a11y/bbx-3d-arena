@@ -42,6 +42,26 @@ async function shot(page, name) {
   for (let i = 0; i < b64.length; i += W) console.log(`SHOT-B64 ${name} ${i / W} ${b64.slice(i, i + W)}`);
 }
 
+/**
+ * 打完一整场比赛（先到 4 分）：每回合发射 → 快进物理 → 等回合横幅 → 跳过休整。
+ * 按时间预算而不是循环次数：软件渲染（无 GPU）下一帧可能要几百毫秒，阶段切换要等主循环跑到，
+ * 所以每一步都等“阶段变化”，而不是固定等 150 ms。返回是否到达比赛结算。
+ */
+async function playMatch(page, aim = () => 0, budgetMs = 360000) {
+  const t0 = Date.now();
+  while (Date.now() - t0 < budgetMs) {
+    const ph = await page.evaluate(() => window.__game.store.get().phase);
+    if (ph === 'matchEnd') return true;
+    if (ph === 'roundEnd') await page.evaluate(() => window.__game.continueRound());
+    else if (ph === 'aim') {
+      await page.evaluate((a) => window.__game.launch({ power: 0.9, aim: a, tilt: 0 }), aim());
+      await page.evaluate(() => window.__game.debugFastForward(70));
+    }
+    await page.waitForFunction((p) => window.__game.store.get().phase !== p, ph, { timeout: 30000 }).catch(() => {});
+  }
+  return (await page.evaluate(() => window.__game.store.get().phase)) === 'matchEnd';
+}
+
 const browser = await chromium.launch({ args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'] });
 try {
   const context = await browser.newContext({
@@ -65,12 +85,82 @@ try {
   await page.waitForTimeout(800);
   await shot(page, '01-home');
 
-  // ── 陀螺库：四个签名构筑，装备森衡 ──
+  // ── M7 收集：新存档只拥有烈刃与森衡的 6 个零件，磐盾 / 紫曜锁定并给出解锁关卡 ──
   await page.tap('[data-testid=open-library]');
   await page.waitForSelector('[data-testid=library]');
   await page.waitForTimeout(300);
   await shot(page, '02-library');
   check('陀螺库：四个签名构筑卡片', (await page.locator('.sig-card').count()) === 4);
+  check(
+    'M7 收集：新存档磐盾 / 紫曜未解锁（装备按钮禁用、显示解锁关卡），烈刃 / 森衡可装备',
+    (await page.locator('[data-testid=equip-pandun]').isDisabled()) &&
+      (await page.locator('[data-testid=equip-ziyao]').isDisabled()) &&
+      !(await page.locator('[data-testid=equip-lieren]').isDisabled()) &&
+      (await page.locator('[data-testid=lock-pandun]').isVisible()),
+  );
+  check('M7 收集：零件 12 个，其中 6 个未拥有', (await page.locator('.part-chip').count()) === 12 && (await page.locator('.part-chip.locked').count()) === 6);
+  await page.locator('[data-testid=parts-grid]').scrollIntoViewIfNeeded();
+  await shot(page, '02b-library-collection');
+  await page.tap('[data-testid=back]');
+  await page.waitForSelector('[data-testid=home]');
+
+  // ── M7 挑战模式：关卡选择 → 第 1 关战斗准备 → 打完整场 → 结算显示通关判定 ──
+  await page.tap('[data-testid=open-challenge]');
+  await page.waitForSelector('[data-testid=challenge]');
+  await page.waitForTimeout(300);
+  await shot(page, '14-challenge');
+  check('挑战模式：10 关，第 1 关开放，第 2 关锁定', (await page.locator('.level-card').count()) === 10 && !(await page.locator('[data-testid=level-1]').isDisabled()) && (await page.locator('[data-testid=level-2]').isDisabled()));
+  await page.tap('[data-testid=level-1]');
+  await page.waitForSelector('[data-testid=prep]');
+  const cs = await page.evaluate(() => window.__game.store.get().setup);
+  check('挑战第 1 关：对手磐盾 · 新手 · 标准竞技场', cs.mode === 'challenge' && cs.level === 1 && cs.rival === 'pandun' && cs.difficulty === 'rookie' && cs.arena === 'standard', JSON.stringify(cs));
+  check('挑战第 1 关：战斗准备显示通关条件与奖励', await page.locator('[data-testid=prep-goal]').isVisible());
+  await page.waitForTimeout(300);
+  await shot(page, '15-challenge-prep');
+  await page.tap('[data-testid=prep-start]');
+  await page.waitForFunction(() => window.__game.store.get().phase === 'aim');
+  await playMatch(page);
+  const ce = await page.evaluate(() => window.__game.store.get());
+  await page.waitForTimeout(400);
+  await shot(page, '16-challenge-end');
+  const cr = ce.challengeResult;
+  check('挑战结算：给出通关判定（决胜回合 + 条件）', ce.phase === 'matchEnd' && !!cr && cr.level === 1 && (await page.locator('[data-testid=challenge-result]').isVisible()), cr ? `${cr.cleared ? '通关' : '未通关'} · ${cr.detail}` : ce.phase);
+  // 真实比赛的胜负不可预期：没通关时用调试入口按同一条通关路径记录第 1 关，验证解锁与存档
+  if (!cr?.cleared) await page.evaluate(() => window.__game.debugClearChallenge(1));
+  await page.waitForFunction(() => window.__game.store.get().save.cleared.includes(1), null, { timeout: 5000 }).catch(() => {});
+  const sv1 = await page.evaluate(() => window.__game.store.get().save);
+  check('挑战通关：解锁潮汐堡垒、记录通关、积分增加', sv1.cleared.includes(1) && sv1.parts.includes('blade:tidal-bastion') && sv1.points >= 100, JSON.stringify({ cleared: sv1.cleared, points: sv1.points }));
+  await page.tap('[data-testid=me-home]');
+  await page.waitForSelector('[data-testid=home]');
+  await page.tap('[data-testid=open-challenge]');
+  await page.waitForSelector('[data-testid=challenge]');
+  check('挑战模式：通关第 1 关后第 2 关开放', !(await page.locator('[data-testid=level-2]').isDisabled()));
+
+  // 存档持久化：重新载入页面后收集与进度仍在（IndexedDB）
+  await page.reload();
+  await page.waitForFunction(() => window.__game?.store.get().phase === 'title', null, { timeout: 60000 });
+  const sv2 = await page.evaluate(() => window.__game.store.get().save);
+  check('存档 v3：重新载入后通关与解锁仍在', sv2.version === 3 && sv2.cleared.includes(1) && sv2.parts.includes('blade:tidal-bastion'), JSON.stringify({ cleared: sv2.cleared, parts: sv2.parts.length }));
+
+  // ── M7 设置：完整面板，修改后写入存档 ──
+  await page.tap('[data-testid=open-settings]');
+  await page.waitForSelector('[data-testid=settings]');
+  await page.tap('[data-testid=camera-overview]');
+  await page.tap('[data-testid=toggle-fps]');
+  await page.waitForTimeout(300);
+  await shot(page, '17-settings');
+  const st = await page.evaluate(() => window.__game.store.get().save.settings);
+  check('设置：镜头与帧率显示写入存档', st.camera === 'overview' && st.showFps === false, JSON.stringify(st));
+  await page.tap('[data-testid=camera-follow]');
+  await page.tap('[data-testid=toggle-fps]');
+  await page.tap('[data-testid=settings-done]');
+
+  // 以下沿用 M3 / M6 的流程（需要全部零件）：调试入口解锁全部零件与竞技场
+  await page.evaluate(() => window.__game.debugUnlockAll());
+  await page.waitForFunction(() => window.__game.store.get().save.parts.length === 12, null, { timeout: 5000 });
+  await page.tap('[data-testid=open-library]');
+  await page.waitForSelector('[data-testid=library]');
+  await page.waitForTimeout(300);
   await page.tap('[data-testid=equip-senheng]');
   const eq = await page.evaluate(() => window.__game.store.get().loadout);
   check('陀螺库：装备森衡 = 疾风新月 + 六齿棘轮 + 平齿轴', eq.blade === 'gale-crescent' && eq.ratchet === 'hex-lock' && eq.bit === 'gear-flat', JSON.stringify(eq));
@@ -157,6 +247,7 @@ try {
   // ── 开始对战：模式与对手 → 竞技场 → 战斗准备 → 第 1 回合 ──
   await page.tap('[data-testid=start]');
   await page.waitForSelector('[data-testid=mode]');
+  await page.tap('[data-testid=mode-free]');
   await page.tap('[data-testid=rival-pandun]');
   await page.tap('[data-testid=diff-pro]');
   await page.waitForTimeout(300);
@@ -368,25 +459,14 @@ try {
 
   // 快进物理直到本回合判定（无头 Chromium 用软件 GPU，实时跑太慢）
   await page.evaluate(() => window.__game.debugFastForward(70));
-  await page.waitForFunction(() => window.__game.store.get().phase === 'roundEnd', null, { timeout: 15000 }).catch(() => {});
+  await page.waitForFunction(() => window.__game.store.get().phase === 'roundEnd', null, { timeout: 60000 }).catch(() => {});
   const end = await page.evaluate(() => window.__game.store.get());
   await page.waitForTimeout(500);
   await shot(page, '09-round-end');
   check('回合判定：出现回合横幅与比分', end.phase === 'roundEnd' && !!end.lastRound, end.lastRound ? `${end.lastRound.text} · 比分 ${end.match.score.player}:${end.match.score.rival}` : end.phase);
 
   // 打完整场比赛：每回合重新发射 → 快进 → 跳过休整，直到先到 4 分
-  let guard = 0;
-  while (guard++ < 30) {
-    const ph = await page.evaluate(() => window.__game.store.get().phase);
-    if (ph === 'matchEnd') break;
-    if (ph === 'roundEnd') await page.evaluate(() => window.__game.continueRound());
-    else if (ph === 'aim') {
-      await page.evaluate(() => window.__game.launch({ power: 0.9, aim: (Math.random() - 0.5) * 0.8, tilt: 0 }));
-      await page.evaluate(() => window.__game.debugFastForward(70));
-    }
-    await page.waitForTimeout(150);
-  }
-  await page.waitForFunction(() => window.__game.store.get().phase === 'matchEnd', null, { timeout: 15000 }).catch(() => {});
+  await playMatch(page, () => (Math.random() - 0.5) * 0.8);
   const fin = await page.evaluate(() => window.__game.store.get());
   await page.waitForTimeout(500);
   await shot(page, '10-match-end');

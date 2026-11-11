@@ -1,10 +1,25 @@
 import { useMemo, useState } from 'react';
 import { AI_LEVELS, type AiLevel } from '../game/beys/motionIntent';
 import { assembleBey, partMass } from '../game/beys/parts/assemble';
-import { buildName, counterOf, ROLE_INFO, signatureOf, SIGNATURE_LIST, SIGNATURES, type SignatureKey } from '../game/beys/parts/catalog';
-import type { BeyLoadout, BeyRole } from '../game/beys/parts/types';
+import { buildName, counterOf, getPart, listParts, ROLE_INFO, signatureOf, SIGNATURE_LIST, SIGNATURES, type SignatureKey } from '../game/beys/parts/catalog';
+import type { BeyLoadout, BeyRole, PartKind } from '../game/beys/parts/types';
 import { FINISH_POINTS } from '../game/battle/match';
 import type { ArenaId, GameEngine, GameSnapshot, ModeId } from '../game/core/GameEngine';
+import {
+  ALL_PART_KEYS,
+  ARENA_NAME,
+  ARENA_PLAYABLE,
+  arenaUnlockLevel,
+  CHALLENGES,
+  conditionText,
+  levelAvailable,
+  missingParts,
+  ownsLoadout,
+  ownsPart,
+  PART_KIND_NAME,
+  partUnlockLevel,
+  rewardText,
+} from '../game/modes/challenge';
 import { BladeGlyph, hex, ScreenFrame, StatBars, statsOf, TypeBadge } from './common';
 
 /**
@@ -31,6 +46,9 @@ export function HomeScreen({ engine, s }: { engine: GameEngine; s: GameSnapshot 
           <button className="btn primary big" onClick={() => engine.navigate('mode')} data-testid="start">
             开始对战
           </button>
+          <button className="btn wide" onClick={() => engine.navigate('challenge')} data-testid="open-challenge">
+            挑战模式 <small className="btn-sub">{s.save.cleared.length}/{CHALLENGES.length}</small>
+          </button>
           <button className="btn wide" onClick={() => engine.navigate('library')} data-testid="open-library">
             陀螺库
           </button>
@@ -38,8 +56,9 @@ export function HomeScreen({ engine, s }: { engine: GameEngine; s: GameSnapshot 
             组装陀螺
           </button>
         </div>
-        <div className="record">
-          战绩 {s.save.wins} 胜 {s.save.losses} 负 · 积分 {s.save.points} · 零件 12/12 · 竞技场 1/3
+        <div className="record" data-testid="home-record">
+          战绩 {s.save.wins} 胜 {s.save.losses} 负 · 积分 {s.save.points} · 零件 {s.save.parts.length}/{ALL_PART_KEYS.length} · 竞技场 {s.save.arenas.length}/3 · 挑战 {s.save.cleared.length}/{CHALLENGES.length}
+          {s.save.titles.length > 0 && <span className="titles"> · 称号：{s.save.titles.join('、')}</span>}
         </div>
       </div>
       <div className="home-right">
@@ -90,12 +109,13 @@ const ROLE_WEAK: Record<BeyRole, string> = {
 
 export function LibraryScreen({ engine, s }: { engine: GameEngine; s: GameSnapshot }) {
   const [filter, setFilter] = useState<BeyRole | 'all'>('all');
+  const [own, setOwn] = useState<'all' | 'owned' | 'locked'>('all');
   const current = signatureOf(s.loadout)?.key;
   const list = SIGNATURE_LIST.filter((b) => filter === 'all' || b.role === filter);
   return (
     <ScreenFrame
       title="陀螺库"
-      sub="四种战斗定位 · 零件 12/12 · 类型由 Bit 决定"
+      sub={`四种战斗定位 · 零件 ${s.save.parts.length}/${ALL_PART_KEYS.length} · 类型由 Bit 决定`}
       onBack={() => engine.navigate('home')}
       testid="library"
       actions={
@@ -118,8 +138,10 @@ export function LibraryScreen({ engine, s }: { engine: GameEngine; s: GameSnapsh
           const color = hex(b.color);
           const spec = assembleBey(b.loadout);
           const on = current === b.key;
+          const owned = ownsLoadout(s.save, b.loadout);
+          const missing = owned ? [] : missingParts(s.save, b.loadout);
           return (
-            <div key={b.key} className={`sig-card ${on ? 'on' : ''}`} style={{ borderColor: on ? color : undefined }} data-testid={`sig-${b.key}`}>
+            <div key={b.key} className={`sig-card ${on ? 'on' : ''} ${owned ? '' : 'locked'}`} style={{ borderColor: on ? color : undefined }} data-testid={`sig-${b.key}`}>
               <div className="sig-top" style={{ background: `linear-gradient(180deg, ${color}55, transparent)` }}>
                 <BladeGlyph loadout={b.loadout} color={color} size={58} />
                 <div>
@@ -135,12 +157,53 @@ export function LibraryScreen({ engine, s }: { engine: GameEngine; s: GameSnapsh
               <StatBars stats={statsOf(b.loadout)} color={color} />
               <div className="sig-note">{ROLE_STYLE[b.role]}</div>
               <div className="sig-note weak">弱点：{ROLE_WEAK[b.role]}</div>
-              <button className={`btn small ${on ? 'on' : ''}`} onClick={() => engine.equipSignature(b.key)} data-testid={`equip-${b.key}`}>
-                {on ? '已装备' : '装备'}
+              {!owned && (
+                <div className="sig-lock" data-testid={`lock-${b.key}`}>
+                  🔒 {missing.map((m) => `${m.name}（第 ${m.level} 关）`).join(' · ')}
+                </div>
+              )}
+              <button className={`btn small ${on ? 'on' : ''}`} disabled={!owned} onClick={() => engine.equipSignature(b.key)} data-testid={`equip-${b.key}`}>
+                {!owned ? '未解锁' : on ? '已装备' : '装备'}
               </button>
             </div>
           );
         })}
+      </div>
+      <div className="parts-head">
+        <span className="pick-label">零件收藏 {s.save.parts.length}/{ALL_PART_KEYS.length}</span>
+        <div className="filters">
+          {(
+            [
+              ['all', '全部'],
+              ['owned', '已拥有'],
+              ['locked', '未拥有'],
+            ] as const
+          ).map(([k, label]) => (
+            <button key={k} className={`chip-btn ${own === k ? 'on' : ''}`} onClick={() => setOwn(k)} data-testid={`own-${k}`}>
+              {label}
+            </button>
+          ))}
+        </div>
+      </div>
+      <div className="parts-grid" data-testid="parts-grid">
+        {(['blade', 'ratchet', 'bit'] as PartKind[]).flatMap((k) =>
+          listParts(k)
+            .filter((p) => {
+              const has = ownsPart(s.save, k, p.id);
+              return own === 'all' || (own === 'owned' ? has : !has);
+            })
+            .map((p) => {
+              const has = ownsPart(s.save, k, p.id);
+              const lv = partUnlockLevel(k, p.id);
+              return (
+                <div key={`${k}:${p.id}`} className={`part-chip ${has ? '' : 'locked'}`} data-testid={`collect-${p.id}`}>
+                  <span className="part-chip-kind">{PART_KIND_NAME[k]}</span>
+                  <span className="part-chip-name">{getPart(k, p.id).name}</span>
+                  <span className="part-chip-state">{has ? '已拥有' : `🔒 挑战第 ${lv} 关`}</span>
+                </div>
+              );
+            }),
+        )}
       </div>
     </ScreenFrame>
   );
@@ -150,7 +213,7 @@ export function LibraryScreen({ engine, s }: { engine: GameEngine; s: GameSnapsh
 
 const MODES: { key: ModeId; name: string; desc: string; open: boolean }[] = [
   { key: 'free', name: '自由对战', desc: '自选构筑、对手与难度，先到 4 分', open: true },
-  { key: 'challenge', name: '挑战模式', desc: '10 关阶梯，解锁零件与竞技场', open: false },
+  { key: 'challenge', name: '挑战模式', desc: '10 关阶梯，解锁零件与竞技场', open: true },
   { key: 'tournament', name: '锦标赛', desc: '8 人单败淘汰，3 轮晋级', open: false },
   { key: 'survival', name: '生存模式', desc: '连胜挑战，难度递增', open: false },
 ];
@@ -181,12 +244,18 @@ export function ModeScreen({ engine, s }: { engine: GameEngine; s: GameSnapshot 
             key={m.key}
             className={`mode-card ${setup.mode === m.key ? 'on' : ''} ${m.open ? '' : 'locked'}`}
             disabled={!m.open}
-            onClick={() => m.open && engine.setSetup({ mode: m.key })}
+            onClick={() => {
+              if (!m.open) return;
+              if (m.key === 'challenge') engine.navigate('challenge');
+              else engine.setSetup({ mode: m.key });
+            }}
             data-testid={`mode-${m.key}`}
           >
             <div className="mode-name">{m.name}</div>
             <div className="mode-desc">{m.desc}</div>
-            <div className="mode-state">{m.open ? (setup.mode === m.key ? '✓ 已选择' : '可选') : '即将开放'}</div>
+            <div className="mode-state">
+              {!m.open ? '即将开放' : m.key === 'challenge' ? `进入关卡 · 已通关 ${s.save.cleared.length}/${CHALLENGES.length}` : setup.mode === m.key ? '✓ 已选择' : '可选'}
+            </div>
           </button>
         ))}
       </div>
@@ -232,9 +301,17 @@ const ARENAS: { key: ArenaId; name: string; theme: string; rules: string[]; fit:
     fit: '平衡基准：四种类型都能打',
     open: true,
   },
-  { key: 'velocity', name: '极限竞技场', theme: '疾驰环道', rules: ['轨道更宽，冲刺更强', '4 个口袋（2 个极限）'], fit: '偏向攻击 / 平衡', open: false },
-  { key: 'sky', name: '天空竞技场', theme: '苍穹浮岛', rules: ['无轨道，外圈更陡', '口袋更宽，出界风险高'], fit: '偏向耐力 / 防守', open: false },
+  { key: 'velocity', name: ARENA_NAME.velocity, theme: '疾驰环道', rules: ['轨道更宽，冲刺更强', '4 个口袋（2 个极限）'], fit: '偏向攻击 / 平衡', open: ARENA_PLAYABLE.velocity },
+  { key: 'sky', name: ARENA_NAME.sky, theme: '苍穹浮岛', rules: ['无轨道，外圈更陡', '口袋更宽，出界风险高'], fit: '偏向耐力 / 防守', open: ARENA_PLAYABLE.sky },
 ];
+
+/** 竞技场卡片的状态说明：可用 / 已解锁但地图还在制作（v1.1）/ 挑战第 n 关解锁 */
+function arenaState(s: GameSnapshot, a: (typeof ARENAS)[number]): { selectable: boolean; text: string } {
+  const unlocked = s.save.arenas.includes(a.key);
+  if (unlocked && a.open) return { selectable: true, text: a.fit };
+  if (unlocked) return { selectable: false, text: '已解锁 · 地图制作中（v1.1 开放）' };
+  return { selectable: false, text: `🔒 挑战第 ${arenaUnlockLevel(a.key)} 关解锁` };
+}
 
 export function ArenaScreen({ engine, s }: { engine: GameEngine; s: GameSnapshot }) {
   return (
@@ -253,12 +330,14 @@ export function ArenaScreen({ engine, s }: { engine: GameEngine; s: GameSnapshot
       }
     >
       <div className="arena-row">
-        {ARENAS.map((a) => (
+        {ARENAS.map((a) => {
+          const st = arenaState(s, a);
+          return (
           <button
             key={a.key}
-            className={`arena-card ${s.setup.arena === a.key ? 'on' : ''} ${a.open ? '' : 'locked'}`}
-            disabled={!a.open}
-            onClick={() => a.open && engine.setSetup({ arena: a.key })}
+            className={`arena-card ${s.setup.arena === a.key ? 'on' : ''} ${st.selectable ? '' : 'locked'}`}
+            disabled={!st.selectable}
+            onClick={() => st.selectable && engine.setSetup({ arena: a.key })}
             data-testid={`arena-${a.key}`}
           >
             <ArenaGlyph id={a.key} />
@@ -269,9 +348,10 @@ export function ArenaScreen({ engine, s }: { engine: GameEngine; s: GameSnapshot
                 <li key={r}>{r}</li>
               ))}
             </ul>
-            <div className="arena-fit">{a.open ? a.fit : '即将开放'}</div>
+            <div className="arena-fit">{st.text}</div>
           </button>
-        ))}
+          );
+        })}
       </div>
     </ScreenFrame>
   );
@@ -331,11 +411,12 @@ export function PrepScreen({ engine, s }: { engine: GameEngine; s: GameSnapshot 
   const ca = colorOf(me);
   const cb = s.setup.rival === 'random' ? '#9aa6bb' : colorOf(them);
   const random = s.setup.rival === 'random';
+  const level = s.setup.mode === 'challenge' && s.setup.level ? CHALLENGES[s.setup.level - 1] : null;
   return (
     <ScreenFrame
       title="战斗准备"
-      sub={`自由对战 · 标准竞技场 · ${AI_LEVELS[s.setup.difficulty].label} · 先到 4 分`}
-      onBack={() => engine.navigate('arena')}
+      sub={`${level ? `挑战第 ${level.n} 关` : '自由对战'} · ${ARENA_NAME[s.setup.arena]} · ${AI_LEVELS[s.setup.difficulty].label} · 先到 4 分`}
+      onBack={() => engine.navigate(level ? 'challenge' : 'arena')}
       testid="prep"
       actions={
         <>
@@ -367,6 +448,13 @@ export function PrepScreen({ engine, s }: { engine: GameEngine; s: GameSnapshot 
         </div>
         <div className="vs-mid">
           <div className="vs">VS</div>
+          {level && (
+            <div className="vs-goal" data-testid="prep-goal">
+              通关条件：{conditionText(level.condition)}
+              <br />
+              首次通关奖励：{rewardText(level.reward)} · 积分 +{level.points}
+            </div>
+          )}
           <div className="vs-hint">{random ? '对手开赛时随机抽取' : matchupHint(a.role, b.role)}</div>
           <div className="vs-rules">
             自转 {FINISH_POINTS.spin} · 出界 {FINISH_POINTS.over} · 爆裂 {FINISH_POINTS.burst} · 极限 {FINISH_POINTS.xtreme}
@@ -409,4 +497,49 @@ export function PrepScreen({ engine, s }: { engine: GameEngine; s: GameSnapshot 
 /** 对手名（结算等处使用） */
 export function rivalName(key: SignatureKey | 'random', loadout: BeyLoadout): string {
   return key === 'random' ? buildName(loadout) : SIGNATURES[key].name;
+}
+
+// ───────────────────────── 挑战模式：关卡选择（v2.0 §8.2） ─────────────────────────
+
+export function ChallengeScreen({ engine, s }: { engine: GameEngine; s: GameSnapshot }) {
+  const cleared = s.save.cleared;
+  return (
+    <ScreenFrame
+      title="挑战模式"
+      sub={`10 关阶梯 · 已通关 ${cleared.length}/${CHALLENGES.length} · 关卡难度只改变电脑的决策，不改变物理`}
+      onBack={() => engine.navigate('home')}
+      testid="challenge"
+      actions={<div className="pick-summary">首次通关解锁零件、竞技场与称号；可重复挑战已通关的关卡</div>}
+    >
+      <div className="level-grid">
+        {CHALLENGES.map((L) => {
+          const sig = SIGNATURES[L.rival];
+          const color = hex(sig.color);
+          const done = cleared.includes(L.n);
+          const open = levelAvailable(s.save, L.n);
+          return (
+            <button
+              key={L.n}
+              className={`level-card ${done ? 'done' : ''} ${open ? '' : 'locked'}`}
+              disabled={!open}
+              onClick={() => engine.startChallenge(L.n)}
+              data-testid={`level-${L.n}`}
+            >
+              <div className="level-top">
+                <span className="level-n">{L.n}</span>
+                <BladeGlyph loadout={sig.loadout} color={color} size={30} />
+                <span className="level-rival" style={{ color }}>
+                  {sig.name}
+                </span>
+                <small>{AI_LEVELS[L.ai].label}</small>
+              </div>
+              <div className="level-cond">{conditionText(L.condition)}</div>
+              <div className="level-reward">奖励：{rewardText(L.reward)}</div>
+              <div className="level-state">{done ? '✓ 已通关' : open ? '可挑战' : `🔒 通关第 ${L.n - 1} 关后开放`}</div>
+            </button>
+          );
+        })}
+      </div>
+    </ScreenFrame>
+  );
 }

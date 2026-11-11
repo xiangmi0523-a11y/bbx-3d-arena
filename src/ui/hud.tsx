@@ -140,6 +140,7 @@ export function MatchEndScreen({ engine, s }: { engine: GameEngine; s: GameSnaps
   const maxImp = Math.max(0, ...rounds.map((r) => r.stats.maxImpulse));
   const peak = Math.max(0, ...rounds.map((r) => Math.max(r.stats.peakStress.player, r.stats.peakStress.rival)));
   const decisive = [...rounds].reverse().find((r) => r.outcome.kind === 'win');
+  const cr = s.challengeResult;
   return (
     <div className="match-end" data-testid="result">
       <div className={`me-title ${won ? 'win' : 'lose'}`}>{won ? '胜 利！' : '败 北'}</div>
@@ -151,6 +152,22 @@ export function MatchEndScreen({ engine, s }: { engine: GameEngine; s: GameSnaps
         <span style={{ color: hex(s.rival.color) }}>{s.rival.name}</span>
       </div>
       {decisive && <div className="me-reason">{decisive.text}</div>}
+      {cr && (
+        <div className={`me-challenge ${cr.cleared ? 'ok' : 'fail'}`} data-testid="challenge-result">
+          <div>
+            挑战第 {cr.level} 关 · {cr.condition} · {cr.detail}
+          </div>
+          <div>
+            {cr.cleared
+              ? cr.firstClear
+                ? `通关！解锁 ${cr.reward} · 积分 +${cr.points}`
+                : '通关（奖励已在首次通关时领取）'
+              : cr.won
+                ? '获胜，但没有达成通关条件'
+                : '未通关，再试一次'}
+          </div>
+        </div>
+      )}
       <div className="me-rounds">
         {rounds.map((r, i) => (
           <span key={i} className={`me-round ${r.outcome.kind === 'draw' ? 'draw' : r.outcome.winner === 'player' ? 'win' : 'lose'}`} title={r.text}>
@@ -170,8 +187,13 @@ export function MatchEndScreen({ engine, s }: { engine: GameEngine; s: GameSnaps
         <span className="muted"> · 分值：自转 {FINISH_POINTS.spin} / 出界 {FINISH_POINTS.over} / 爆裂 {FINISH_POINTS.burst} / 极限 {FINISH_POINTS.xtreme}</span>
       </div>
       <div className="me-actions">
-        <button className="btn primary" onClick={() => engine.rematch()} data-testid="again">
-          重赛
+        {cr?.next && (
+          <button className="btn primary" onClick={() => engine.nextChallenge()} data-testid="next-level">
+            下一关 ›
+          </button>
+        )}
+        <button className={`btn ${cr?.next ? '' : 'primary'}`} onClick={() => engine.rematch()} data-testid="again">
+          {cr ? (cr.cleared ? '再挑战一次' : '再试一次') : '重赛'}
         </button>
         <button className="btn" onClick={() => engine.openGarage()} data-testid="me-garage">
           换构筑
