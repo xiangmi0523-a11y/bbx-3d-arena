@@ -206,6 +206,8 @@ export class BattleSystem {
     const params = computeLaunch(this.specs[side], side, cmd);
     const level = this.ai[side];
     const bey = new BeyPhysics(this.pw, this.specs[side], level ? { ...params, ai: level } : params);
+    // 只读：执行层按这个主体名从 ContactService 读取上一子步的接地法向力（C0，不参与任何计算）
+    bey.contactOwner = side;
     this.beys[side] = bey;
     // 发射过渡：两台都在场时设定各自的初始倾斜方向（只在第一步之前生效一次）
     const other = this.beys[side === 'player' ? 'rival' : 'player'];
