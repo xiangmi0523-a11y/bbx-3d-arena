@@ -17,6 +17,15 @@ export const PHYSICS_HZ = 120;
 export const PHYSICS_DT = 1 / PHYSICS_HZ;
 export const GRAVITY = -20;
 
+/**
+ * M4 物理尺度实验开关（docs/engineering/m4-experiment-plan.md §4.2 A1；默认 = 现有行为，逐位不变）。构造 PhysicsWorld 时读取：
+ *  - substeps：每个 1/120 s 固定步里的物理子步数 k。每个子步完整执行一次 beforeStep(dt/k) → world.step → 接触事件与观测 → afterStep(dt/k)，
+ *    陀螺、战斗结算、爆裂观测、终结判定都在子步上运行；对外仍是“一次 step() 前进 1/120 s”（实时推进、渲染插值、计时不变）；
+ *  - gravity：重力加速度的大小（默认 20 = −GRAVITY）；
+ *  - floorFriction：场地地面摩擦系数的倍数（createArenaPhysics 读取 PhysicsWorld.floorFriction，默认 1）。
+ */
+export const PHYSICS_EXPERIMENT = { substeps: 1, gravity: -GRAVITY, floorFriction: 1 };
+
 export interface CollisionPair {
   a: number; // collider handle
   b: number;
@@ -43,11 +52,24 @@ export class PhysicsWorld {
    * 在 world.step 之后、afterStep 之前观测一次；只读取窄相位数据，不改变物理（见 ContactService.ts，golden 逐位验证）。
    */
   readonly contacts: ContactService | null;
+  /** 每个 1/120 s 固定步里的物理子步数（PHYSICS_EXPERIMENT.substeps，构造时读取） */
+  readonly substeps: number;
+  /** 每个物理子步的时长 = PHYSICS_DT / substeps（beforeStep / afterStep 收到的 dt） */
+  readonly stepDt: number;
+  /** 重力加速度的大小（PHYSICS_EXPERIMENT.gravity，构造时读取） */
+  readonly g: number;
+  /** 场地地面摩擦系数的倍数（PHYSICS_EXPERIMENT.floorFriction，构造时读取） */
+  readonly floorFriction: number;
 
   constructor(R: Rapier, opts: { observeContacts?: boolean } = {}) {
     this.R = R;
-    this.world = new R.World({ x: 0, y: GRAVITY, z: 0 });
-    this.world.timestep = PHYSICS_DT;
+    const X = PHYSICS_EXPERIMENT;
+    this.substeps = Math.max(1, Math.round(X.substeps));
+    this.stepDt = PHYSICS_DT / this.substeps;
+    this.g = X.gravity;
+    this.floorFriction = X.floorFriction;
+    this.world = new R.World({ x: 0, y: -this.g, z: 0 });
+    this.world.timestep = this.stepDt;
     this.world.integrationParameters.numSolverIterations = 8;
     this.events = new R.EventQueue(true);
     this.contacts = opts.observeContacts !== false ? new ContactService(this.world) : null;
@@ -68,15 +90,19 @@ export class PhysicsWorld {
     return steps;
   }
 
+  /** 前进一个固定步（1/120 s）：依次执行 substeps 个物理子步，每个子步都完整调用 beforeStep / afterStep */
   step(): void {
-    this.beforeStep?.(PHYSICS_DT);
-    this.world.step(this.events);
-    this.startedContacts.length = 0;
-    this.events.drainCollisionEvents((h1, h2, started) => {
-      if (started) this.startedContacts.push({ a: h1, b: h2 });
-    });
-    this.contacts?.observe();
-    this.afterStep?.(PHYSICS_DT);
+    const h = this.stepDt;
+    for (let i = 0; i < this.substeps; i++) {
+      this.beforeStep?.(h);
+      this.world.step(this.events);
+      this.startedContacts.length = 0;
+      this.events.drainCollisionEvents((h1, h2, started) => {
+        if (started) this.startedContacts.push({ a: h1, b: h2 });
+      });
+      this.contacts?.observe();
+      this.afterStep?.(h);
+    }
   }
 
   /**

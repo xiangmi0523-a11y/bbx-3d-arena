@@ -14,7 +14,7 @@ run() {
 
 # M4-A 基准已完成（docs/engineering/m4a-baseline.md，CI 43029289458）；重跑：npx vitest run --config vitest.diag.config.ts tests/diag/m4a-baseline.diag.ts
 # M4-B（docs/engineering/m4-experiment-plan.md §4，预注册）：B1、B2 未通过（m4-results.md）；重跑某个臂：M4B_ARM=B2 npx vitest run --config vitest.diag.config.ts tests/diag/m4b.diag.ts
-# B2 根因探针（只读，不采用任何开关）：Q1–Q3 物理子步对照、接地运动学、平底静稳定（CI 43037223927）、Q4 重力尺度（CI 43038195551）已完成；
-# 本次运行 Q5 量纲一致（g ↑ 且 μ × 20 / g）
-export M4B_PROBE=Q5
-run "M4-B B2 根因探针 Q5" npx vitest run --config vitest.diag.config.ts tests/diag/m4b-probe.diag.ts
+# B2 根因探针（只读）已完成：Q1–Q3（CI 43037223927）、Q4（43038195551）、Q5（43038817940），结果见 m4-results.md。
+# Huang 选择 A 物理尺度路线（m4-experiment-plan.md §4.2）：本次运行 A1 子步耗时 / 一致性 + A2 单台标定网格（预注册）
+run "M4-A1 子步耗时与一致性" npx vitest run --config vitest.diag.config.ts tests/diag/m4a1.diag.ts
+run "M4-A2 单台标定网格" npx vitest run --config vitest.diag.config.ts tests/diag/m4a2.diag.ts

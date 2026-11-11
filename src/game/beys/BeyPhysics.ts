@@ -1,7 +1,7 @@
 import type RAPIER from '@dimforge/rapier3d-compat';
 import { ARENA, floorHeight, floorNormal } from '../arena/arenaSpec';
 import { emptyGyroState, FLAT_TIP, GYRO_EXPERIMENT, gyroRecover, gyroStep, type GyroState } from '../physics/gyro';
-import { GRAVITY, type PhysicsWorld } from '../physics/PhysicsWorld';
+import type { PhysicsWorld } from '../physics/PhysicsWorld';
 import { MotionIntent, type AiLevel } from './motionIntent';
 import { beyMassProps, type MassProps } from './massProps';
 import { REF_INERTIA, type AssembledBey } from './parts/assemble';
@@ -626,7 +626,7 @@ export class BeyPhysics {
       const v = body.linvel();
       const sp = Math.hypot(v.x, v.z);
       if (sp > 1e-3) {
-        const dv = Math.min(sp, (T.rollBase + T.rollFriction * this.spec.bit.friction) * -GRAVITY * dt);
+        const dv = Math.min(sp, (T.rollBase + T.rollFriction * this.spec.bit.friction) * this.pw.g * dt);
         const m = body.mass();
         body.applyImpulse({ x: (-v.x / sp) * dv * m, y: 0, z: (-v.z / sp) * dv * m }, true);
       }

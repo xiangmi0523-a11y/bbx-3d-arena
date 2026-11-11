@@ -6,7 +6,7 @@ import type { AiLevel } from '../beys/motionIntent';
 import { computeLaunch, type Side } from '../launcher/launch';
 import type { LaunchCommand } from '../launcher/PullStringGesture';
 import { BEY_COLLIDER_PARTS, type ContactSubject } from '../physics/ContactService';
-import { PHYSICS_DT, type PhysicsWorld } from '../physics/PhysicsWorld';
+import type { PhysicsWorld } from '../physics/PhysicsWorld';
 import { BURST_TUNING, BurstObserver } from './burst';
 import { CLAW_EXPERIMENT, clawSinPsi, solveStrike, type StrikeBody, type V3 } from './clawStrike';
 import { ContactFeedback, type ContactSample, type ImpactDecision } from './contactFeedback';
@@ -179,7 +179,7 @@ export class BattleSystem {
     this.sampling = opts.contactFeedback !== false;
     this.judgeRound = new RoundJudge(opts.rules);
     const res = (s: AssembledBey) => ({ lock: s.ratchet.lock, burstGuard: s.bit.burstGuard });
-    this.burst = pw.contacts ? new BurstObserver(PHYSICS_DT, [res(specs.player), res(specs.rival)], opts.kBurst === undefined ? BURST_TUNING.kBurst : opts.kBurst) : null;
+    this.burst = pw.contacts ? new BurstObserver(pw.stepDt, [res(specs.player), res(specs.rival)], opts.kBurst === undefined ? BURST_TUNING.kBurst : opts.kBurst) : null;
     // 只读接触观测：告诉 ContactService 哪些碰撞体属于哪一台（只读 beys，不改变任何状态）
     const cs = pw.contacts;
     if (cs) {

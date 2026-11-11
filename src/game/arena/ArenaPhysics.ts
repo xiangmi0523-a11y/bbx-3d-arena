@@ -62,7 +62,7 @@ export function createArenaPhysics(pw: PhysicsWorld, spec: ArenaSpec = ARENA): A
   // 1) 碗形地面
   const mesh = buildFloorMesh(spec, 36, 96);
   const floor = world.createCollider(
-    R.ColliderDesc.trimesh(mesh.vertices, mesh.indices).setFriction(0.5).setRestitution(0.15),
+    R.ColliderDesc.trimesh(mesh.vertices, mesh.indices).setFriction(0.5 * pw.floorFriction).setRestitution(0.15),
     fixed,
   );
   handles.add(floor.handle);

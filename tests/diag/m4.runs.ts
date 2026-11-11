@@ -10,7 +10,7 @@ import { ARENA } from '../../src/game/arena/arenaSpec';
 import { createArenaPhysics, TABLE_Y } from '../../src/game/arena/ArenaPhysics';
 import { FINISH_TUNING } from '../../src/game/battle/BattleSystem';
 import { BeyPhysics } from '../../src/game/beys/BeyPhysics';
-import { assembleBey } from '../../src/game/beys/parts/assemble';
+import { assembleBey, type AssembledBey } from '../../src/game/beys/parts/assemble';
 import { BITS, SIGNATURE_LIST } from '../../src/game/beys/parts/catalog';
 import type { BeyLoadout } from '../../src/game/beys/parts/types';
 import { computeLaunch } from '../../src/game/launcher/launch';
@@ -45,16 +45,27 @@ export interface SoloRec {
   /** 超出倾角首次持续 ≥ 0.25 rad（之后不再回落 0.2 s 以上）到结束的秒数 */
   destabDuration: number | null;
   destabOnsetRatio: number | null;
+  /** M4-A2 G1：转速比例 ≥ 0.3 时“原地滚边”（速度 < 0.3 u/s 且横向角速度 > 0.15 ω_s）最长连续秒数 */
+  rollInPlaceMax: number;
+  /** M4-A2 G4：转速比例 > 0.3 时超出倾角 ≥ 0.25 rad 的最长连续秒数（发射后 1 s 的落地过渡不计） */
+  excursionAbove03: number;
+  /** M4-A2 G2：转速比例 0.3–0.7 段的平均半径（没有这一段为 null） */
+  rMid: number | null;
 }
 
-export function soloRun(R: R, name: string, loadout: BeyLoadout, power: number, seed: number, acc: CurveAcc, maxSeconds = 150): SoloRec {
+export interface SoloOpts {
+  /** 构造陀螺前改写装配结果（例如 M4-A2 的转速尺度：返回副本，不改零件目录） */
+  prep?: (spec: AssembledBey) => AssembledBey;
+}
+
+export function soloRun(R: R, name: string, loadout: BeyLoadout, power: number, seed: number, acc: CurveAcc, maxSeconds = 150, opts: SoloOpts = {}): SoloRec {
   const rnd0 = Math.random;
   Math.random = seeded(seed);
   try {
     const pw = new PhysicsWorld(R, { observeContacts: true });
     createArenaPhysics(pw);
     const floor = findFloor(R, pw.world);
-    const spec = assembleBey(loadout);
+    const spec = opts.prep ? opts.prep(assembleBey(loadout)) : assembleBey(loadout);
     const rnd = seeded(seed * 7 + 13);
     const params = computeLaunch(spec, 'player', { power, aim: (rnd() - 0.5) * 0.8, tilt: 0 });
     const bey = new BeyPhysics(pw, spec, { ...params, seed });
@@ -92,6 +103,25 @@ export function soloRun(R: R, name: string, loadout: BeyLoadout, power: number, 
       for (let i = 0; i <= i0; i++) if (tr.v(0, i, C.ratio) < thr) return r2((i0 - i) * DT);
       return null;
     };
+    // M4-A2 门槛用的逐帧量：原地滚边、比例 > 0.3 时的倾角偏移、中段半径
+    let roll = 0;
+    let rollMax = 0;
+    let exc = 0;
+    let excMax = 0;
+    let rSum = 0;
+    let rN = 0;
+    for (let i = 0; i <= i0; i++) {
+      const rt = tr.v(0, i, C.ratio);
+      const sp = Math.hypot(tr.v(0, i, C.vx), tr.v(0, i, C.vz));
+      roll = rt >= 0.3 && sp < 0.3 && tr.v(0, i, C.wPerp) > 0.15 * tr.v(0, i, C.spin) ? roll + DT : 0;
+      rollMax = Math.max(rollMax, roll);
+      exc = i >= steps(1) && rt > 0.3 && tr.v(0, i, C.tiltN) - base >= 0.25 ? exc + DT : 0;
+      excMax = Math.max(excMax, exc);
+      if (rt >= 0.3 && rt < 0.7) {
+        rSum += Math.hypot(tr.v(0, i, C.x), tr.v(0, i, C.z));
+        rN++;
+      }
+    }
     let maxEx = 0;
     const sp3: number[] = [];
     for (let i = Math.max(0, i0 - steps(3)); i <= i0; i++) {
@@ -149,6 +179,9 @@ export function soloRun(R: R, name: string, loadout: BeyLoadout, power: number, 
       baseTilt: r3(base),
       destabDuration: destab,
       destabOnsetRatio: onsetRatio,
+      rollInPlaceMax: r2(rollMax),
+      excursionAbove03: r2(excMax),
+      rMid: rN ? r2(rSum / rN) : null,
     };
   } finally {
     Math.random = rnd0;
@@ -245,17 +278,17 @@ export const PAIRS: [string, string, string][] = [
 ];
 
 /** M4 单台套件：四个签名构筑 × 三种力度 × 2 种子（seed 90000+…）+ 疾风新月 / 六齿棘轮配四种轴心 × 力度 0.8 × 3（seed 91000+…） */
-export function soloSuite(R: R) {
+export function soloSuite(R: R, opts: SoloOpts = {}) {
   const t0 = Date.now();
   const recs: SoloRec[] = [];
   const curves: Record<string, CurveAcc> = {};
   SIGNATURE_LIST.forEach((sg, si) => {
     POW.forEach((p, pi) => {
-      for (let i = 0; i < 2; i++) recs.push(soloRun(R, sg.key, sg.loadout, p, 90000 + si * 100 + pi * 10 + i, (curves[sg.key] ??= newCurve())));
+      for (let i = 0; i < 2; i++) recs.push(soloRun(R, sg.key, sg.loadout, p, 90000 + si * 100 + pi * 10 + i, (curves[sg.key] ??= newCurve()), 150, opts));
     });
   });
   Object.keys(BITS).forEach((bit, bi) => {
-    for (let i = 0; i < 3; i++) recs.push(soloRun(R, `衡+${bit}`, { blade: 'gale-crescent', ratchet: 'hex-lock', bit }, 0.8, 91000 + bi * 10 + i, (curves[`衡+${bit}`] ??= newCurve())));
+    for (let i = 0; i < 3; i++) recs.push(soloRun(R, `衡+${bit}`, { blade: 'gale-crescent', ratchet: 'hex-lock', bit }, 0.8, 91000 + bi * 10 + i, (curves[`衡+${bit}`] ??= newCurve()), 150, opts));
   });
   const byName: Record<string, Record<string, unknown>> = {};
   for (const name of [...new Set(recs.map((x) => x.name))]) {
@@ -273,6 +306,9 @@ export function soloSuite(R: R) {
       last3MaxExcessP50: r3(median(nums((x) => x.last3MaxExcess))),
       last3SpeedOverMidP50: r3(median(nums((x) => x.last3SpeedOverMid))),
       floorInLast3sShare: r3(g.filter((x) => x.firstFloorBeforeEnd !== null).length / g.length),
+      rollInPlaceMax: r2(Math.max(...g.map((x) => x.rollInPlaceMax))),
+      excursionAbove03Max: r2(Math.max(...g.map((x) => x.excursionAbove03))),
+      rMidP50: r2(median(nums((x) => x.rMid))),
       shape: curveShape(curves[name]),
       bins: curveReport(curves[name]),
     };
