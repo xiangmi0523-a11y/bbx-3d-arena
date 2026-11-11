@@ -42,6 +42,26 @@ async function shot(page, name) {
   for (let i = 0; i < b64.length; i += W) console.log(`SHOT-B64 ${name} ${i / W} ${b64.slice(i, i + W)}`);
 }
 
+/**
+ * 打完一整场比赛（先到 4 分）：每回合发射 → 快进物理 → 等回合横幅 → 跳过休整。
+ * 按时间预算而不是循环次数：软件渲染（无 GPU）下一帧可能要几百毫秒，阶段切换要等主循环跑到，
+ * 所以每一步都等“阶段变化”，而不是固定等 150 ms。返回是否到达比赛结算。
+ */
+async function playMatch(page, aim = () => 0, budgetMs = 360000) {
+  const t0 = Date.now();
+  while (Date.now() - t0 < budgetMs) {
+    const ph = await page.evaluate(() => window.__game.store.get().phase);
+    if (ph === 'matchEnd') return true;
+    if (ph === 'roundEnd') await page.evaluate(() => window.__game.continueRound());
+    else if (ph === 'aim') {
+      await page.evaluate((a) => window.__game.launch({ power: 0.9, aim: a, tilt: 0 }), aim());
+      await page.evaluate(() => window.__game.debugFastForward(70));
+    }
+    await page.waitForFunction((p) => window.__game.store.get().phase !== p, ph, { timeout: 30000 }).catch(() => {});
+  }
+  return (await page.evaluate(() => window.__game.store.get().phase)) === 'matchEnd';
+}
+
 const browser = await chromium.launch({ args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'] });
 try {
   const context = await browser.newContext({
@@ -99,17 +119,7 @@ try {
   await shot(page, '15-challenge-prep');
   await page.tap('[data-testid=prep-start]');
   await page.waitForFunction(() => window.__game.store.get().phase === 'aim');
-  for (let g = 0; g < 40; g++) {
-    const ph = await page.evaluate(() => window.__game.store.get().phase);
-    if (ph === 'matchEnd') break;
-    if (ph === 'roundEnd') await page.evaluate(() => window.__game.continueRound());
-    else if (ph === 'aim') {
-      await page.evaluate(() => window.__game.launch({ power: 0.9, aim: 0, tilt: 0 }));
-      await page.evaluate(() => window.__game.debugFastForward(70));
-    }
-    await page.waitForTimeout(150);
-  }
-  await page.waitForFunction(() => window.__game.store.get().phase === 'matchEnd', null, { timeout: 15000 }).catch(() => {});
+  await playMatch(page);
   const ce = await page.evaluate(() => window.__game.store.get());
   await page.waitForTimeout(400);
   await shot(page, '16-challenge-end');
@@ -449,25 +459,14 @@ try {
 
   // 快进物理直到本回合判定（无头 Chromium 用软件 GPU，实时跑太慢）
   await page.evaluate(() => window.__game.debugFastForward(70));
-  await page.waitForFunction(() => window.__game.store.get().phase === 'roundEnd', null, { timeout: 15000 }).catch(() => {});
+  await page.waitForFunction(() => window.__game.store.get().phase === 'roundEnd', null, { timeout: 60000 }).catch(() => {});
   const end = await page.evaluate(() => window.__game.store.get());
   await page.waitForTimeout(500);
   await shot(page, '09-round-end');
   check('回合判定：出现回合横幅与比分', end.phase === 'roundEnd' && !!end.lastRound, end.lastRound ? `${end.lastRound.text} · 比分 ${end.match.score.player}:${end.match.score.rival}` : end.phase);
 
   // 打完整场比赛：每回合重新发射 → 快进 → 跳过休整，直到先到 4 分
-  let guard = 0;
-  while (guard++ < 30) {
-    const ph = await page.evaluate(() => window.__game.store.get().phase);
-    if (ph === 'matchEnd') break;
-    if (ph === 'roundEnd') await page.evaluate(() => window.__game.continueRound());
-    else if (ph === 'aim') {
-      await page.evaluate(() => window.__game.launch({ power: 0.9, aim: (Math.random() - 0.5) * 0.8, tilt: 0 }));
-      await page.evaluate(() => window.__game.debugFastForward(70));
-    }
-    await page.waitForTimeout(150);
-  }
-  await page.waitForFunction(() => window.__game.store.get().phase === 'matchEnd', null, { timeout: 15000 }).catch(() => {});
+  await playMatch(page, () => (Math.random() - 0.5) * 0.8);
   const fin = await page.evaluate(() => window.__game.store.get());
   await page.waitForTimeout(500);
   await shot(page, '10-match-end');
