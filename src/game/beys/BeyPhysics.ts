@@ -2,6 +2,7 @@ import type RAPIER from '@dimforge/rapier3d-compat';
 import { ARENA, floorHeight } from '../arena/arenaSpec';
 import { GRAVITY, type PhysicsWorld } from '../physics/PhysicsWorld';
 import { MotionIntent, type AiLevel } from './motionIntent';
+import { beyMassProps, type MassProps } from './massProps';
 import { REF_INERTIA, type AssembledBey } from './parts/assemble';
 
 export interface Vec3 {
@@ -30,7 +31,8 @@ export interface LaunchParams {
  * 只做记账：与物理计算并行累加，不参与任何物理量的计算（golden 逐位不变）。
  *  - base / scrape / rail / drive / steer / burst / air：preStep 里游戏层衰减的各个分项（已按惯量比换算，按实际扣除量分摊）；
  *  - smash：刀刃咬合结算的掉速（BattleSystem.resolveSmash → loseSpin）；
- *  - contactLoss / contactGain：两次 preStep 之间 Rapier 积分对转速的改变（接触摩擦、陀螺耦合等），扣除 smash 后按正负分开。
+ *  - claw：重击（D1 方案 A，clawStrike.ts）冲量造成的转速变化（施加前后角速度在转轴上的投影之差，正 = 掉速；只在实验开关打开时非零）；
+ *  - contactLoss / contactGain：两次 preStep 之间 Rapier 积分对转速的改变（接触摩擦、陀螺耦合等），扣除 smash、claw 后按正负分开。
  */
 export interface SpinLedger {
   base: number;
@@ -41,11 +43,12 @@ export interface SpinLedger {
   burst: number;
   air: number;
   smash: number;
+  claw: number;
   contactLoss: number;
   contactGain: number;
 }
 
-export const emptyLedger = (): SpinLedger => ({ base: 0, scrape: 0, rail: 0, drive: 0, steer: 0, burst: 0, air: 0, smash: 0, contactLoss: 0, contactGain: 0 });
+export const emptyLedger = (): SpinLedger => ({ base: 0, scrape: 0, rail: 0, drive: 0, steer: 0, burst: 0, air: 0, smash: 0, claw: 0, contactLoss: 0, contactGain: 0 });
 
 /** 爆裂后剩余部分的额外转速衰减（rad/s²，按参考惯量；只影响回合结束后的表现） */
 const BURST_SPINDOWN = 60;
@@ -219,8 +222,15 @@ export class BeyPhysics {
   /** 上一次 preStep 写回的转速、之后 loseSpin 扣掉的量（账本用） */
   private ledgerWritten = -1;
   private ledgerSmash = 0;
+  private ledgerClaw = 0;
+  /**
+   * 刚体质量属性（解析，与下方创建的碰撞体逐一对应，见 massProps.ts；CI 用 Rapier 的冲量响应核对）。
+   * 只供重击模型的有效质量与能量审计读取，不参与其他物理计算。
+   */
+  readonly massProps: MassProps;
 
   constructor(pw: PhysicsWorld, spec: AssembledBey, launch: LaunchParams) {
+    this.massProps = beyMassProps(spec);
     this.pw = pw;
     this.spec = spec;
     // 战术意图的随机种子：游戏里来自 Math.random（每局不同），测试里由固定种子决定
@@ -256,7 +266,7 @@ export class BeyPhysics {
     const { bit, ratchet, blade, layers } = spec;
     const events = R.ActiveEvents.COLLISION_EVENTS;
 
-    // Bit：接地球 + 轴杆
+    // Bit：接地球 + 轴杆（碰撞体的形状、质量、位置改动时同步修改 massProps.ts；tests/clawPhysics.test.ts 会核对）
     const ball = R.ColliderDesc.ball(bit.contactRadius)
       .setTranslation(0, bit.contactRadius, 0)
       .setMass(bit.mass * 0.6)
@@ -302,6 +312,22 @@ export class BeyPhysics {
   }
 
   /** 陀螺当前的旋转轴（世界坐标） */
+  /** 世界坐标质心：刚体原点 + 转轴 × 质心高度（全部碰撞体同轴叠放，质心在本地 y 轴上） */
+  comWorld(): Vec3 {
+    const p = this.body.translation();
+    const u = this.up();
+    const h = this.massProps.comY;
+    return { x: p.x + u.x * h, y: p.y + u.y * h, z: p.z + u.z * h };
+  }
+
+  /**
+   * 账本：记录一次重击冲量造成的转速变化（loss > 0 = 掉速），并从下一次 preStep 测到的 Rapier 积分变化里扣除（只记账，不改物理）。
+   */
+  recordClaw(loss: number): void {
+    this.ledger.claw += loss;
+    this.ledgerClaw += loss;
+  }
+
   up(): Vec3 {
     const q = this.body.rotation();
     // 把 (0,1,0) 用四元数旋转
@@ -428,11 +454,12 @@ export class BeyPhysics {
     let mag = Math.abs(spinSigned);
     // 账本：上一步写回之后的变化 = Rapier 积分 + 咬合掉速（只记账）
     if (this.ledgerWritten >= 0) {
-      const d = mag - this.ledgerWritten + this.ledgerSmash;
+      const d = mag - this.ledgerWritten + this.ledgerSmash + this.ledgerClaw;
       if (d < 0) this.ledger.contactLoss -= d;
       else this.ledger.contactGain += d;
     }
     this.ledgerSmash = 0;
+    this.ledgerClaw = 0;
     let lScrape = 0;
     let lRail = 0;
     let lDrive = 0;

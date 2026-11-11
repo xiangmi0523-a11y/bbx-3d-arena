@@ -12,5 +12,6 @@ run() {
   echo "::endgroup::"
 }
 
-# D3（同爆裁决改为比较绝对转速）可能改变 golden 中同一步双方爆裂的场次：重跑 golden 归因并导出新 golden（行首 GOLDEN-B64）
-run "golden 归因与导出（M2 A 部分）" env M2_PARTS=A M2_GOLDEN_DUMP=1 npx vitest run --config vitest.diag.config.ts tests/diag/m2-experiment.diag.ts
+# M5b（docs/engineering/m5b-experiment-plan.md）：E-CF / E-A1 / E-A1b 结果见 docs/engineering/m5b-results.md。
+# E-A2 只在选出臂后运行（需要 M4 的 AI 瞄准口袋，见结果文档）；这里运行一次空跑确认脚本可加载（未设 M5B_KAPPA 时立即跳过）
+run "E-A2（未选臂：跳过）" npx vitest run --config vitest.diag.config.ts tests/diag/m5b-claw.diag.ts -t "E-A2"

@@ -8,6 +8,7 @@ import type { LaunchCommand } from '../launcher/PullStringGesture';
 import { BEY_COLLIDER_PARTS, type ContactSubject } from '../physics/ContactService';
 import { PHYSICS_DT, type PhysicsWorld } from '../physics/PhysicsWorld';
 import { BURST_TUNING, BurstObserver } from './burst';
+import { CLAW_EXPERIMENT, clawSinPsi, solveStrike, type StrikeBody, type V3 } from './clawStrike';
 import { ContactFeedback, type ContactSample, type ImpactDecision } from './contactFeedback';
 import { boundingRadius, canSkip, classifyContact, emptyEvidence, queryContact, type ContactClass, type ContactEvidence } from './contactSampling';
 import { impactTier, type ImpactTier } from './impactTiers';
@@ -243,17 +244,22 @@ export class BattleSystem {
     // 接触反馈先于撞击结算读取本步接触（只读：接触流形不受 resolveSmash 施加的冲量影响）
     if (this.sampling) this.contact.step(dt, this.sampleContact(a, b, dt));
 
-    for (const pair of this.pw.startedContacts) {
-      const hitAB =
-        (a.ownsCollider(pair.a) && b.ownsCollider(pair.b)) || (a.ownsCollider(pair.b) && b.ownsCollider(pair.a));
-      if (hitAB && this.time - this.lastHit > SMASH_TUNING.cooldown) {
-        this.lastHit = this.time;
-        const n = this.impacts.length;
-        this.resolveSmash(a, b);
-        if (this.impacts.length > n) {
-          const ev = this.impacts[n];
-          ev.episode = this.contact.state.episode;
-          ev.feedback = this.contact.impact(ev.tier, ev.strength);
+    if (CLAW_EXPERIMENT.enabled > 0) {
+      // 重击模型（D1 方案 A，实验开关）：替换下面的咬合冲量，每个有真实刀刃接触的物理步按刚体碰撞求解
+      this.resolveClaw(a, b);
+    } else {
+      for (const pair of this.pw.startedContacts) {
+        const hitAB =
+          (a.ownsCollider(pair.a) && b.ownsCollider(pair.b)) || (a.ownsCollider(pair.b) && b.ownsCollider(pair.a));
+        if (hitAB && this.time - this.lastHit > SMASH_TUNING.cooldown) {
+          this.lastHit = this.time;
+          const n = this.impacts.length;
+          this.resolveSmash(a, b);
+          if (this.impacts.length > n) {
+            const ev = this.impacts[n];
+            ev.episode = this.contact.state.episode;
+            ev.feedback = this.contact.impact(ev.tier, ev.strength);
+          }
         }
       }
     }
@@ -516,6 +522,128 @@ export class BattleSystem {
       episode: 0,
       feedback: 'play',
     });
+  }
+
+  /**
+   * 重击统计（诊断 / 物理审计，只在 CLAW_EXPERIMENT 打开时累计）：
+   * strikes 施加次数；rejectedEnergy 能量审计拒绝次数（理论上为 0）；maxDv / sumDv 每次重击两方速度变化的较大值（u/s）；
+   * maxRelDke 最大相对动能变化（应 ≤ 0）；momentumResid Rapier 实际施加后两体线动量变化 / 冲量的最大值（浮点误差量级）；
+   * maxSpinLoss 单次重击的最大掉速（rad/s）。
+   */
+  readonly claw = { strikes: 0, rejectedEnergy: 0, maxDv: 0, sumDv: 0, maxRelDke: -Infinity, momentumResid: 0, maxSpinLoss: 0 };
+
+  /**
+   * 重击（D1 方案 A，见 clawStrike.ts 与 docs/engineering/m5b-experiment-plan.md §3）：
+   * 只在两刀刃碰撞体之间有真实接触（法向冲量 > 0 或求解器接触距离 ≤ 0）时求解；接触点取 Rapier 求解器接触点的平均，
+   * 质量 / 惯量 / 质心来自碰撞体（massProps），恢复系数与摩擦与 Rapier 的刀刃材料相同。冲量成对施加在同一点，不设置任何速度。
+   */
+  private resolveClaw(a: BeyPhysics, b: BeyPhysics): void {
+    if (a.bursted || b.bursted) return;
+    const pa = a.body.translation();
+    const pb = b.body.translation();
+    const Ra = a.spec.blade.radius;
+    const Rb = b.spec.blade.radius;
+    if (Math.hypot(pb.x - pa.x, pb.z - pa.z) > Ra + Rb + 0.3) return;
+    let imp = 0;
+    let minDist = Infinity;
+    let px = 0;
+    let py = 0;
+    let pz = 0;
+    let np = 0;
+    this.pw.world.contactPair(a.bladeCollider, b.bladeCollider, (m) => {
+      for (let i = 0, n = m.numContacts(); i < n; i++) imp += m.contactImpulse(i);
+      const point = (m as unknown as { solverContactPoint?: (i: number) => V3 | null }).solverContactPoint;
+      for (let i = 0, n = m.numSolverContacts(); i < n; i++) {
+        minDist = Math.min(minDist, m.solverContactDist(i));
+        const q = point ? point.call(m, i) : null;
+        if (q) {
+          px += q.x;
+          py += q.y;
+          pz += q.z;
+          np++;
+        }
+      }
+    });
+    if (!(imp > 0 || minDist <= 0)) return;
+    const ca = a.comWorld();
+    const cb = b.comWorld();
+    let ux = cb.x - ca.x;
+    let uz = cb.z - ca.z;
+    const ul = Math.hypot(ux, uz);
+    if (ul < 1e-6) return;
+    ux /= ul;
+    uz /= ul;
+    const p: V3 =
+      np > 0
+        ? { x: px / np, y: py / np, z: pz / np }
+        : {
+            x: ca.x + ux * ul * (Ra / (Ra + Rb)),
+            y: (pa.y + a.spec.layers.blade.center + pb.y + b.spec.layers.blade.center) / 2,
+            z: ca.z + uz * ul * (Ra / (Ra + Rb)),
+          };
+    const va = this.preVel.player;
+    const vb = this.preVel.rival;
+    const approach = Math.max(0, (va.x - vb.x) * ux + (va.z - vb.z) * uz);
+    const T = SMASH_TUNING;
+    const eng = { base: T.engageBase, ref: T.engageRef, min: T.engageMin };
+    const K = CLAW_EXPERIMENT.kappa;
+    const body = (x: BeyPhysics, c: V3): StrikeBody => ({ m: x.massProps.mass, c, v: x.body.linvel(), w: x.body.angvel(), up: x.up(), Ia: x.massProps.Ia, It: x.massProps.It });
+    const A = body(a, ca);
+    const B = body(b, cb);
+    const s = solveStrike({
+      A,
+      B,
+      p,
+      sinPsiA: clawSinPsi(K, a.spec.blade.attack, b.spec.blade.defense, approach, eng),
+      sinPsiB: clawSinPsi(K, b.spec.blade.attack, a.spec.blade.defense, approach, eng),
+      e: ((a.spec.blade.restitution + b.spec.blade.restitution) / 2) * 0.4,
+      mu: (a.spec.blade.friction + b.spec.blade.friction) / 2,
+    });
+    if (!s.applied) {
+      if (s.reason === 'energy') this.claw.rejectedEnergy++;
+      return;
+    }
+    const ma = a.body.mass();
+    const mb = b.body.mass();
+    const va0 = a.body.linvel();
+    const vb0 = b.body.linvel();
+    const spinA0 = Math.abs(A.w.x * A.up.x + A.w.y * A.up.y + A.w.z * A.up.z);
+    const spinB0 = Math.abs(B.w.x * B.up.x + B.w.y * B.up.y + B.w.z * B.up.z);
+    b.body.applyImpulseAtPoint(s.J, p, true);
+    a.body.applyImpulseAtPoint({ x: -s.J.x, y: -s.J.y, z: -s.J.z }, p, true);
+    const wa1 = a.body.angvel();
+    const wb1 = b.body.angvel();
+    const va1 = a.body.linvel();
+    const vb1 = b.body.linvel();
+    const lossA = spinA0 - Math.abs(wa1.x * A.up.x + wa1.y * A.up.y + wa1.z * A.up.z);
+    const lossB = spinB0 - Math.abs(wb1.x * B.up.x + wb1.y * B.up.y + wb1.z * B.up.z);
+    a.recordClaw(lossA);
+    b.recordClaw(lossB);
+    const jmag = Math.hypot(s.J.x, s.J.y, s.J.z);
+    const C = this.claw;
+    C.strikes++;
+    const dv = Math.max(jmag / ma, jmag / mb);
+    C.maxDv = Math.max(C.maxDv, dv);
+    C.sumDv += dv;
+    C.maxRelDke = Math.max(C.maxRelDke, s.dke / Math.max(1e-9, s.ke0));
+    C.maxSpinLoss = Math.max(C.maxSpinLoss, lossA, lossB);
+    const dpx = ma * (va1.x - va0.x) + mb * (vb1.x - vb0.x);
+    const dpy = ma * (va1.y - va0.y) + mb * (vb1.y - vb0.y);
+    const dpz = ma * (va1.z - va0.z) + mb * (vb1.z - vb0.z);
+    C.momentumResid = Math.max(C.momentumResid, Math.hypot(dpx, dpy, dpz) / Math.max(1e-9, jmag));
+    // 撞击反馈（只读，与旧模型相同的冷却与分档；不影响物理）
+    const mu = (ma * mb) / (ma + mb);
+    const dvRel = jmag / mu;
+    if (this.time - this.lastHit <= T.cooldown) return;
+    this.lastHit = this.time;
+    if (dvRel < T.minEventDv) {
+      this.grinds++;
+      return;
+    }
+    this.hits++;
+    const strength = Math.min(1, dvRel / T.strengthRef);
+    const tier = impactTier(strength);
+    this.impacts.push({ strength, tier, approach, impulse: jmag, dvRel, x: p.x, y: p.y, z: p.z, nx: s.n.x, nz: s.n.z, episode: this.contact.state.episode, feedback: this.contact.impact(tier, strength) });
   }
 
   /** 一台陀螺本步的终结观测（判定只读这些，阈值见 FINISH_TUNING） */
