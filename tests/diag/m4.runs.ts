@@ -207,6 +207,8 @@ export function runSet(R: R, scs: Scn[], tag: string, examples?: Example[]) {
     let tr: Trace | null = null;
     let floor: RAPIER.Collider | null = null;
     let seen = 0;
+    // 两台之间的身体级法向冲量按物理子步累计成整帧（PHYSICS_EXPERIMENT.substeps = 1 时就是这一步的值，与之前逐位相同）
+    let frameImp = 0;
     return runRound(
       R,
       sc,
@@ -215,10 +217,10 @@ export function runSet(R: R, scs: Scn[], tag: string, examples?: Example[]) {
           tr = new Trace(2, (sc.maxSeconds ?? 61) + 1);
           floor = findFloor(R, ctx.pw.world);
         }
-        const bp = ctx.pw.contacts?.bodyPair('player', 'rival');
         const hit = ctx.b.impacts.length > seen;
         seen = ctx.b.impacts.length;
-        tr.record(ctx.pw.world, [ctx.A, ctx.B], floor!, bp?.normalImpulse ?? 0, hit);
+        tr.record(ctx.pw.world, [ctx.A, ctx.B], floor!, frameImp, hit);
+        frameImp = 0;
       },
       (ctx, rec) => {
         const o = ctx.b.judgeRound.outcome;
@@ -244,6 +246,13 @@ export function runSet(R: R, scs: Scn[], tag: string, examples?: Example[]) {
             series.push([r2((i - i0) * DT), r3(t.v(L, i, C.ratio)), r3(t.v(L, i, C.tiltN) - bl), r2(t.speed(L, i)), r3(t.v(W, i, C.tiltN) - bw), r2(t.speed(W, i)), t.imp[i] > 0 ? 1 : 0, t.has(L, i, FL.floor) ? 1 : 0]);
           examples.push({ name: sc.name, finish: fin.finish, loser: fin.loser === 0 ? rec.p : rec.r, series });
         }
+      },
+      (ctx) => {
+        const after = ctx.pw.afterStep;
+        ctx.pw.afterStep = (dt) => {
+          after?.(dt);
+          frameImp += ctx.pw.contacts?.bodyPair('player', 'rival')?.normalImpulse ?? 0;
+        };
       },
     );
   });

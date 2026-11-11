@@ -161,12 +161,19 @@ export function matrixScenarios(base: number, seeds: number): Scn[] {
   return list;
 }
 
-/** 运行一个回合并记录；onStep 可读取每步状态（只读） */
-export function runRound(R: R, sc: Scn, onStep?: (ctx: ReturnType<typeof setup>) => void, onEnd?: (ctx: ReturnType<typeof setup>, rec: RoundRec) => void): RoundRec {
+/** 运行一个回合并记录；onStep 可读取每步状态（只读）；onSetup 在第一步之前调用（例如给 afterStep 包一层逐子步累计，只读） */
+export function runRound(
+  R: R,
+  sc: Scn,
+  onStep?: (ctx: ReturnType<typeof setup>) => void,
+  onEnd?: (ctx: ReturnType<typeof setup>, rec: RoundRec) => void,
+  onSetup?: (ctx: ReturnType<typeof setup>) => void,
+): RoundRec {
   const orig = Math.random;
   Math.random = seeded(sc.seed);
   try {
     const ctx = setup(R, sc, { observeContacts: true });
+    onSetup?.(ctx);
     const { pw, b, A, B } = ctx;
     const max = Math.round((sc.maxSeconds ?? MATCH_RULES.roundTimeLimit + 1) / PHYSICS_DT);
     const ms = [0, 0];
