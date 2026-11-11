@@ -12,5 +12,6 @@ run() {
   echo "::endgroup::"
 }
 
-# M5b（docs/engineering/m5b-experiment-plan.md）：E-CF / E-A1 结果见 docs/engineering/m5b-results.md；本次运行 E-A1b（κ × R6 口袋 + 重击方向，探索性）
-run "E-A1b 重击 × 口袋筛选" npx vitest run --config vitest.diag.config.ts tests/diag/m5b-claw.diag.ts -t "E-A1b"
+# M5b（docs/engineering/m5b-experiment-plan.md）：E-CF / E-A1 / E-A1b 结果见 docs/engineering/m5b-results.md。
+# E-A2 只在选出臂后运行（需要 M4 的 AI 瞄准口袋，见结果文档）；这里运行一次空跑确认脚本可加载（未设 M5B_KAPPA 时立即跳过）
+run "E-A2（未选臂：跳过）" npx vitest run --config vitest.diag.config.ts tests/diag/m5b-claw.diag.ts -t "E-A2"
