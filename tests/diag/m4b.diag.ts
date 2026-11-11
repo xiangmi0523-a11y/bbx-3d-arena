@@ -25,6 +25,9 @@ interface Arm {
 
 const ARMS: Record<string, Arm> = {
   B1: { gyro: { enabled: 1, pd: 0, tiltDrive: 1 }, requires: ['E1', 'E5'], note: '陀螺项开；自稳 PD 关；牵引方向取实际倾斜、大小乘接地点偏移比例；意图进动调制暂停' },
+  // B1 未通过（m4-results.md）：显式牵引按现有大小公式把陀螺推上外圈贴墙。B2 按计划 §4 去掉显式牵引、平底类轴心用圆角圆柱接地，
+  // 因为 B1 没被采用，这里把 B1 的开关一并写明（独立定义的臂，计划 §4.1）
+  B2: { gyro: { enabled: 1, pd: 0, tiltDrive: 1, flatTip: 1, explicitDrive: 0 }, requires: ['E1', 'E2', 'E3', 'E5'], note: '陀螺项开；自稳 PD 关；显式牵引关（牵引只来自 Rapier 接地摩擦）；平底 / 橡胶轴心圆角圆柱接地；意图进动调制暂停' },
 };
 
 /** M4-A 基准（m4a-baseline.md）：全程不退化项的参照 */

@@ -1,6 +1,6 @@
 import type RAPIER from '@dimforge/rapier3d-compat';
 import { ARENA, floorHeight, floorNormal } from '../arena/arenaSpec';
-import { emptyGyroState, GYRO_EXPERIMENT, gyroRecover, gyroStep, type GyroState } from '../physics/gyro';
+import { emptyGyroState, FLAT_TIP, GYRO_EXPERIMENT, gyroRecover, gyroStep, type GyroState } from '../physics/gyro';
 import { GRAVITY, type PhysicsWorld } from '../physics/PhysicsWorld';
 import { MotionIntent, type AiLevel } from './motionIntent';
 import { beyMassProps, type MassProps } from './massProps';
@@ -235,8 +235,10 @@ export class BeyPhysics {
   private readonly gyroState: GyroState = emptyGyroState();
 
   constructor(pw: PhysicsWorld, spec: AssembledBey, launch: LaunchParams) {
-    this.massProps = beyMassProps(spec);
-    this.massPropsNoBlade = beyMassProps(spec, { withBlade: false });
+    // B2 实验：平底类轴心用圆角圆柱接地（只在构造时读取开关）
+    const flatTip = GYRO_EXPERIMENT.flatTip > 0 && (spec.bit.visual.shape === 'gear-flat' || spec.bit.visual.shape === 'rubber') ? FLAT_TIP : null;
+    this.massProps = beyMassProps(spec, { flatTip });
+    this.massPropsNoBlade = beyMassProps(spec, { withBlade: false, flatTip });
     this.pw = pw;
     this.spec = spec;
     // 战术意图的随机种子：游戏里来自 Math.random（每局不同），测试里由固定种子决定
@@ -273,8 +275,10 @@ export class BeyPhysics {
     const events = R.ActiveEvents.COLLISION_EVENTS;
 
     // Bit：接地球 + 轴杆（碰撞体的形状、质量、位置改动时同步修改 massProps.ts；tests/clawPhysics.test.ts 会核对）
-    const ball = R.ColliderDesc.ball(bit.contactRadius)
-      .setTranslation(0, bit.contactRadius, 0)
+    const tipDesc = flatTip
+      ? R.ColliderDesc.roundCylinder(flatTip.halfHeight, bit.contactRadius - flatTip.border, flatTip.border).setTranslation(0, flatTip.halfHeight + flatTip.border, 0)
+      : R.ColliderDesc.ball(bit.contactRadius).setTranslation(0, bit.contactRadius, 0);
+    const ball = tipDesc
       .setMass(bit.mass * 0.6)
       .setFriction(bit.friction)
       // 摩擦相乘：低摩擦轴心在斜面上打滑、被重力拉回中心；高摩擦轴心抓地、绕场移动
@@ -475,7 +479,7 @@ export class BeyPhysics {
     // 轴心摩擦、牵引、刮地都是“力矩”，转速下降 = 力矩 / 转动惯量：
     // 同样的轴心，惯量大（重量集中在外缘）的陀螺掉速更慢 → 耐力型的优势来自零件本身
     let decay = this.spec.bit.spinDecay;
-    if (this.tilt > 0.5) {
+    if (this.tilt > 0.5 && GYRO_EXPERIMENT.scrape > 0) {
       lScrape = T.scrapeDecay * Math.min(1, (this.tilt - 0.5) * 2);
       decay += T.scrapeDecay * Math.min(1, (this.tilt - 0.5) * 2);
     }
@@ -602,7 +606,7 @@ export class BeyPhysics {
       // 否则针尖会在外圈获得随相位乱转的推力，越转越快（实测耐力型游走从 1 m/s 加速到 6 m/s 沿墙绕）
       const edgeOnly = this.breakout <= 0 && grip < T.driveMinGrip;
       const edgeHelps = !edgeOnly || dx * Math.cos(this.intent.heading) + dz * Math.sin(this.intent.heading) > 0;
-      if (edgeHelps && along < T.driveSpeed * driveGrip * (0.35 + 0.65 * (this.breakout > 0 ? Math.max(ratio, T.breakoutRatio) : ratio))) {
+      if (G.explicitDrive > 0 && edgeHelps && along < T.driveSpeed * driveGrip * (0.35 + 0.65 * (this.breakout > 0 ? Math.max(ratio, T.breakoutRatio) : ratio))) {
         // 脱困（辅助机制）：低转速的球头 / 针尖轴心牵引很弱，停在碗底会一直原地互转。
         // 僵持一段时间后，按“至少 breakoutRatio 的转速、breakoutGrip 的咬合度”给 0.7 秒牵引，方向背离对手；
         // 力的大小仍按轴心牵引公式与速度上限计算，拉开后由碗面重力拉回、真实碰撞

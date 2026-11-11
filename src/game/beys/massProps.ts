@@ -30,14 +30,17 @@ interface Part {
   it: number;
 }
 
-export function beyMassProps(spec: AssembledBey, opts: { withBlade?: boolean } = {}): MassProps {
+export function beyMassProps(spec: AssembledBey, opts: { withBlade?: boolean; flatTip?: { halfHeight: number; border: number } | null } = {}): MassProps {
   const { bit, ratchet, blade, layers } = spec;
   const parts: Part[] = [];
   const cyl = (m: number, hh: number, r: number, y: number) => parts.push({ m, y, ia: (m * r * r) / 2, it: (m * (3 * r * r + 4 * hh * hh)) / 12 });
-  // 接地球
+  // 接地体：球（默认）；B2 的平底类轴心为圆角圆柱，按同尺寸实心圆柱近似（总半径 contactRadius、总半高 halfHeight + border）
   const rb = bit.contactRadius;
   const mb = bit.mass * BIT_BALL_SHARE;
-  parts.push({ m: mb, y: rb, ia: 0.4 * mb * rb * rb, it: 0.4 * mb * rb * rb });
+  if (opts.flatTip) {
+    const hh = opts.flatTip.halfHeight + opts.flatTip.border;
+    cyl(mb, hh, rb, hh);
+  } else parts.push({ m: mb, y: rb, ia: 0.4 * mb * rb * rb, it: 0.4 * mb * rb * rb });
   // 轴杆
   const shaftH = Math.max(0.02, layers.bit.top - rb);
   cyl(bit.mass * (1 - BIT_BALL_SHARE), shaftH / 2, SHAFT_RADIUS, rb + shaftH / 2);

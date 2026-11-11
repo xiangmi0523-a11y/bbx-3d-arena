@@ -24,9 +24,18 @@ export interface V3 {
  *  - enabled：1 = 补上陀螺项（本文件的精确转动）；
  *  - pd：1 = 保留合成自稳 PD（BeyPhysics.preStep 第 3 部分：目标倾角 + 合成进动）；0 = 去掉（B1 起）；
  *  - tiltDrive：1 = 轴心牵引方向取实际转轴相对地面法线的倾斜方向，大小再乘接地点偏移比例 min(1, sin θ_rel / sin drift)；
- *    同时暂停战术意图的进动调制（没有执行器，M4-C 再建）；0 = 现有（合成进动相位）。
+ *    同时暂停战术意图的进动调制（没有执行器，M4-C 再建）；0 = 现有（合成进动相位）；
+ *  - flatTip：1 = 平底类轴心用圆角圆柱接地碰撞体（B2，见 FLAT_TIP），只在构造陀螺时读取；
+ *  - explicitDrive：1 = 保留显式牵引冲量（现有）；0 = 去掉，牵引只来自 Rapier 接地摩擦（B2）；
+ *  - scrape：1 = 保留合成刮地衰减（倾角 > 0.5 rad 的额外掉速，现有）；0 = 去掉，由刀刃 / 棘轮与地面的真实摩擦掉速（B3）。
  */
-export const GYRO_EXPERIMENT = { enabled: 0, pd: 1, tiltDrive: 0 };
+export const GYRO_EXPERIMENT = { enabled: 0, pd: 1, tiltDrive: 0, flatTip: 0, explicitDrive: 1, scrape: 1 };
+
+/**
+ * B2 接地几何：平底类轴心（平齿、橡胶）的接地碰撞体改为圆角圆柱——平底朝下、边缘倒圆，总半径 = contactRadius，
+ * 倾斜后由边缘着地（接地点离转轴约 contactRadius − border），而不是用一个球近似。halfHeight / border 为形状参数（米）。
+ */
+export const FLAT_TIP = { halfHeight: 0.02, border: 0.03 };
 
 /** 一台陀螺的陀螺项状态：上一步的 L̂、Ω_L、λ 与交给 Rapier 的 ω_eff */
 export interface GyroState {

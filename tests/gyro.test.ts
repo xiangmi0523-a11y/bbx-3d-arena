@@ -238,6 +238,6 @@ describe('陀螺项：场地内（T3）', () => {
   }
 
   it('默认关闭：开关是现有行为（与 golden 同一条路径）', () => {
-    expect(GYRO_EXPERIMENT).toEqual({ enabled: 0, pd: 1, tiltDrive: 0 });
+    expect(GYRO_EXPERIMENT).toEqual({ enabled: 0, pd: 1, tiltDrive: 0, flatTip: 0, explicitDrive: 1, scrape: 1 });
   });
 });
