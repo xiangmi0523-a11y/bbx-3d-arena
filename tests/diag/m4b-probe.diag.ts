@@ -8,8 +8,10 @@
  *  Q2 接地运动学（同一批运行，逐子步）：轴心与地面接触点离转轴的距离 d、接触点切向滑移速度、接地占比、
  *     横向角速度相邻子步的相位差（物理章动 ≈ I_a ω_s / I_t′ · dt；每步 ≈ π 说明是逐步来回跳的数值抖动）。
  *  Q3 平底静稳定：不转 / 低速时放在场地中央、倾斜 θ0 静止释放，3 s 后是立回去还是倒下；与几何推算的倾倒角比较。
+ *  Q4 重力尺度（Q1–Q3 之后追加）：B2 开关 + 480 Hz 下把世界重力设为 g ∈ {20, 60, 150}（转速、零件不变），
+ *     看陀螺项与接地摩擦给出的进动、失稳转速、牵引与碗面平衡半径怎样随 g 变化（只诊断，不是候选参数）。
  *
- * 用法：npx vitest run --config vitest.diag.config.ts tests/diag/m4b-probe.diag.ts
+ * 用法：M4B_PROBE=Q1,Q3,Q4 npx vitest run --config vitest.diag.config.ts tests/diag/m4b-probe.diag.ts（省略 = 全部）
  */
 import { test } from 'vitest';
 import { ARENA, floorHeight, floorNormal } from '../../src/game/arena/arenaSpec';
@@ -33,6 +35,8 @@ const B2 = { enabled: 1, pd: 0, tiltDrive: 1, flatTip: 1, explicitDrive: 0 };
 const KEYS = ['lieren', 'senheng', 'ziyao', 'pandun'];
 const RATES = [1, 2, 4];
 const POWER = 0.8;
+const GS = [20, 60, 150];
+const WANT = (process.env.M4B_PROBE ?? 'Q1,Q3,Q4').split(',');
 
 interface Manifold {
   numSolverContacts(): number;
@@ -82,12 +86,13 @@ interface BinAcc {
 }
 const newBin = (): BinAcc => ({ frames: 0, speed: 0, tiltN: 0, wPerp: 0, r: 0, subs: 0, touch: 0, d: [], slip: [], rim: [], phase: [], prec: [] });
 
-/** Q1 / Q2：B2 开关下单台转到停，k = 每个 1/120 s 的物理子步数 */
-function soloProbe(R: R, key: string, seed: number, k: number, maxSeconds = 150) {
+/** Q1 / Q2 / Q4：B2 开关下单台转到停，k = 每个 1/120 s 的物理子步数，g = 世界重力（只改 Rapier 世界的重力） */
+function soloProbe(R: R, key: string, seed: number, k: number, g = -GRAVITY, maxSeconds = 150) {
   const rnd0 = Math.random;
   Math.random = seeded(seed);
   try {
     const pw = new PhysicsWorld(R, { observeContacts: true });
+    if (g !== -GRAVITY) pw.world.gravity = { x: 0, y: -g, z: 0 };
     createArenaPhysics(pw);
     const floor = findFloor(R, pw.world);
     const { spec } = specOf(key);
@@ -111,6 +116,7 @@ function soloProbe(R: R, key: string, seed: number, k: number, maxSeconds = 150)
     let lastFloorFrame = -1;
     let maxTiltLast = 0;
     const tiltHist: number[] = [];
+    const ratioHist: number[] = [];
     const frames = Math.round(maxSeconds / DT);
     let sTouch = 0;
     let sSubs = 0;
@@ -217,6 +223,7 @@ function soloProbe(R: R, key: string, seed: number, k: number, maxSeconds = 150)
         prevAz = az;
       } else prevAz = NaN;
       tiltHist.push(tiltN);
+      ratioHist.push(bey.spinRatio);
       if (floorTouch(pw.world, bey, floor)) lastFloorFrame = f;
       if ((f + 1) % Math.round(0.5 / DT) === 0) {
         series.push([r2((f + 1) * DT), r3(bey.spinRatio), r2(r), r2(speed), r3(tiltN), r2(wPerp), r3(sSubs ? sTouch / sSubs : 0), r3(median(sD)), r2(median(sSlip))]);
@@ -242,6 +249,26 @@ function soloProbe(R: R, key: string, seed: number, k: number, maxSeconds = 150)
     }
     const i0 = endFrame >= 0 ? endFrame : f - 1;
     for (let i = Math.max(0, i0 - Math.round(3 / DT)); i <= i0 && i < tiltHist.length; i++) maxTiltLast = Math.max(maxTiltLast, tiltHist[i]);
+    // 失衡过程（与 m4.runs.ts soloRun 同一口径）：基础倾角 = 转速比例 > 0.6 时倾角中位；结束时超出 ≥ 0.25 rad 才算，
+    // 从结束往回找最后一段回落到 0.25 以下持续 > 0.2 s 的位置作为起点
+    const base = median(tiltHist.filter((_, i) => ratioHist[i] > 0.6));
+    let destab: number | null = null;
+    let onsetRatio: number | null = null;
+    if (i0 < tiltHist.length && tiltHist[i0] - base >= 0.25) {
+      let below = 0;
+      let tStar = 0;
+      for (let i = i0; i >= 0; i--) {
+        if (tiltHist[i] - base < 0.25) {
+          below++;
+          if (below > Math.round(0.2 / DT)) {
+            tStar = i + below;
+            break;
+          }
+        } else below = 0;
+      }
+      destab = r2((i0 - tStar) * DT);
+      onsetRatio = r3(ratioHist[tStar]);
+    }
     pw.dispose();
     const binOut = bins
       .map((b, i) => ({ b, i }))
@@ -267,6 +294,10 @@ function soloProbe(R: R, key: string, seed: number, k: number, maxSeconds = 150)
       key,
       seed,
       hz: Math.round(1 / h),
+      g,
+      baseTilt: r3(base),
+      destab,
+      onsetRatio,
       end,
       endAt: r2((i0 + 1) * DT),
       maxTiltLast3: r3(maxTiltLast),
@@ -313,6 +344,7 @@ function standProbe(R: R, key: string, theta0: number, spin0: number) {
 }
 
 test('M4-B 探针 Q3：平底静稳定（B2 接地几何）', async () => {
+  if (!WANT.includes('Q3')) return;
   const R = await loadRapier();
   withB2(() => {
     for (const key of KEYS)
@@ -324,6 +356,7 @@ test('M4-B 探针 Q3：平底静稳定（B2 接地几何）', async () => {
 
 for (const key of KEYS)
   test(`M4-B 探针 Q1/Q2：${key} 120 / 240 / 480 Hz`, async () => {
+    if (!WANT.includes('Q1')) return;
     const R = await loadRapier();
     const si = SIGNATURE_LIST.findIndex((s) => s.key === key);
     // m4.runs.ts soloSuite 的种子：90000 + si·100 + pi·10 + i（力度 0.8 → pi = 1）
@@ -335,5 +368,32 @@ for (const key of KEYS)
           const res = soloProbe(R, key, seed, k);
           out('M4B-PROBE-Q1', { ...res, ms: Date.now() - t0 });
         }
+    });
+  });
+
+/** 理论量随 g：临界转速比例 ω_c / ω_launch（力度 0.8）与发射时的重力进动角速度 m g l / (I_a ω) */
+function theoryAt(key: string, g: number) {
+  const { spec, mp } = specOf(key);
+  const l = mp.comY - spec.bit.contactRadius;
+  const wc = Math.sqrt(4 * mp.mass * g * l * (mp.It + mp.mass * l * l)) / mp.Ia;
+  const w0 = spec.maxSpin * (0.4 + 0.6 * POWER);
+  return { critRatio: r3(wc / w0), precessionAtLaunch: r3((mp.mass * g * l) / (mp.Ia * w0)), tractionMuG: r2(spec.bit.friction * 0.5 * g) };
+}
+
+for (const key of KEYS)
+  test(`M4-B 探针 Q4：${key} 重力尺度 g = ${GS.join(' / ')}（480 Hz）`, async () => {
+    if (!WANT.includes('Q4')) return;
+    const R = await loadRapier();
+    const si = SIGNATURE_LIST.findIndex((s) => s.key === key);
+    const seeds = [0, 1].map((i) => 90000 + si * 100 + 10 + i);
+    withB2(() => {
+      for (const g of GS) {
+        out('M4B-PROBE-Q4T', { key, g, ...theoryAt(key, g) });
+        for (const seed of seeds) {
+          const t0 = Date.now();
+          const res = soloProbe(R, key, seed, 4, g);
+          out('M4B-PROBE-Q4', { ...res, ms: Date.now() - t0 });
+        }
+      }
     });
   });
