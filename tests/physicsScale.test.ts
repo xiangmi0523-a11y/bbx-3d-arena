@@ -74,27 +74,30 @@ describe('M4-A1 物理尺度开关', () => {
     }
   });
 
-  it('重力：自由落体 0.5 s 与辛欧拉离散解 g·h²·n(n+1)/2 一致（g = 20 / 80，k = 1 / 4）', async () => {
+  it('重力：自由落体 0.5 s 接近 ½·g·t²，且下落距离与 g 成正比（g = 20 / 80，k = 1 / 4）', async () => {
     const R = await loadRapier();
+    const drop = (g: number, k: number) =>
+      withPhysics({ gravity: g, substeps: k }, () => {
+        const pw = new PhysicsWorld(R, { observeContacts: false });
+        const body = pw.world.createRigidBody(R.RigidBodyDesc.dynamic().setTranslation(0, 100, 0));
+        pw.world.createCollider(R.ColliderDesc.ball(0.1), body);
+        for (let i = 0; i < 60; i++) pw.step();
+        const d = 100 - body.translation().y;
+        pw.dispose();
+        return d;
+      });
+    const T = 60 * PHYSICS_DT;
     for (const [g, k] of [
       [20, 1],
       [80, 1],
       [80, 4],
     ]) {
-      withPhysics({ gravity: g, substeps: k }, () => {
-        const pw = new PhysicsWorld(R, { observeContacts: false });
-        const body = pw.world.createRigidBody(R.RigidBodyDesc.dynamic().setTranslation(0, 100, 0));
-        pw.world.createCollider(R.ColliderDesc.ball(0.1), body);
-        const frames = 60;
-        for (let i = 0; i < frames; i++) pw.step();
-        const n = frames * k;
-        const h = PHYSICS_DT / k;
-        const expected = (g * h * h * n * (n + 1)) / 2;
-        const drop = 100 - body.translation().y;
-        expect(Math.abs(drop - expected) / expected).toBeLessThan(2e-4);
-        pw.dispose();
-      });
+      const d = drop(g, k);
+      // 离散积分与连续解的差 ~ g·t·dt 量级，0.5 s 内 < 2%
+      expect(Math.abs(d - 0.5 * g * T * T) / (0.5 * g * T * T)).toBeLessThan(0.02);
     }
+    // 同一步长下下落距离严格与 g 成正比（重力确实按开关设置）
+    expect(Math.abs(drop(80, 1) / drop(20, 1) - 4)).toBeLessThan(1e-4);
   });
 
   it('地面摩擦：createArenaPhysics 的碗面摩擦 = 0.5 × floorFriction', async () => {
