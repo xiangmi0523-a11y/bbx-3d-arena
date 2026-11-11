@@ -51,11 +51,15 @@ export interface SoloRec {
   excursionAbove03: number;
   /** M4-A2 G2：转速比例 0.3–0.7 段的平均半径（没有这一段为 null） */
   rMid: number | null;
+  /** SoloOpts.instrument 的结果（只读记录） */
+  instr?: unknown;
 }
 
 export interface SoloOpts {
   /** 构造陀螺前改写装配结果（例如 M4-A2 的转速尺度：返回副本，不改零件目录） */
   prep?: (spec: AssembledBey) => AssembledBey;
+  /** 只读记录：陀螺创建后调用，返回结束时取结果的函数（例如给 afterStep 包一层逐子步记录） */
+  instrument?: (pw: PhysicsWorld, bey: BeyPhysics, floor: RAPIER.Collider) => () => unknown;
 }
 
 export function soloRun(R: R, name: string, loadout: BeyLoadout, power: number, seed: number, acc: CurveAcc, maxSeconds = 150, opts: SoloOpts = {}): SoloRec {
@@ -70,6 +74,7 @@ export function soloRun(R: R, name: string, loadout: BeyLoadout, power: number, 
     const params = computeLaunch(spec, 'player', { power, aim: (rnd() - 0.5) * 0.8, tilt: 0 });
     const bey = new BeyPhysics(pw, spec, { ...params, seed });
     pw.beforeStep = (dt) => bey.preStep(dt);
+    const finishInstr = opts.instrument?.(pw, bey, floor);
     const tr = new Trace(1, maxSeconds + 1);
     let end = 'limit';
     let endStep = -1;
@@ -182,6 +187,7 @@ export function soloRun(R: R, name: string, loadout: BeyLoadout, power: number, 
       rollInPlaceMax: r2(rollMax),
       excursionAbove03: r2(excMax),
       rMid: rN ? r2(rSum / rN) : null,
+      ...(finishInstr ? { instr: finishInstr() } : {}),
     };
   } finally {
     Math.random = rnd0;

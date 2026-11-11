@@ -1,6 +1,6 @@
 import type RAPIER from '@dimforge/rapier3d-compat';
 import { ARENA, floorHeight, floorNormal } from '../arena/arenaSpec';
-import { emptyGyroState, FLAT_TIP, GYRO_EXPERIMENT, gyroRecover, gyroStep, type GyroState } from '../physics/gyro';
+import { capHullPoints, emptyGyroState, FLAT_TIP, GYRO_EXPERIMENT, gyroRecover, gyroStep, type GyroState } from '../physics/gyro';
 import type { PhysicsWorld } from '../physics/PhysicsWorld';
 import { MotionIntent, type AiLevel } from './motionIntent';
 import { beyMassProps, type MassProps } from './massProps';
@@ -276,7 +276,9 @@ export class BeyPhysics {
 
     // Bit：接地球 + 轴杆（碰撞体的形状、质量、位置改动时同步修改 massProps.ts；tests/clawPhysics.test.ts 会核对）
     const tipDesc = flatTip
-      ? R.ColliderDesc.roundCylinder(flatTip.halfHeight, bit.contactRadius - flatTip.border, flatTip.border).setTranslation(0, flatTip.halfHeight + flatTip.border, 0)
+      ? GYRO_EXPERIMENT.flatTip === 2
+        ? R.ColliderDesc.roundConvexHull(capHullPoints(bit.contactRadius, flatTip), flatTip.capBorder)!
+        : R.ColliderDesc.roundCylinder(flatTip.halfHeight, bit.contactRadius - flatTip.border, flatTip.border).setTranslation(0, flatTip.halfHeight + flatTip.border, 0)
       : R.ColliderDesc.ball(bit.contactRadius).setTranslation(0, bit.contactRadius, 0);
     const ball = tipDesc
       .setMass(bit.mass * 0.6)
