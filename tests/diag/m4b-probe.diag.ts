@@ -10,6 +10,8 @@
  *  Q3 平底静稳定：不转 / 低速时放在场地中央、倾斜 θ0 静止释放，3 s 后是立回去还是倒下；与几何推算的倾倒角比较。
  *  Q4 重力尺度（Q1–Q3 之后追加）：B2 开关 + 480 Hz 下把世界重力设为 g ∈ {20, 60, 150}（转速、零件不变），
  *     看陀螺项与接地摩擦给出的进动、失稳转速、牵引与碗面平衡半径怎样随 g 变化（只诊断，不是候选参数）。
+ *  Q5 量纲一致（Q4 之后追加）：g 提高的同时把地面摩擦系数按 20 / g 缩小（μ·g 不变 → 牵引加速度与接地摩擦掉速不变，
+ *     只改变重力相对摩擦的比例：进动、失稳转速、碗面回中力按 g 变化），记录轨迹看有没有花瓣绕行（只诊断）。
  *
  * 用法：M4B_PROBE=Q1,Q3,Q4 npx vitest run --config vitest.diag.config.ts tests/diag/m4b-probe.diag.ts（省略 = 全部）
  */
@@ -36,6 +38,11 @@ const KEYS = ['lieren', 'senheng', 'ziyao', 'pandun'];
 const RATES = [1, 2, 4];
 const POWER = 0.8;
 const GS = [20, 60, 150];
+/** Q5：[g, 地面摩擦缩放]（地面原摩擦 0.5，与轴心摩擦相乘） */
+const Q5 = [
+  [80, 20 / 80],
+  [150, 20 / 150],
+];
 const WANT = (process.env.M4B_PROBE ?? 'Q1,Q3,Q4').split(',');
 
 interface Manifold {
@@ -87,7 +94,7 @@ interface BinAcc {
 const newBin = (): BinAcc => ({ frames: 0, speed: 0, tiltN: 0, wPerp: 0, r: 0, subs: 0, touch: 0, d: [], slip: [], rim: [], phase: [], prec: [] });
 
 /** Q1 / Q2 / Q4：B2 开关下单台转到停，k = 每个 1/120 s 的物理子步数，g = 世界重力（只改 Rapier 世界的重力） */
-function soloProbe(R: R, key: string, seed: number, k: number, g = -GRAVITY, maxSeconds = 150) {
+function soloProbe(R: R, key: string, seed: number, k: number, g = -GRAVITY, opts: { floorFrictionScale?: number; path?: boolean } = {}, maxSeconds = 150) {
   const rnd0 = Math.random;
   Math.random = seeded(seed);
   try {
@@ -95,6 +102,8 @@ function soloProbe(R: R, key: string, seed: number, k: number, g = -GRAVITY, max
     if (g !== -GRAVITY) pw.world.gravity = { x: 0, y: -g, z: 0 };
     createArenaPhysics(pw);
     const floor = findFloor(R, pw.world);
+    if (opts.floorFrictionScale !== undefined) floor.setFriction(floor.friction() * opts.floorFrictionScale);
+    const path: number[][] = [];
     const { spec } = specOf(key);
     // 与 m4.runs.ts soloRun 相同的发射（同种子 → k = 1 时与 B2 单台套件逐项相同）
     const rnd = seeded(seed * 7 + 13);
@@ -225,6 +234,7 @@ function soloProbe(R: R, key: string, seed: number, k: number, g = -GRAVITY, max
       tiltHist.push(tiltN);
       ratioHist.push(bey.spinRatio);
       if (floorTouch(pw.world, bey, floor)) lastFloorFrame = f;
+      if (opts.path && (f + 1) % Math.round(0.05 / DT) === 0) path.push([r2(p.x), r2(p.z), r3(tiltN), r3(bey.spinRatio)]);
       if ((f + 1) % Math.round(0.5 / DT) === 0) {
         series.push([r2((f + 1) * DT), r3(bey.spinRatio), r2(r), r2(speed), r3(tiltN), r2(wPerp), r3(sSubs ? sTouch / sSubs : 0), r3(median(sD)), r2(median(sSlip))]);
         sTouch = 0;
@@ -304,6 +314,7 @@ function soloProbe(R: R, key: string, seed: number, k: number, g = -GRAVITY, max
       floorBeforeEnd: lastFloorFrame >= 0 ? r2((i0 - lastFloorFrame) * DT) : null,
       bins: binOut,
       series,
+      ...(opts.path ? { path } : {}),
     };
   } finally {
     Math.random = rnd0;
@@ -393,6 +404,24 @@ for (const key of KEYS)
           const t0 = Date.now();
           const res = soloProbe(R, key, seed, 4, g);
           out('M4B-PROBE-Q4', { ...res, ms: Date.now() - t0 });
+        }
+      }
+    });
+  });
+
+for (const key of KEYS)
+  test(`M4-B 探针 Q5：${key} 量纲一致（g ↑、μ × 20 / g，480 Hz）`, async () => {
+    if (!WANT.includes('Q5')) return;
+    const R = await loadRapier();
+    const si = SIGNATURE_LIST.findIndex((s) => s.key === key);
+    const seeds = [0, 1].map((i) => 90000 + si * 100 + 10 + i);
+    withB2(() => {
+      for (const [g, fs] of [[20, 1], ...Q5]) {
+        out('M4B-PROBE-Q5T', { key, g, floorFrictionScale: r3(fs), ...theoryAt(key, g), tractionMuG: r2(specOf(key).spec.bit.friction * 0.5 * fs * g) });
+        for (const seed of seeds) {
+          const t0 = Date.now();
+          const res = soloProbe(R, key, seed, 4, g, { floorFrictionScale: fs, path: true });
+          out('M4B-PROBE-Q5', { ...res, floorFrictionScale: r3(fs), ms: Date.now() - t0 });
         }
       }
     });
