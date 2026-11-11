@@ -92,6 +92,8 @@ function instrument(pw: PhysicsWorld, bey: BeyPhysics, floor: RAPIER.Collider) {
   const mp = bey.massProps;
   const tip = bey.colliders[0];
   const parts = bey.colliders.slice(1);
+  const I = bey.body.principalInertia();
+  const massInfo = { m: r3(mp.mass), Ia: r3(mp.Ia), It: r3(mp.It), comY: r3(mp.comY), rapierMass: r3(bey.body.mass()), rapierPrincipal: [I.x, I.y, I.z].map(r3), rapierComY: r3(bey.body.localCom().y) };
   let prevNet = bey.ledger.contactLoss - bey.ledger.contactGain;
   let n = 0;
   const after = pw.afterStep;
@@ -185,7 +187,8 @@ function instrument(pw: PhysicsWorld, bey: BeyPhysics, floor: RAPIER.Collider) {
     }
   };
   return () => ({
-    mass: { m: r3(mp.mass), Ia: r3(mp.Ia), It: r3(mp.It), comY: r3(mp.comY), rapierMass: r3(bey.body.mass()) },
+    // 结束时世界已经释放，这里只返回记录好的数据（不再访问 Rapier 对象）
+    mass: massInfo,
     bins: bins
       .map((b, i) => ({ b, i }))
       .filter(({ b }) => b.subs > 0)

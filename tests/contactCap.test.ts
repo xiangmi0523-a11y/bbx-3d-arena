@@ -47,20 +47,24 @@ describe('C1 微凸球冠接地', () => {
     expect(maxR + tip.capBorder).toBeCloseTo(a, 5);
   });
 
-  it('Rapier 质量 / 主惯量与 massProps 解析值相差 < 3%', async () => {
+  it('球冠与圆角圆柱的 Rapier 质量、主惯量（排序后逐个比较）相差 < 3%（质量属性沿用同尺寸圆柱的依据）', async () => {
     const R = await loadRapier();
-    Object.assign(GYRO_EXPERIMENT, { flatTip: 2 });
-    FLAT_TIP.capRadius = 0.25;
-    const pw = new PhysicsWorld(R);
-    const spec = assembleBey(lieren.loadout);
-    const bey = new BeyPhysics(pw, spec, { ...computeLaunchLike(), seed: 1 });
-    const I = bey.body.principalInertia();
-    const Ia = I.y;
-    const It = (I.x + I.z) / 2;
-    expect(Math.abs(bey.body.mass() - bey.massProps.mass) / bey.massProps.mass).toBeLessThan(0.03);
-    expect(Math.abs(Ia - bey.massProps.Ia) / bey.massProps.Ia).toBeLessThan(0.03);
-    expect(Math.abs(It - bey.massProps.It) / bey.massProps.It).toBeLessThan(0.03);
-    pw.dispose();
+    const props = (flatTip: number) => {
+      Object.assign(GYRO_EXPERIMENT, { flatTip });
+      FLAT_TIP.border = 0.05;
+      FLAT_TIP.capRadius = 0.25;
+      const pw = new PhysicsWorld(R);
+      const bey = new BeyPhysics(pw, assembleBey(lieren.loadout), { ...computeLaunchLike(), seed: 1 });
+      const I = bey.body.principalInertia();
+      const out = { m: bey.body.mass(), I: [I.x, I.y, I.z].sort((a, b) => a - b), comY: bey.body.localCom().y };
+      pw.dispose();
+      return out;
+    };
+    const cyl = props(1);
+    const cap = props(2);
+    expect(Math.abs(cap.m - cyl.m) / cyl.m).toBeLessThan(0.03);
+    for (let i = 0; i < 3; i++) expect(Math.abs(cap.I[i] - cyl.I[i]) / cyl.I[i]).toBeLessThan(0.03);
+    expect(Math.abs(cap.comY - cyl.comY)).toBeLessThan(0.02);
   });
 
   it('静稳定方向：圆角圆柱倾斜 0.15 rad 立回去，球冠 ρ = 0.25 倒下（不转）', async () => {
