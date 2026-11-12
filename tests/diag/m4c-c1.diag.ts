@@ -340,7 +340,19 @@ function afterStep(t: Track, cs: ContactService | null, sample: string, postLaun
     A.inc('applied');
     const F = s.j / DT;
     const ny = n[1];
-    if (bey.load.valid && nLag === 0) A.inc('applied.Nlag0');
+    if (bey.load.valid && nLag === 0) {
+      A.inc('applied.Nlag0');
+      if (cs) {
+        const id = `${t.side}:bit`;
+        let other = false;
+        for (const p of cs.colliderPairs) {
+          if (p.seenStep !== cs.step || !p.physicalContact) continue;
+          const o = p.a.id === id ? p.b.id : p.b.id === id ? p.a.id : null;
+          if (o && o !== 'arena:floor') other = true;
+        }
+        if (other) A.inc('applied.Nlag0.bitOther');
+      }
+    }
     if (nPost === 0) A.inc('applied.Npost0');
     if (rec) {
       if (bey.load.valid && nLag > 0) {
@@ -471,6 +483,49 @@ function roundSummary(t: Track) {
 const contactAgg = new Map<string, number[]>();
 const pushC = (k: string, v: number) => (contactAgg.get(k) ?? contactAgg.set(k, []).get(k)!).push(v);
 
+/** 连续为真的段：结束时记入段长（步）；回合结束时仍为真的段另记 |open */
+class Episodes {
+  cur = 0;
+  constructor(readonly keys: string[]) {}
+  step(on: boolean) {
+    if (on) this.cur++;
+    else if (this.cur > 0) {
+      for (const k of this.keys) pushC(k, this.cur);
+      this.cur = 0;
+    }
+  }
+  end() {
+    if (this.cur > 0) {
+      for (const k of this.keys) {
+        pushC(k, this.cur);
+        pushC(`${k}|open`, this.cur);
+      }
+      this.cur = 0;
+    }
+  }
+}
+/** 物理接触簇：间隔 ≤ gap 步的接触合并为一簇，簇长 = 最后一次接触 − 第一次接触 + 1（步） */
+class Clusters {
+  start = -1;
+  last = -1;
+  constructor(
+    readonly keys: string[],
+    readonly gap: number,
+  ) {}
+  step(k: number, on: boolean) {
+    if (!on) return;
+    if (this.start >= 0 && k - this.last <= this.gap) this.last = k;
+    else {
+      this.flush();
+      this.start = this.last = k;
+    }
+  }
+  flush() {
+    if (this.start >= 0) for (const k of this.keys) pushC(k, this.last - this.start + 1);
+    this.start = -1;
+  }
+}
+
 test('M4-C C1 预算诊断（只读）', async () => {
   const R = await loadRapier();
   const t0 = Date.now();
@@ -484,6 +539,12 @@ test('M4-C C1 预算诊断（只读）', async () => {
       let B: Track | null = null;
       let roundSteps = 0;
       const matchup = sc.name.split('#')[0];
+      const ks = (suffix: string) => [`S1|${matchup}|${suffix}`, `S1|all|${suffix}`];
+      // 几何贴近（feelSim 的 touching：中心距 < 两刀刃半径和 + 0.03）与僵持（P2.3.1 的定义：两台水平速度都 < 0.8、中心距 < 半径和 + 0.4、转速都 > 10）
+      const touch = new Episodes(ks('touch'));
+      const stall = new Episodes(ks('stall'));
+      const clu10 = new Clusters(ks('clu0.1'), Math.round(0.1 / DT));
+      const clu25 = new Clusters(ks('clu0.25'), Math.round(0.25 / DT));
       const rec = runRound(
         R,
         sc,
@@ -506,6 +567,18 @@ test('M4-C C1 预算诊断（只读）', async () => {
               }
             }
           }
+          {
+            const pa = ctx.A.body.translation();
+            const pb = ctx.B.body.translation();
+            const va = ctx.A.body.linvel();
+            const vb = ctx.B.body.linvel();
+            const dd = Math.hypot(pa.x - pb.x, pa.z - pb.z);
+            const rsum = ctx.A.spec.blade.radius + ctx.B.spec.blade.radius;
+            touch.step(dd < rsum + 0.03);
+            stall.step(Math.hypot(va.x, va.z) < 0.8 && Math.hypot(vb.x, vb.z) < 0.8 && dd < rsum + 0.4 && ctx.A.spin > 10 && ctx.B.spin > 10);
+            clu10.step(roundSteps, bodyContact);
+            clu25.step(roundSteps, bodyContact);
+          }
           for (const [t, bey] of [
             [A!, ctx.A],
             [B!, ctx.B],
@@ -522,7 +595,12 @@ test('M4-C C1 预算诊断（只读）', async () => {
             pushC(`S1|${matchup}`, bp.durationSteps);
             pushC(`S1|all`, bp.durationSteps);
           }
+          touch.end();
+          stall.end();
+          clu10.flush();
+          clu25.flush();
           pushC(`S1|${matchup}|roundSteps`, roundSteps);
+          pushC(`S1|all|roundSteps`, roundSteps);
           for (const t of [A!, B!]) {
             const own = (t.side === 'player' ? rr.sides[0] : rr.sides[1]).won;
             out('MC1-ROUND', { sample: 'S1', scn: sc.name, seed: sc.seed, dur: rr.dur, finish: rr.finish, kind: rr.kind, won: own, ...roundSummary(t) });
