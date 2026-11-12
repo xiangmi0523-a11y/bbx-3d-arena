@@ -117,6 +117,9 @@ class Track {
   step = 0;
   prevSpin: number;
   prevDrive = 0;
+  /** 账本各分项上一步的值与折算成能量的累计 Σ I_a·ω·Δω_分项（ω 取该步扣除前的转速） */
+  readonly prevLedger: Record<string, number> = {};
+  readonly eLedger: Record<string, number> = {};
   // 一阶投影：ω′（牵引按功率形式 η = 1），ω″（牵引 + 姿态）
   wP: number;
   wPP: number;
@@ -217,6 +220,12 @@ function afterStep(t: Track, cs: ContactService | null, sample: string, postLaun
   const g = bey.pw.g;
 
   // ── 投影与能量（发射过渡也计入，只排除爆裂后）──
+  for (const kk of LEDGER_KEYS) {
+    const cur = bey.ledger[kk];
+    const d = cur - (t.prevLedger[kk] ?? 0);
+    if (d !== 0) t.eLedger[kk] = (t.eLedger[kk] ?? 0) + t.Ia * Math.max(0, t.prevSpin) * d;
+    t.prevLedger[kk] = cur;
+  }
   const dDrive = bey.ledger.drive - t.prevDrive;
   const dw = spin - t.prevSpin;
   t.prevDrive = bey.ledger.drive;
@@ -435,6 +444,7 @@ function roundSummary(t: Track) {
     wEnd: r4(t.bey.spin),
     E0: r4(0.5 * t.Ia * t.w0 * t.w0),
     ledger: led,
+    eLedger: Object.fromEntries(Object.entries(t.eLedger).map(([kk, v]) => [kk, Math.round(v * 1000) / 1000])),
     WtrPos: r4(e.WtrPos),
     WtrNeg: r4(e.WtrNeg),
     dwP: r4(e.dwP),
