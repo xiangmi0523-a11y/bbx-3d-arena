@@ -17,5 +17,7 @@ run() {
 # B2 根因探针（只读）已完成：Q1–Q3（CI 43037223927）、Q4（43038195551）、Q5（43038817940），结果见 m4-results.md。
 # Huang 选择 A 物理尺度路线（m4-experiment-plan.md §4.2）：A1 耗时 / 一致性与 A2 单台标定网格已完成（CI 43046986070，12 组都未通过，见 m4-results.md）
 # 最后一轮定向实验（m4-final-round-plan.md）已完成并触发停止条件（m4-results.md）。
-# M4-C（Huang 2026-11-12 授权 C0 + 扩充版 C1）：C0 同机耗时对比（执行层 vs 旧路径）
-run "M4-C C0 耗时对比" npx vitest run --config vitest.diag.config.ts tests/diag/m4c0.diag.ts
+# M4-C（Huang 2026-11-12 授权 C0 + 扩充版 C1）：C0 已通过验收（m4c-c0-acceptance.md；同机耗时对比 CI 43118644656，重跑：
+#   npx vitest run --config vitest.diag.config.ts tests/diag/m4c0.diag.ts）
+# C1 预算诊断（只读，m4c-c1-plan.md）：签名矩阵筛选集 320 回合 + 单台套件 36 台，输出行首 MC1-
+run "M4-C C1 预算诊断" npx vitest run --config vitest.diag.config.ts tests/diag/m4c-c1.diag.ts

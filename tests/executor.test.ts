@@ -7,7 +7,7 @@ import { configSnapshot } from './repro/config';
 import { rapier, recordRun } from './repro/recorder';
 import { withDeterminism } from './repro/determinism';
 import { BEY_TUNING, BeyPhysics } from '../src/game/beys/BeyPhysics';
-import { EXECUTOR_SWITCH, EXECUTOR_TUNING, newExecFrame, readTipLoad, newLoadSample, stepPosture, stepTraction, type ExecutorHost, type ExecFrame } from '../src/game/beys/motionExecutor';
+import { EXECUTOR_PROBE, EXECUTOR_SWITCH, EXECUTOR_TUNING, newExecFrame, readTipLoad, newLoadSample, stepPosture, stepTraction, type ExecutorHost, type ExecutorProbe, type ExecFrame } from '../src/game/beys/motionExecutor';
 import { assembleBey } from '../src/game/beys/parts/assemble';
 import { SIGNATURE_LIST } from '../src/game/beys/parts/catalog';
 import { createArenaPhysics } from '../src/game/arena/ArenaPhysics';
@@ -112,7 +112,14 @@ interface Cover {
  * 两个相同的世界并排推进：A 走执行层、B 走旧路径。每个物理步把两边刚体上的全部读写调用（含参数与返回值）按顺序记录，
  * 逐步比较哈希；最后比较完整状态。perturb 在两边同一步做同样的测试摆放（只用于强制进入某个分支）。
  */
-function lockstep(R: R, sc: Scn, frames: number, perturb?: (step: number, b: ReturnType<typeof setup>) => void): Cover {
+function lockstep(
+  R: R,
+  sc: Scn,
+  frames: number,
+  perturb?: (step: number, b: ReturnType<typeof setup>) => void,
+  /** C1：只在 A 的物理步期间安装的只读探针；afterA 在 A 这一步结束后拿到 A 的调用记录（用于核对探针报告的冲量） */
+  probe?: { make: (A: ReturnType<typeof setup>) => ExecutorProbe; afterA: (log: string[]) => void },
+): Cover {
   const mk = () => withDeterminism(sc.seed, () => setup(R, sc, { observeContacts: true })).value;
   const A = mk();
   const B = mk();
@@ -124,12 +131,21 @@ function lockstep(R: R, sc: Scn, frames: number, perturb?: (step: number, b: Ret
   tap(B.B, 'r', logB);
   const cover: Cover = { dash: 0, breakoutDrive: 0, edgeOnly: 0, pdSat: 0, pdTail: 0, pdOff: 0, scrape: 0 };
   const T = BEY_TUNING;
+  let pa: ExecutorProbe | undefined;
   for (let s = 0; s < frames && !A.b.result && !B.b.result; s++) {
     perturb?.(s, A);
     perturb?.(s, B);
     logA.length = 0;
     logB.length = 0;
-    withSwitch(0, () => A.pw.step());
+    if (probe) {
+      EXECUTOR_PROBE.on = pa ??= probe.make(A);
+      try {
+        withSwitch(0, () => A.pw.step());
+      } finally {
+        EXECUTOR_PROBE.on = null;
+      }
+      probe.afterA(logA);
+    } else withSwitch(0, () => A.pw.step());
     withSwitch(1, () => B.pw.step());
     const ha = fnv(logA.join('\n'));
     const hb = fnv(logB.join('\n'));
@@ -215,6 +231,113 @@ describe('C0 执行顺序与中间状态读取：新旧路径并排推进，刚�
     const on = lockstep(R, scn('ziyao', 'pandun', 20023, 60), Math.round(60 / PHYSICS_DT));
     expect(on.scrape + off.scrape).toBeGreaterThan(0);
   }, 300000);
+});
+
+// ───────────────────────── C1 只读探针 ─────────────────────────
+
+/**
+ * 记录型探针：把探针报告的每一次冲量按刚体实际调用的格式写成期望记录，并读取全部字段（模拟诊断脚本的读取）。
+ * A 每一步结束后核对：期望记录全部出现在 A 的刚体调用记录里（参数逐位相同）。
+ */
+function checkingProbe(seen: Record<string, number>) {
+  const want: string[] = [];
+  let sink = 0;
+  return {
+    make: (A: ReturnType<typeof setup>): ExecutorProbe => {
+      const tag = (h: ExecutorHost) => (h === A.A ? 'p' : h === A.B ? 'r' : '?');
+      const imp = (h: ExecutorHost, x: number, z: number) => want.push(`${tag(h)}.applyImpulse(${JSON.stringify([{ x, y: 0, z }, true])})=null`);
+      return {
+        rail(h, dx, dz, accel, m, dt, vx, vz) {
+          seen.rail++;
+          sink += vx + vz;
+          imp(h, dx * accel * m * dt, dz * accel * m * dt);
+        },
+        traction(h, t) {
+          seen.traction++;
+          if (t.eligible) seen.eligible++;
+          sink += t.mag + t.ratio + t.vx + t.vz + t.along + t.cap + t.driveGrip + t.driveScale + t.steering + h.load.N;
+          if (t.applied) {
+            seen.applied++;
+            imp(h, t.dx * t.j, t.dz * t.j);
+          }
+        },
+        rolling(h, vx, vz, sp, dv, m) {
+          seen.rolling++;
+          imp(h, (-vx / sp) * dv * m, (-vz / sp) * dv * m);
+        },
+        posture(h, f, s, lean, px0, py0, pz0) {
+          seen.posture++;
+          if (s > 0) seen.pd++;
+          sink += f.px + f.py + f.pz + px0 + py0 + pz0 + (Number.isFinite(lean) ? lean : 0) + h.tilt;
+        },
+      };
+    },
+    afterA: (log: string[]) => {
+      const have = new Set(log);
+      for (const w of want) if (!have.has(w)) throw new Error(`探针报告的冲量不在刚体调用记录里：${w}`);
+      seen.checked += want.length;
+      want.length = 0;
+      if (!Number.isFinite(sink)) sink = 0;
+    },
+  };
+}
+
+describe('C1 只读探针（零行为变化）', () => {
+  it('探针开启的执行层与旧路径并排推进：刚体调用序列逐位相同；探针报告的每个冲量与实际 applyImpulse 参数逐位相同', async () => {
+    const R = await rapier();
+    const seen: Record<string, number> = { rail: 0, traction: 0, eligible: 0, applied: 0, rolling: 0, posture: 0, pd: 0, checked: 0 };
+    for (const [p, r, seed] of [
+      ['lieren', 'ziyao', 20101],
+      ['ziyao', 'ziyao', 20103],
+    ] as const) lockstep(R, scn(p, r, seed, 40), Math.round(40 / PHYSICS_DT), undefined, checkingProbe(seen));
+    // 轨道冲刺与墙边借用（同 C0 强制分支的摆放）
+    lockstep(R, scn('senheng', 'pandun', 20113), 400, (s, x) => {
+      if (s === 10) {
+        const r = 4.9;
+        x.A.body.setTranslation({ x: r, y: floorHeight(Math.min(r, 5.4)) + 0.1, z: 0 }, true);
+        x.A.body.setLinvel({ x: 0, y: 0, z: 4 }, true);
+      }
+    }, checkingProbe(seen));
+    lockstep(R, scn('pandun', 'ziyao', 20112), 700, (s, x) => {
+      if (s === 300 || s === 500) {
+        const r = 4.1;
+        x.A.body.setTranslation({ x: r, y: floorHeight(r) + 0.1, z: 0 }, true);
+        x.A.body.setLinvel({ x: 1.5, y: 0, z: 2.5 }, true);
+      }
+    }, checkingProbe(seen));
+    expect(EXECUTOR_PROBE.on).toBeNull();
+    for (const k of ['rail', 'eligible', 'applied', 'rolling', 'pd', 'checked']) expect(seen[k], k).toBeGreaterThan(0);
+    // 每台每步各调用一次牵引与姿态探针
+    expect(seen.traction).toBe(seen.posture);
+  }, 300000);
+
+  it(`探针开启时与 golden 逐场一致（${process.env.REPRO_FULL ? '全部 180 场' : '每组第一场'}）`, async () => {
+    const R = await rapier();
+    const all = scenariosV2();
+    const list = process.env.REPRO_FULL ? all : all.filter((s, i) => all.findIndex((x) => x.group === s.group) === i);
+    const seen: Record<string, number> = { rail: 0, traction: 0, eligible: 0, applied: 0, rolling: 0, posture: 0, pd: 0, checked: 0 };
+    let sink = 0;
+    const probe: ExecutorProbe = {
+      rail: (_h, dx, dz, accel, m, dt, vx, vz) => void (seen.rail++, (sink += dx + dz + accel + m + dt + vx + vz)),
+      traction: (h, t) => void (seen.traction++, (sink += t.j + t.along + t.cap + h.load.N)),
+      rolling: (_h, vx, vz, sp, dv, m) => void (seen.rolling++, (sink += vx + vz + sp + dv + m)),
+      posture: (_h, f, s, _lean, px0, py0, pz0) => void (seen.posture++, (sink += f.px + s + px0 + py0 + pz0)),
+    };
+    EXECUTOR_PROBE.on = probe;
+    let runs: TraceSummary[];
+    try {
+      runs = list.map((sc) => summarize(recordRun(R, sc, { keyframes: false })));
+    } finally {
+      EXECUTOR_PROBE.on = null;
+    }
+    const want = G.runs.filter((g) => list.some((s) => s.name === g.name));
+    const rep = compareTraces(runs.map(behavior), want.map(behavior));
+    expect(rep.missing).toEqual([]);
+    expect(rep.diffs, JSON.stringify(rep.diffs.slice(0, 3), null, 1)).toEqual([]);
+    expect(rep.identical).toBe(list.length);
+    expect(seen.traction).toBeGreaterThan(0);
+    expect(Number.isNaN(sink)).toBe(false);
+  }, 600000);
 });
 
 // ───────────────────────── 阶段函数的分支语义（假刚体） ─────────────────────────

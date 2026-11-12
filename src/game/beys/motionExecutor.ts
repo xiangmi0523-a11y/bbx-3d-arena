@@ -28,6 +28,75 @@ export const EXECUTOR_SWITCH = { legacy: 0 };
 /** 执行层参数（独立于 BEY_TUNING，不进参数指纹）。C0 为零行为变化拆分，没有新参数 */
 export const EXECUTOR_TUNING: Record<string, number> = {};
 
+/** 牵引阶段交给探针的中间量（对象复用；探针需要保留请复制） */
+export interface TractionProbe {
+  /** 进入了牵引分支（未爆裂、咬合度 ≥ 门限、接地、未冲刺、转速 > 2·minStableSpin） */
+  eligible: boolean;
+  /** 施加了牵引冲量 */
+  applied: boolean;
+  driveGrip: number;
+  /** 本步转速（扣除衰减前）与转速比例 min(1, ω / ω₀) */
+  mag: number;
+  ratio: number;
+  /** 施加时用的转速比例（脱困时 ≥ breakoutRatio） */
+  r2: number;
+  /** 牵引阶段读到的线速度（施加前，已含本步轨道冲刺冲量） */
+  vx: number;
+  vz: number;
+  /** 牵引方向（单位水平向量）与沿该方向的速度 */
+  dx: number;
+  dz: number;
+  along: number;
+  /** 现行速度上限 driveSpeed·grip·(0.35 + 0.65·ratio)（与原判断式逐字相同） */
+  cap: number;
+  edgeOnly: boolean;
+  edgeHelps: boolean;
+  explicit: boolean;
+  driveScale: number;
+  /** 施加的冲量大小（冲量 = (dx·j, 0, dz·j)）；未施加为 0 */
+  j: number;
+  steering: number;
+}
+
+/**
+ * M4-C · C1 只读探针（Huang 2026-11-12 授权的扩充版 C1，docs/engineering/m4c-c1-plan.md §0）。默认 null。
+ * 设置后，各阶段在原位置把本步已经算出的中间量交给它：只传数值与复用对象，探针不得调用 Rapier、不得写宿主 / ExecFrame / 刚体。
+ * 关闭时各阶段只多一次 null 判断，不做任何额外计算。零行为变化由 tests/executor.test.ts 的“C1 只读探针”测试证明。
+ */
+export interface ExecutorProbe {
+  /** 轨道冲刺施加时：冲量 = (dx·accel·m·dt, 0, dz·accel·m·dt)；(vx, vz) 为施加前读到的线速度 */
+  rail(h: ExecutorHost, dx: number, dz: number, accel: number, m: number, dt: number, vx: number, vz: number): void;
+  /** 牵引阶段结束时（每台每步一次，包括没有进入牵引分支的步） */
+  traction(h: ExecutorHost, t: TractionProbe): void;
+  /** 滚动阻力施加时：冲量 = (−vx/sp·dv·m, 0, −vz/sp·dv·m) */
+  rolling(h: ExecutorHost, vx: number, vz: number, sp: number, dv: number, m: number): void;
+  /** 姿态阶段结束时：s = 自稳强度（0 = 未修正），lean = 目标倾角（未修正时 NaN），(px0, py0, pz0) = PD 前的横向角速度；PD 后见 f.px / f.py / f.pz */
+  posture(h: ExecutorHost, f: ExecFrame, s: number, lean: number, px0: number, py0: number, pz0: number): void;
+}
+
+export const EXECUTOR_PROBE: { on: ExecutorProbe | null } = { on: null };
+
+const PT: TractionProbe = {
+  eligible: false,
+  applied: false,
+  driveGrip: 0,
+  mag: 0,
+  ratio: 0,
+  r2: 0,
+  vx: 0,
+  vz: 0,
+  dx: 0,
+  dz: 0,
+  along: 0,
+  cap: 0,
+  edgeOnly: false,
+  edgeHelps: false,
+  explicit: false,
+  driveScale: 0,
+  j: 0,
+  steering: 0,
+};
+
 /** 执行层读取的陀螺状态（BeyPhysics 实现；只在执行层的阶段函数里读写） */
 export interface ExecutorHost {
   readonly body: RAPIER.RigidBody;
@@ -43,6 +112,8 @@ export interface ExecutorHost {
   readonly gyroFactor: number;
   readonly launchHeading: number;
   readonly pw: PhysicsWorld;
+  /** 上一子步的接地法向力（只读；C0 / C1 不参与任何计算） */
+  readonly load: LoadSample;
   precession: number;
   dashing: boolean;
   knocked: boolean;
@@ -155,6 +226,8 @@ export function stepRail(h: ExecutorHost, f: ExecFrame, T: RailTuning): void {
       f.decay += T.railSpinCost * dashK;
       f.lRail = T.railSpinCost * dashK;
       h.dashing = true;
+      const P = EXECUTOR_PROBE.on;
+      if (P) P.rail(h, dx, dz, accel, m, dt, v.x, v.z);
     }
   }
 }
@@ -177,6 +250,14 @@ export function stepTraction(h: ExecutorHost, f: ExecFrame, T: TractionTuning): 
   // 墙边：没有牵引的轴心（针尖）贴近外圈时，与脱困同理按 edgeGrip 计算牵引（倾斜着压在陡坡上，接触点外移）
   if (T.edgeGrip > 0 && h.intent.edgeW > 0) driveGrip = Math.max(driveGrip, T.edgeGrip * Math.min(1, h.intent.edgeW * 2));
   let steering = 0;
+  const P = EXECUTOR_PROBE.on;
+  if (P) {
+    PT.eligible = false;
+    PT.applied = false;
+    PT.driveGrip = driveGrip;
+    PT.mag = mag;
+    PT.j = 0;
+  }
   if (!h.bursted && driveGrip >= T.driveMinGrip && h.grounded && !h.dashing && mag > T.minStableSpin * 2) {
     const ratio = Math.min(1, mag / h.launchSpin);
     const v = body.linvel();
@@ -241,12 +322,35 @@ export function stepTraction(h: ExecutorHost, f: ExecFrame, T: TractionTuning): 
       body.applyImpulse({ x: dx * a, y: 0, z: dz * a }, true);
       f.decay += T.driveSpinCost * driveGrip;
       f.lDrive = T.driveSpinCost * driveGrip;
+      if (P) {
+        PT.applied = true;
+        PT.j = a;
+        PT.r2 = r2;
+      }
     }
     // 改变轴的倾斜方向需要力矩：按调制深度额外消耗转速
     f.decay += T.steerSpinCost * steering * driveGrip;
     f.lSteer = T.steerSpinCost * steering * driveGrip;
+    if (P) {
+      PT.eligible = true;
+      PT.ratio = ratio;
+      PT.vx = v.x;
+      PT.vz = v.z;
+      PT.dx = dx;
+      PT.dz = dz;
+      PT.along = along;
+      PT.cap = T.driveSpeed * driveGrip * (0.35 + 0.65 * (h.breakout > 0 ? Math.max(ratio, T.breakoutRatio) : ratio));
+      PT.edgeOnly = edgeOnly;
+      PT.edgeHelps = edgeHelps;
+      PT.explicit = G.explicitDrive > 0;
+      PT.driveScale = driveScale;
+    }
   }
   f.steering = steering;
+  if (P) {
+    PT.steering = steering;
+    P.traction(h, PT);
+  }
 }
 
 /** 阶段 4：轴心滚动 / 滑动阻力（原 preStep 滚动阻力段，逐字移入） */
@@ -260,6 +364,8 @@ export function stepRolling(h: ExecutorHost, f: ExecFrame, T: RollingTuning): vo
       const dv = Math.min(sp, (T.rollBase + T.rollFriction * h.spec.bit.friction) * h.pw.g * f.dt);
       const m = body.mass();
       body.applyImpulse({ x: (-v.x / sp) * dv * m, y: 0, z: (-v.z / sp) * dv * m }, true);
+      const P = EXECUTOR_PROBE.on;
+      if (P) P.rolling(h, v.x, v.z, sp, dv, m);
     }
   }
 }
@@ -271,6 +377,10 @@ export function stepPosture(h: ExecutorHost, f: ExecFrame, T: PostureTuning): vo
   const mag = f.mag;
   const dt = f.dt;
   const steering = f.steering;
+  const P = EXECUTOR_PROBE.on;
+  const px0 = f.px;
+  const py0 = f.py;
+  const pz0 = f.pz;
   // 3) 陀螺仪自稳：转得越快越能保持直立；角动量 L = Iω 越大越难被撞歪（防御 / 耐力型更稳）
   const s = Math.max(0, Math.min(1, (mag - T.minStableSpin) / (h.launchSpin * 0.3))) * h.gyroFactor;
   if (s > 0 && G.pd > 0) {
@@ -309,7 +419,8 @@ export function stepPosture(h: ExecutorHost, f: ExecFrame, T: PostureTuning): vo
     f.px += (T.uprightStiffness * s * ax - T.uprightDamping * s * f.px) * dt;
     f.pz += (T.uprightStiffness * s * az - T.uprightDamping * s * f.pz) * dt;
     f.py -= T.uprightDamping * s * f.py * dt;
-  }
+    if (P) P.posture(h, f, s, lean, px0, py0, pz0);
+  } else if (P) P.posture(h, f, 0, NaN, px0, py0, pz0);
 }
 
 /** 各阶段读取的 BEY_TUNING 字段（类型上只声明用到的部分，取值仍是同一个 BEY_TUNING 对象） */
