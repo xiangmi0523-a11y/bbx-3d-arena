@@ -1,4 +1,5 @@
 /// <reference types="node" />
+import { appendFileSync, mkdirSync } from 'node:fs';
 /**
  * M5b 实验的共用部分（docs/engineering/m5b-experiment-plan.md）：签名矩阵的回合运行与记录、统计（Wilson / Newcombe / 卡方）、
  * D4 掉速口径（账本实测总掉速率 + 各来源 + 未解释残差）、整场比赛时长的重抽样估计、僵持探针（与 M2 B 部分的定义完全相同）。
@@ -15,7 +16,17 @@ import { seeded } from '../motion/motionSim';
 import { setup, type R as RT, type Scn } from './stallprobe2.shared';
 
 export type R = RT;
-export const out = (tag: string, v: unknown) => process.stdout.write(`${tag} ${JSON.stringify(v)}\n`);
+/** 诊断输出：打印到日志，同时追加到 test-results/diag-out.jsonl（CI 把 test-results/ 作为产物上传，日志接口不可用时也能取回） */
+export const out = (tag: string, v: unknown) => {
+  const line = `${tag} ${JSON.stringify(v)}\n`;
+  process.stdout.write(line);
+  try {
+    mkdirSync('test-results', { recursive: true });
+    appendFileSync('test-results/diag-out.jsonl', line);
+  } catch {
+    // 只影响备份文件
+  }
+};
 export const r3 = (v: number) => Math.round(v * 1000) / 1000;
 export const r2 = (v: number) => Math.round(v * 100) / 100;
 /** 回合间休息（秒），与 GameEngine.ROUND_REST 相同（这里不引入渲染层模块） */
@@ -161,12 +172,19 @@ export function matrixScenarios(base: number, seeds: number): Scn[] {
   return list;
 }
 
-/** 运行一个回合并记录；onStep 可读取每步状态（只读） */
-export function runRound(R: R, sc: Scn, onStep?: (ctx: ReturnType<typeof setup>) => void, onEnd?: (ctx: ReturnType<typeof setup>, rec: RoundRec) => void): RoundRec {
+/** 运行一个回合并记录；onStep 可读取每步状态（只读）；onSetup 在第一步之前调用（例如给 afterStep 包一层逐子步累计，只读） */
+export function runRound(
+  R: R,
+  sc: Scn,
+  onStep?: (ctx: ReturnType<typeof setup>) => void,
+  onEnd?: (ctx: ReturnType<typeof setup>, rec: RoundRec) => void,
+  onSetup?: (ctx: ReturnType<typeof setup>) => void,
+): RoundRec {
   const orig = Math.random;
   Math.random = seeded(sc.seed);
   try {
     const ctx = setup(R, sc, { observeContacts: true });
+    onSetup?.(ctx);
     const { pw, b, A, B } = ctx;
     const max = Math.round((sc.maxSeconds ?? MATCH_RULES.roundTimeLimit + 1) / PHYSICS_DT);
     const ms = [0, 0];

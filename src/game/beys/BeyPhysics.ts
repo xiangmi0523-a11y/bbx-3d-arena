@@ -1,6 +1,8 @@
 import type RAPIER from '@dimforge/rapier3d-compat';
-import { ARENA, floorHeight } from '../arena/arenaSpec';
-import { GRAVITY, type PhysicsWorld } from '../physics/PhysicsWorld';
+import { ARENA, floorHeight, floorNormal } from '../arena/arenaSpec';
+import { capHullPoints, emptyGyroState, FLAT_TIP, GYRO_EXPERIMENT, gyroRecover, gyroStep, type GyroState } from '../physics/gyro';
+import type { PhysicsWorld } from '../physics/PhysicsWorld';
+import { EXECUTOR_SWITCH, newExecFrame, newLoadSample, readTipLoad, stepPosture, stepRail, stepRolling, stepTraction, type ExecutorHost, type LoadSample } from './motionExecutor';
 import { MotionIntent, type AiLevel } from './motionIntent';
 import { beyMassProps, type MassProps } from './massProps';
 import { REF_INERTIA, type AssembledBey } from './parts/assemble';
@@ -189,7 +191,7 @@ export const BEY_TUNING = {
  *  - 陀螺仪自稳：转速越高越不容易倾倒，转速低时自然倒下；
  *  - 齿轮咬合轨道的冲刺。
  */
-export class BeyPhysics {
+export class BeyPhysics implements ExecutorHost {
   readonly body: RAPIER.RigidBody;
   readonly colliders: RAPIER.Collider[] = [];
   readonly bladeCollider: RAPIER.Collider;
@@ -204,12 +206,16 @@ export class BeyPhysics {
   dashing = false;
   /** 是否接触地面 */
   grounded = false;
-  private readonly pw: PhysicsWorld;
-  private readonly spinSign: number;
+  /** @internal 执行层读取（重力） */
+  readonly pw: PhysicsWorld;
+  /** @internal 执行层读取 */
+  readonly spinSign: number;
   /** 进动相位（倾斜方向） */
-  private precession = Math.random() * Math.PI * 2;
+  /** @internal 执行层读写 */
+  precession = Math.random() * Math.PI * 2;
   /** 发射方向（水平，弧度） */
-  private readonly launchHeading: number;
+  /** @internal 执行层读取 */
+  readonly launchHeading: number;
   private launchAligned = false;
   /** 设定发射初相前的随机初相：第一步时若已经贴着对手（不在 launch 状态），恢复它 */
   private launchPhase0: number | null = null;
@@ -228,9 +234,16 @@ export class BeyPhysics {
    * 只供重击模型的有效质量与能量审计读取，不参与其他物理计算。
    */
   readonly massProps: MassProps;
+  /** 爆裂后（刀刃脱离）的质量属性：陀螺项实验（GYRO_EXPERIMENT）用 */
+  private readonly massPropsNoBlade: MassProps;
+  /** 陀螺项实验的逐步状态（只在 GYRO_EXPERIMENT.enabled 时使用） */
+  private readonly gyroState: GyroState = emptyGyroState();
 
   constructor(pw: PhysicsWorld, spec: AssembledBey, launch: LaunchParams) {
-    this.massProps = beyMassProps(spec);
+    // B2 实验：平底类轴心用圆角圆柱接地（只在构造时读取开关）
+    const flatTip = GYRO_EXPERIMENT.flatTip > 0 && (spec.bit.visual.shape === 'gear-flat' || spec.bit.visual.shape === 'rubber') ? FLAT_TIP : null;
+    this.massProps = beyMassProps(spec, { flatTip });
+    this.massPropsNoBlade = beyMassProps(spec, { withBlade: false, flatTip });
     this.pw = pw;
     this.spec = spec;
     // 战术意图的随机种子：游戏里来自 Math.random（每局不同），测试里由固定种子决定
@@ -267,8 +280,12 @@ export class BeyPhysics {
     const events = R.ActiveEvents.COLLISION_EVENTS;
 
     // Bit：接地球 + 轴杆（碰撞体的形状、质量、位置改动时同步修改 massProps.ts；tests/clawPhysics.test.ts 会核对）
-    const ball = R.ColliderDesc.ball(bit.contactRadius)
-      .setTranslation(0, bit.contactRadius, 0)
+    const tipDesc = flatTip
+      ? GYRO_EXPERIMENT.flatTip === 2
+        ? R.ColliderDesc.roundConvexHull(capHullPoints(bit.contactRadius, flatTip), flatTip.capBorder)!
+        : R.ColliderDesc.roundCylinder(flatTip.halfHeight, bit.contactRadius - flatTip.border, flatTip.border).setTranslation(0, flatTip.halfHeight + flatTip.border, 0)
+      : R.ColliderDesc.ball(bit.contactRadius).setTranslation(0, bit.contactRadius, 0);
+    const ball = tipDesc
       .setMass(bit.mass * 0.6)
       .setFriction(bit.friction)
       // 摩擦相乘：低摩擦轴心在斜面上打滑、被重力拉回中心；高摩擦轴心抓地、绕场移动
@@ -376,8 +393,15 @@ export class BeyPhysics {
   /** 参考惯量 / 实际惯量：摩擦力矩造成的掉速倍率 */
   private readonly inertiaRatio: number;
   /** 陀螺自稳强度倍率（√(I / 参考惯量)） */
-  private readonly gyroFactor: number;
+  /** @internal 执行层读取 */
+  readonly gyroFactor: number;
   private ccdOn = false;
+  /** 执行层各阶段共用的局部量（复用，不分配） */
+  private readonly frame = newExecFrame(GYRO_EXPERIMENT);
+  /** ContactService 里的主体名（'player' / 'rival'，由 BattleSystem 写入；单台 / 测试为 null） */
+  contactOwner: string | null = null;
+  /** 只读：上一子步的接地法向力（见 motionExecutor.readTipLoad；C0 不参与任何计算） */
+  readonly load: LoadSample = newLoadSample();
   /** 对手（由对战系统写入），战术意图读取它的位置、速度和转速 */
   opponent: BeyPhysics | null = null;
   /** 脱困计时（秒） */
@@ -417,7 +441,17 @@ export class BeyPhysics {
     }
   }
 
+  /**
+   * 每个物理子步之前调用。C0（M4-C）：轨道冲刺、牵引、滚动阻力、姿态四个阶段由执行层（motionExecutor.ts）按原顺序分段执行，
+   * 各阶段自己读取新鲜状态并在原位置施加；EXECUTOR_SWITCH.legacy = 1 时整体走原样保留的 preStepLegacy（两者逐位等价）。
+   */
   preStep(dt: number): void {
+    if (EXECUTOR_SWITCH.legacy > 0) {
+      this.preStepLegacy(dt);
+      return;
+    }
+    // 只读：上一子步的接地法向力 N = 法向冲量 / dt（滞后一拍，C0 不参与任何计算）
+    readTipLoad(this.pw.contacts, this.contactOwner, this.pw.stepDt, this.load);
     const T = BEY_TUNING;
     // 已经开始运动后不再设定初相
     this.launchAligned = true;
@@ -438,7 +472,158 @@ export class BeyPhysics {
       this.ccdOn = needCcd;
       body.enableCcd(needCcd);
     }
-    const w = body.angvel();
+    const G = GYRO_EXPERIMENT;
+    // 陀螺项实验：上一步交给 Rapier 的是等效角速度，这里恢复真实角速度（见 physics/gyro.ts）
+    const w = G.enabled > 0 ? gyroRecover(body.angvel(), up, this.gyroState) : body.angvel();
+    const spinSigned = w.x * up.x + w.y * up.y + w.z * up.z;
+    let px = w.x - up.x * spinSigned;
+    let py = w.y - up.y * spinSigned;
+    let pz = w.z - up.z * spinSigned;
+
+    this.tilt = Math.acos(Math.max(-1, Math.min(1, up.y)));
+    const pos = body.translation();
+    const r = Math.hypot(pos.x, pos.z);
+    const floorY = r <= ARENA.radius ? floorHeight(r) : -Infinity;
+    this.grounded = pos.y - floorY < 0.12;
+
+    // 1) 转速衰减：轴心恒定摩擦 + 空气阻力 + 倾倒刮地
+    let mag = Math.abs(spinSigned);
+    // 账本：上一步写回之后的变化 = Rapier 积分 + 咬合掉速（只记账）
+    if (this.ledgerWritten >= 0) {
+      const d = mag - this.ledgerWritten + this.ledgerSmash + this.ledgerClaw;
+      if (d < 0) this.ledger.contactLoss -= d;
+      else this.ledger.contactGain += d;
+    }
+    this.ledgerSmash = 0;
+    this.ledgerClaw = 0;
+    let lScrape = 0;
+    // 轴心摩擦、牵引、刮地都是“力矩”，转速下降 = 力矩 / 转动惯量：
+    // 同样的轴心，惯量大（重量集中在外缘）的陀螺掉速更慢 → 耐力型的优势来自零件本身
+    let decay = this.spec.bit.spinDecay;
+    if (this.tilt > 0.5 && GYRO_EXPERIMENT.scrape > 0) {
+      lScrape = T.scrapeDecay * Math.min(1, (this.tilt - 0.5) * 2);
+      decay += T.scrapeDecay * Math.min(1, (this.tilt - 0.5) * 2);
+    }
+    // 爆裂后只剩 Ratchet + Bit：失去刀刃的惯量与驱动，很快停转倾倒（回合已由规则结束，只是表现）
+    if (this.bursted) decay += BURST_SPINDOWN;
+
+    const xf = this.frame;
+    xf.dt = dt;
+    xf.G = G;
+    xf.up = up;
+    xf.pos = pos;
+    xf.r = r;
+    xf.mag = mag;
+    xf.decay = decay;
+    xf.lRail = 0;
+    xf.lDrive = 0;
+    xf.lSteer = 0;
+    xf.steering = 0;
+    xf.px = px;
+    xf.py = py;
+    xf.pz = pz;
+    // 2) 极限轨道：齿轮轴心咬合轨道冲刺（执行层，原位置）
+    stepRail(this, xf, T);
+    // 战术意图：决定“希望牵引指向哪里”和调制深度（不施力）
+    const opp = this.opponent;
+    if (opp) {
+      const op = opp.body.translation();
+      const ov = opp.body.linvel();
+      const v0 = body.linvel();
+      this.intent.update({
+        dt,
+        px: pos.x,
+        pz: pos.z,
+        vx: v0.x,
+        vz: v0.z,
+        ox: op.x,
+        oz: op.z,
+        ovx: ov.x,
+        ovz: ov.z,
+        bladeSum: this.spec.blade.radius + opp.spec.blade.radius,
+        outerSum: this.spec.outerRadius + opp.spec.outerRadius,
+        spinRatio: this.spinRatio,
+        oppSpinRatio: opp.spinRatio,
+        oppAggression: opp.intent.profile.aggression,
+      });
+    }
+    // 第一步就已经贴着对手（意图直接进入 contact，例如测试里发射后摆放成接触），发射初相不适用，恢复原随机初相
+    if (this.launchPhase0 !== null) {
+      if (this.intent.state !== 'launch') this.precession = this.launchPhase0;
+      this.launchPhase0 = null;
+    }
+
+    // 轴心牵引（执行层，原位置；读取的线速度已包含本步轨道冲刺冲量）
+    stepTraction(this, xf, T);
+    // 轴心滚动 / 滑动阻力（执行层，原位置；读取的线速度已包含牵引冲量）
+    stepRolling(this, xf, T);
+
+    decay = xf.decay;
+    const lRail = xf.lRail;
+    const lDrive = xf.lDrive;
+    const lSteer = xf.lSteer;
+    const mag0 = mag;
+    decay = decay * this.inertiaRatio + T.airDrag * mag;
+    mag = Math.max(0, mag - decay * dt);
+    // 账本：本步实际扣除量按各分项比例分摊（转速见底时扣除量 < decay·dt）
+    if (decay > 0) {
+      const L = this.ledger;
+      const f = ((mag0 - mag) / (decay * dt)) * dt;
+      const k = this.inertiaRatio * f;
+      L.base += this.spec.bit.spinDecay * k;
+      L.scrape += lScrape * k;
+      L.rail += lRail * k;
+      L.drive += lDrive * k;
+      L.steer += lSteer * k;
+      if (this.bursted) L.burst += BURST_SPINDOWN * k;
+      L.air += T.airDrag * mag0 * f;
+    }
+
+    // 3) 陀螺仪自稳 + 进动（执行层，原位置；读取扣除衰减后的转速）
+    xf.mag = mag;
+    stepPosture(this, xf, T);
+    px = xf.px;
+    py = xf.py;
+    pz = xf.pz;
+
+    const sign = spinSigned === 0 ? this.spinSign : Math.sign(spinSigned);
+    const wNew = { x: px + up.x * mag * sign, y: py + up.y * mag * sign, z: pz + up.z * mag * sign };
+    if (G.enabled > 0) {
+      // 陀螺项实验：把这一步的精确无力矩转动换算成等效恒定角速度交给 Rapier（不施加力、不设定朝向）
+      const mp = this.bursted ? this.massPropsNoBlade : this.massProps;
+      body.setAngvel(gyroStep(wNew, up, mp.Ia, mp.It, dt, this.gyroState), true);
+    } else body.setAngvel(wNew, true);
+    this.spin = mag;
+    this.ledgerWritten = mag;
+  }
+
+  /**
+   * 旧 preStep 路径，原样保留（C0 回滚开关 EXECUTOR_SWITCH.legacy = 1 时使用；不再修改，C0 验收用它做逐位对照）。
+   */
+  preStepLegacy(dt: number): void {
+    const T = BEY_TUNING;
+    // 已经开始运动后不再设定初相
+    this.launchAligned = true;
+    const body = this.body;
+    const up = this.up();
+    const p0 = body.translation();
+    this.prevPos.x = p0.x;
+    this.prevPos.y = p0.y;
+    this.prevPos.z = p0.z;
+    this.prevUp.x = up.x;
+    this.prevUp.y = up.y;
+    this.prevUp.z = up.z;
+    this.hasPrev = true;
+    if (this.breakout > 0) this.breakout -= dt;
+    const lv = body.linvel();
+    const needCcd = lv.y < -3.5 || lv.x * lv.x + lv.z * lv.z > 100;
+    if (needCcd !== this.ccdOn) {
+      this.ccdOn = needCcd;
+      body.enableCcd(needCcd);
+    }
+    const G = GYRO_EXPERIMENT;
+    // 陀螺项实验：上一步交给 Rapier 的是等效角速度，这里恢复真实角速度（见 physics/gyro.ts）
+    const w = G.enabled > 0 ? gyroRecover(body.angvel(), up, this.gyroState) : body.angvel();
     const spinSigned = w.x * up.x + w.y * up.y + w.z * up.z;
     let px = w.x - up.x * spinSigned;
     let py = w.y - up.y * spinSigned;
@@ -467,7 +652,7 @@ export class BeyPhysics {
     // 轴心摩擦、牵引、刮地都是“力矩”，转速下降 = 力矩 / 转动惯量：
     // 同样的轴心，惯量大（重量集中在外缘）的陀螺掉速更慢 → 耐力型的优势来自零件本身
     let decay = this.spec.bit.spinDecay;
-    if (this.tilt > 0.5) {
+    if (this.tilt > 0.5 && GYRO_EXPERIMENT.scrape > 0) {
       lScrape = T.scrapeDecay * Math.min(1, (this.tilt - 0.5) * 2);
       decay += T.scrapeDecay * Math.min(1, (this.tilt - 0.5) * 2);
     }
@@ -544,6 +729,22 @@ export class BeyPhysics {
       const v = body.linvel();
       let dx = -Math.sin(this.precession) * this.spinSign;
       let dz = Math.cos(this.precession) * this.spinSign;
+      // 实验（GYRO_EXPERIMENT.tiltDrive）：牵引方向取实际转轴相对地面法线的倾斜方向，大小按接地点偏移比例缩放
+      let driveScale = 1;
+      if (G.tiltDrive > 0) {
+        const n = r <= ARENA.radius ? floorNormal(pos.x, pos.z) : [0, 1, 0];
+        const d = up.x * n[0] + up.y * n[1] + up.z * n[2];
+        const tx = up.x - d * n[0];
+        const ty = up.y - d * n[1];
+        const tz = up.z - d * n[2];
+        const sinRel = Math.hypot(tx, ty, tz);
+        if (sinRel > 1e-6) {
+          const phi = Math.atan2(tz, tx);
+          dx = -Math.sin(phi) * this.spinSign;
+          dz = Math.cos(phi) * this.spinSign;
+        }
+        driveScale = Math.min(1, sinRel / Math.max(1e-3, Math.sin(this.spec.bit.drift)));
+      }
       // 脱困（P2.3.1 辅助机制，保持原样）：牵引方向背离对手并偏开 runupAngle，靠外圈时不朝墙
       if (this.breakout > 0 && opp) {
         const op = opp.body.translation();
@@ -572,18 +773,18 @@ export class BeyPhysics {
           dz = gz / gl;
         }
       }
-      steering = this.breakout > 0 ? 0 : this.intent.authority;
+      steering = this.breakout > 0 || G.tiltDrive > 0 ? 0 : this.intent.authority;
       const along = v.x * dx + v.z * dz;
       // 借来的墙边咬合（轴心本身没有牵引）只在牵引方向与墙边修正方向夹角 < 90° 时起作用：
       // 否则针尖会在外圈获得随相位乱转的推力，越转越快（实测耐力型游走从 1 m/s 加速到 6 m/s 沿墙绕）
       const edgeOnly = this.breakout <= 0 && grip < T.driveMinGrip;
       const edgeHelps = !edgeOnly || dx * Math.cos(this.intent.heading) + dz * Math.sin(this.intent.heading) > 0;
-      if (edgeHelps && along < T.driveSpeed * driveGrip * (0.35 + 0.65 * (this.breakout > 0 ? Math.max(ratio, T.breakoutRatio) : ratio))) {
+      if (G.explicitDrive > 0 && edgeHelps && along < T.driveSpeed * driveGrip * (0.35 + 0.65 * (this.breakout > 0 ? Math.max(ratio, T.breakoutRatio) : ratio))) {
         // 脱困（辅助机制）：低转速的球头 / 针尖轴心牵引很弱，停在碗底会一直原地互转。
         // 僵持一段时间后，按“至少 breakoutRatio 的转速、breakoutGrip 的咬合度”给 0.7 秒牵引，方向背离对手；
         // 力的大小仍按轴心牵引公式与速度上限计算，拉开后由碗面重力拉回、真实碰撞
         const r2 = this.breakout > 0 ? Math.max(ratio, T.breakoutRatio) : ratio;
-        const a = T.driveAccel * driveGrip * r2 * body.mass() * dt;
+        const a = T.driveAccel * driveGrip * r2 * body.mass() * dt * driveScale;
         body.applyImpulse({ x: dx * a, y: 0, z: dz * a }, true);
         decay += T.driveSpinCost * driveGrip;
         lDrive = T.driveSpinCost * driveGrip;
@@ -598,7 +799,7 @@ export class BeyPhysics {
       const v = body.linvel();
       const sp = Math.hypot(v.x, v.z);
       if (sp > 1e-3) {
-        const dv = Math.min(sp, (T.rollBase + T.rollFriction * this.spec.bit.friction) * -GRAVITY * dt);
+        const dv = Math.min(sp, (T.rollBase + T.rollFriction * this.spec.bit.friction) * this.pw.g * dt);
         const m = body.mass();
         body.applyImpulse({ x: (-v.x / sp) * dv * m, y: 0, z: (-v.z / sp) * dv * m }, true);
       }
@@ -624,7 +825,7 @@ export class BeyPhysics {
     // 3) 陀螺仪自稳：转得越快越能保持直立；角动量 L = Iω 越大越难被撞歪（防御 / 耐力型更稳）
     const s =
       Math.max(0, Math.min(1, (mag - T.minStableSpin) / (this.launchSpin * 0.3))) * this.gyroFactor;
-    if (s > 0) {
+    if (s > 0 && G.pd > 0) {
       // 目标姿态：轴心类型决定的“自然倾角”，倾斜方向以进动角速度绕竖直轴旋转。
       // 倾斜的轴心与地面的接触点偏离转轴，摩擦力方向随进动旋转，
       // 由 Rapier 的摩擦自然产生花瓣形移动轨迹（攻击型轴心倾角大、移动激烈）。
@@ -666,10 +867,12 @@ export class BeyPhysics {
     }
 
     const sign = spinSigned === 0 ? this.spinSign : Math.sign(spinSigned);
-    body.setAngvel(
-      { x: px + up.x * mag * sign, y: py + up.y * mag * sign, z: pz + up.z * mag * sign },
-      true,
-    );
+    const wNew = { x: px + up.x * mag * sign, y: py + up.y * mag * sign, z: pz + up.z * mag * sign };
+    if (G.enabled > 0) {
+      // 陀螺项实验：把这一步的精确无力矩转动换算成等效恒定角速度交给 Rapier（不施加力、不设定朝向）
+      const mp = this.bursted ? this.massPropsNoBlade : this.massProps;
+      body.setAngvel(gyroStep(wNew, up, mp.Ia, mp.It, dt, this.gyroState), true);
+    } else body.setAngvel(wNew, true);
     this.spin = mag;
     this.ledgerWritten = mag;
   }
