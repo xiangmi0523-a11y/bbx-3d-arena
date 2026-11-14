@@ -19,6 +19,7 @@ import { ARENA, floorNormal } from '../arena/arenaSpec';
 import type { GYRO_EXPERIMENT } from '../physics/gyro';
 import type { ContactService } from '../physics/ContactService';
 import type { PhysicsWorld } from '../physics/PhysicsWorld';
+import type { MassProps } from './massProps';
 import type { MotionIntent } from './motionIntent';
 import type { AssembledBey } from './parts/assemble';
 
@@ -27,6 +28,17 @@ export const EXECUTOR_SWITCH = { legacy: 0 };
 
 /** 执行层参数（独立于 BEY_TUNING，不进参数指纹）。C0 为零行为变化拆分，没有新参数 */
 export const EXECUTOR_TUNING: Record<string, number> = {};
+
+/**
+ * M4-C · C2-P 姿态刚度预算（实验开关，docs/engineering/m4c-c2-preregistration.md §3.2，冻结于 1aab164）。**默认关闭**。
+ * 独立对象：不进 BEY_TUNING、参数指纹与 EXECUTOR_TUNING。on = 0 时 stepPosture 走原来的语句，与现有行为逐位相同。
+ * on = 1 时只截断 PD 的刚度项（恢复项）：
+ *   B = kRef · I_a^game · ω（Ω_ref ≡ 1 rad/s，所以 kRef 数值上就是 c_g），I_a^game = spec.spinInertia，ω = 本步转速（扣除衰减后）；
+ *   α_S = uprightStiffness · s · (a_x, 0, a_z)；|α_S| > 0 时 λ = min(1, B / (I_t · |α_S|))，|α_S| = 0 时 λ = 1（不做除法）；
+ *   α_S′ = λ · α_S；阻尼项 α_D = −uprightDamping · s · p 不变；p ← p + (α_S′ + α_D) · dt。I_t = massProps.It。
+ * 合成进动、牵引方向、陀螺项、刮地、能量账本都不变（姿态正功不从自转扣，只由诊断测量）。
+ */
+export const POSTURE_BUDGET = { on: 0, kRef: 0 };
 
 /** 牵引阶段交给探针的中间量（对象复用；探针需要保留请复制） */
 export interface TractionProbe {
@@ -70,8 +82,12 @@ export interface ExecutorProbe {
   traction(h: ExecutorHost, t: TractionProbe): void;
   /** 滚动阻力施加时：冲量 = (−vx/sp·dv·m, 0, −vz/sp·dv·m) */
   rolling(h: ExecutorHost, vx: number, vz: number, sp: number, dv: number, m: number): void;
-  /** 姿态阶段结束时：s = 自稳强度（0 = 未修正），lean = 目标倾角（未修正时 NaN），(px0, py0, pz0) = PD 前的横向角速度；PD 后见 f.px / f.py / f.pz */
-  posture(h: ExecutorHost, f: ExecFrame, s: number, lean: number, px0: number, py0: number, pz0: number): void;
+  /**
+   * 姿态阶段结束时：s = 自稳强度（0 = 未修正），lean = 目标倾角（未修正时 NaN），(px0, py0, pz0) = PD 前的横向角速度；PD 后见 f.px / f.py / f.pz。
+   * C2-P：(sx, sz) = 截断前的刚度项 α_S（横向角加速度，rad/s²；未修正时 0），lam = 刚度预算系数 λ（开关关闭或未修正时 1）；
+   * 阻尼项 α_D = −uprightDamping · s · (px0, py0, pz0)。
+   */
+  posture(h: ExecutorHost, f: ExecFrame, s: number, lean: number, px0: number, py0: number, pz0: number, sx: number, sz: number, lam: number): void;
 }
 
 export const EXECUTOR_PROBE: { on: ExecutorProbe | null } = { on: null };
@@ -114,6 +130,8 @@ export interface ExecutorHost {
   readonly pw: PhysicsWorld;
   /** 上一子步的接地法向力（只读；C0 / C1 不参与任何计算） */
   readonly load: LoadSample;
+  /** 刚体质量属性（C2-P 预算只读 It；BeyPhysics.massProps） */
+  readonly massProps: MassProps;
   precession: number;
   dashing: boolean;
   knocked: boolean;
@@ -416,11 +434,25 @@ export function stepPosture(h: ExecutorHost, f: ExecFrame, T: PostureTuning): vo
     // 回正轴 = up × target
     const ax = up.y * tz - up.z * ty;
     const az = up.x * ty - up.y * tx;
-    f.px += (T.uprightStiffness * s * ax - T.uprightDamping * s * f.px) * dt;
-    f.pz += (T.uprightStiffness * s * az - T.uprightDamping * s * f.pz) * dt;
-    f.py -= T.uprightDamping * s * f.py * dt;
-    if (P) P.posture(h, f, s, lean, px0, py0, pz0);
-  } else if (P) P.posture(h, f, 0, NaN, px0, py0, pz0);
+    if (POSTURE_BUDGET.on > 0) {
+      // C2-P：只截断刚度项（§3.2）；阻尼项与下面关闭分支的写法相同
+      const sx = T.uprightStiffness * s * ax;
+      const sz = T.uprightStiffness * s * az;
+      const den = h.massProps.It * Math.hypot(sx, sz);
+      const B = POSTURE_BUDGET.kRef * h.spec.spinInertia * mag;
+      // |α_S| = 0（den = 0）时 λ = 1、不做除法；B = 0 而 |α_S| > 0 时 B < den → λ = 0
+      const lam = B < den ? B / den : 1;
+      f.px += (lam * sx - T.uprightDamping * s * f.px) * dt;
+      f.pz += (lam * sz - T.uprightDamping * s * f.pz) * dt;
+      f.py -= T.uprightDamping * s * f.py * dt;
+      if (P) P.posture(h, f, s, lean, px0, py0, pz0, sx, sz, lam);
+    } else {
+      f.px += (T.uprightStiffness * s * ax - T.uprightDamping * s * f.px) * dt;
+      f.pz += (T.uprightStiffness * s * az - T.uprightDamping * s * f.pz) * dt;
+      f.py -= T.uprightDamping * s * f.py * dt;
+      if (P) P.posture(h, f, s, lean, px0, py0, pz0, T.uprightStiffness * s * ax, T.uprightStiffness * s * az, 1);
+    }
+  } else if (P) P.posture(h, f, 0, NaN, px0, py0, pz0, 0, 0, 1);
 }
 
 /** 各阶段读取的 BEY_TUNING 字段（类型上只声明用到的部分，取值仍是同一个 BEY_TUNING 对象） */

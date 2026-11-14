@@ -7,7 +7,7 @@ import { configSnapshot } from './repro/config';
 import { rapier, recordRun } from './repro/recorder';
 import { withDeterminism } from './repro/determinism';
 import { BEY_TUNING, BeyPhysics } from '../src/game/beys/BeyPhysics';
-import { EXECUTOR_PROBE, EXECUTOR_SWITCH, EXECUTOR_TUNING, newExecFrame, readTipLoad, newLoadSample, stepPosture, stepTraction, type ExecutorHost, type ExecutorProbe, type ExecFrame } from '../src/game/beys/motionExecutor';
+import { EXECUTOR_PROBE, EXECUTOR_SWITCH, EXECUTOR_TUNING, POSTURE_BUDGET, newExecFrame, readTipLoad, newLoadSample, stepPosture, stepTraction, type ExecutorHost, type ExecutorProbe, type ExecFrame } from '../src/game/beys/motionExecutor';
 import { assembleBey } from '../src/game/beys/parts/assemble';
 import { SIGNATURE_LIST } from '../src/game/beys/parts/catalog';
 import { createArenaPhysics } from '../src/game/arena/ArenaPhysics';
@@ -574,5 +574,175 @@ describe('C0 接地法向力 N（只读）', () => {
     const out = newLoadSample();
     readTipLoad(null, null, PHYSICS_DT, out);
     expect(out).toEqual({ valid: false, impulse: 0, N: 0, step: -1, status: 'none' });
+  });
+});
+
+// ───────────────────────── C2-P 姿态刚度预算（实验开关，默认关闭） ─────────────────────────
+
+/**
+ * M4-C · C2-P（docs/engineering/m4c-c2-preregistration.md §3.2、§10，冻结于 1aab164）的实现验收：
+ *  1. 开关默认关闭，独立于 BEY_TUNING / 参数指纹 / EXECUTOR_TUNING；
+ *  2. 关闭时（kRef 任意）与旧路径并排推进调用序列逐位相同、与 golden 逐场一致；
+ *  3. 打开且 kRef = ∞（λ ≡ 1）时与 golden 逐场一致——证明打开后唯一的变化是 λ；
+ *  4. λ 的定义：|α_S| = 0 → λ = 1、α_S′ = 0；B = 0 且 |α_S| > 0 → λ = 0；一般情况 λ = min(1, B / (I_t·|α_S|))，截断后刚度项的大小 = α_S,max；
+ *     阻尼项、合成进动相位与关闭时逐位相同；不产生 NaN / Inf；探针报告的 α_S、λ 与实际修正量一致。
+ */
+function withBudget<T>(b: Partial<typeof POSTURE_BUDGET>, fn: () => T): T {
+  const old = { ...POSTURE_BUDGET };
+  Object.assign(POSTURE_BUDGET, b);
+  try {
+    return fn();
+  } finally {
+    Object.assign(POSTURE_BUDGET, old);
+  }
+}
+
+describe('C2-P 姿态刚度预算：开关与回滚', () => {
+  it('默认关闭；不进 BEY_TUNING、参数快照与 EXECUTOR_TUNING', async () => {
+    expect(POSTURE_BUDGET).toEqual({ on: 0, kRef: 0 });
+    expect(Object.keys(EXECUTOR_TUNING)).toEqual([]);
+    expect(Object.keys(BEY_TUNING)).not.toContain('kRef');
+    const R = await rapier();
+    const snap = JSON.stringify(configSnapshot(R));
+    expect(snap.includes('kRef')).toBe(false);
+    expect(snap.includes('POSTURE_BUDGET')).toBe(false);
+  });
+
+  it('关闭（on = 0，kRef = 0.2）：执行层与旧路径并排推进，刚体调用序列逐位相同（含只读探针）', async () => {
+    const R = await rapier();
+    const seen: Record<string, number> = { rail: 0, traction: 0, eligible: 0, applied: 0, rolling: 0, posture: 0, pd: 0, checked: 0 };
+    withBudget({ on: 0, kRef: 0.2 }, () => {
+      for (const [p, r, seed] of [
+        ['lieren', 'ziyao', 20201],
+        ['senheng', 'senheng', 20202],
+      ] as const) lockstep(R, scn(p, r, seed, 40), Math.round(40 / PHYSICS_DT), undefined, checkingProbe(seen));
+    });
+    expect(seen.pd).toBeGreaterThan(0);
+  }, 300000);
+
+  for (const [label, b] of [
+    ['关闭（on = 0，kRef = 0.2）', { on: 0, kRef: 0.2 }],
+    ['打开且 kRef = ∞（λ ≡ 1）', { on: 1, kRef: Infinity }],
+  ] as const)
+    it(`${label}：与 golden 逐场一致（${process.env.REPRO_FULL ? '全部 180 场' : '每组第一场'}）`, async () => {
+      const R = await rapier();
+      const all = scenariosV2();
+      const list = process.env.REPRO_FULL ? all : all.filter((s, i) => all.findIndex((x) => x.group === s.group) === i);
+      let lamMin = Infinity;
+      let pd = 0;
+      const probe: ExecutorProbe = {
+        rail: () => undefined,
+        traction: () => undefined,
+        rolling: () => undefined,
+        posture: (_h, _f, s, _lean, _px0, _py0, _pz0, _sx, _sz, lam) => {
+          if (s > 0) pd++;
+          lamMin = Math.min(lamMin, lam);
+        },
+      };
+      const runs = withBudget(b, () => {
+        EXECUTOR_PROBE.on = probe;
+        try {
+          return list.map((sc) => summarize(recordRun(R, sc, { keyframes: false })));
+        } finally {
+          EXECUTOR_PROBE.on = null;
+        }
+      });
+      const want = G.runs.filter((g) => list.some((s) => s.name === g.name));
+      const rep = compareTraces(runs.map(behavior), want.map(behavior));
+      expect(rep.missing).toEqual([]);
+      expect(rep.diffs, JSON.stringify(rep.diffs.slice(0, 3), null, 1)).toEqual([]);
+      expect(rep.identical).toBe(list.length);
+      expect(pd).toBeGreaterThan(0);
+      expect(lamMin).toBe(1);
+    }, 900000);
+});
+
+describe('C2-P 姿态刚度预算：λ 的定义与边界（假刚体）', () => {
+  const T = BEY_TUNING;
+  const It = 0.3;
+  /** 一次姿态步：返回 PD 后的 p、进动相位与探针记录 */
+  const post = (b: Partial<typeof POSTURE_BUDGET>, o: { mag?: number; up?: { x: number; y: number; z: number }; drift?: number; p?: [number, number, number]; tilt?: number } = {}) =>
+    withBudget(b, () => {
+      const x = fakeHost({ tilt: o.tilt ?? 0, gyroFactor: 1, launchSpin: 130, precession: 0.7, bit: { drift: o.drift ?? 0.2 }, massProps: { mass: 4.4, comY: 0.42, Ia: 0.46, It } });
+      const f = frame(o.mag ?? 100, { x: 0, y: 0, z: 0 }, o.up ?? { x: 0, y: 1, z: 0 });
+      [f.px, f.py, f.pz] = o.p ?? [0.4, -0.1, 0.25];
+      let rec: { s: number; sx: number; sz: number; lam: number; px0: number; py0: number; pz0: number } | null = null;
+      EXECUTOR_PROBE.on = {
+        rail: () => undefined,
+        traction: () => undefined,
+        rolling: () => undefined,
+        posture: (_h, _f, s, _lean, px0, py0, pz0, sx, sz, lam) => void (rec = { s, sx, sz, lam, px0, py0, pz0 }),
+      };
+      try {
+        stepPosture(x.h, f, T);
+      } finally {
+        EXECUTOR_PROBE.on = null;
+      }
+      return { f, precession: x.h.precession, rec: rec!, Ia: x.h.spec.spinInertia };
+    });
+  const tilted = { x: Math.sin(0.3) * Math.cos(2), y: Math.cos(0.3), z: Math.sin(0.3) * Math.sin(2) };
+
+  it('|α_S| = 0（转轴恰在目标上）：λ = 1、刚度修正为 0、只有阻尼；不产生 NaN', () => {
+    for (const kRef of [0, 0.2, Infinity]) {
+      const r = post({ on: 1, kRef }, { drift: 0, up: { x: 0, y: 1, z: 0 } });
+      expect(r.rec.sx).toBe(0);
+      expect(r.rec.sz).toBe(0);
+      expect(r.rec.lam).toBe(1);
+      const off = post({ on: 0 }, { drift: 0, up: { x: 0, y: 1, z: 0 } });
+      expect([r.f.px, r.f.py, r.f.pz]).toEqual([off.f.px, off.f.py, off.f.pz]);
+      for (const v of [r.f.px, r.f.py, r.f.pz]) expect(Number.isFinite(v)).toBe(true);
+    }
+  });
+
+  it('B = 0 且 |α_S| > 0（kRef = 0）：λ = 0，横向角速度只受阻尼；不产生 NaN', () => {
+    const r = post({ on: 1, kRef: 0 }, { up: tilted, tilt: 0.3 });
+    expect(Math.hypot(r.rec.sx, r.rec.sz)).toBeGreaterThan(1);
+    expect(r.rec.lam).toBe(0);
+    const s = r.rec.s;
+    const dt = PHYSICS_DT;
+    expect(r.f.px).toBe(r.rec.px0 + (0 * r.rec.sx - T.uprightDamping * s * r.rec.px0) * dt);
+    expect(r.f.pz).toBe(r.rec.pz0 + (0 * r.rec.sz - T.uprightDamping * s * r.rec.pz0) * dt);
+    expect(Number.isFinite(r.f.px) && Number.isFinite(r.f.pz)).toBe(true);
+  });
+
+  it('一般情况：λ = min(1, B / (I_t·|α_S|))，截断后刚度项大小 = α_S,max = kRef·I_a^game·ω / I_t；阻尼项、py 与进动相位与关闭时逐位相同', () => {
+    const mag = 40;
+    const off = post({ on: 0 }, { up: tilted, tilt: 0.3, mag });
+    for (const kRef of [0.05, 0.2, 0.6, 1.2, 1e6]) {
+      const r = post({ on: 1, kRef }, { up: tilted, tilt: 0.3, mag });
+      const aS = Math.hypot(r.rec.sx, r.rec.sz);
+      const B = kRef * r.Ia * mag;
+      const lam = Math.min(1, B / (It * aS));
+      expect(r.rec.lam).toBeCloseTo(lam, 14);
+      // 探针报告的 α_S 与关闭时的刚度项相同（截断前）
+      expect(r.rec.sx).toBe(off.rec.sx);
+      expect(r.rec.sz).toBe(off.rec.sz);
+      // 实际修正 = λ·α_S + α_D：扣掉阻尼后剩下的刚度项大小
+      const dt = PHYSICS_DT;
+      const s = r.rec.s;
+      const stx = (r.f.px - r.rec.px0) / dt + T.uprightDamping * s * r.rec.px0;
+      const stz = (r.f.pz - r.rec.pz0) / dt + T.uprightDamping * s * r.rec.pz0;
+      expect(Math.hypot(stx, stz)).toBeCloseTo(Math.min(aS, (kRef * r.Ia * mag) / It), 6);
+      if (lam < 1) expect(Math.hypot(stx, stz)).toBeLessThan(aS);
+      // 方向不变（只缩放）
+      expect(stx * r.rec.sz - stz * r.rec.sx).toBeCloseTo(0, 6);
+      expect(r.f.py).toBe(off.f.py);
+      expect(r.precession).toBe(off.precession);
+    }
+    // λ = 1 时（kRef 足够大）与关闭逐位相同
+    const big = post({ on: 1, kRef: 1e6 }, { up: tilted, tilt: 0.3, mag });
+    expect(big.rec.lam).toBe(1);
+    expect([big.f.px, big.f.py, big.f.pz]).toEqual([off.f.px, off.f.py, off.f.pz]);
+  });
+
+  it('边界扫描：kRef ∈ {0, 1e-300, 0.2, 1e300, ∞}、ω ∈ {0, 7.5, 40, 200}、多个姿态：结果全部有限，λ ∈ [0, 1]', () => {
+    for (const kRef of [0, 1e-300, 0.2, 1e300, Infinity])
+      for (const mag of [0, 7.5, 40, 200])
+        for (const up of [{ x: 0, y: 1, z: 0 }, tilted, { x: 1, y: 0, z: 0 }, { x: 1e-200, y: 1, z: 0 }]) {
+          const r = post({ on: 1, kRef }, { up, mag, tilt: Math.acos(up.y) });
+          for (const v of [r.f.px, r.f.py, r.f.pz, r.precession, r.rec.lam]) expect(Number.isFinite(v)).toBe(true);
+          expect(r.rec.lam).toBeGreaterThanOrEqual(0);
+          expect(r.rec.lam).toBeLessThanOrEqual(1);
+        }
   });
 });
